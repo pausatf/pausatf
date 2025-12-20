@@ -62,15 +62,61 @@ curl -I https://www.pausatf.org/ | grep -i cf-
 ### Current DNS Records (Production)
 
 ```
-TYPE    NAME                VALUE               TTL     PROXY STATUS
-A       pausatf.org         REDACTED_PROD_NEW_IP       Auto    Proxied (orange cloud)
-A       www.pausatf.org     REDACTED_PROD_NEW_IP       Auto    Proxied (orange cloud)
-A       prod.pausatf.org     REDACTED_PROD_NEW_IP       Auto    Proxied (orange cloud)
-AAAA    pausatf.org         [IPv6 if enabled]  Auto    Proxied
-AAAA    www.pausatf.org     [IPv6 if enabled]  Auto    Proxied
-MX      pausatf.org         [mail server]      Auto    DNS Only (gray cloud)
-TXT     pausatf.org         [SPF/DKIM/etc]     Auto    DNS Only
+TYPE    NAME                        VALUE                       TTL     PROXY STATUS
+A       pausatf.org                 REDACTED_PROD_NEW_IP               Auto    Proxied ✓
+A       www.pausatf.org             REDACTED_PROD_NEW_IP               Auto    Proxied ✓
+A       ftp.pausatf.org             REDACTED_PROD_NEW_IP               Auto    DNS Only
+A       stage.pausatf.org           REDACTED_STAGE_IP               Auto    DNS Only
+CNAME   prod.pausatf.org            ftp.pausatf.org            Auto    DNS Only
+MX      pausatf.org                 aspmx.l.google.com (pri 1) Auto    DNS Only
+TXT     pausatf.org                 v=spf1 include:_spf...     Auto    DNS Only ✓
+TXT     _dmarc.pausatf.org          v=DMARC1; p=none;          Auto    DNS Only
+CAA     pausatf.org                 0 issue "letsencrypt.org"  Auto    DNS Only ✓
+CAA     pausatf.org                 0 issue "digicert.com"     Auto    DNS Only ✓
+CAA     pausatf.org                 0 issuewild "letsencrypt..." Auto  DNS Only ✓
+CAA     pausatf.org                 0 issuewild "digicert.com" Auto    DNS Only ✓
+CAA     pausatf.org                 0 iodef "mailto:admin..."  Auto    DNS Only ✓
 ```
+
+### DNS Best Practices (Implemented ✅)
+
+**1. SPF Record (Sender Policy Framework)**
+```
+v=spf1 include:_spf.google.com include:sendgrid.net ~all
+```
+- ✅ Prevents email spoofing
+- ✅ Authorizes Google Workspace and SendGrid to send email
+- ✅ ~all = softfail for unauthorized senders
+
+**2. CAA Records (Certificate Authority Authorization)**
+```
+0 issue "letsencrypt.org"          # Allow Let's Encrypt
+0 issue "digicert.com"              # Allow DigiCert (Cloudflare)
+0 issuewild "letsencrypt.org"       # Wildcard support Let's Encrypt
+0 issuewild "digicert.com"          # Wildcard support DigiCert
+0 iodef "mailto:admin@pausatf.org"  # Violation reporting
+```
+- ✅ Prevents unauthorized SSL certificate issuance
+- ✅ Compatible with both server (Let's Encrypt) and Cloudflare (DigiCert) certs
+- ✅ Wildcard certificate support for *.pausatf.org
+- ✅ Email alerts for certificate authorization violations
+
+**3. DMARC Record (Domain-based Message Authentication)**
+```
+v=DMARC1; p=none;
+```
+- ✅ Email authentication and reporting
+- ⚠️ Currently set to "none" (monitoring only)
+- 📋 Future: Consider upgrading to p=quarantine or p=reject
+
+**4. DKIM Records**
+- ✅ Multiple DKIM keys configured (s1, s2, cf2024-1)
+- ✅ Email cryptographic signing in place
+
+**5. Proxied vs DNS-Only**
+- ✅ Main site (pausatf.org, www) proxied through Cloudflare for DDoS protection
+- ✅ Direct access domains (ftp, prod, stage) set to DNS-only for SSH access
+- ✅ Mail records (MX, DKIM, DMARC) always DNS-only (best practice)
 
 ### DNS Record Configuration via Dashboard
 

@@ -11,9 +11,22 @@ and this project adheres to semantic versioning principles for infrastructure ch
 
 ### Added
 - CNAME record for prod.pausatf.org pointing to production server
+- SPF record for email authentication (Google Workspace + SendGrid)
+- CAA records for SSL certificate authority authorization:
+  - Let's Encrypt (server certificates)
+  - DigiCert (Cloudflare certificates)
+  - Wildcard certificate support for both
+  - Violation reporting via email (iodef)
+- DNS best practices section in Cloudflare configuration guide
+- Executive summary document for non-technical stakeholders
 
 ### Changed
 - All documentation references updated from ftp.pausatf.org to prod.pausatf.org
+
+### Security
+- Implemented DNS security best practices (SPF, CAA)
+- Protected domain from unauthorized SSL certificate issuance
+- Enhanced email authentication to prevent spoofing
 
 ---
 
