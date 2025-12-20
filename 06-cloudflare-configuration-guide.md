@@ -65,7 +65,7 @@ curl -I https://www.pausatf.org/ | grep -i cf-
 TYPE    NAME                VALUE               TTL     PROXY STATUS
 A       pausatf.org         64.225.40.54       Auto    Proxied (orange cloud)
 A       www.pausatf.org     64.225.40.54       Auto    Proxied (orange cloud)
-A       ftp.pausatf.org     64.225.40.54       Auto    Proxied (orange cloud)
+A       prod.pausatf.org     64.225.40.54       Auto    Proxied (orange cloud)
 AAAA    pausatf.org         [IPv6 if enabled]  Auto    Proxied
 AAAA    www.pausatf.org     [IPv6 if enabled]  Auto    Proxied
 MX      pausatf.org         [mail server]      Auto    DNS Only (gray cloud)
@@ -115,7 +115,7 @@ curl -X POST "https://api.cloudflare.com/client/v4/zones/${CF_ZONE_ID}/dns_recor
     "proxied": true
   }'
 
-# Create/Update ftp.pausatf.org A record
+# Create/Update prod.pausatf.org A record
 curl -X POST "https://api.cloudflare.com/client/v4/zones/${CF_ZONE_ID}/dns_records" \
   -H "Authorization: Bearer ${CF_API_TOKEN}" \
   -H "Content-Type: application/json" \
@@ -744,34 +744,40 @@ curl -X PATCH \
 ### Brotli Compression
 
 ```
-Brotli: ON
-  ✓ Better compression than gzip
+Brotli: ON ✅
+  ✓ Better compression than gzip (15-20% smaller files)
   ✓ Faster page loads
+  ✓ Supported by all modern browsers
 ```
 
 ### Rocket Loader
 
 ```
-Rocket Loader: OFF (recommended for WordPress)
-  ↑ Can break some WordPress themes/plugins
-  ↑ Enable only after thorough testing
+Rocket Loader: ON ✅
+  ✓ Async JavaScript loading
+  ✓ Improves page load times
+  ⚠ Monitor for compatibility with WordPress themes/plugins
 ```
 
-### Image Optimization (Pro+ feature)
+**Note:** Rocket Loader is currently enabled and working well with TheSource theme. Disable if JavaScript issues occur.
+
+### HTTP/2, HTTP/3, and Modern Protocols
 
 ```
-Polish: Lossless (Pro plan required)
-WebP: ON (Pro plan required)
+HTTP/2: ON ✅ (enabled by default)
+HTTP/3 (with QUIC): ON ✅
+0-RTT (Zero Round Trip Time): ON ✅
+TLS 1.3: ON (zrt mode - Zero Round Trip) ✅
+Early Hints: ON ✅ (103 status code for faster resource loading)
 ```
 
-### HTTP/2 and HTTP/3
+**Benefits:**
+- HTTP/3 uses QUIC protocol over UDP (faster than TCP)
+- 0-RTT reduces connection time for repeat visitors
+- TLS 1.3 with zrt mode provides fastest encryption handshake
+- Early Hints send resource hints before full response
 
-```
-HTTP/2: ON (enabled by default)
-HTTP/3 (with QUIC): ON
-```
-
-**Enable HTTP/3:**
+**Enable HTTP/3 (already enabled):**
 ```bash
 curl -X PATCH \
   "https://api.cloudflare.com/client/v4/zones/${CF_ZONE_ID}/settings/http3" \
@@ -779,6 +785,24 @@ curl -X PATCH \
   -H "Content-Type: application/json" \
   --data '{"value":"on"}'
 ```
+
+**Enable 0-RTT (already enabled):**
+```bash
+curl -X PATCH \
+  "https://api.cloudflare.com/client/v4/zones/${CF_ZONE_ID}/settings/0rtt" \
+  -H "Authorization: Bearer ${CF_API_TOKEN}" \
+  -H "Content-Type: application/json" \
+  --data '{"value":"on"}'
+```
+
+### Image Optimization (Pro+ feature)
+
+```
+Polish: Not enabled (Pro plan required)
+WebP: Not enabled (Pro plan required)
+```
+
+**Alternative:** Use WordPress plugins for image optimization (Imagify, ShortPixel, etc.)
 
 ---
 
@@ -1031,7 +1055,7 @@ curl -X GET \
   -H "Authorization: Bearer ${CF_API_TOKEN}"
 
 # Ensure origin has valid SSL certificate
-ssh root@ftp.pausatf.org "certbot certificates"
+ssh root@prod.pausatf.org "certbot certificates"
 ```
 
 ### 520/521/522 Errors
@@ -1047,10 +1071,10 @@ nc -zv $NEW_SERVER_IP 80
 nc -zv $NEW_SERVER_IP 443
 
 # Check Apache is running
-ssh root@ftp.pausatf.org "systemctl status apache2"
+ssh root@prod.pausatf.org "systemctl status apache2"
 
 # Check firewall
-ssh root@ftp.pausatf.org "ufw status"
+ssh root@prod.pausatf.org "ufw status"
 ```
 
 ---

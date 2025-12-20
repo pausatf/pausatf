@@ -75,20 +75,27 @@ deployment-package/
 3. **Quick fixes:** ~10 minutes to resolve main issues
 4. **Next review:** June 2026 (6 months)
 
+### For Infrastructure Upgrades
+
+1. **Review roadmap:** [08-recommended-upgrades-roadmap.md](08-recommended-upgrades-roadmap.md)
+2. **Critical priority:** PHP 8.3 upgrade (Q1 2026)
+3. **High priority:** Ubuntu 24.04 migration (Q2 2026)
+4. **Track changes:** [CHANGELOG.md](CHANGELOG.md)
+
 ---
 
 ## Server Environment
 
 ### Production Server
 
-- **Hostname:** ftp.pausatf.org
+- **Hostname:** prod.pausatf.org
 - **IP Address:** 64.225.40.54
 - **Droplet:** pausatf-prod (DigitalOcean)
 - **Web Server:** Apache 2.4
 - **PHP:** 7.4.33
 - **WordPress:** 6.9
 - **Document Root:** /var/www/legacy/public_html/
-- **SSH Access:** ✅ Available via `ssh root@ftp.pausatf.org`
+- **SSH Access:** ✅ Available via `ssh root@prod.pausatf.org`
 
 ### Staging Server
 
@@ -123,7 +130,7 @@ deployment-package/
 - ✅ Page Rules not required (CF-Cache-Control headers sufficient)
 
 **Server Access:**
-- ✅ SSH restored to production server (ftp.pausatf.org)
+- ✅ SSH restored to production server (prod.pausatf.org)
 - ✅ Staging server fully accessible (stage.pausatf.org)
 
 **Security Audit:**
@@ -141,6 +148,17 @@ deployment-package/
 - ✅ Set widget_custom_html (4.04 MB) to not autoload
 - ✅ All WordPress Site Health critical issues resolved
 - See: [07-performance-optimization-complete.md](07-performance-optimization-complete.md)
+
+**Cloudflare Performance Features (Verified Active):**
+- ✅ HTTP/3 with QUIC protocol enabled
+- ✅ 0-RTT (Zero Round Trip Time) connection resumption
+- ✅ TLS 1.3 with Zero Round Trip (zrt mode)
+- ✅ Brotli compression (15-20% better than gzip)
+- ✅ Early Hints (103 status code for faster loading)
+- ✅ Rocket Loader (async JavaScript loading)
+- ✅ Always Use HTTPS + Automatic HTTPS Rewrites
+- ✅ Aggressive cache level with origin header respect
+- See: [06-cloudflare-configuration-guide.md](06-cloudflare-configuration-guide.md)
 
 ### ⏳ Pending Items
 
@@ -162,6 +180,7 @@ deployment-package/
 pausatf-infrastructure-docs/
 │
 ├── README.md                                    # This file - start here
+├── CHANGELOG.md                                 # All infrastructure changes (Keep a Changelog format)
 │
 ├── 01-cache-implementation-guide.md             # Cache fix implementation details
 ├── 02-cache-audit-report.md                     # Pre-fix cache configuration audit
@@ -178,7 +197,7 @@ pausatf-infrastructure-docs/
     └── DEPLOYMENT_INSTRUCTIONS.txt              # Deployment steps
 ```
 
-**Reading Order:** Files are numbered 01-08 in recommended reading sequence. Start with the README, then follow the numbered guides as needed.
+**Reading Order:** Files are numbered 01-08 in recommended reading sequence. Start with the README, then follow the numbered guides as needed. Check CHANGELOG.md for recent changes.
 
 ---
 
@@ -241,39 +260,39 @@ curl -I https://www.pausatf.org/data/2025/sf-rec-park.jpg | grep -i cache
 
 ```bash
 # On production server
-ssh root@ftp.pausatf.org "/usr/local/bin/purge_cloudflare_cache.sh all"
+ssh root@prod.pausatf.org "/usr/local/bin/purge_cloudflare_cache.sh all"
 
 # Specific file
-ssh root@ftp.pausatf.org "/usr/local/bin/purge_cloudflare_cache.sh 2025/filename.html"
+ssh root@prod.pausatf.org "/usr/local/bin/purge_cloudflare_cache.sh 2025/filename.html"
 
 # Check purge log
-ssh root@ftp.pausatf.org "tail /var/log/cloudflare_purge.log"
+ssh root@prod.pausatf.org "tail /var/log/cloudflare_purge.log"
 ```
 
 ### Verify Apache Configuration
 
 ```bash
 # Check mod_headers enabled
-ssh root@ftp.pausatf.org "apachectl -M | grep headers"
+ssh root@prod.pausatf.org "apachectl -M | grep headers"
 
 # Test Apache config
-ssh root@ftp.pausatf.org "apachectl configtest"
+ssh root@prod.pausatf.org "apachectl configtest"
 
 # View error log
-ssh root@ftp.pausatf.org "tail -f /var/log/apache2/error.log"
+ssh root@prod.pausatf.org "tail -f /var/log/apache2/error.log"
 ```
 
 ### WordPress Health Check
 
 ```bash
 # List themes
-ssh root@ftp.pausatf.org "wp theme list --path=/var/www/html/ --allow-root"
+ssh root@prod.pausatf.org "wp theme list --path=/var/www/html/ --allow-root"
 
 # List plugins
-ssh root@ftp.pausatf.org "wp plugin list --path=/var/www/html/ --allow-root"
+ssh root@prod.pausatf.org "wp plugin list --path=/var/www/html/ --allow-root"
 
 # Check for updates
-ssh root@ftp.pausatf.org "wp core check-update --path=/var/www/html/ --allow-root"
+ssh root@prod.pausatf.org "wp core check-update --path=/var/www/html/ --allow-root"
 ```
 
 ---
@@ -287,16 +306,16 @@ ssh root@ftp.pausatf.org "wp core check-update --path=/var/www/html/ --allow-roo
 **Checks:**
 ```bash
 # 1. Verify .htaccess exists
-ssh root@ftp.pausatf.org "cat /var/www/legacy/public_html/data/2025/.htaccess"
+ssh root@prod.pausatf.org "cat /var/www/legacy/public_html/data/2025/.htaccess"
 
 # 2. Check Apache mod_headers
-ssh root@ftp.pausatf.org "apachectl -M | grep headers"
+ssh root@prod.pausatf.org "apachectl -M | grep headers"
 
 # 3. Test headers
 curl -I https://www.pausatf.org/data/2025/test.html | grep -i cache
 
 # 4. Purge Cloudflare cache
-ssh root@ftp.pausatf.org "/usr/local/bin/purge_cloudflare_cache.sh all"
+ssh root@prod.pausatf.org "/usr/local/bin/purge_cloudflare_cache.sh all"
 ```
 
 ### SSH Connection Issues
@@ -306,7 +325,7 @@ ssh root@ftp.pausatf.org "/usr/local/bin/purge_cloudflare_cache.sh all"
 **Solutions:**
 ```bash
 # Test connectivity
-nc -zv ftp.pausatf.org 22
+nc -zv prod.pausatf.org 22
 
 # Check from DigitalOcean
 doctl compute droplet get 355909945 --format Status

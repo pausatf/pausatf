@@ -1,6 +1,6 @@
 # THESOURCE THEME SECURITY AUDIT REPORT
 **Date:** 2025-12-20
-**Server:** www.pausatf.org (ftp.pausatf.org / 64.225.40.54)
+**Server:** www.pausatf.org (prod.pausatf.org / 64.225.40.54)
 **WordPress Version:** 6.9 (latest)
 **PHP Version:** 7.4.33
 
@@ -48,7 +48,7 @@ The TheSource themes are **reasonably secure** with no critical vulnerabilities 
 
 **Recommendation:**
 ```bash
-ssh root@ftp.pausatf.org "rm /var/www/html/wp-content/themes/TheSource/js/DD_belatedPNG_0.0.8a-min.js"
+ssh root@prod.pausatf.org "rm /var/www/html/wp-content/themes/TheSource/js/DD_belatedPNG_0.0.8a-min.js"
 ```
 
 **Check if it's being used:**
@@ -95,7 +95,7 @@ eval(function(p,a,c,k,e,r){e=function(c){return(c<a?'':e(parseInt(c/a)))+...
 
 **Recommendation:**
 ```bash
-ssh root@ftp.pausatf.org "cd /var/www/html/wp-content/themes/TheSource-child/ && \
+ssh root@prod.pausatf.org "cd /var/www/html/wp-content/themes/TheSource-child/ && \
   rm -f *.bak *.bak.* *.disabled && \
   ls -la"
 ```
@@ -113,7 +113,7 @@ ssh root@ftp.pausatf.org "cd /var/www/html/wp-content/themes/TheSource-child/ &&
 
 **Recommendation:**
 ```bash
-ssh root@ftp.pausatf.org "cd /var/www/html/wp-content/themes/TheSource-child/ && \
+ssh root@prod.pausatf.org "cd /var/www/html/wp-content/themes/TheSource-child/ && \
   rm -f ClubsPHP.php ClubsPHP.php.bak"
 ```
 
@@ -265,12 +265,12 @@ wp-mail-smtp (4.7.1)
 
 1. **Remove IE6 PNG Fix**
    ```bash
-   ssh root@ftp.pausatf.org "rm /var/www/html/wp-content/themes/TheSource/js/DD_belatedPNG_0.0.8a-min.js"
+   ssh root@prod.pausatf.org "rm /var/www/html/wp-content/themes/TheSource/js/DD_belatedPNG_0.0.8a-min.js"
    ```
 
 2. **Remove Backup Files from Child Theme**
    ```bash
-   ssh root@ftp.pausatf.org "cd /var/www/html/wp-content/themes/TheSource-child/ && rm -f *.bak *.bak.* *.disabled ClubsPHP.php*"
+   ssh root@prod.pausatf.org "cd /var/www/html/wp-content/themes/TheSource-child/ && rm -f *.bak *.bak.* *.disabled ClubsPHP.php*"
    ```
 
 ### SHORT-TERM ACTIONS (Medium Priority)

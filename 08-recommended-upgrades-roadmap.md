@@ -104,7 +104,7 @@ This document provides a comprehensive roadmap for infrastructure, software, and
    doctl compute droplet-action snapshot 355909945 --snapshot-name "pre-php83-upgrade-$(date +%Y%m%d)"
 
    # Database backup
-   ssh root@ftp.pausatf.org "wp db export /tmp/pausatf-pre-php83.sql --path=/var/www/html/ --allow-root"
+   ssh root@prod.pausatf.org "wp db export /tmp/pausatf-pre-php83.sql --path=/var/www/html/ --allow-root"
    ```
 
 2. **Install PHP 8.3:**
@@ -210,7 +210,7 @@ sudo do-release-upgrade
 #### A. Database Audit (1-2 hours)
 ```bash
 # Connect to production
-ssh root@ftp.pausatf.org
+ssh root@prod.pausatf.org
 
 # Check database size
 wp db size --path=/var/www/html/ --allow-root
@@ -276,7 +276,7 @@ wp db query "SELECT COUNT(*) FROM wp_options WHERE option_name LIKE '%_transient
 #### A. Remove IE6 PNG Fix Library
 ```bash
 # On production server
-ssh root@ftp.pausatf.org
+ssh root@prod.pausatf.org
 
 # Remove iepngfix directory
 rm -rf /var/www/html/wp-content/themes/TheSource/iepngfix/
@@ -288,10 +288,10 @@ curl -I https://www.pausatf.org/
 #### B. Clean Backup Files from Child Theme
 ```bash
 # List backup files
-ssh root@ftp.pausatf.org "find /var/www/html/wp-content/themes/TheSource-child/ -name '*.bak' -o -name '*~' -o -name '*.backup'"
+ssh root@prod.pausatf.org "find /var/www/html/wp-content/themes/TheSource-child/ -name '*.bak' -o -name '*~' -o -name '*.backup'"
 
 # Remove after review
-ssh root@ftp.pausatf.org "find /var/www/html/wp-content/themes/TheSource-child/ -name '*.bak' -delete"
+ssh root@prod.pausatf.org "find /var/www/html/wp-content/themes/TheSource-child/ -name '*.bak' -delete"
 ```
 
 #### C. Theme Code Modernization (Optional)
@@ -319,7 +319,7 @@ ssh root@ftp.pausatf.org "find /var/www/html/wp-content/themes/TheSource-child/ 
 #### Monthly Plugin Maintenance
 ```bash
 # First week of each month
-ssh root@ftp.pausatf.org
+ssh root@prod.pausatf.org
 
 # Check for updates
 wp plugin list --update=available --path=/var/www/html/ --allow-root
@@ -330,7 +330,7 @@ wp plugin update --all --path=/var/www/html/ --allow-root
 
 # Test staging site thoroughly
 # If all good, update production:
-ssh root@ftp.pausatf.org
+ssh root@prod.pausatf.org
 wp plugin update --all --path=/var/www/html/ --allow-root
 ```
 
@@ -402,23 +402,40 @@ wp plugin update --all --path=/var/www/html/ --allow-root
 ## PERFORMANCE OPTIMIZATION ROADMAP
 
 ### Completed (Dec 2025) ✅
-- ✅ WP Super Cache installed
+
+**WordPress Optimizations:**
+- ✅ WP Super Cache installed and configured
 - ✅ Autoloaded options optimized (4.54 MB → 298 KB)
 - ✅ Jetpack modules optimized (35 → 28)
-- ✅ Cache headers configured
-- ✅ Cloudflare CDN active
+- ✅ Cache headers configured (CF-Cache-Control)
+- ✅ Response time: 1,357ms → 220ms (6x faster)
+
+**Cloudflare CDN Optimizations (Already Enabled):**
+- ✅ HTTP/3 with QUIC protocol (enabled)
+- ✅ 0-RTT (Zero Round Trip Time) connection resumption
+- ✅ TLS 1.3 with Zero Round Trip (zrt mode)
+- ✅ Brotli compression (enabled)
+- ✅ Early Hints (103 status code for faster loading)
+- ✅ Rocket Loader (async JavaScript loading)
+- ✅ Always Use HTTPS (automatic redirect)
+- ✅ Automatic HTTPS Rewrites
+- ✅ Aggressive cache level
+- ✅ Browser cache respects origin headers (TTL: 0)
+
+**Note:** Cloudflare Free plan already includes HTTP/3, Brotli, TLS 1.3, and other advanced performance features at no additional cost.
 
 ### Q1 2026
-- [ ] Image optimization (WebP conversion, lazy loading)
-- [ ] CSS/JS minification and concatenation
-- [ ] Database query optimization
-- [ ] Implement Redis object cache (optional)
+- [ ] Image optimization (WebP conversion with fallback, lazy loading)
+- [ ] CSS/JS minification and concatenation (currently disabled in Cloudflare)
+- [ ] Database query optimization and indexing
+- [ ] Implement Redis object cache (optional, for transient storage)
+- [ ] Consider enabling Cloudflare CSS/JS/HTML minification
 
 ### Q2 2026
-- [ ] HTTP/3 support
-- [ ] Brotli compression
-- [ ] Critical CSS extraction
-- [ ] Resource hints (preload, prefetch, preconnect)
+- [ ] Critical CSS extraction and inline placement
+- [ ] Resource hints (preload, prefetch, preconnect, dns-prefetch)
+- [ ] Implement responsive images with srcset
+- [ ] Consider Cloudflare Zaraz (third-party tool optimization)
 
 ---
 

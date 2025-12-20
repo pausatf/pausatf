@@ -80,7 +80,7 @@ We will send a confirmation email once the migration is complete.
 ### Production Server (Source)
 
 ```
-Hostname:     ftp.pausatf.org
+Hostname:     prod.pausatf.org
 IP Address:   64.225.40.54
 Droplet ID:   355909945
 Droplet Name: pausatf-prod (DigitalOcean) / pausatforg20230516-primary (hostname)
@@ -125,7 +125,7 @@ Zone ID:          your-cloudflare-zone-id
 
 Current Records:
   www.pausatf.org  -> 64.225.40.54 (A record)
-  ftp.pausatf.org  -> 64.225.40.54 (A record)
+  prod.pausatf.org  -> 64.225.40.54 (A record)
   pausatf.org      -> (check current config)
 ```
 
@@ -178,7 +178,7 @@ apt-get install doctl rsync mysql-client
 
 ```bash
 # Via SSH (recommended):
-ssh root@ftp.pausatf.org
+ssh root@prod.pausatf.org
 
 # OR via DigitalOcean Console:
 # 1. Go to https://cloud.digitalocean.com/droplets
@@ -321,10 +321,10 @@ cd ~/pausatf-migration-backup
 
 # Download via DigitalOcean Spaces (if configured)
 # OR via SCP (if SSH available):
-scp -r root@ftp.pausatf.org:/root/migration-backup/* .
+scp -r root@prod.pausatf.org:/root/migration-backup/* .
 
 # OR via rsync (recommended):
-rsync -avz --progress root@ftp.pausatf.org:/root/migration-backup/ .
+rsync -avz --progress root@prod.pausatf.org:/root/migration-backup/ .
 
 # Verify checksums
 md5sum -c checksums.txt
@@ -723,7 +723,7 @@ wp search-replace 'https://www.pausatf.org' 'http://$NEW_IP' \
 cat > /etc/apache2/sites-available/pausatf.conf << 'EOF'
 <VirtualHost *:80>
     ServerName pausatf.org
-    ServerAlias www.pausatf.org ftp.pausatf.org
+    ServerAlias www.pausatf.org prod.pausatf.org
     ServerAdmin admin@pausatf.org
 
     DocumentRoot /var/www/legacy/public_html
@@ -759,7 +759,7 @@ systemctl reload apache2
 
 ```bash
 # Install Let's Encrypt certificate
-certbot --apache -d pausatf.org -d www.pausatf.org -d ftp.pausatf.org
+certbot --apache -d pausatf.org -d www.pausatf.org -d prod.pausatf.org
 
 # Choose option 2: Redirect HTTP to HTTPS
 
@@ -819,7 +819,7 @@ chmod 644 /var/www/legacy/public_html/data/2025/.htaccess
 ```bash
 # Test site with /etc/hosts file on local machine
 # Add to /etc/hosts:
-echo "$NEW_IP www.pausatf.org pausatf.org ftp.pausatf.org" | sudo tee -a /etc/hosts
+echo "$NEW_IP www.pausatf.org pausatf.org prod.pausatf.org" | sudo tee -a /etc/hosts
 
 # Test in browser:
 # http://$NEW_IP
@@ -839,7 +839,7 @@ sudo vim /etc/hosts  # Remove the line
 # Set TTL to 300 seconds (5 minutes) for:
 # - pausatf.org A record
 # - www.pausatf.org A record
-# - ftp.pausatf.org A record
+# - prod.pausatf.org A record
 
 # Wait 24 hours before changing IP addresses
 ```
@@ -853,7 +853,7 @@ sudo vim /etc/hosts  # Remove the line
 4. Update A records:
    - `pausatf.org` → `$NEW_IP`
    - `www.pausatf.org` → `$NEW_IP`
-   - `ftp.pausatf.org` → `$NEW_IP`
+   - `prod.pausatf.org` → `$NEW_IP`
 5. Keep TTL at 300 seconds initially
 
 **Via API:**
@@ -874,7 +874,7 @@ curl -X PUT "https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/dns_records/R
   -H "Content-Type: application/json" \
   --data '{"type":"A","name":"www.pausatf.org","content":"'$NEW_IP'","ttl":300,"proxied":true}'
 
-# Repeat for pausatf.org and ftp.pausatf.org
+# Repeat for pausatf.org and prod.pausatf.org
 ```
 
 ### Step 7.4: Verify DNS Propagation
@@ -1212,7 +1212,7 @@ wp search-replace --dry-run 'http://' 'https://' --path=/var/www/legacy/public_h
 **Solutions:**
 ```bash
 # Reinstall certificate
-certbot --apache -d pausatf.org -d www.pausatf.org -d ftp.pausatf.org --force-renewal
+certbot --apache -d pausatf.org -d www.pausatf.org -d prod.pausatf.org --force-renewal
 
 # Check certificate
 openssl x509 -in /etc/letsencrypt/live/pausatf.org/cert.pem -text -noout

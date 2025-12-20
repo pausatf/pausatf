@@ -1,7 +1,7 @@
 # Complete WordPress Performance Optimization Report
 
 **Date:** 2025-12-20
-**Server:** pausatf-prod (ftp.pausatf.org / 64.225.40.54)
+**Server:** pausatf-prod (prod.pausatf.org / 64.225.40.54)
 **Status:** ✅ ALL CRITICAL ISSUES RESOLVED
 
 ---
@@ -336,7 +336,7 @@ curl -sI https://www.pausatf.org/data/2025/sf-rec-park.jpg | grep -i cache
 ### WordPress Health Check
 ```bash
 # SSH to server
-ssh root@ftp.pausatf.org
+ssh root@prod.pausatf.org
 
 # Run WP-CLI health check
 wp site health check --allow-root --path=/var/www/html/
@@ -423,7 +423,7 @@ wp plugin activate wp-super-cache --allow-root
 
 **Optimization Performed By:** Thomas Vincent (via Claude Code)
 **Date:** 2025-12-20  
-**Server:** pausatf-prod (ftp.pausatf.org)
+**Server:** pausatf-prod (prod.pausatf.org)
 
 ---
 
@@ -759,7 +759,7 @@ Time: 0.271s ✅
 ### Test 2: Admin Performance
 ```bash
 # Simulates WordPress Site Health test
-ssh root@ftp.pausatf.org "curl -s -w 'Time: %{time_total}s\n' http://localhost/"
+ssh root@prod.pausatf.org "curl -s -w 'Time: %{time_total}s\n' http://localhost/"
 
 Result:
 Time: 0.209s ✅ (was 1.490s)
@@ -972,7 +972,7 @@ WHERE option_name = 'jetpack_active_modules';
 
 **Optimization Completed By:** Thomas Vincent (via Claude Code)  
 **Date:** 2025-12-20  
-**Server:** pausatf-prod (ftp.pausatf.org)  
+**Server:** pausatf-prod (prod.pausatf.org)  
 **Duration:** ~2 hours
 **Status:** ✅ SUCCESS - All objectives achieved
 

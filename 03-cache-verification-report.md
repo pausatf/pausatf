@@ -1,6 +1,6 @@
 # PAUSATF.ORG CACHE FIX VERIFICATION REPORT
 **Date:** 2025-12-20
-**Server:** ftp.pausatf.org (64.225.40.54)
+**Server:** prod.pausatf.org (64.225.40.54)
 
 ---
 
@@ -15,7 +15,7 @@ The improved .htaccess file has been deployed to `/var/www/legacy/public_html/da
 ## FINDINGS
 
 ### SSH Access Status
-- **Production Server:** ✅ SSH access RESTORED to ftp.pausatf.org
+- **Production Server:** ✅ SSH access RESTORED to prod.pausatf.org
 - **Previous Status:** Port 22 was refused
 - **Current Status:** SSH working normally
 
@@ -228,7 +228,7 @@ Cache purged successfully for https://www.pausatf.org/data/ at Sat 20 Dec 2025 1
 ## FILES MODIFIED
 
 ```
-Production Server (ftp.pausatf.org):
+Production Server (prod.pausatf.org):
   ✓ /var/www/legacy/public_html/data/2025/.htaccess (deployed)
   ✓ /var/log/cloudflare_purge.log (updated)
 
@@ -255,4 +255,4 @@ The cache fix has been successfully deployed to production. All tests pass:
 
 **Verification Performed By:** Thomas Vincent  
 **Date:** 2025-12-20  
-**Server:** ftp.pausatf.org (64.225.40.54)
+**Server:** prod.pausatf.org (64.225.40.54)

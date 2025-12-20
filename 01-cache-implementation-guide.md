@@ -6,13 +6,13 @@
 ## SERVER ENVIRONMENT
 
 ### Production Server
-- **Hostname:** ftp.pausatf.org
+- **Hostname:** prod.pausatf.org
 - **IP:** 64.225.40.54
 - **Droplet:** pausatf-prod (DigitalOcean name) / pausatforg20230516-primary (hostname)
 - **Web Server:** Apache 2.4
 - **PHP:** 7.4.33
 - **Document Root:** /var/www/legacy/public_html/
-- **SSH Access:** ✅ Available via `ssh root@ftp.pausatf.org`
+- **SSH Access:** ✅ Available via `ssh root@prod.pausatf.org`
 
 ### Staging Server
 - **Hostname:** stage.pausatf.org
@@ -101,8 +101,8 @@ Options -Indexes
 
 **Installation on Production:**
 ```bash
-# On production server (ftp.pausatf.org / 64.225.40.54)
-# SSH: ssh root@ftp.pausatf.org (currently unavailable - use console)
+# On production server (prod.pausatf.org / 64.225.40.54)
+# SSH: ssh root@prod.pausatf.org (currently unavailable - use console)
 cat > /var/www/legacy/public_html/data/2025/.htaccess << 'EOFHTACCESS'
 [paste content above]
 EOFHTACCESS
@@ -130,7 +130,7 @@ curl -I https://www.pausatf.org/data/2025/somefile.html | grep -i cache
 **Installation:**
 ```bash
 # Already installed on STAGING (stage.pausatf.org / 64.227.85.73)
-# For PRODUCTION (ftp.pausatf.org / 64.225.40.54):
+# For PRODUCTION (prod.pausatf.org / 64.225.40.54):
 
 cat > /usr/local/bin/purge_cloudflare_cache.sh << 'EOFSCRIPT'
 #!/bin/bash
@@ -371,9 +371,9 @@ tail -f /var/log/cloudflare-monitor.log
 
 ## DEPLOYMENT CHECKLIST
 
-### Production Server (ftp.pausatf.org - 64.225.40.54)
+### Production Server (prod.pausatf.org - 64.225.40.54)
 **Droplet:** pausatf-prod (DigitalOcean name) / pausatforg20230516-primary (hostname)
-**SSH:** ✅ Available via `ssh root@ftp.pausatf.org`
+**SSH:** ✅ Available via `ssh root@prod.pausatf.org`
 - [ ] 1. Create `.htaccess` in `/var/www/legacy/public_html/data/2025/`
 - [ ] 2. Install fixed purge script `/usr/local/bin/purge_cloudflare_cache.sh`
 - [ ] 3. Test purge script manually

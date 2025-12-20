@@ -7,7 +7,7 @@
 
 **Server:** pausatf-prod (DigitalOcean name) / pausatforg20230516-primary (hostname)
 **IP Address:** 64.225.40.54
-**SSH Access:** ✅ Available via `ssh root@ftp.pausatf.org`
+**SSH Access:** ✅ Available via `ssh root@prod.pausatf.org`
 **Website:** ✅ Running and accessible
 **Deployment:** Manual deployment package created
 
