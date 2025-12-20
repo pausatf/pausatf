@@ -7,10 +7,11 @@ SERVER INFORMATION:
 Production Server:
   - Hostname: ftp.pausatf.org
   - IP Address: 64.225.40.54
-  - Droplet Name: pausatforg20230516-primary
+  - Droplet Name: pausatf-prod (DigitalOcean) / pausatforg20230516-primary (hostname)
   - Web Server: Apache 2.4
-  - PHP Version: 7.4
+  - PHP Version: 7.4.33
   - Document Root: /var/www/legacy/public_html/
+  - SSH Access: ✅ Available via `ssh root@ftp.pausatf.org`
 
 Staging Server (for reference):
   - Hostname: stage.pausatf.org
@@ -19,10 +20,7 @@ Staging Server (for reference):
   - Web Server: OpenLiteSpeed 1.8.3
   - PHP Version: 8.4.15
   - Document Root: /var/www/html/
-
-CRITICAL: SSH access to production (ftp.pausatf.org) is currently unavailable.
-Port 22 connections are refused. You must deploy these files manually via
-DigitalOcean Droplet Console or Recovery Mode.
+  - SSH Access: ✅ Available via `ssh root@stage.pausatf.org`
 
 FILES IN THIS PACKAGE:
 ----------------------
@@ -34,12 +32,15 @@ DEPLOYMENT STEPS:
 -----------------
 
 ### Step 1: Access Production Server
-Option A: Via DigitalOcean Droplet Console
+Option A: Via SSH (recommended)
+   ssh root@ftp.pausatf.org
+
+Option B: Via DigitalOcean Droplet Console
    1. Go to https://cloud.digitalocean.com/droplets
-   2. Click on "pausatforg20230516-primary"
+   2. Click on "pausatf-prod"
    3. Click "Access" → "Launch Droplet Console"
 
-Option B: Via Recovery Mode (if console doesn't work)
+Option C: Via Recovery Mode (if other methods don't work)
    1. Enable recovery mode in DigitalOcean
    2. Mount /dev/vda1 and access filesystem
 

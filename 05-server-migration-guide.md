@@ -32,7 +32,6 @@
 ### Why Migrate?
 
 Common reasons to migrate to a new droplet:
-- **SSH Access Issues:** Current production server (ftp.pausatf.org) has port 22 blocked
 - **Performance:** Upgrade to faster CPU/more RAM
 - **Security:** Fresh installation with latest security patches
 - **OS Upgrade:** Move from older Ubuntu to latest LTS version
@@ -84,12 +83,12 @@ We will send a confirmation email once the migration is complete.
 Hostname:     ftp.pausatf.org
 IP Address:   64.225.40.54
 Droplet ID:   355909945
-Droplet Name: pausatforg20230516-primary
+Droplet Name: pausatf-prod (DigitalOcean) / pausatforg20230516-primary (hostname)
 Region:       sfo2 (San Francisco)
 Size:         8GB RAM / 4 vCPUs / 160GB SSD
-OS:           Ubuntu (version TBD)
+OS:           Ubuntu 20.04 LTS
 Web Server:   Apache 2.4
-PHP:          7.4
+PHP:          7.4.33
 Database:     MySQL/MariaDB (version TBD)
 SSL:          Let's Encrypt (managed by certbot)
 ```
@@ -178,13 +177,13 @@ apt-get install doctl rsync mysql-client
 ### Step 1.1: Access Current Server
 
 ```bash
-# Via DigitalOcean Console (if SSH unavailable)
-# 1. Go to https://cloud.digitalocean.com/droplets
-# 2. Click on "pausatforg20230516-primary"
-# 3. Click "Access" → "Launch Droplet Console"
-
-# OR via SSH (if available):
+# Via SSH (recommended):
 ssh root@ftp.pausatf.org
+
+# OR via DigitalOcean Console:
+# 1. Go to https://cloud.digitalocean.com/droplets
+# 2. Click on "pausatf-prod"
+# 3. Click "Access" → "Launch Droplet Console"
 ```
 
 ### Step 1.2: Create DigitalOcean Snapshot (Recommended)

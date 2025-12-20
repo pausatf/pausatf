@@ -35,6 +35,7 @@ Documentation is organized in numbered sequence for logical reading order:
 | 05 | **[05-server-migration-guide.md](05-server-migration-guide.md)** | Guide | Complete 10-phase DigitalOcean migration process |
 | 06 | **[06-cloudflare-configuration-guide.md](06-cloudflare-configuration-guide.md)** | Guide | DNS, SSL, caching, firewall, API automation |
 | 07 | **[07-performance-optimization-complete.md](07-performance-optimization-complete.md)** | Report | **Complete WordPress performance optimization (93% faster)** |
+| 08 | **[08-recommended-upgrades-roadmap.md](08-recommended-upgrades-roadmap.md)** | Roadmap | **Infrastructure upgrade plan (PHP 8.3, Ubuntu 24.04, security hardening)** |
 
 ### 📦 Deployment Package
 
@@ -169,6 +170,7 @@ pausatf-infrastructure-docs/
 ├── 05-server-migration-guide.md                 # 10-phase DigitalOcean migration
 ├── 06-cloudflare-configuration-guide.md         # Complete CDN configuration
 ├── 07-performance-optimization-complete.md      # Complete WordPress optimization
+├── 08-recommended-upgrades-roadmap.md           # Infrastructure upgrade roadmap
 │
 └── deployment-package/
     ├── data_2025_htaccess                       # Production .htaccess
@@ -176,7 +178,7 @@ pausatf-infrastructure-docs/
     └── DEPLOYMENT_INSTRUCTIONS.txt              # Deployment steps
 ```
 
-**Reading Order:** Files are numbered 01-07 in recommended reading sequence. Start with the README, then follow the numbered guides as needed.
+**Reading Order:** Files are numbered 01-08 in recommended reading sequence. Start with the README, then follow the numbered guides as needed.
 
 ---
 

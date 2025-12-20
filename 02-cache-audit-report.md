@@ -5,9 +5,10 @@
 
 ## PRODUCTION SERVER STATUS
 
-**Server:** pausatforg20230516-primary (64.225.40.54)  
-**Status:** ⚠️ **SSH PORT 22 BLOCKED - Cannot access remotely**  
-**Website:** ✅ Running and accessible  
+**Server:** pausatf-prod (DigitalOcean name) / pausatforg20230516-primary (hostname)
+**IP Address:** 64.225.40.54
+**SSH Access:** ✅ Available via `ssh root@ftp.pausatf.org`
+**Website:** ✅ Running and accessible
 **Deployment:** Manual deployment package created
 
 ---

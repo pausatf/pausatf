@@ -8,12 +8,11 @@
 ### Production Server
 - **Hostname:** ftp.pausatf.org
 - **IP:** 64.225.40.54
-- **Droplet:** pausatforg20230516-primary (DigitalOcean)
+- **Droplet:** pausatf-prod (DigitalOcean name) / pausatforg20230516-primary (hostname)
 - **Web Server:** Apache 2.4
-- **PHP:** 7.4
+- **PHP:** 7.4.33
 - **Document Root:** /var/www/legacy/public_html/
-- **SSH Access:** ❌ Currently unavailable (port 22 refused)
-- **Access Method:** DigitalOcean Droplet Console only
+- **SSH Access:** ✅ Available via `ssh root@ftp.pausatf.org`
 
 ### Staging Server
 - **Hostname:** stage.pausatf.org
@@ -373,11 +372,8 @@ tail -f /var/log/cloudflare-monitor.log
 ## DEPLOYMENT CHECKLIST
 
 ### Production Server (ftp.pausatf.org - 64.225.40.54)
-**Droplet:** pausatforg20230516-primary
-**SSH:** Currently unavailable (port 22 refused) - use DigitalOcean console
-**Access:** `ssh root@ftp.pausatf.org` (when SSH is enabled)
-
-- [ ] 0. Enable SSH access on server (see Step 7 in DEPLOYMENT_INSTRUCTIONS.txt)
+**Droplet:** pausatf-prod (DigitalOcean name) / pausatforg20230516-primary (hostname)
+**SSH:** ✅ Available via `ssh root@ftp.pausatf.org`
 - [ ] 1. Create `.htaccess` in `/var/www/legacy/public_html/data/2025/`
 - [ ] 2. Install fixed purge script `/usr/local/bin/purge_cloudflare_cache.sh`
 - [ ] 3. Test purge script manually
