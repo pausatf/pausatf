@@ -1,0 +1,107 @@
+PAUSATF.ORG PRODUCTION CACHE FIX DEPLOYMENT
+============================================
+Generated: 2025-12-20
+
+CRITICAL: SSH port 22 is blocked on production server.
+You must deploy these files manually via console/recovery mode.
+
+FILES IN THIS PACKAGE:
+----------------------
+1. data_2025_htaccess       - Cache headers for /data/2025/ directory
+2. purge_cloudflare_cache.sh - Fixed Cloudflare purge script
+3. DEPLOYMENT_INSTRUCTIONS.txt - This file
+
+DEPLOYMENT STEPS:
+-----------------
+
+### Step 1: Access Production Server
+Option A: Via DigitalOcean Droplet Console
+   1. Go to https://cloud.digitalocean.com/droplets
+   2. Click on "pausatforg20230516-primary"
+   3. Click "Access" → "Launch Droplet Console"
+
+Option B: Via Recovery Mode (if console doesn't work)
+   1. Enable recovery mode in DigitalOcean
+   2. Mount /dev/vda1 and access filesystem
+
+### Step 2: Deploy .htaccess to Data Directory
+# Copy file to correct location
+cp data_2025_htaccess /var/www/legacy/public_html/data/2025/.htaccess
+
+# Set correct permissions
+chown www-data:www-data /var/www/legacy/public_html/data/2025/.htaccess
+chmod 644 /var/www/legacy/public_html/data/2025/.htaccess
+
+# Verify installation
+cat /var/www/legacy/public_html/data/2025/.htaccess
+ls -la /var/www/legacy/public_html/data/2025/.htaccess
+
+### Step 3: Install Purge Script
+# Copy to /usr/local/bin
+cp purge_cloudflare_cache.sh /usr/local/bin/purge_cloudflare_cache.sh
+chmod +x /usr/local/bin/purge_cloudflare_cache.sh
+
+# Test script
+/usr/local/bin/purge_cloudflare_cache.sh "https://www.pausatf.org/data/2025/"
+
+### Step 4: Verify Apache mod_headers is Enabled
+# Check if mod_headers is loaded
+apachectl -M | grep headers
+
+# If not loaded, enable it
+a2enmod headers
+systemctl restart apache2
+
+### Step 5: Test Cache Headers
+# From your local machine:
+curl -I https://www.pausatf.org/data/2025/somefile.html | grep -i cache
+
+# Expected output:
+# cache-control: no-cache, no-store, must-revalidate, max-age=0
+# cf-cache-status: BYPASS or DYNAMIC (not HIT)
+
+### Step 6: Purge Cloudflare Cache
+# Full purge to clear all cached content
+/usr/local/bin/purge_cloudflare_cache.sh
+
+# Check log
+tail /var/log/cloudflare-purge.log
+
+### Step 7: Enable SSH (IMPORTANT for future access)
+# Add firewall rule or check SSH config
+systemctl status ssh
+netstat -tlnp | grep :22
+
+# If SSH is blocked, enable it:
+ufw allow 22/tcp
+systemctl enable ssh
+systemctl start ssh
+
+VERIFICATION CHECKLIST:
+-----------------------
+[ ] .htaccess file deployed to /var/www/legacy/public_html/data/2025/
+[ ] Purge script installed at /usr/local/bin/purge_cloudflare_cache.sh
+[ ] mod_headers enabled in Apache
+[ ] Cache headers verified with curl
+[ ] Cloudflare cache purged
+[ ] SSH access enabled for future deployments
+
+TROUBLESHOOTING:
+----------------
+If headers don't appear:
+1. Check Apache error log: tail -f /var/log/apache2/error.log
+2. Verify .htaccess is being read: Add test header and check with curl
+3. Check AllowOverride in Apache vhost config
+
+If purge script fails:
+1. Check API token permissions
+2. Verify network connectivity: ping api.cloudflare.com
+3. Check logs: tail -f /var/log/cloudflare-purge.log
+
+NEXT STEPS AFTER DEPLOYMENT:
+----------------------------
+1. Configure Cloudflare Page Rules (see main documentation)
+2. Notify users to hard refresh ONE TIME
+3. Monitor /var/log/cloudflare-purge.log for issues
+4. Consider enabling file monitoring (see full docs)
+
