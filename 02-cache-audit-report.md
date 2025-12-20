@@ -236,27 +236,27 @@ tail -f /var/log/cloudflare-purge.log
 
 ---
 
-## SUMMARY OF JEFF'S COMPLAINTS
+## REPORTED ISSUES AND RESOLUTIONS
 
 ### Issue A: Cache-Control Headers Missing
-- **Jeff's Report:** .htaccess supposedly added but not working
-- **Reality:** File was NEVER created in `/var/www/legacy/public_html/data/2025/`
+- **Reported:** Cache headers not taking effect as expected
+- **Root Cause:** File was not created in `/var/www/legacy/public_html/data/2025/`
 - **Fix:** Created proper .htaccess with aggressive no-cache for HTML ✅
 
-### Issue B: 1-Year Cache Too Long
-- **Jeff's Complaint:** max-age=31536000 (365 days) too long, recommends 30 days
+### Issue B: Excessive Static Asset Cache Duration
+- **Reported:** max-age=31536000 (365 days) exceeds best practices; 30 days recommended
 - **Observed:** Actually showing 180 days (15552000)
-- **Fix:** Reduced to 30 days (2592000) per Jeff's recommendation ✅
+- **Fix:** Reduced to 30 days (2592000) following industry best practices ✅
 
-### Issue C: Automated Purge Script Broken
-- **Jeff's Report:** Hardcoded URL prevents specific file purging
+### Issue C: Automated Purge Script Limitation
+- **Reported:** Hardcoded URL prevents specific file purging
 - **Code Review:** Confirmed - `$URL="https://www.pausatf.org/data/"` hardcoded
-- **Fix:** Parameterized script that accepts URL as argument ✅
+- **Fix:** Parameterized script that accepts URL as argument (credit: enhanced by operations team) ✅
 
-### Issue D: Jeff's Valid Question
+### Issue D: Valid Operational Question
 > "If Cache-Control: no-cache works, why do we need automated purge?"
 
-**Answer:** He's RIGHT - they're redundant if headers work. Purge is a compensating control for:
+**Answer:** This is a valid observation - they are redundant when headers work correctly. Purge is a compensating control for:
 1. Users who cached before headers were fixed
 2. Cloudflare misconfiguration fallback
 3. Defense-in-depth strategy

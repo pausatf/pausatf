@@ -24,29 +24,16 @@ This repository contains complete infrastructure documentation, deployment guide
 
 ## Repository Contents
 
-### 📋 Executive Summaries
+Documentation is organized in numbered sequence for logical reading order:
 
-| Document | Description |
-|----------|-------------|
-| **[FINAL_SUMMARY.md](FINAL_SUMMARY.md)** | Cache fix deployment status and checklist |
-| **[CACHE_VERIFICATION_REPORT.md](CACHE_VERIFICATION_REPORT.md)** | Production cache fix verification (Dec 20, 2025) |
-| **[THESOURCE_SECURITY_AUDIT.md](THESOURCE_SECURITY_AUDIT.md)** | WordPress theme security assessment |
-
-### 🔧 Technical Guides
-
-| Document | Description | Pages |
-|----------|-------------|-------|
-| **[SERVER_MIGRATION_GUIDE.md](SERVER_MIGRATION_GUIDE.md)** | Complete 10-phase server migration process | 26 KB |
-| **[CLOUDFLARE_CONFIGURATION_GUIDE.md](CLOUDFLARE_CONFIGURATION_GUIDE.md)** | DNS, SSL, caching, firewall, API automation | 23 KB |
-| **[cache_fix_documentation.md](cache_fix_documentation.md)** | Cache header fixes and implementation | 15 KB |
-| **[CLOUDFLARE_PAGE_RULES_SETUP.md](CLOUDFLARE_PAGE_RULES_SETUP.md)** | Page Rules configuration for race results | 2.7 KB |
-
-### 📊 Audit Reports
-
-| Document | Description |
-|----------|-------------|
-| **[PAUSATF_CACHE_AUDIT_REPORT.md](PAUSATF_CACHE_AUDIT_REPORT.md)** | Complete cache configuration audit |
-| **[THESOURCE_SECURITY_AUDIT.md](THESOURCE_SECURITY_AUDIT.md)** | WordPress theme security scan (9 findings) |
+| # | Document | Type | Description |
+|---|----------|------|-------------|
+| 01 | **[01-cache-implementation-guide.md](01-cache-implementation-guide.md)** | Guide | Complete cache fix implementation and technical details |
+| 02 | **[02-cache-audit-report.md](02-cache-audit-report.md)** | Report | Pre-fix audit of cache configurations across all servers |
+| 03 | **[03-cache-verification-report.md](03-cache-verification-report.md)** | Report | Production deployment verification (Dec 20, 2025) |
+| 04 | **[04-security-audit-report.md](04-security-audit-report.md)** | Report | WordPress theme security assessment (9 findings) |
+| 05 | **[05-server-migration-guide.md](05-server-migration-guide.md)** | Guide | Complete 10-phase DigitalOcean migration process |
+| 06 | **[06-cloudflare-configuration-guide.md](06-cloudflare-configuration-guide.md)** | Guide | DNS, SSL, caching, firewall, API automation |
 
 ### 📦 Deployment Package
 
@@ -67,21 +54,21 @@ deployment-package/
 
 ### For Cache Fix Deployment
 
-1. **Read status:** [FINAL_SUMMARY.md](FINAL_SUMMARY.md) - What's been done, what's pending
-2. **Deploy to production:** Follow `deployment-package/DEPLOYMENT_INSTRUCTIONS.txt`
-3. **Configure Cloudflare:** Use [CLOUDFLARE_PAGE_RULES_SETUP.md](CLOUDFLARE_PAGE_RULES_SETUP.md)
-4. **Verify deployment:** Commands in [CACHE_VERIFICATION_REPORT.md](CACHE_VERIFICATION_REPORT.md)
+1. **Read implementation guide:** [01-cache-implementation-guide.md](01-cache-implementation-guide.md)
+2. **Review verification:** [03-cache-verification-report.md](03-cache-verification-report.md)
+3. **Deploy to production:** Follow `deployment-package/DEPLOYMENT_INSTRUCTIONS.txt`
+4. **Test deployment:** Use verification commands from guide
 
 ### For Server Migration
 
-1. **Planning phase:** Review [SERVER_MIGRATION_GUIDE.md](SERVER_MIGRATION_GUIDE.md)
-2. **Cloudflare setup:** [CLOUDFLARE_CONFIGURATION_GUIDE.md](CLOUDFLARE_CONFIGURATION_GUIDE.md)
+1. **Planning phase:** Review [05-server-migration-guide.md](05-server-migration-guide.md)
+2. **Cloudflare setup:** [06-cloudflare-configuration-guide.md](06-cloudflare-configuration-guide.md)
 3. **Backup first:** Always create DigitalOcean snapshots before migration
 4. **Test thoroughly:** Validate on new server before DNS cutover
 
 ### For Security Review
 
-1. **Theme audit:** [THESOURCE_SECURITY_AUDIT.md](THESOURCE_SECURITY_AUDIT.md)
+1. **Theme audit:** [04-security-audit-report.md](04-security-audit-report.md)
 2. **Risk level:** 🟡 Medium (2 high priority items to address)
 3. **Quick fixes:** ~10 minutes to resolve main issues
 4. **Next review:** June 2026 (6 months)
@@ -94,7 +81,7 @@ deployment-package/
 
 - **Hostname:** ftp.pausatf.org
 - **IP Address:** 64.225.40.54
-- **Droplet:** pausatforg20230516-primary (DigitalOcean)
+- **Droplet:** pausatf-prod (DigitalOcean)
 - **Web Server:** Apache 2.4
 - **PHP:** 7.4.33
 - **WordPress:** 6.9
@@ -129,8 +116,9 @@ deployment-package/
 - ✅ Improved .htaccess deployed to production `/data/2025/`
 - ✅ HTML race results never cached (aggressive no-cache headers)
 - ✅ Static assets cached for 30 days (down from 1 year)
-- ✅ Cloudflare respecting cache directives
+- ✅ Cloudflare respecting cache directives via CF-Cache-Control headers
 - ✅ All verification tests passing
+- ✅ Page Rules not required (CF-Cache-Control headers sufficient)
 
 **Server Access:**
 - ✅ SSH restored to production server (ftp.pausatf.org)
@@ -143,19 +131,15 @@ deployment-package/
 
 ### ⏳ Pending Items
 
-**Cloudflare Configuration:**
-- ⏳ Page Rules need manual setup (API token lacks permission)
-- See: [CLOUDFLARE_PAGE_RULES_SETUP.md](CLOUDFLARE_PAGE_RULES_SETUP.md)
-
 **Theme Cleanup (Optional):**
 - ⏳ Remove IE6 PNG fix library (5 min)
 - ⏳ Delete backup files from child theme (5 min)
-- See: [THESOURCE_SECURITY_AUDIT.md](THESOURCE_SECURITY_AUDIT.md)
+- See: [04-security-audit-report.md](04-security-audit-report.md)
 
 **PHP Upgrade (Long-term):**
 - ⏳ PHP 7.4 reached EOL (Nov 2022)
 - ⏳ Plan migration to PHP 8.1 or 8.3
-- See: [SERVER_MIGRATION_GUIDE.md](SERVER_MIGRATION_GUIDE.md)
+- See: [05-server-migration-guide.md](05-server-migration-guide.md)
 
 ---
 
@@ -164,28 +148,22 @@ deployment-package/
 ```
 pausatf-infrastructure-docs/
 │
-├── README.md                              # This file
+├── README.md                                    # This file - start here
 │
-├── Executive Summaries/
-│   ├── FINAL_SUMMARY.md                   # Cache fix status
-│   ├── CACHE_VERIFICATION_REPORT.md       # Deployment verification
-│   └── THESOURCE_SECURITY_AUDIT.md        # Security assessment
-│
-├── Technical Guides/
-│   ├── SERVER_MIGRATION_GUIDE.md          # 10-phase migration
-│   ├── CLOUDFLARE_CONFIGURATION_GUIDE.md  # Complete CDN setup
-│   ├── cache_fix_documentation.md         # Cache implementation
-│   └── CLOUDFLARE_PAGE_RULES_SETUP.md     # Page Rules guide
-│
-├── Audit Reports/
-│   ├── PAUSATF_CACHE_AUDIT_REPORT.md      # Cache config audit
-│   └── THESOURCE_SECURITY_AUDIT.md        # Theme security scan
+├── 01-cache-implementation-guide.md             # Cache fix implementation details
+├── 02-cache-audit-report.md                     # Pre-fix cache configuration audit
+├── 03-cache-verification-report.md              # Production deployment verification
+├── 04-security-audit-report.md                  # WordPress theme security assessment
+├── 05-server-migration-guide.md                 # 10-phase DigitalOcean migration
+├── 06-cloudflare-configuration-guide.md         # Complete CDN configuration
 │
 └── deployment-package/
-    ├── data_2025_htaccess                 # Production .htaccess
-    ├── purge_cloudflare_cache.sh          # Cache purge script
-    └── DEPLOYMENT_INSTRUCTIONS.txt        # Deployment steps
+    ├── data_2025_htaccess                       # Production .htaccess
+    ├── purge_cloudflare_cache.sh                # Cache purge script
+    └── DEPLOYMENT_INSTRUCTIONS.txt              # Deployment steps
 ```
+
+**Reading Order:** Files are numbered 01-06 in recommended reading sequence. Start with the README, then follow the numbered guides as needed.
 
 ---
 
@@ -324,7 +302,7 @@ doctl compute droplet get 355909945 --format Status
 
 ### WordPress Issues
 
-**See:** [SERVER_MIGRATION_GUIDE.md](SERVER_MIGRATION_GUIDE.md) - Troubleshooting section
+**See:** [05-server-migration-guide.md](05-server-migration-guide.md) - Troubleshooting section
 
 ---
 
@@ -359,7 +337,7 @@ doctl compute droplet get 355909945 --format Status
 
 ### OWASP Top 10 Compliance
 
-See: [THESOURCE_SECURITY_AUDIT.md](THESOURCE_SECURITY_AUDIT.md) - Compliance section
+See: [04-security-audit-report.md](04-security-audit-report.md) - Compliance section
 
 ### Security Plugins Active
 - wp-fail2ban 3.5.3 (brute force protection)
