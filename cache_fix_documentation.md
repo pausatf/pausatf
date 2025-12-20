@@ -3,6 +3,29 @@
 
 ---
 
+## SERVER ENVIRONMENT
+
+### Production Server
+- **Hostname:** ftp.pausatf.org
+- **IP:** REDACTED_PROD_NEW_IP
+- **Droplet:** pausatforg20230516-primary (DigitalOcean)
+- **Web Server:** Apache 2.4
+- **PHP:** 7.4
+- **Document Root:** /var/www/legacy/public_html/
+- **SSH Access:** ❌ Currently unavailable (port 22 refused)
+- **Access Method:** DigitalOcean Droplet Console only
+
+### Staging Server
+- **Hostname:** stage.pausatf.org
+- **IP:** REDACTED_STAGE_IP
+- **Droplet:** pausatf-stage (DigitalOcean)
+- **Web Server:** OpenLiteSpeed 1.8.3
+- **PHP:** 8.4.15
+- **Document Root:** /var/www/html/
+- **SSH Access:** ✅ Available via `ssh root@stage.pausatf.org`
+
+---
+
 ## EXECUTIVE SUMMARY
 
 **Problem:** Static HTML race results in `/data/2025/` showing stale content to users for YEARS  
@@ -79,7 +102,8 @@ Options -Indexes
 
 **Installation on Production:**
 ```bash
-# On production server (REDACTED_PROD_NEW_IP)
+# On production server (ftp.pausatf.org / REDACTED_PROD_NEW_IP)
+# SSH: ssh root@ftp.pausatf.org (currently unavailable - use console)
 cat > /var/www/legacy/public_html/data/2025/.htaccess << 'EOFHTACCESS'
 [paste content above]
 EOFHTACCESS
@@ -106,8 +130,8 @@ curl -I https://www.pausatf.org/data/2025/somefile.html | grep -i cache
 
 **Installation:**
 ```bash
-# Already installed on STAGING (REDACTED_STAGE_IP)
-# For PRODUCTION (REDACTED_PROD_NEW_IP):
+# Already installed on STAGING (stage.pausatf.org / REDACTED_STAGE_IP)
+# For PRODUCTION (ftp.pausatf.org / REDACTED_PROD_NEW_IP):
 
 cat > /usr/local/bin/purge_cloudflare_cache.sh << 'EOFSCRIPT'
 #!/bin/bash
@@ -348,8 +372,12 @@ tail -f /var/log/cloudflare-monitor.log
 
 ## DEPLOYMENT CHECKLIST
 
-### Production Server (www.pausatf.org - REDACTED_PROD_NEW_IP)
+### Production Server (ftp.pausatf.org - REDACTED_PROD_NEW_IP)
+**Droplet:** pausatforg20230516-primary
+**SSH:** Currently unavailable (port 22 refused) - use DigitalOcean console
+**Access:** `ssh root@ftp.pausatf.org` (when SSH is enabled)
 
+- [ ] 0. Enable SSH access on server (see Step 7 in DEPLOYMENT_INSTRUCTIONS.txt)
 - [ ] 1. Create `.htaccess` in `/var/www/legacy/public_html/data/2025/`
 - [ ] 2. Install fixed purge script `/usr/local/bin/purge_cloudflare_cache.sh`
 - [ ] 3. Test purge script manually
@@ -360,6 +388,9 @@ tail -f /var/log/cloudflare-monitor.log
 - [ ] 8. Notify users to hard refresh ONE TIME
 
 ### Staging Server (stage.pausatf.org - REDACTED_STAGE_IP)
+**Droplet:** pausatf-stage
+**SSH:** Available
+**Access:** `ssh root@stage.pausatf.org`
 
 - [✅] 1. Add cache headers to main `.htaccess`
 - [✅] 2. Install purge script

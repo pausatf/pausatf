@@ -40,16 +40,22 @@ The `deployment-package/` directory contains files ready for production deployme
 
 ## Deployment Status
 
-### ✅ Staging Server (REDACTED_STAGE_IP / stage.pausatf.org)
+### ✅ Staging Server (stage.pausatf.org - REDACTED_STAGE_IP)
+- **Droplet:** pausatf-stage
+- **SSH:** Available via `ssh root@stage.pausatf.org`
 - Cache-Control headers installed in main .htaccess
-- Fixed purge script deployed to `/usr/local/bin/`
+- Fixed purge script deployed to `/usr/local/bin/purge_cloudflare_cache.sh`
 - OpenLiteSpeed cache module verified
 - Cloudflare cache purged
+- All fixes tested and working
 
-### ⏳ Production Server (REDACTED_PROD_NEW_IP / www.pausatf.org)
-- **BLOCKED:** SSH port 22 is refusing connections
-- Deployment package created for manual installation via DigitalOcean console
+### ⏳ Production Server (ftp.pausatf.org - REDACTED_PROD_NEW_IP)
+- **Droplet:** pausatforg20230516-primary
+- **SSH:** ❌ UNAVAILABLE - Port 22 connections refused
+- **Access Method:** DigitalOcean Droplet Console only
+- Deployment package created for manual installation
 - Requires manual deployment following DEPLOYMENT_INSTRUCTIONS.txt
+- SSH service needs to be enabled on server (see Step 7 in deployment instructions)
 
 ### ⏳ Cloudflare Configuration
 - Page Rules need manual configuration via dashboard (API token lacks permission)
@@ -70,8 +76,23 @@ The `deployment-package/` directory contains files ready for production deployme
 
 ### Servers
 
-- **Production:** REDACTED_PROD_NEW_IP (Apache 2.4, PHP 7.4)
-- **Staging:** REDACTED_STAGE_IP (OpenLiteSpeed 1.8.3, PHP 8.4.15)
+**Production Server:**
+- **Hostname:** ftp.pausatf.org
+- **IP Address:** REDACTED_PROD_NEW_IP
+- **Droplet:** pausatforg20230516-primary
+- **Web Server:** Apache 2.4
+- **PHP:** 7.4
+- **Document Root:** /var/www/legacy/public_html/
+- **SSH Access:** Currently unavailable (port 22 refused)
+
+**Staging Server:**
+- **Hostname:** stage.pausatf.org
+- **IP Address:** REDACTED_STAGE_IP
+- **Droplet:** pausatf-stage
+- **Web Server:** OpenLiteSpeed 1.8.3
+- **PHP:** 8.4.15
+- **Document Root:** /var/www/html/
+- **SSH Access:** Available via `ssh root@stage.pausatf.org`
 
 ### Cloudflare Configuration
 

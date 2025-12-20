@@ -5,7 +5,9 @@
 
 ## ✅ WHAT WAS COMPLETED
 
-### STAGING SERVER (stage.pausatf.org - REDACTED_STAGE_IP)
+### STAGING SERVER
+**Hostname:** stage.pausatf.org | **IP:** REDACTED_STAGE_IP | **Droplet:** pausatf-stage
+**SSH Access:** ✅ Available via `ssh root@stage.pausatf.org`
 
 1. ✅ **Scanned all cache configurations**
    - Apache/OpenLiteSpeed configs
@@ -32,7 +34,9 @@
    - Deleted 12 orphaned database tables (765 MB freed)
    - Removed 6 orphaned cron jobs
 
-### PRODUCTION SERVER (www.pausatf.org - REDACTED_PROD_NEW_IP)
+### PRODUCTION SERVER
+**Hostname:** ftp.pausatf.org | **IP:** REDACTED_PROD_NEW_IP | **Droplet:** pausatforg20230516-primary
+**SSH Access:** ❌ UNAVAILABLE (Port 22 refused - must use DigitalOcean console)
 
 6. ✅ **Created deployment package**
    - Location: `~/pausatf_cache_fixes.tar.gz`
@@ -47,10 +51,15 @@
 
 ## ⚠️ PENDING ACTIONS (Require Manual Intervention)
 
-### 1. Enable SSH on Production Server
-**Why:** Port 22 is currently blocked/refusing connections  
-**Impact:** Cannot deploy fixes remotely  
-**How:** Via DigitalOcean console or recovery mode
+### 1. Enable SSH on Production Server (ftp.pausatf.org)
+**Current Status:** Port 22 connections refused on REDACTED_PROD_NEW_IP
+**Impact:** Cannot deploy fixes remotely via `ssh root@ftp.pausatf.org`
+**Access Method:** DigitalOcean Droplet Console only
+**How to Fix:**
+1. Access server via DigitalOcean console (droplet: pausatforg20230516-primary)
+2. Run: `systemctl enable ssh && systemctl start ssh`
+3. Verify: `ss -tlnp | grep :22`
+4. Test from local: `ssh root@ftp.pausatf.org`
 
 ### 2. Deploy Cache Fixes to Production
 **Files to install:**
