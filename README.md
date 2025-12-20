@@ -22,6 +22,8 @@ Jeff reported critical cache issues where static HTML race results were showing 
 - **[cache_fix_documentation.md](cache_fix_documentation.md)** - Comprehensive technical documentation with all fixes and testing procedures
 - **[PAUSATF_CACHE_AUDIT_REPORT.md](PAUSATF_CACHE_AUDIT_REPORT.md)** - Complete audit of all cache configurations found on servers
 - **[CLOUDFLARE_PAGE_RULES_SETUP.md](CLOUDFLARE_PAGE_RULES_SETUP.md)** - Step-by-step guide for configuring Cloudflare Page Rules
+- **[SERVER_MIGRATION_GUIDE.md](SERVER_MIGRATION_GUIDE.md)** - Complete guide for migrating to a new DigitalOcean droplet
+- **[CLOUDFLARE_CONFIGURATION_GUIDE.md](CLOUDFLARE_CONFIGURATION_GUIDE.md)** - Detailed Cloudflare configuration with API examples
 
 ### Deployment Package
 
@@ -33,10 +35,17 @@ The `deployment-package/` directory contains files ready for production deployme
 
 ## Quick Start
 
+### For Cache Fix Deployment
 1. **Read the executive summary:** Start with [FINAL_SUMMARY.md](FINAL_SUMMARY.md)
 2. **Review deployment status:** Check which fixes have been applied to staging vs production
 3. **Production deployment:** Follow instructions in `deployment-package/DEPLOYMENT_INSTRUCTIONS.txt`
 4. **Configure Cloudflare:** Use [CLOUDFLARE_PAGE_RULES_SETUP.md](CLOUDFLARE_PAGE_RULES_SETUP.md) to set up Page Rules
+
+### For Server Migration
+1. **Planning:** Review [SERVER_MIGRATION_GUIDE.md](SERVER_MIGRATION_GUIDE.md) - Complete 10-phase migration process
+2. **Cloudflare Setup:** Use [CLOUDFLARE_CONFIGURATION_GUIDE.md](CLOUDFLARE_CONFIGURATION_GUIDE.md) for detailed configuration
+3. **Backup First:** Always create snapshots and backups before migration
+4. **Test Thoroughly:** Validate on new server before updating DNS
 
 ## Deployment Status
 
