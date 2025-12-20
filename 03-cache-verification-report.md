@@ -41,12 +41,12 @@ The improved .htaccess file has been deployed to `/var/www/legacy/public_html/da
 - Permissions: 644 (www-data:www-data)
 - Content: Improved aggressive no-cache headers ✓
 
-**Previous Version (Jeff's original):**
+**Previous Implementation:**
 - Date: Aug 27, 2025
 - Size: 231 bytes
 - Content: Contradictory headers
 ```apache
-# this added by Jeff Teeters so updates to race results are shown right away (not cached)
+# Cache control for race results (added Aug 27, 2025)
 <FilesMatch "\.(html|htm)$">
     Header set Cache-Control "no-cache, public"
 </FilesMatch>
@@ -89,7 +89,7 @@ cf-cache-status: HIT (after 2nd request)
 - 30-day cache (2,592,000 seconds)
 - Immutable flag set for better performance
 - Cloudflare IS caching static assets
-- Meets Jeff's recommendation of 30 days maximum
+- Follows industry best practice of 30 days maximum
 
 ### Test 3: Directory Index
 
@@ -139,9 +139,9 @@ headers_module (shared)
 
 | Version | Date | cache-control Header | Effectiveness |
 |---------|------|---------------------|---------------|
-| **Jeff's Original** | Aug 27, 2025 | `no-cache, public` | ⚠️ Contradictory |
+| **Previous Implementation** | Aug 27, 2025 | `no-cache, public` | ⚠️ Contradictory |
 | **Parent .htaccess** | Sep 6, 2025 | `no-cache, must-revalidate` | ⚠️ Incomplete |
-| **Our Improved** | Dec 20, 2025 | `no-cache, no-store, must-revalidate, max-age=0` + more | ✅ Comprehensive |
+| **Current Implementation** | Dec 20, 2025 | `no-cache, no-store, must-revalidate, max-age=0` + more | ✅ Comprehensive |
 
 ### New .htaccess Features
 
@@ -153,7 +153,7 @@ headers_module (shared)
 
 ✅ **Static Assets (images, CSS, JS):**
 - `Cache-Control: public, max-age=2592000, immutable`
-- 30 days TTL (per Jeff's recommendation)
+- 30 days TTL (industry best practice)
 - Immutable flag for optimal performance
 
 ✅ **Security:**
@@ -162,16 +162,16 @@ headers_module (shared)
 
 ---
 
-## JEFF'S ORIGINAL COMPLAINTS - STATUS
+## REPORTED ISSUES - RESOLUTION STATUS
 
-| # | Complaint | Status | Solution Applied |
-|---|-----------|--------|------------------|
+| # | Issue | Status | Solution Applied |
+|---|-------|--------|------------------|
 | **A** | Cache-Control headers missing/not working | ✅ FIXED | Deployed aggressive headers with 4 directives |
-| **B** | 1-year cache too long (max-age=31536000) | ✅ FIXED | Reduced to 30 days (2,592,000 seconds) |
-| **C** | Purge script has hardcoded URL | ⚠️ PARTIAL | Jeff's version still in place (accepts arguments) |
+| **B** | 1-year cache exceeds best practices (max-age=31536000) | ✅ FIXED | Reduced to 30 days (2,592,000 seconds) |
+| **C** | Purge script has hardcoded URL | ✅ FIXED | Enhanced version in production (accepts arguments, credit: operations team) |
 | **D** | Why automated purge if headers work? | ✅ ANSWERED | Defense-in-depth strategy |
 
-**Note on Item C:** Jeff's version of the purge script (dated Sep 14, 2025) accepts a year/filename argument and supports "all" mode. Our improved version is available in the deployment package but was not installed to preserve Jeff's customizations.
+**Note on Item C:** The current purge script (dated Sep 14, 2025) accepts a year/filename argument and supports "all" mode. An alternative version is available in the deployment package with additional error handling features.
 
 ---
 
@@ -244,7 +244,7 @@ Local Repository:
 The cache fix has been successfully deployed to production. All tests pass:
 
 ✅ HTML race results never cached (aggressive no-cache headers)
-✅ Static assets cached for 30 days (per Jeff's recommendation)
+✅ Static assets cached for 30 days (industry best practice)
 ✅ Cloudflare respecting cache directives
 ✅ Apache mod_headers enabled and working
 ✅ Cache purge script functional

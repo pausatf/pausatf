@@ -39,13 +39,13 @@
 
 ### 1. Missing Cache-Control Headers
 - **Problem:** No `.htaccess` file in `/var/www/legacy/public_html/data/2025/`
-- **Jeff's Complaint:** File supposedly added but not working
-- **Reality:** Headers may be in wrong location or overridden by Cloudflare
+- **Reported Issue:** Cache headers not taking effect as expected
+- **Analysis:** Headers may be in wrong location or overridden by Cloudflare
 
 ### 2. Excessive Static Asset Caching
 - **Configured:** `max-age=31536000` (365 days)
-- **Observed:** `max-age=15552000` (180 days) 
-- **Jeff's Recommendation:** 30 days maximum
+- **Observed:** `max-age=15552000` (180 days)
+- **Recommended Approach:** 30 days maximum (industry best practice)
 - **Problem:** Updated images invisible to users for months
 
 ### 3. Broken Automated Purge Script
@@ -80,7 +80,7 @@
         Header set CF-Cache-Control "no-cache"
     </FilesMatch>
     
-    # Static assets - Reasonable TTL (30 days per Jeff's recommendation)
+    # Static assets - Reasonable TTL (30 days, recommended by operations team)
     # IMPORTANT: Use versioned filenames when updating (e.g., logo-v2.png)
     <FilesMatch "\.(jpg|jpeg|png|gif|ico|svg|webp)$">
         Header set Cache-Control "public, max-age=2592000, immutable"
@@ -426,11 +426,11 @@ Thank you for your patience!
 
 ## ARCHITECTURAL DECISION: Why This Approach?
 
-### Jeff's Valid Question Answered
+### Operational Question: Redundancy Between Headers and Purging
 
 > "If Cache-Control: no-cache works, why do we need automated purge?"
 
-**Answer:** You're RIGHT - they're redundant if headers work correctly.
+**Answer:** This is a valid observation - they are redundant when headers work correctly.
 
 **The Reality:**
 - Headers are **primary defense** (tells browsers/CDN to always check for fresh content)
