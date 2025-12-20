@@ -37,6 +37,7 @@ Documentation is organized in numbered sequence for logical reading order:
 | 07 | **[07-performance-optimization-complete.md](07-performance-optimization-complete.md)** | Report | **Complete WordPress performance optimization (93% faster)** |
 | 08 | **[08-recommended-upgrades-roadmap.md](08-recommended-upgrades-roadmap.md)** | Roadmap | **Infrastructure upgrade plan (PHP 8.3, Ubuntu 24.04, security hardening)** |
 | 09 | **[09-google-workspace-email-security.md](09-google-workspace-email-security.md)** | Guide | **Google Workspace email security setup (SPF, DKIM, DMARC)** |
+| 10 | **[10-operational-procedures.md](10-operational-procedures.md)** | Guide | **Day-to-day operations, updates, backups, emergency procedures** |
 | -- | **[EXECUTIVE-SUMMARY.md](EXECUTIVE-SUMMARY.md)** | Summary | **Non-technical overview for stakeholders** |
 
 ### 📦 Deployment Package
@@ -193,6 +194,7 @@ pausatf-infrastructure-docs/
 ├── 07-performance-optimization-complete.md      # Complete WordPress optimization
 ├── 08-recommended-upgrades-roadmap.md           # Infrastructure upgrade roadmap
 ├── 09-google-workspace-email-security.md        # Google Workspace email setup
+├── 10-operational-procedures.md                 # Day-to-day operations and maintenance
 ├── EXECUTIVE-SUMMARY.md                         # Non-technical stakeholder summary
 │
 └── deployment-package/
