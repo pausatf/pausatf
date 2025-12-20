@@ -34,8 +34,7 @@ Documentation is organized in numbered sequence for logical reading order:
 | 04 | **[04-security-audit-report.md](04-security-audit-report.md)** | Report | WordPress theme security assessment (9 findings) |
 | 05 | **[05-server-migration-guide.md](05-server-migration-guide.md)** | Guide | Complete 10-phase DigitalOcean migration process |
 | 06 | **[06-cloudflare-configuration-guide.md](06-cloudflare-configuration-guide.md)** | Guide | DNS, SSL, caching, firewall, API automation |
-| | **[PERFORMANCE_OPTIMIZATION_REPORT.md](PERFORMANCE_OPTIMIZATION_REPORT.md)** | Report | Initial WordPress performance improvements (6x faster) |
-| | **[WORDPRESS_OPTIMIZATION_FINAL.md](WORDPRESS_OPTIMIZATION_FINAL.md)** | Report | **Final optimization: 4.54 MB → 298 KB autoloaded options** |
+| 07 | **[07-performance-optimization-complete.md](07-performance-optimization-complete.md)** | Report | **Complete WordPress performance optimization (93% faster)** |
 
 ### 📦 Deployment Package
 
@@ -140,7 +139,7 @@ deployment-package/
 - ✅ Disabled 8 unnecessary Jetpack modules (35 → 28)
 - ✅ Set widget_custom_html (4.04 MB) to not autoload
 - ✅ All WordPress Site Health critical issues resolved
-- See: [WORDPRESS_OPTIMIZATION_FINAL.md](WORDPRESS_OPTIMIZATION_FINAL.md)
+- See: [07-performance-optimization-complete.md](07-performance-optimization-complete.md)
 
 ### ⏳ Pending Items
 
@@ -169,7 +168,7 @@ pausatf-infrastructure-docs/
 ├── 04-security-audit-report.md                  # WordPress theme security assessment
 ├── 05-server-migration-guide.md                 # 10-phase DigitalOcean migration
 ├── 06-cloudflare-configuration-guide.md         # Complete CDN configuration
-├── PERFORMANCE_OPTIMIZATION_REPORT.md           # WordPress performance improvements
+├── 07-performance-optimization-complete.md      # Complete WordPress optimization
 │
 └── deployment-package/
     ├── data_2025_htaccess                       # Production .htaccess
@@ -177,7 +176,7 @@ pausatf-infrastructure-docs/
     └── DEPLOYMENT_INSTRUCTIONS.txt              # Deployment steps
 ```
 
-**Reading Order:** Files are numbered 01-06 in recommended reading sequence. Start with the README, then follow the numbered guides as needed.
+**Reading Order:** Files are numbered 01-07 in recommended reading sequence. Start with the README, then follow the numbered guides as needed.
 
 ---
 
