@@ -36,6 +36,8 @@ Documentation is organized in numbered sequence for logical reading order:
 | 06 | **[06-cloudflare-configuration-guide.md](06-cloudflare-configuration-guide.md)** | Guide | DNS, SSL, caching, firewall, API automation |
 | 07 | **[07-performance-optimization-complete.md](07-performance-optimization-complete.md)** | Report | **Complete WordPress performance optimization (93% faster)** |
 | 08 | **[08-recommended-upgrades-roadmap.md](08-recommended-upgrades-roadmap.md)** | Roadmap | **Infrastructure upgrade plan (PHP 8.3, Ubuntu 24.04, security hardening)** |
+| 09 | **[09-google-workspace-email-security.md](09-google-workspace-email-security.md)** | Guide | **Google Workspace email security setup (SPF, DKIM, DMARC)** |
+| -- | **[EXECUTIVE-SUMMARY.md](EXECUTIVE-SUMMARY.md)** | Summary | **Non-technical overview for stakeholders** |
 
 ### 📦 Deployment Package
 
@@ -190,6 +192,8 @@ pausatf-infrastructure-docs/
 ├── 06-cloudflare-configuration-guide.md         # Complete CDN configuration
 ├── 07-performance-optimization-complete.md      # Complete WordPress optimization
 ├── 08-recommended-upgrades-roadmap.md           # Infrastructure upgrade roadmap
+├── 09-google-workspace-email-security.md        # Google Workspace email setup
+├── EXECUTIVE-SUMMARY.md                         # Non-technical stakeholder summary
 │
 └── deployment-package/
     ├── data_2025_htaccess                       # Production .htaccess
