@@ -7,7 +7,7 @@
 
 **Server:** pausatf-prod (DigitalOcean name) / pausatforg20230516-primary (hostname)
 **IP Address:** REDACTED_PROD_NEW_IP
-**SSH Access:** ✅ Available via `ssh root@ftp.pausatf.org`
+**SSH Access:** ✅ Available via `ssh root@prod.pausatf.org`
 **Website:** ✅ Running and accessible
 **Deployment:** Manual deployment package created
 
