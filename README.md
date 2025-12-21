@@ -485,9 +485,32 @@ Internal documentation for pausatf.org infrastructure. Not for public distributi
 
 ---
 
+## Infrastructure as Code Repositories
+
+This documentation repository is part of a complete IaC ecosystem:
+
+| Repository | Purpose | Technologies |
+|------------|---------|--------------|
+| **[pausatf-infrastructure-docs](https://github.com/pausatf/pausatf-infrastructure-docs)** | Documentation, guides, and procedures | Markdown |
+| **[pausatf-terraform](https://github.com/pausatf/pausatf-terraform)** | Infrastructure provisioning | Terraform, DigitalOcean, Cloudflare |
+| **[pausatf-ansible](https://github.com/pausatf/pausatf-ansible)** | Configuration management | Ansible, WordPress, Apache, MySQL |
+| **[pausatf-scripts](https://github.com/pausatf/pausatf-scripts)** | Automation and operations | Bash, Python |
+
+All repositories include:
+- ✅ Pre-commit hooks for security
+- ✅ Dependabot for dependency updates
+- ✅ GitHub Actions for CI/CD
+- ✅ Secret detection and prevention
+- ✅ Comprehensive documentation
+
+---
+
 ## Quick Links
 
-- **GitHub Repository:** https://github.com/pausatf/pausatf-infrastructure-docs
+- **Documentation:** https://github.com/pausatf/pausatf-infrastructure-docs
+- **Terraform:** https://github.com/pausatf/pausatf-terraform
+- **Ansible:** https://github.com/pausatf/pausatf-ansible
+- **Scripts:** https://github.com/pausatf/pausatf-scripts
 - **Production Site:** https://www.pausatf.org
 - **Staging Site:** https://stage.pausatf.org
 - **Cloudflare Dashboard:** https://dash.cloudflare.com/
