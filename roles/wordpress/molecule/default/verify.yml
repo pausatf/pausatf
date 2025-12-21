@@ -1,0 +1,84 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Check Nginx is installed
+      package:
+        name: nginx
+        state: present
+      check_mode: yes
+      register: nginx_check
+      failed_when: nginx_check is changed
+
+    - name: Check Nginx is running
+      service:
+        name: nginx
+        state: started
+      check_mode: yes
+      register: nginx_service
+      failed_when: nginx_service is changed
+
+    - name: Check PHP 8.3 packages are installed
+      package:
+        name: "{{ item }}"
+        state: present
+      check_mode: yes
+      register: php_packages_check
+      failed_when: php_packages_check is changed
+      loop:
+        - php8.3-fpm
+        - php8.3-mysql
+        - php8.3-curl
+        - php8.3-gd
+        - php8.3-mbstring
+
+    - name: Check PHP-FPM is running
+      service:
+        name: php8.3-fpm
+        state: started
+      check_mode: yes
+      register: php_fpm_service
+      failed_when: php_fpm_service is changed
+
+    - name: Verify WordPress directory exists
+      file:
+        path: /var/www/html
+        state: directory
+      check_mode: yes
+      register: wp_dir_check
+      failed_when: wp_dir_check is changed
+
+    - name: Check Nginx configuration is valid
+      command: nginx -t
+      register: nginx_config_test
+      changed_when: false
+      failed_when: nginx_config_test.rc != 0
+
+    - name: Verify PHP-FPM configuration exists
+      stat:
+        path: /etc/php/8.3/fpm/pool.d/www.conf
+      register: php_fpm_config
+      failed_when: not php_fpm_config.stat.exists
+
+    - name: Check WordPress Nginx site is enabled
+      stat:
+        path: /etc/nginx/sites-enabled/wordpress
+      register: wp_site
+      failed_when: not wp_site.stat.exists
+
+    - name: Verify default Nginx site is disabled
+      stat:
+        path: /etc/nginx/sites-enabled/default
+      register: default_site
+      failed_when: default_site.stat.exists
+
+    - name: Test Nginx is responding
+      uri:
+        url: http://localhost
+        status_code: [200, 301, 302, 404]
+        timeout: 5
+      register: http_response
+      until: http_response.status in [200, 301, 302, 404]
+      retries: 3
+      delay: 2

@@ -1,12 +1,5 @@
 ---
-# Monitoring handlers
-
-- name: Restart Monit
-  service:
-    name: monit
+- name: restart sysstat
+  systemd:
+    name: sysstat
     state: restarted
-
-- name: Reload Monit
-  service:
-    name: monit
-    state: reloaded

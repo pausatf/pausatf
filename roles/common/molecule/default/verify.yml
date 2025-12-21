@@ -1,0 +1,80 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Check that essential packages are installed
+      package:
+        name: "{{ item }}"
+        state: present
+      check_mode: yes
+      register: package_check
+      failed_when: package_check is changed
+      loop:
+        - curl
+        - git
+        - vim
+        - htop
+        - ufw
+        - fail2ban
+
+    - name: Check UFW is enabled
+      command: ufw status
+      register: ufw_status
+      changed_when: false
+      failed_when: "'Status: active' not in ufw_status.stdout"
+
+    - name: Check fail2ban is running
+      service:
+        name: fail2ban
+        state: started
+      check_mode: yes
+      register: fail2ban_check
+      failed_when: fail2ban_check is changed
+
+    - name: Verify SSH configuration security
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+        state: present
+      check_mode: yes
+      register: ssh_config_check
+      failed_when: ssh_config_check is changed
+      loop:
+        - { regexp: '^PermitRootLogin', line: 'PermitRootLogin prohibit-password' }
+        - { regexp: '^PasswordAuthentication', line: 'PasswordAuthentication no' }
+        - { regexp: '^PubkeyAuthentication', line: 'PubkeyAuthentication yes' }
+
+    - name: Check timezone is UTC
+      command: timedatectl show --property=Timezone --value
+      register: timezone_check
+      changed_when: false
+      failed_when: timezone_check.stdout != 'UTC'
+
+    - name: Verify deploy user exists
+      user:
+        name: deploy
+        state: present
+      check_mode: yes
+      register: deploy_user_check
+      failed_when: deploy_user_check is changed
+
+    - name: Check unattended upgrades are configured
+      stat:
+        path: /etc/apt/apt.conf.d/20auto-upgrades
+      register: auto_upgrades
+      failed_when: not auto_upgrades.stat.exists
+
+    - name: Verify sysctl security settings
+      sysctl:
+        name: "{{ item.name }}"
+        value: "{{ item.value }}"
+        state: present
+      check_mode: yes
+      register: sysctl_check
+      failed_when: sysctl_check is changed
+      loop:
+        - { name: 'net.ipv4.conf.all.rp_filter', value: '1' }
+        - { name: 'net.ipv4.tcp_syncookies', value: '1' }
+        - { name: 'net.ipv4.icmp_echo_ignore_broadcasts', value: '1' }
