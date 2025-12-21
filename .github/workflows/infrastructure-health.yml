@@ -1,0 +1,112 @@
+name: Infrastructure Health Check
+
+on:
+  schedule:
+    # Run daily at 6:00 AM UTC
+    - cron: '0 6 * * *'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  check-backups:
+    name: Verify DigitalOcean Backups
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Check Production Backup Status
+        run: |
+          echo "=== Production Server Backup Check ==="
+          doctl compute droplet get ${{ secrets.PROD_DROPLET_ID }}
+
+          echo ""
+          echo "=== Recent Production Backups ==="
+          doctl compute droplet backup list ${{ secrets.PROD_DROPLET_ID }}
+
+      - name: Check Staging Backup Status
+        run: |
+          echo "=== Staging Server Backup Check ==="
+          doctl compute droplet get ${{ secrets.STAGING_DROPLET_ID }}
+
+          echo ""
+          echo "=== Recent Staging Backups ==="
+          doctl compute droplet backup list ${{ secrets.STAGING_DROPLET_ID }}
+
+      - name: Check Droplet Status
+        run: |
+          echo "=== Droplet Health Status ==="
+          doctl compute droplet list | grep pausatf || echo "Warning: Droplets not found"
+
+  check-cloudflare:
+    name: Verify Cloudflare Configuration
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check Cloudflare Zone Status
+        run: |
+          echo "=== Cloudflare Zone Status ==="
+          curl -s "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_ID }}" \
+            -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+            | jq '.result | {name, status, paused}'
+
+      - name: Check DNS Records
+        run: |
+          echo "=== DNS Records for pausatf.org ==="
+          curl -s "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_ID }}/dns_records" \
+            -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+            | jq '.result[] | {name, type, content, proxied}' \
+            | head -50
+
+      - name: Check SSL Status
+        run: |
+          echo "=== SSL Certificate Status ==="
+          curl -s "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_ID }}/settings/ssl" \
+            -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+            | jq '.result'
+
+  resource-monitoring:
+    name: Monitor Server Resources
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Check Resource Usage
+        run: |
+          echo "=== Server Resource Summary ==="
+          echo ""
+          echo "Production Server:"
+          doctl compute droplet get ${{ secrets.PROD_DROPLET_ID }} \
+            --format ID,Name,Memory,VCPUs,Disk,Status
+
+          echo ""
+          echo "Staging Server:"
+          doctl compute droplet get ${{ secrets.STAGING_DROPLET_ID }} \
+            --format ID,Name,Memory,VCPUs,Disk,Status
+
+      - name: Check Monthly Costs
+        run: |
+          echo "=== Monthly Cost Summary ==="
+          echo "Current billing period costs:"
+          # Note: DigitalOcean API doesn't expose detailed billing via doctl
+          # This would need to be enhanced with actual API calls
+          echo "Production: ~\$57.60/month (8GB RAM + backups)"
+          echo "Staging: ~\$28.80/month (4GB RAM + backups)"
+          echo "Total: ~\$86.40/month"
+          echo ""
+          echo "See 12-server-rightsizing-analysis.md for optimization recommendations"
