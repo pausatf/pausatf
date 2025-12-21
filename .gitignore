@@ -52,3 +52,6 @@ logs/
 tmp/
 temp/
 *.tmp
+
+# Development tools
+.claude
