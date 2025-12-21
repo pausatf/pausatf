@@ -1,0 +1,110 @@
+---
+# MySQL role - Database configuration for PAUSATF
+
+- name: Install MySQL packages
+  apt:
+    name:
+      - mysql-server
+      - mysql-client
+      - python3-mysqldb
+      - python3-pymysql
+    state: present
+
+- name: Ensure MySQL is started and enabled
+  service:
+    name: mysql
+    state: started
+    enabled: yes
+
+- name: Deploy MySQL configuration
+  template:
+    src: mysqld.cnf.j2
+    dest: /etc/mysql/mysql.conf.d/mysqld.cnf
+    owner: root
+    group: root
+    mode: '0644'
+    backup: yes
+  notify: Restart MySQL
+
+- name: Create MySQL log directory
+  file:
+    path: /var/log/mysql
+    state: directory
+    owner: mysql
+    group: adm
+    mode: '0750'
+
+- name: Set MySQL root password
+  mysql_user:
+    name: root
+    password: "{{ mysql_root_password }}"
+    host: localhost
+    login_unix_socket: "{{ mysql_socket }}"
+    state: present
+  ignore_errors: yes
+
+- name: Create .my.cnf for root
+  template:
+    src: root-my.cnf.j2
+    dest: /root/.my.cnf
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Remove anonymous MySQL users
+  mysql_user:
+    name: ''
+    host_all: yes
+    state: absent
+    login_unix_socket: "{{ mysql_socket }}"
+  ignore_errors: yes
+
+- name: Remove test database
+  mysql_db:
+    name: test
+    state: absent
+    login_unix_socket: "{{ mysql_socket }}"
+  ignore_errors: yes
+
+- name: Create WordPress databases
+  mysql_db:
+    name: "{{ item.db_name }}"
+    state: present
+    encoding: utf8mb4
+    collation: utf8mb4_unicode_ci
+    login_unix_socket: "{{ mysql_socket }}"
+  loop: "{{ wordpress_installs }}"
+  when: item.db_name is defined
+
+- name: Create WordPress database users
+  mysql_user:
+    name: "{{ item.db_user }}"
+    password: "{{ item.db_password }}"
+    priv: "{{ item.db_name }}.*:ALL"
+    host: localhost
+    state: present
+    login_unix_socket: "{{ mysql_socket }}"
+  loop: "{{ wordpress_installs }}"
+  when: item.db_user is defined
+  no_log: true
+
+- name: Configure MySQL slow query log
+  lineinfile:
+    path: /etc/mysql/mysql.conf.d/mysqld.cnf
+    regexp: "^#?slow_query_log"
+    line: "slow_query_log = 1"
+  notify: Restart MySQL
+
+- name: Configure MySQL slow query log file
+  lineinfile:
+    path: /etc/mysql/mysql.conf.d/mysqld.cnf
+    regexp: "^#?slow_query_log_file"
+    line: "slow_query_log_file = /var/log/mysql/mysql-slow.log"
+  notify: Restart MySQL
+
+- name: Configure MySQL long query time
+  lineinfile:
+    path: /etc/mysql/mysql.conf.d/mysqld.cnf
+    regexp: "^#?long_query_time"
+    line: "long_query_time = 2"
+  notify: Restart MySQL

@@ -1,0 +1,77 @@
+<?php
+/**
+ * TheSource Child Theme Functions
+ */
+
+// Enqueue parent theme's scripts and styles with browser detection
+function thesource_child_enqueue_scripts() {
+    // Add a version number for cache busting
+    $version = '1.1.' . time();
+    
+    // Enqueue parent theme's style.css
+    wp_enqueue_style('parent-style', get_template_directory_uri() . '/style.css');
+    
+    // Enqueue child theme's dropdown.css for menu color fixes with cache busting
+    wp_enqueue_style('child-dropdown', get_stylesheet_directory_uri() . '/dropdown.css', array('parent-style'), $version);
+    // ✅ Enqueue red theme overrides (after dropdown)
+    wp_enqueue_style('red-style', get_stylesheet_directory_uri() . '/style-Red.css', array('child-dropdown'), $version);
+ 
+    // Add browser-specific CSS
+    $user_agent = isset(isset(isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '') ? isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '' : '') ? isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '' : '';
+    if (strpos($user_agent, 'Chrome') !== false) {
+        wp_enqueue_style('chrome-fixes', get_stylesheet_directory_uri() . '/chrome-fixes.css', array('child-dropdown'), $version);
+    }
+    
+    // Enqueue jQuery first to ensure it's loaded before superfish
+    wp_enqueue_script('jquery');
+    
+    // Enqueue superfish.js from parent theme with cache busting
+    wp_enqueue_script('superfish', get_template_directory_uri() . '/js/superfish.js', array('jquery'), $version, true);
+    
+    // Initialize superfish with more robust settings
+    wp_add_inline_script('superfish', '
+jQuery(document).ready(function($) {
+    // Wait for DOM to be fully loaded
+    setTimeout(function() {
+        try {
+            $("ul.superfish, ul.nav").superfish({
+                delay: 200,
+                animation: {opacity:"show",height:"show"},
+                speed: "fast",
+                autoArrows: true,
+                dropShadows: false,
+                disableHI: false,
+                onBeforeShow: function() {
+                    // Fix for Chrome
+                    $(this).css("display", "none").show();
+                }
+            });
+            console.log("Superfish initialized successfully");
+        } catch(e) {
+            console.error("Error initializing superfish: " + e.message);
+        }
+    }, 500);
+});
+');
+}
+add_action('wp_enqueue_scripts', 'thesource_child_enqueue_scripts', 999);
+
+// Add browser class to body
+function thesource_child_browser_body_class($classes) {
+    $user_agent = isset(isset(isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '') ? isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '' : '') ? isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '' : '';
+    
+    if (strpos($user_agent, 'Chrome') !== false) {
+        $classes[] = 'browser-chrome';
+    } elseif (strpos($user_agent, 'Safari') !== false) {
+        $classes[] = 'browser-safari';
+    } elseif (strpos($user_agent, 'Firefox') !== false) {
+        $classes[] = 'browser-firefox';
+    } elseif (strpos($user_agent, 'MSIE') !== false || strpos($user_agent, 'Trident') !== false) {
+        $classes[] = 'browser-ie';
+    } elseif (strpos($user_agent, 'Edge') !== false) {
+        $classes[] = 'browser-edge';
+    }
+    
+    return $classes;
+}
+add_filter('body_class', 'thesource_child_browser_body_class');

@@ -1,0 +1,163 @@
+#!/bin/bash
+# WordPress Auto-Update Script
+# Managed by Ansible - do not edit manually
+#
+# Updates WordPress core, plugins, and themes with security patches
+# Run via cron or manually: /usr/local/bin/wp-update.sh
+
+set -euo pipefail
+
+# Configuration
+WP_PATH="{{ item.path }}"
+WP_USER="{{ apache_user }}"
+WP_CLI="{{ wpcli_path }}"
+LOG_FILE="/var/log/wordpress-updates.log"
+LOCK_FILE="/var/run/wp-update.lock"
+
+# Excluded from auto-updates
+EXCLUDE_PLUGINS=({% for plugin in wpcli_exclude_plugins | default([]) %}"{{ plugin }}" {% endfor %})
+EXCLUDE_THEMES=({% for theme in wpcli_exclude_themes | default([]) %}"{{ theme }}" {% endfor %})
+
+log() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [{{ item.domain }}] $1" >> "$LOG_FILE"
+}
+
+# Check if already running
+if [ -f "$LOCK_FILE" ]; then
+    pid=$(cat "$LOCK_FILE")
+    if kill -0 "$pid" 2>/dev/null; then
+        log "ERROR: Update already running (PID $pid)"
+        exit 1
+    fi
+fi
+echo $$ > "$LOCK_FILE"
+trap "rm -f $LOCK_FILE" EXIT
+
+log "Starting WordPress update check"
+
+# Function to run WP-CLI as web user
+wp_cmd() {
+    sudo -u "$WP_USER" "$WP_CLI" --path="$WP_PATH" "$@" 2>/dev/null
+}
+
+# Check if WordPress is installed
+if ! wp_cmd core is-installed; then
+    log "ERROR: WordPress not installed at $WP_PATH"
+    exit 1
+fi
+
+# Get current versions
+CURRENT_WP=$(wp_cmd core version)
+log "Current WordPress version: $CURRENT_WP"
+
+{% if item.auto_update_core | default(false) %}
+# Update WordPress Core
+{% if item.auto_update_core == "minor" %}
+log "Checking for minor core updates..."
+if wp_cmd core check-update --minor 2>/dev/null | grep -q "version"; then
+    log "Minor update available, applying..."
+    if wp_cmd core update --minor; then
+        NEW_WP=$(wp_cmd core version)
+        log "WordPress updated: $CURRENT_WP -> $NEW_WP"
+    else
+        log "ERROR: Core update failed"
+    fi
+else
+    log "WordPress core is up to date (minor)"
+fi
+{% else %}
+log "Checking for core updates..."
+if wp_cmd core check-update 2>/dev/null | grep -q "version"; then
+    log "Update available, applying..."
+    if wp_cmd core update; then
+        NEW_WP=$(wp_cmd core version)
+        log "WordPress updated: $CURRENT_WP -> $NEW_WP"
+    else
+        log "ERROR: Core update failed"
+    fi
+else
+    log "WordPress core is up to date"
+fi
+{% endif %}
+{% endif %}
+
+{% if wpcli_update_plugins | default(true) %}
+# Update Plugins
+log "Checking plugin updates..."
+
+# Get list of plugins with updates
+PLUGIN_UPDATES=$(wp_cmd plugin list --update=available --format=csv --fields=name 2>/dev/null | tail -n +2 || true)
+
+if [ -n "$PLUGIN_UPDATES" ]; then
+    while IFS= read -r plugin; do
+        # Check if plugin is excluded
+        excluded=false
+        for exclude in "${EXCLUDE_PLUGINS[@]}"; do
+            if [ "$plugin" = "$exclude" ]; then
+                excluded=true
+                log "Skipping excluded plugin: $plugin"
+                break
+            fi
+        done
+
+        if [ "$excluded" = false ]; then
+            OLD_VER=$(wp_cmd plugin get "$plugin" --field=version 2>/dev/null || echo "unknown")
+            if wp_cmd plugin update "$plugin"; then
+                NEW_VER=$(wp_cmd plugin get "$plugin" --field=version 2>/dev/null || echo "unknown")
+                log "Plugin updated: $plugin ($OLD_VER -> $NEW_VER)"
+            else
+                log "ERROR: Failed to update plugin: $plugin"
+            fi
+        fi
+    done <<< "$PLUGIN_UPDATES"
+else
+    log "All plugins are up to date"
+fi
+{% endif %}
+
+{% if wpcli_update_themes | default(true) %}
+# Update Themes
+log "Checking theme updates..."
+
+# Get list of themes with updates
+THEME_UPDATES=$(wp_cmd theme list --update=available --format=csv --fields=name 2>/dev/null | tail -n +2 || true)
+
+if [ -n "$THEME_UPDATES" ]; then
+    while IFS= read -r theme; do
+        # Check if theme is excluded
+        excluded=false
+        for exclude in "${EXCLUDE_THEMES[@]}"; do
+            if [ "$theme" = "$exclude" ]; then
+                excluded=true
+                log "Skipping excluded theme: $theme"
+                break
+            fi
+        done
+
+        if [ "$excluded" = false ]; then
+            OLD_VER=$(wp_cmd theme get "$theme" --field=version 2>/dev/null || echo "unknown")
+            if wp_cmd theme update "$theme"; then
+                NEW_VER=$(wp_cmd theme get "$theme" --field=version 2>/dev/null || echo "unknown")
+                log "Theme updated: $theme ($OLD_VER -> $NEW_VER)"
+            else
+                log "ERROR: Failed to update theme: $theme"
+            fi
+        fi
+    done <<< "$THEME_UPDATES"
+else
+    log "All themes are up to date"
+fi
+{% endif %}
+
+# Update database if needed
+if wp_cmd core update-db --dry-run 2>/dev/null | grep -q "Success"; then
+    log "Database update required, applying..."
+    wp_cmd core update-db
+    log "Database updated"
+fi
+
+# Clear caches
+wp_cmd cache flush 2>/dev/null || true
+wp_cmd rewrite flush 2>/dev/null || true
+
+log "WordPress update check complete"

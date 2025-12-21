@@ -1,0 +1,13 @@
+---
+# PHP handlers
+
+- name: Restart Apache
+  service:
+    name: apache2
+    state: restarted
+
+- name: Restart PHP-FPM
+  service:
+    name: "php{{ php_version }}-fpm"
+    state: restarted
+  ignore_errors: yes

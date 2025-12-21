@@ -1,0 +1,45 @@
+<?php
+/**
+ * Plugin Name: WP fail2ban Integration
+ * Description: Logs authentication failures to syslog for fail2ban
+ * Version: 1.0.0
+ * Managed by Ansible
+ */
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+// Log authentication failures
+add_action('wp_login_failed', function($username) {
+    openlog('wordpress(' . $_SERVER['HTTP_HOST'] . ')', LOG_NDELAY | LOG_PID, LOG_AUTHPRIV);
+    syslog(LOG_NOTICE, "Authentication failure for $username from " . $_SERVER['REMOTE_ADDR']);
+    closelog();
+});
+
+// Log successful logins
+add_action('wp_login', function($username, $user) {
+    openlog('wordpress(' . $_SERVER['HTTP_HOST'] . ')', LOG_NDELAY | LOG_PID, LOG_AUTHPRIV);
+    syslog(LOG_INFO, "Accepted password for $username from " . $_SERVER['REMOTE_ADDR']);
+    closelog();
+}, 10, 2);
+
+// Log XML-RPC authentication failures
+add_filter('xmlrpc_login_error', function($error, $user) {
+    if (is_wp_error($user)) {
+        openlog('wordpress(' . $_SERVER['HTTP_HOST'] . ')', LOG_NDELAY | LOG_PID, LOG_AUTHPRIV);
+        syslog(LOG_NOTICE, "XML-RPC authentication failure from " . $_SERVER['REMOTE_ADDR']);
+        closelog();
+    }
+    return $error;
+}, 10, 2);
+
+// Block user enumeration
+add_action('init', function() {
+    if (!is_admin() && isset($_REQUEST['author']) && is_numeric($_REQUEST['author'])) {
+        openlog('wordpress(' . $_SERVER['HTTP_HOST'] . ')', LOG_NDELAY | LOG_PID, LOG_AUTHPRIV);
+        syslog(LOG_NOTICE, "User enumeration attempt from " . $_SERVER['REMOTE_ADDR']);
+        closelog();
+        wp_die('Forbidden', 'Forbidden', array('response' => 403));
+    }
+});

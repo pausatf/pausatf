@@ -1,0 +1,12 @@
+---
+# MySQL handlers
+
+- name: Restart MySQL
+  service:
+    name: mysql
+    state: restarted
+
+- name: Reload MySQL
+  service:
+    name: mysql
+    state: reloaded

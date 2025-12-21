@@ -1,0 +1,43 @@
+#!/bin/bash
+# WordPress Backup Script
+# Managed by Ansible
+
+set -euo pipefail
+
+BACKUP_DIR="{{ backup_destination }}"
+RETENTION_DAYS="{{ backup_retention_days }}"
+DATE=$(date +%Y%m%d-%H%M%S)
+LOG_FILE="/var/log/wordpress-backup.log"
+
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
+}
+
+log "Starting WordPress backup..."
+
+# Create backup directory
+mkdir -p "$BACKUP_DIR"
+
+{% for wp in wordpress_installs %}
+# Backup {{ wp.name }}
+log "Backing up {{ wp.name }}..."
+
+# Database backup
+MYSQL_PWD="{{ wp.db_password }}" mysqldump -u {{ wp.db_user }} {{ wp.db_name }} | gzip > "$BACKUP_DIR/{{ wp.name }}-db-$DATE.sql.gz"
+
+# Files backup
+tar -czf "$BACKUP_DIR/{{ wp.name }}-files-$DATE.tar.gz" -C $(dirname {{ wp.path }}) $(basename {{ wp.path }}) --exclude="wp-content/cache" --exclude="wp-content/uploads/cache"
+
+log "{{ wp.name }} backup complete"
+
+{% endfor %}
+
+# Cleanup old backups
+log "Cleaning up backups older than $RETENTION_DAYS days..."
+find "$BACKUP_DIR" -name "*.gz" -mtime +$RETENTION_DAYS -delete
+
+# Show backup sizes
+log "Backup sizes:"
+ls -lh "$BACKUP_DIR"/*-$DATE* | tee -a "$LOG_FILE"
+
+log "Backup complete!"

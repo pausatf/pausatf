@@ -1,0 +1,7 @@
+---
+# Cloudflare Role Handlers
+
+- name: Reload Apache
+  service:
+    name: apache2
+    state: reloaded

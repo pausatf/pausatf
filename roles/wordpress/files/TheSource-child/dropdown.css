@@ -1,0 +1,110 @@
+/* Dropdown menu color fixes for TheSource child theme */
+
+/* Force consistent styling for both logged-in and non-logged-in users */
+body.logged-in ul.nav li a:hover,
+body.logged-in #cat-nav-content ul.nav li a:hover,
+body.logged-in #cat-nav-content ul.nav li.current-cat > a,
+body.logged-in ul.nav li.current_page_item a,
+body:not(.logged-in) ul.nav li a:hover,
+body:not(.logged-in) #cat-nav-content ul.nav li a:hover,
+body:not(.logged-in) #cat-nav-content ul.nav li.current-cat > a,
+body:not(.logged-in) ul.nav li.current_page_item a {
+    color: #ce0010 !important;
+}
+
+/* Dropdown menu background color for both logged-in and non-logged-in users */
+body.logged-in #page-menu ul.nav ul,
+body.logged-in #cat-nav-content ul.nav ul,
+body:not(.logged-in) #page-menu ul.nav ul,
+body:not(.logged-in) #cat-nav-content ul.nav ul {
+    background: #232323 !important; /* Keep black background as it works when logged in */
+    border: 0px;
+}
+
+/* Dropdown menu text color for both logged-in and non-logged-in users */
+body.logged-in #cat-nav-content ul.nav li li a,
+body.logged-in #page-menu ul.nav li li a,
+body:not(.logged-in) #cat-nav-content ul.nav li li a,
+body:not(.logged-in) #page-menu ul.nav li li a {
+    color: #fefefe !important;
+}
+
+/* Dropdown menu hover color for both logged-in and non-logged-in users */
+body.logged-in #cat-nav-content ul.nav li li a:hover,
+body.logged-in #page-menu ul.nav li li a:hover,
+body:not(.logged-in) #cat-nav-content ul.nav li li a:hover,
+body:not(.logged-in) #page-menu ul.nav li li a:hover {
+    color: #ce0010 !important;
+    background-color: transparent !important;
+}
+
+/* Fix for dropdown submenu background */
+body.logged-in #page-menu ul.nav ul ul,
+body.logged-in #cat-nav-content ul.nav ul ul,
+body:not(.logged-in) #page-menu ul.nav ul ul,
+body:not(.logged-in) #cat-nav-content ul.nav ul ul {
+    background: #232323 !important;
+    border-top: 1px solid #111010 !important;
+}
+
+/* Ensure superfish functionality works for both logged-in and non-logged-in users */
+body.logged-in ul.superfish,
+body:not(.logged-in) ul.superfish {
+    z-index: 9999 !important;
+}
+
+/* Override any admin bar interference */
+body.admin-bar #page-menu,
+body.admin-bar #cat-nav-content {
+    z-index: 99999 !important;
+}
+
+/* 🛠 Fix: Make all nav links white, even active/current */
+ul.nav li a,
+ul.nav li.current_page_item a,
+ul.nav li.current-menu-item a,
+#cat-nav-content ul.nav li a,
+#cat-nav-content ul.nav li.current-cat > a {
+  color: #ffffff !important;
+  text-shadow: 1px 1px 1px #8d1a13;
+}
+
+#cat-nav .sf-arrow,
+#cat-nav li.current_page_item::before {
+  top: 15px !important;  /* Matches nav's -15px upward pull */
+}
+
+/* BLACK BAR (header-below or post-nav) - pull up behind nav */
+#header-below, #banner-below, .blackbar, .below-header, .below-menu {
+  position: relative;
+  margin-top: -15px;
+  z-index: 10;
+}
+
+#header-top {
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
+  overflow: visible;
+}
+
+#logo {
+  display: block;
+  position: relative;
+  margin: 0 auto;
+  height: auto;
+  max-height: 100%;
+  float: none !important;
+}
+
+#content,
+.container,
+#main-area {
+  padding-top: 0 !important;
+}
+
+.breadcrumbs,
+#breadcrumbs {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+

@@ -1,0 +1,23 @@
+# Apache SSL Configuration
+# Managed by Ansible - Do not edit manually
+
+<IfModule mod_ssl.c>
+    # SSL Protocol and Cipher Configuration
+    SSLProtocol {{ ssl_protocol | default('all -SSLv3') }}
+    SSLCipherSuite {{ ssl_cipher_suite | default('ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384') }}
+    SSLHonorCipherOrder off
+
+    # SSL Compression (disabled for security)
+    SSLCompression off
+
+    # SSL Session Cache
+    SSLSessionCache shmcb:${APACHE_RUN_DIR}/ssl_scache(512000)
+    SSLSessionCacheTimeout 300
+
+    # OCSP Stapling
+    SSLUseStapling Off
+    # SSLStaplingCache shmcb:${APACHE_RUN_DIR}/ssl_stapling(32768)
+
+    # Strict SNI
+    SSLStrictSNIVHostCheck Off
+</IfModule>

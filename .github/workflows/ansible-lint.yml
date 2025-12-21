@@ -1,0 +1,72 @@
+name: Ansible Lint
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '**.yml'
+      - '**.yaml'
+      - 'roles/**'
+      - '.github/workflows/ansible-*.yml'
+  push:
+    branches: [main]
+    paths:
+      - '**.yml'
+      - '**.yaml'
+
+jobs:
+  lint:
+    name: Ansible Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install ansible ansible-lint
+
+      - name: Run ansible-lint
+        run: ansible-lint --offline
+
+  syntax:
+    name: Ansible Syntax Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Ansible
+        run: pip install ansible
+
+      - name: Ansible Syntax Check
+        run: ansible-playbook site.yml --syntax-check
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Checkov
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: .
+          framework: ansible
+          soft_fail: false
+          output_format: cli
+          quiet: true
