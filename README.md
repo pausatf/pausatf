@@ -61,6 +61,7 @@ Documentation is organized in numbered sequence for logical reading order:
 | 10 | **[10-operational-procedures.md](10-operational-procedures.md)** | Guide | **Day-to-day operations, updates, backups, emergency procedures** |
 | 11 | **[11-database-maintenance.md](11-database-maintenance.md)** | Guide | **Database maintenance procedures, primary key requirements, troubleshooting** |
 | 12 | **[12-server-rightsizing-analysis.md](12-server-rightsizing-analysis.md)** | Analysis | **Resource optimization, cost analysis, backup configuration** |
+| 13 | **[13-digitalocean-optimization-guide.md](13-digitalocean-optimization-guide.md)** | Guide | **DigitalOcean infrastructure improvements, security, monitoring, DR** |
 | -- | **[EXECUTIVE-SUMMARY.md](EXECUTIVE-SUMMARY.md)** | Summary | **Non-technical overview for stakeholders** |
 
 ### 📦 Deployment Package
@@ -243,6 +244,7 @@ pausatf-infrastructure-docs/
 ├── 10-operational-procedures.md                 # Day-to-day operations and maintenance
 ├── 11-database-maintenance.md                   # Database maintenance and primary keys
 ├── 12-server-rightsizing-analysis.md            # Resource optimization and cost analysis
+├── 13-digitalocean-optimization-guide.md        # DigitalOcean infrastructure improvements
 ├── EXECUTIVE-SUMMARY.md                         # Non-technical stakeholder summary
 │
 └── deployment-package/
@@ -251,7 +253,7 @@ pausatf-infrastructure-docs/
     └── DEPLOYMENT_INSTRUCTIONS.txt              # Deployment steps
 ```
 
-**Reading Order:** Files are numbered 01-12 in recommended reading sequence. Start with the README, then follow the numbered guides as needed. Check CHANGELOG.md for recent changes.
+**Reading Order:** Files are numbered 01-13 in recommended reading sequence. Start with the README, then follow the numbered guides as needed. Check CHANGELOG.md for recent changes.
 
 ---
 
