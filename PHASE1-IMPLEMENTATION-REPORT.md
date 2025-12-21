@@ -196,52 +196,30 @@ Configure monitoring alerts via DigitalOcean web interface:
 
 ---
 
-### 5. ⚠️ SSH Access Restriction (Optional but Recommended)
+### 5. ❌ SSH Access Restriction (Evaluated - Not Implemented)
 
 **Current:** SSH accessible from entire internet (0.0.0.0/0)
-**Risk:** Brute force attacks (mitigated by fail2ban but not eliminated)
+**Risk:** Brute force attacks (mitigated by fail2ban)
+**Decision:** Keep current configuration
 
-**Recommended Actions (Choose One):**
+**Status:** Evaluated as optional security improvement but decided against implementation.
 
-**Option A: IP Whitelist (Best for Static IPs)**
+**Current Protections:**
+- fail2ban active and monitoring SSH attempts
+- Strong password/key authentication required
+- Regular security updates enabled
+- Monitoring via DigitalOcean agent
 
-If you have static IP addresses:
-```bash
-# Update production firewall
-doctl compute firewall update a4e42798-ab22-467f-a821-daa290f56655 \
-  --inbound-rules "protocol:tcp,ports:22,address:YOUR_HOME_IP/32,address:YOUR_OFFICE_IP/32 \
-                   protocol:tcp,ports:80,address:0.0.0.0/0 \
-                   protocol:tcp,ports:443,address:0.0.0.0/0 \
-                   protocol:icmp,address:0.0.0.0/0"
+**Rationale for Current Approach:**
+- Fail2ban provides adequate brute force protection
+- No static IP addresses available for whitelisting
+- VPN overhead not justified for current use case
+- SSH access flexibility preferred over additional restriction
 
-# Update staging firewall
-doctl compute firewall update c12dfc7f-f43a-4b32-96c6-80ba34035b1a \
-  --inbound-rules "protocol:tcp,ports:22,address:YOUR_HOME_IP/32,address:YOUR_OFFICE_IP/32 \
-                   protocol:tcp,ports:80,address:0.0.0.0/0 \
-                   protocol:tcp,ports:443,address:0.0.0.0/0 \
-                   protocol:icmp,address:0.0.0.0/0"
-```
-
-**Option B: Tailscale VPN (Best for Dynamic IPs)**
-
-1. Install Tailscale on both servers:
-```bash
-ssh root@prod.pausatf.org "curl -fsSL https://tailscale.com/install.sh | sh"
-ssh root@stage.pausatf.org "curl -fsSL https://tailscale.com/install.sh | sh"
-```
-
-2. Authenticate and join Tailscale network
-
-3. Update firewall to only allow SSH from Tailscale network (100.x.x.x/10)
-
-**Option C: Keep Current (Least Secure)**
-- Continue allowing SSH from anywhere
-- Rely on fail2ban for protection
-- Monitor for suspicious activity
-
-**Recommendation:** Option A if you have static IPs, Option B otherwise
-**Estimated Time:** 30-45 minutes
-**Priority:** MEDIUM (can be done within 1 week)
+**Alternative considered:**
+- IP whitelisting (requires static IPs)
+- Tailscale VPN (additional complexity)
+- Both options rejected in favor of current fail2ban protection
 
 ---
 
