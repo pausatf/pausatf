@@ -1,0 +1,31 @@
+# Environment files
+.env
+.env.*
+*.env
+!.env.example
+
+# Secrets
+*.pem
+*.key
+*.cert
+*.crt
+credentials.json
+secrets.yaml
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
