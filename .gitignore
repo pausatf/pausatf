@@ -78,3 +78,6 @@ temp/
 *.tmp
 *.bak
 *.backup
+
+# Development tools
+.claude
