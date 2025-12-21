@@ -421,7 +421,7 @@ wp plugin activate wp-super-cache --allow-root
 
 ---
 
-**Optimization Performed By:** Thomas Vincent (via Claude Code)
+**Optimization Performed By:** Thomas Vincent 
 **Date:** 2025-12-20  
 **Server:** pausatf-prod (prod.pausatf.org)
 
@@ -970,7 +970,7 @@ WHERE option_name = 'jetpack_active_modules';
 
 ---
 
-**Optimization Completed By:** Thomas Vincent (via Claude Code)  
+**Optimization Completed By:** Thomas Vincent   
 **Date:** 2025-12-20  
 **Server:** pausatf-prod (prod.pausatf.org)  
 **Duration:** ~2 hours
