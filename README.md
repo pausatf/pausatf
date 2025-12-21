@@ -142,9 +142,9 @@ deployment-package/
 
 ### Cloudflare Configuration
 
-- **Zone ID:** your-cloudflare-zone-id
-- **API Token:** (stored in environment variables)
-- **Plan:** Free (or Pro - verify in dashboard)
+- **Zone ID:** 67b87131144a68ad5ed43ebfd4e6d811
+- **API Token:** (stored in GitHub secrets for CI/CD)
+- **Plan:** Free
 - **Cache Purge Script:** `/usr/local/bin/purge_cloudflare_cache.sh`
 
 ---
@@ -191,6 +191,23 @@ deployment-package/
 - ✅ Always Use HTTPS + Automatic HTTPS Rewrites
 - ✅ Aggressive cache level with origin header respect
 - See: [06-cloudflare-configuration-guide.md](06-cloudflare-configuration-guide.md)
+
+**Server Right-Sizing and Backups (Dec 21, 2025):**
+- ✅ Daily automated backups enabled on both servers
+- ✅ Disk cleanup: freed 54 GB total (32 GB prod, 22 GB staging)
+- ✅ Resource usage analysis: both servers over-provisioned (20% RAM, 26% disk)
+- ✅ Cost optimization: $460.80/year savings potential identified
+- ✅ Migration strategy documented for Q2 2026 (with Ubuntu 24.04 upgrade)
+- See: [12-server-rightsizing-analysis.md](12-server-rightsizing-analysis.md)
+
+**CI/CD and Automation (Dec 21, 2025):**
+- ✅ GitHub Actions workflows configured
+- ✅ Daily infrastructure health monitoring (backups, droplets, Cloudflare)
+- ✅ Automated documentation validation on commits
+- ✅ 7 GitHub secrets configured (DigitalOcean, Cloudflare, server details)
+- ✅ Read-only API tokens for security
+- ✅ Secret rotation procedures documented
+- See: [.github/SECRETS.md](.github/SECRETS.md)
 
 ### ⏳ Pending Items
 
