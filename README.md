@@ -8,6 +8,27 @@
 
 ---
 
+## ⚠️ SECURITY NOTICE
+
+**This is a PUBLIC repository.** Do NOT commit:
+- API tokens or keys
+- Passwords or credentials
+- Private keys or certificates
+- Database connection strings with passwords
+- Any sensitive infrastructure information
+
+**Pre-commit hooks are configured** to detect secrets. Install them:
+```bash
+pip install pre-commit
+pre-commit install
+```
+
+All sensitive values should use placeholders like `your-cloudflare-api-token`.
+
+**Git History:** This repository's history was cleaned on 2025-12-21 to remove accidentally committed secrets. All exposed tokens have been rotated.
+
+---
+
 ## Overview
 
 This repository contains complete infrastructure documentation, deployment guides, security audits, and operational procedures for the Pacific Association of USA Track and Field (PAUSATF) website infrastructure.
