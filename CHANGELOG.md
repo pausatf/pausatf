@@ -9,6 +9,40 @@ and this project adheres to semantic versioning principles for infrastructure ch
 
 ## [Unreleased]
 
+---
+
+## [2025-12-21] - Database Maintenance & Primary Keys
+
+### Added
+- Database maintenance documentation (11-database-maintenance.md)
+- Comprehensive guide for DigitalOcean MySQL primary key requirements
+- Troubleshooting procedures for database issues
+- Monthly maintenance checklist for database health
+- Preventive measures for plugin-created tables
+
+### Fixed
+- **CRITICAL:** Added primary keys to 7 tables in `pausatf-stage-db`
+  - `wp_statistics_pages` (738,450 rows) - PRIMARY KEY on (uri, date)
+  - `wp_yoast_seo_meta` (1,409 rows) - PRIMARY KEY on object_id
+  - `wp_nxs_log` (696 rows) - PRIMARY KEY on id
+  - `wp_cjtoolbox_form_group_xfields` - PRIMARY KEY on groupId
+  - `wp_nxs_query` - PRIMARY KEY on id
+  - `wp_wsluserscontacts` - PRIMARY KEY on id
+  - `wp_wslusersprofiles` - PRIMARY KEY on id
+
+### Security
+- Resolved data loss risk for wp_statistics_pages (well above 5,000 row threshold)
+- Improved database replication stability
+- All tables now comply with DigitalOcean MySQL requirements
+
+### Performance
+- Eliminated replication lag caused by missing primary keys
+- Improved query performance on previously unindexed tables
+
+---
+
+## [2025-12-20] - DNS Security Enhancements
+
 ### Added
 - CNAME record for prod.pausatf.org pointing to production server
 - SPF record for email authentication (Google Workspace + SendGrid)
