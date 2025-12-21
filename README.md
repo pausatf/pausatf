@@ -497,11 +497,37 @@ This documentation repository is part of a complete IaC ecosystem:
 | **[pausatf-scripts](https://github.com/pausatf/pausatf-scripts)** | Automation and operations | Bash, Python |
 
 All repositories include:
-- ✅ Pre-commit hooks for security
-- ✅ Dependabot for dependency updates
-- ✅ GitHub Actions for CI/CD
-- ✅ Secret detection and prevention
-- ✅ Comprehensive documentation
+- ✅ Pre-commit hooks for security (shellcheck, ansible-lint, terraform fmt/validate, tfsec, tflint)
+- ✅ Dependabot for dependency updates (managed via Terraform)
+- ✅ GitHub Actions for CI/CD (validation, testing, security scanning)
+- ✅ Secret detection and prevention (gitleaks, detect-secrets, checkov)
+- ✅ Required GPG signed commits on main branch
+- ✅ Comprehensive documentation and CHANGELOGs
+
+### GitHub Actions Workflows
+
+**Terraform Repository:**
+- `terraform-validate.yml`: Format check, validation, tfsec, tflint
+- `terraform-plan.yml`: Generate plans on pull requests
+
+**Ansible Repository:**
+- `ansible-lint.yml`: Ansible and YAML linting, syntax checks
+
+**Scripts Repository:**
+- `shellcheck.yml`: Shell script linting and syntax validation
+
+**Documentation Repository:**
+- `markdown-lint.yml`: Markdown linting and link checking
+
+### GitHub Repository Management
+
+All GitHub repositories are managed as code using Terraform:
+- Repository settings (visibility, features, branch protection)
+- Branch protection rules (GPG signing, status checks)
+- Dependabot security updates
+- Required status checks per repository type
+
+See [pausatf-terraform/environments/github](https://github.com/pausatf/pausatf-terraform/tree/main/environments/github) for configuration.
 
 ---
 
