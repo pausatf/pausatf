@@ -9,6 +9,14 @@ and this project adheres to semantic versioning.
 
 ## [Unreleased]
 
+### Added
+- GitHub repository management module
+- GitHub environment configuration for managing all PAUSATF repositories
+- Automated branch protection rules with required GPG signing
+- Dependabot security updates configuration via Terraform
+- Required status checks for Terraform, Ansible, and Scripts repositories
+- Comprehensive documentation for GitHub repository management
+
 ---
 
 ## [1.0.0] - 2025-12-21

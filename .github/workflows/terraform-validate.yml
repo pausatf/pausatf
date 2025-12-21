@@ -1,23 +1,21 @@
-name: Terraform Validation
+name: Terraform Validate
 
 on:
   pull_request:
-    branches: [main]
     paths:
       - '**.tf'
-      - '**.tfvars.example'
-      - '.github/workflows/terraform-*.yml'
+      - '.github/workflows/terraform-validate.yml'
   push:
-    branches: [main]
+    branches:
+      - main
     paths:
       - '**.tf'
-      - '.github/workflows/terraform-*.yml'
+      - '.github/workflows/terraform-validate.yml'
 
 jobs:
-  validate:
-    name: Terraform Validate
+  terraform-fmt:
+    name: Terraform Format Check
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -25,31 +23,40 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.6.0
+          terraform_version: ~1.6
 
       - name: Terraform Format Check
         run: terraform fmt -check -recursive
 
-      - name: Terraform Init (Production)
-        working-directory: ./environments/production
-        run: terraform init -backend=false
-
-      - name: Terraform Validate (Production)
-        working-directory: ./environments/production
-        run: terraform validate
-
-      - name: Terraform Init (Staging)
-        working-directory: ./environments/staging
-        run: terraform init -backend=false
-
-      - name: Terraform Validate (Staging)
-        working-directory: ./environments/staging
-        run: terraform validate
-
-  security:
-    name: Security Scan
+  terraform-validate:
+    name: Terraform Validate
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment:
+          - production
+          - staging
+          - github
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ~1.6
+
+      - name: Terraform Init
+        run: terraform init -backend=false
+        working-directory: environments/${{ matrix.environment }}
+
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: environments/${{ matrix.environment }}
+
+  tfsec:
+    name: TFSec Security Scan
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -58,20 +65,18 @@ jobs:
         uses: aquasecurity/tfsec-action@v1.0.3
         with:
           soft_fail: false
+          format: sarif
+          additional_args: --concise-output
 
-      - name: Run Checkov
-        uses: bridgecrewio/checkov-action@v12
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
         with:
-          directory: .
-          framework: terraform
-          soft_fail: false
-          output_format: cli
-          quiet: true
+          sarif_file: results.sarif
 
-  lint:
-    name: Terraform Lint
+  tflint:
+    name: TFLint
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -81,5 +86,8 @@ jobs:
         with:
           tflint_version: latest
 
+      - name: Init TFLint
+        run: tflint --init
+
       - name: Run TFLint
-        run: tflint --recursive --config=.tflint.hcl
+        run: tflint --recursive --format compact
