@@ -1,0 +1,7 @@
+# Fail2ban filter for WordPress
+# Managed by Ansible
+
+[Definition]
+failregex = ^%(__prefix_line)sAuthentication failure for .* from <HOST>$
+            ^%(__prefix_line)sXML-RPC authentication failure from <HOST>$
+ignoreregex =

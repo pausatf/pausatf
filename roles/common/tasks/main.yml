@@ -1,0 +1,93 @@
+---
+# Common role - Base system configuration
+
+- name: Set timezone
+  timezone:
+    name: "{{ timezone }}"
+
+- name: Set hostname
+  hostname:
+    name: "{{ hostname }}"
+  when: hostname is defined
+
+- name: Update /etc/hosts
+  lineinfile:
+    path: /etc/hosts
+    regexp: '^127\.0\.1\.1'
+    line: "127.0.1.1 {{ hostname }}"
+  when: hostname is defined
+
+- name: Install common packages
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+      - software-properties-common
+      - unzip
+      - vim
+      - htop
+      - iotop
+      - net-tools
+      - wget
+      - git
+      - rsync
+      - tree
+      - jq
+      - ncdu
+    state: present
+    update_cache: yes
+
+- name: Install monitoring tools
+  apt:
+    name:
+      - monit
+      - supervisor
+    state: present
+
+- name: Configure automatic security updates
+  apt:
+    name: unattended-upgrades
+    state: present
+
+- name: Enable unattended upgrades
+  copy:
+    dest: /etc/apt/apt.conf.d/20auto-upgrades
+    content: |
+      APT::Periodic::Update-Package-Lists "1";
+      APT::Periodic::Unattended-Upgrade "1";
+      APT::Periodic::AutocleanInterval "7";
+    mode: '0644'
+
+- name: Set up logrotate for custom logs
+  copy:
+    dest: /etc/logrotate.d/pausatf
+    content: |
+      /var/log/pausatf/*.log {
+          daily
+          missingok
+          rotate 14
+          compress
+          delaycompress
+          notifempty
+          create 0640 www-data adm
+          sharedscripts
+      }
+    mode: '0644'
+
+- name: Create backup directory
+  file:
+    path: "{{ backup_destination }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0750'
+  when: backup_enabled | default(false)
+
+- name: Install WP-CLI
+  get_url:
+    url: https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+    dest: /usr/local/bin/wp
+    mode: '0755'

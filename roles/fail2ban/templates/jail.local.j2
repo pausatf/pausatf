@@ -1,0 +1,65 @@
+# Fail2ban Configuration
+# Managed by Ansible - Do not edit manually
+
+[DEFAULT]
+bantime = {{ fail2ban_bantime }}
+findtime = {{ fail2ban_findtime }}
+maxretry = {{ fail2ban_maxretry }}
+ignoreip = 127.0.0.1/8 ::1
+
+# Email notifications (optional)
+# destemail = admin@pausatf.org
+# sendername = Fail2Ban
+# mta = sendmail
+# action = %(action_mwl)s
+
+[sshd]
+enabled = true
+port = ssh
+filter = sshd
+logpath = /var/log/auth.log
+maxretry = 3
+
+[apache-auth]
+enabled = true
+port = http,https
+filter = apache-auth
+logpath = /var/log/apache2/*error.log
+maxretry = 6
+
+[apache-badbots]
+enabled = true
+port = http,https
+filter = apache-badbots
+logpath = /var/log/apache2/*access.log
+maxretry = 2
+
+[apache-noscript]
+enabled = true
+port = http,https
+filter = apache-noscript
+logpath = /var/log/apache2/*error.log
+maxretry = 6
+
+[apache-overflows]
+enabled = true
+port = http,https
+filter = apache-overflows
+logpath = /var/log/apache2/*error.log
+maxretry = 2
+
+[wordpress]
+enabled = true
+port = http,https
+filter = wordpress
+logpath = /var/log/auth.log
+maxretry = 5
+bantime = 3600
+
+[wordpress-hard]
+enabled = true
+port = http,https
+filter = wordpress-hard
+logpath = /var/log/auth.log
+maxretry = 1
+bantime = 86400

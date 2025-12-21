@@ -1,0 +1,25 @@
+# Monit Apache Monitoring
+# Managed by Ansible
+
+check process apache2 with pidfile /var/run/apache2/apache2.pid
+    group www
+    start program = "/bin/systemctl start apache2"
+    stop program = "/bin/systemctl stop apache2"
+    if failed host 127.0.0.1 port 80 protocol http then restart
+    if 5 restarts within 5 cycles then timeout
+    depends on apache2_bin
+    depends on apache2_rc
+
+check file apache2_bin with path /usr/sbin/apache2
+    group www
+    if failed checksum then unmonitor
+    if failed permission 755 then unmonitor
+    if failed uid root then unmonitor
+    if failed gid root then unmonitor
+
+check file apache2_rc with path /etc/init.d/apache2
+    group www
+    if failed checksum then unmonitor
+    if failed permission 755 then unmonitor
+    if failed uid root then unmonitor
+    if failed gid root then unmonitor

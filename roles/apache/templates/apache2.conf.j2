@@ -1,0 +1,74 @@
+# Apache2 Main Configuration
+# Managed by Ansible - Do not edit manually
+# Server: {{ ansible_hostname }}
+
+# Global configuration
+ServerRoot "/etc/apache2"
+ServerName {{ apache_server_name }}
+
+# Mutex settings
+Mutex file:${APACHE_LOCK_DIR} default
+
+# PID file
+PidFile ${APACHE_PID_FILE}
+
+# Timeout settings
+Timeout 60
+KeepAlive On
+MaxKeepAliveRequests 100
+KeepAliveTimeout 5
+
+# User and Group
+User ${APACHE_RUN_USER}
+Group ${APACHE_RUN_GROUP}
+
+# Host name lookups
+HostnameLookups Off
+
+# Error logging
+ErrorLog ${APACHE_LOG_DIR}/error.log
+LogLevel warn
+
+# Include module configurations
+IncludeOptional mods-enabled/*.load
+IncludeOptional mods-enabled/*.conf
+
+# Include ports configuration
+Include ports.conf
+
+# Directory settings
+<Directory />
+    Options FollowSymLinks
+    AllowOverride None
+    Require all denied
+</Directory>
+
+<Directory /usr/share>
+    AllowOverride None
+    Require all granted
+</Directory>
+
+<Directory /var/www/>
+    Options Indexes FollowSymLinks
+    AllowOverride All
+    Require all granted
+</Directory>
+
+# Access to .htaccess files
+AccessFileName .htaccess
+<FilesMatch "^\.ht">
+    Require all denied
+</FilesMatch>
+
+# Logging format
+LogFormat "%v:%p %h %l %u %t \"%r\" %>s %O \"%{Referer}i\" \"%{User-Agent}i\"" vhost_combined
+LogFormat "%h %l %u %t \"%r\" %>s %O \"%{Referer}i\" \"%{User-Agent}i\"" combined
+LogFormat "%h %l %u %t \"%r\" %>s %O" common
+LogFormat "%{Referer}i -> %U" referer
+LogFormat "%{User-agent}i" agent
+
+# Include global configurations
+IncludeOptional conf-enabled/*.conf
+
+# Include virtual hosts
+IncludeOptional sites-enabled/*.conf

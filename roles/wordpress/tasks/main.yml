@@ -1,0 +1,311 @@
+---
+# WordPress role - WordPress installation and configuration for PAUSATF
+
+# =============================================================================
+# WP-CLI Installation
+# =============================================================================
+- name: Check if WP-CLI is installed
+  stat:
+    path: "{{ wpcli_path }}"
+  register: wpcli_installed
+  tags: [wordpress, wpcli]
+
+- name: Download WP-CLI
+  get_url:
+    url: https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+    dest: "{{ wpcli_path }}"
+    mode: '0755'
+  when: not wpcli_installed.stat.exists
+  tags: [wordpress, wpcli]
+
+- name: Verify WP-CLI works
+  command: "{{ wpcli_path }} --info"
+  register: wpcli_info
+  changed_when: false
+  failed_when: false
+  tags: [wordpress, wpcli]
+
+- name: Update WP-CLI if enabled
+  command: "{{ wpcli_path }} cli update --yes"
+  when:
+    - wpcli_installed.stat.exists
+    - wpcli_auto_update | default(false)
+  register: wpcli_update
+  changed_when: "'Success' in wpcli_update.stdout"
+  failed_when: false
+  tags: [wordpress, wpcli]
+
+# =============================================================================
+# WordPress Directory Structure
+# =============================================================================
+- name: Create WordPress directories
+  file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ apache_user }}"
+    group: "{{ apache_group }}"
+    mode: '0755'
+  loop: "{{ wordpress_installs }}"
+  tags: wordpress
+
+- name: Create wp-content subdirectories
+  file:
+    path: "{{ item.0.path }}/wp-content/{{ item.1 }}"
+    state: directory
+    owner: "{{ apache_user }}"
+    group: "{{ apache_group }}"
+    mode: '0755'
+  loop: "{{ wordpress_installs | product(['uploads', 'plugins', 'themes', 'mu-plugins', 'upgrade']) | list }}"
+  tags: wordpress
+
+# =============================================================================
+# WordPress Configuration
+# =============================================================================
+- name: Deploy wp-config.php
+  template:
+    src: wp-config.php.j2
+    dest: "{{ item.path }}/wp-config.php"
+    owner: "{{ apache_user }}"
+    group: "{{ apache_group }}"
+    mode: '0640'
+    backup: yes
+  loop: "{{ wordpress_installs }}"
+  tags: wordpress
+
+- name: Deploy .htaccess
+  template:
+    src: htaccess.j2
+    dest: "{{ item.path }}/.htaccess"
+    owner: "{{ apache_user }}"
+    group: "{{ apache_group }}"
+    mode: '0644'
+  loop: "{{ wordpress_installs }}"
+  tags: wordpress
+
+# =============================================================================
+# Must-Use Plugins
+# =============================================================================
+- name: Deploy wp-fail2ban must-use plugin
+  template:
+    src: wp-fail2ban.php.j2
+    dest: "{{ item.path }}/wp-content/mu-plugins/wp-fail2ban.php"
+    owner: "{{ apache_user }}"
+    group: "{{ apache_group }}"
+    mode: '0644'
+  loop: "{{ wordpress_installs }}"
+  when: fail2ban_enabled | default(false)
+  tags: wordpress
+
+- name: Deploy fix-translations must-use plugin
+  copy:
+    dest: "{{ item.path }}/wp-content/mu-plugins/fix-translations.php"
+    content: |
+      <?php
+      /**
+       * Plugin Name: Fix Translations
+       * Description: Fixes translation loading issues
+       * Version: 1.0
+       */
+      add_filter('override_load_textdomain', function($retval, $domain, $mofile) {
+          if (!file_exists($mofile)) {
+              return true;
+          }
+          return $retval;
+      }, 10, 3);
+    owner: "{{ apache_user }}"
+    group: "{{ apache_group }}"
+    mode: '0644'
+  loop: "{{ wordpress_installs }}"
+  tags: wordpress
+
+# =============================================================================
+# PHP Settings
+# =============================================================================
+- name: Create .user.ini for PHP settings
+  copy:
+    dest: "{{ item.path }}/.user.ini"
+    content: |
+      upload_max_filesize = {{ php_upload_max_filesize }}
+      post_max_size = {{ php_post_max_size }}
+      max_execution_time = {{ php_max_execution_time }}
+      max_input_vars = {{ php_max_input_vars }}
+    owner: "{{ apache_user }}"
+    group: "{{ apache_group }}"
+    mode: '0644'
+  loop: "{{ wordpress_installs }}"
+  tags: wordpress
+
+# =============================================================================
+# WordPress Cron
+# =============================================================================
+- name: Set up WordPress cron job
+  cron:
+    name: "WordPress cron for {{ item.domain }}"
+    minute: "*"
+    job: "wget -q -O - https://{{ item.domain }}/wp-cron.php?doing_wp_cron > /dev/null 2>&1"
+    user: root
+  loop: "{{ wordpress_installs }}"
+  when: item.cron_enabled | default(false)
+  tags: wordpress
+
+- name: Disable WordPress internal cron (use system cron instead)
+  lineinfile:
+    path: "{{ item.path }}/wp-config.php"
+    regexp: "^define.*DISABLE_WP_CRON"
+    line: "define('DISABLE_WP_CRON', true);"
+    insertbefore: "That's all, stop editing"
+  loop: "{{ wordpress_installs }}"
+  when: item.cron_enabled | default(false)
+  tags: wordpress
+
+# =============================================================================
+# WP-CLI Auto-Update Scripts
+# =============================================================================
+- name: Deploy WordPress update script
+  template:
+    src: wp-update.sh.j2
+    dest: "/usr/local/bin/wp-update-{{ item.name }}.sh"
+    owner: root
+    group: root
+    mode: '0755'
+  loop: "{{ wordpress_installs }}"
+  when: wpcli_enabled | default(false)
+  tags: [wordpress, wpcli]
+
+- name: Create WordPress update log file
+  file:
+    path: /var/log/wordpress-updates.log
+    state: touch
+    owner: root
+    group: root
+    mode: '0644'
+  changed_when: false
+  when: wpcli_enabled | default(false)
+  tags: [wordpress, wpcli]
+
+- name: Schedule WordPress auto-updates (weekly)
+  cron:
+    name: "WordPress auto-update for {{ item.domain }}"
+    special_time: weekly
+    job: "/usr/local/bin/wp-update-{{ item.name }}.sh"
+    user: root
+  loop: "{{ wordpress_installs }}"
+  when:
+    - wpcli_enabled | default(false)
+    - wpcli_update_schedule | default('weekly') == 'weekly'
+    - item.auto_update_core | default(false)
+  tags: [wordpress, wpcli]
+
+- name: Schedule WordPress auto-updates (daily)
+  cron:
+    name: "WordPress auto-update for {{ item.domain }}"
+    special_time: daily
+    job: "/usr/local/bin/wp-update-{{ item.name }}.sh"
+    user: root
+  loop: "{{ wordpress_installs }}"
+  when:
+    - wpcli_enabled | default(false)
+    - wpcli_update_schedule | default('weekly') == 'daily'
+    - item.auto_update_core | default(false)
+  tags: [wordpress, wpcli]
+
+# =============================================================================
+# File Permissions (Idempotent)
+# =============================================================================
+- name: Set ownership on WordPress directories
+  file:
+    path: "{{ item.path }}"
+    owner: "{{ apache_user }}"
+    group: "{{ apache_group }}"
+    recurse: yes
+  loop: "{{ wordpress_installs }}"
+  tags: wordpress
+
+- name: Find directories needing permission fix
+  find:
+    paths: "{{ item.path }}"
+    file_type: directory
+    recurse: yes
+  loop: "{{ wordpress_installs }}"
+  register: wp_directories
+  changed_when: false
+  tags: wordpress
+
+- name: Set directory permissions to 755
+  file:
+    path: "{{ dir.path }}"
+    mode: '0755'
+  loop: "{{ wp_directories.results | map(attribute='files') | flatten }}"
+  loop_control:
+    loop_var: dir
+    label: "{{ dir.path }}"
+  when: dir.mode != '0755'
+  tags: wordpress
+
+- name: Find files needing permission fix
+  find:
+    paths: "{{ item.path }}"
+    file_type: file
+    recurse: yes
+    excludes:
+      - "*.sh"
+  loop: "{{ wordpress_installs }}"
+  register: wp_files
+  changed_when: false
+  tags: wordpress
+
+- name: Set file permissions to 644
+  file:
+    path: "{{ file.path }}"
+    mode: '0644'
+  loop: "{{ wp_files.results | map(attribute='files') | flatten }}"
+  loop_control:
+    loop_var: file
+    label: "{{ file.path }}"
+  when: file.mode != '0644'
+  tags: wordpress
+
+- name: Secure wp-config.php
+  file:
+    path: "{{ item.path }}/wp-config.php"
+    mode: '0640'
+  loop: "{{ wordpress_installs }}"
+  tags: wordpress
+
+# =============================================================================
+# WordPress Verification
+# =============================================================================
+- name: Verify WordPress installation
+  command: "{{ wpcli_path }} --path={{ item.path }} core is-installed"
+  become: yes
+  become_user: "{{ apache_user }}"
+  loop: "{{ wordpress_installs }}"
+  register: wp_verify
+  changed_when: false
+  failed_when: false
+  when: wpcli_installed.stat.exists
+  tags: [wordpress, verify]
+
+- name: Get WordPress version
+  command: "{{ wpcli_path }} --path={{ item.path }} core version"
+  become: yes
+  become_user: "{{ apache_user }}"
+  loop: "{{ wordpress_installs }}"
+  register: wp_versions
+  changed_when: false
+  failed_when: false
+  when: wpcli_installed.stat.exists
+  tags: [wordpress, verify]
+
+- name: Display WordPress status
+  debug:
+    msg: |
+      WordPress Status for {{ item.item.domain }}:
+        Path: {{ item.item.path }}
+        Version: {{ item.stdout | default('unknown') }}
+        Status: {{ 'Installed' if item.rc == 0 else 'Not installed or error' }}
+  loop: "{{ wp_versions.results }}"
+  loop_control:
+    label: "{{ item.item.domain }}"
+  when: wpcli_installed.stat.exists
+  tags: [wordpress, verify]
