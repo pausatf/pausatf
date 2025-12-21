@@ -1,88 +1,31 @@
 ---
-# Monitoring role - Basic monitoring and backup for PAUSATF
-
 - name: Install monitoring tools
   apt:
     name:
-      - monit
-      - logwatch
+      - htop
+      - iotop
+      - iftop
+      - nethogs
+      - sysstat
+      - vnstat
     state: present
 
-# Health Check Endpoint
-- name: Deploy health check endpoint
-  template:
-    src: health-check.php.j2
-    dest: "{{ wp_main_document_root | default('/var/www/html') }}/health-check.php"
-    owner: www-data
-    group: www-data
-    mode: '0644'
-  tags: [monitoring, healthcheck]
-
-- name: Ensure health check is accessible
+- name: Enable sysstat
   lineinfile:
-    path: "{{ wp_main_document_root | default('/var/www/html') }}/.htaccess"
-    regexp: '^# Health check bypass'
-    line: "# Health check bypass - allow direct access"
-    insertbefore: BOF
-    create: yes
-  tags: [monitoring, healthcheck]
+    path: /etc/default/sysstat
+    regexp: '^ENABLED='
+    line: 'ENABLED="true"'
+    state: present
+  notify: restart sysstat
 
-- name: Deploy Monit configuration
-  template:
-    src: monitrc.j2
-    dest: /etc/monit/monitrc
-    owner: root
-    group: root
-    mode: '0600'
-  notify: Restart Monit
-
-- name: Deploy Monit service configurations
-  template:
-    src: "{{ item }}.j2"
-    dest: "/etc/monit/conf.d/{{ item }}"
-    owner: root
-    group: root
-    mode: '0644'
-  loop:
-    - apache
-    - mysql
-    - system
-  notify: Reload Monit
-
-- name: Ensure Monit is started and enabled
-  service:
-    name: monit
+- name: Start and enable vnstat
+  systemd:
+    name: vnstat
     state: started
     enabled: yes
 
-- name: Create backup script
-  template:
-    src: backup-wordpress.sh.j2
-    dest: /usr/local/bin/backup-wordpress.sh
-    owner: root
-    group: root
-    mode: '0750'
-  when: backup_enabled | default(false)
-
-- name: Schedule daily backup
-  cron:
-    name: "WordPress daily backup"
-    minute: "30"
-    hour: "2"
-    job: "/usr/local/bin/backup-wordpress.sh > /var/log/wordpress-backup.log 2>&1"
-    user: root
-  when: backup_enabled | default(false)
-
-- name: Configure logrotate for backup logs
-  copy:
-    dest: /etc/logrotate.d/wordpress-backup
-    content: |
-      /var/log/wordpress-backup.log {
-          weekly
-          rotate 4
-          compress
-          missingok
-          notifempty
-      }
-    mode: '0644'
-  when: backup_enabled | default(false)
+- name: Start and enable sysstat
+  systemd:
+    name: sysstat
+    state: started
+    enabled: yes
