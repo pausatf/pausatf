@@ -469,8 +469,6 @@ This is a private documentation repository for pausatf.org infrastructure.
 - Change 2
 - Verification: test results
 
-🤖 Generated with Claude Code
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
 ```
 
 ---
