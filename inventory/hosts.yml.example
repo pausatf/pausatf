@@ -1,0 +1,34 @@
+---
+all:
+  children:
+    production:
+      hosts:
+        pausatf-prod:
+          ansible_host: REDACTED_PROD_NEW_IP
+          ansible_user: root
+          environment: production
+          server_role: web
+          wordpress_enabled: true
+      vars:
+        env: production
+
+    staging:
+      hosts:
+        pausatf-stage:
+          ansible_host: REDACTED_STAGE_IP
+          ansible_user: root
+          environment: staging
+          server_role: web
+          wordpress_enabled: true
+      vars:
+        env: staging
+
+    webservers:
+      children:
+        - production
+        - staging
+      vars:
+        ansible_python_interpreter: /usr/bin/python3
+
+  vars:
+    ansible_ssh_common_args: '-o StrictHostKeyChecking=no'

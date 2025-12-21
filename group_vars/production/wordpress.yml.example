@@ -1,0 +1,49 @@
+---
+# WordPress configuration for production
+# IMPORTANT: Encrypt this file with ansible-vault before committing!
+# ansible-vault encrypt group_vars/production/wordpress.yml
+
+wordpress_db_name: "pausatf_wordpress"
+wordpress_db_user: "wpuser"
+wordpress_db_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          # Replace with actual vault-encrypted password
+
+wordpress_db_host: "pausatf-stage-db-do-user-183006-0.m.db.ondigitalocean.com:25060"
+
+wordpress_site_url: "pausatf.org"
+wordpress_admin_email: "admin@pausatf.org"
+
+# Salt keys - Generate from https://api.wordpress.org/secret-key/1.1/salt/
+# Then encrypt with ansible-vault
+wordpress_auth_key: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          # Replace with vault-encrypted key
+
+wordpress_secure_auth_key: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          # Replace with vault-encrypted key
+
+wordpress_logged_in_key: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          # Replace with vault-encrypted key
+
+wordpress_nonce_key: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          # Replace with vault-encrypted key
+
+wordpress_auth_salt: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          # Replace with vault-encrypted salt
+
+wordpress_secure_auth_salt: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          # Replace with vault-encrypted salt
+
+wordpress_logged_in_salt: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          # Replace with vault-encrypted salt
+
+wordpress_nonce_salt: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          # Replace with vault-encrypted salt

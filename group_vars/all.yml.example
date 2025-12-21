@@ -1,0 +1,19 @@
+---
+# Global variables for all hosts
+# Copy this file to group_vars/all.yml and customize
+
+# Timezone
+timezone: "UTC"
+
+# Security
+ufw_reset: false
+ssh_port: 22
+allowed_ssh_networks:
+  - "0.0.0.0/0"
+
+# Monitoring
+enable_monitoring: true
+
+# Backup configuration
+backup_enabled: true
+backup_retention_days: 7
