@@ -44,6 +44,35 @@ and this project adheres to semantic versioning principles for infrastructure ch
 ## [2025-12-20] - DNS Security Enhancements
 
 ### Added
+- Server right-sizing analysis document (11-server-rightsizing-analysis.md)
+- Daily automated backups enabled on both production and staging servers
+- DigitalOcean backup policy configured for nightly backups
+- Comprehensive cost optimization analysis ($460.80/year potential savings)
+- Resource usage monitoring and baseline documentation
+- Migration checklist for future right-sizing efforts
+
+### Changed
+- Production disk usage: 71 GB → 39 GB (freed 32 GB of 2019 backups)
+- Staging disk usage: 48 GB → 26 GB (freed 22 GB of test installations)
+- Server specifications updated in README with resource utilization metrics
+- Backup status documented across all infrastructure guides
+
+### Removed
+- Production: html_clean.tar (7.5 GB), html_HACKED_wordfence.tar (7.5 GB), legacy_wordfence_backup.tar (1.7 GB), wp-content_wordfence_backup.tar (647 MB), transit/ directory (15 GB)
+- Staging: html.land test installation (22 GB), html.backup (129 MB)
+- Total disk space freed: 54 GB across both servers
+
+### Cost Analysis
+- Current monthly costs: $86.40 ($57.60 production + $28.80 staging)
+- Right-sized potential: $48.00/month (44% reduction)
+- Annual savings potential: $460.80/year if migrated to optimal droplet sizes
+- Note: DigitalOcean disk constraints prevent in-place downsizing (requires migration)
+
+---
+
+## [2025-12-21] - Server Right-Sizing and Backup Configuration
+
+### Added
 - CNAME record for prod.pausatf.org pointing to production server
 - SPF record for email authentication (Google Workspace + SendGrid)
 - CAA records for SSL certificate authority authorization:
@@ -53,14 +82,18 @@ and this project adheres to semantic versioning principles for infrastructure ch
   - Violation reporting via email (iodef)
 - DNS best practices section in Cloudflare configuration guide
 - Executive summary document for non-technical stakeholders
+- Apache → OpenLiteSpeed migration rationale with performance comparison
 
 ### Changed
 - All documentation references updated from ftp.pausatf.org to prod.pausatf.org
+- Expanded Apache → OpenLiteSpeed migration section with real performance data
+- Documentation now includes actual resource usage metrics and cost breakdowns
 
 ### Security
 - Implemented DNS security best practices (SPF, CAA)
 - Protected domain from unauthorized SSL certificate issuance
 - Enhanced email authentication to prevent spoofing
+- Daily backups now protecting against data loss
 
 ---
 
@@ -245,11 +278,17 @@ and this project adheres to semantic versioning principles for infrastructure ch
 - [ ] Database optimization and cleanup
 - [ ] Theme code cleanup (remove IE6 PNG fix, backup files)
 - [ ] Security hardening phase 1 (2FA, security headers)
+- [ ] Monitor resource usage trends for right-sizing validation
 
 ### Q2 2026
 - [ ] Ubuntu 24.04 LTS migration (new droplet)
+- [ ] Server right-sizing migration (combined with Ubuntu upgrade)
+  - Production: 8GB → 4GB RAM droplet (save $307/year)
+  - Staging: 4GB → 2GB RAM droplet (save $96/year)
+  - Total savings: $403/year (44% cost reduction)
 - [ ] Security hardening phase 2 (malware scanning, IDS)
-- [ ] Performance optimization phase 2 (image optimization, HTTP/3)
+- [ ] Performance optimization phase 2 (image optimization)
+- [ ] Apache → OpenLiteSpeed migration evaluation
 
 ### Q3 2026
 - [ ] Monitoring implementation (uptime, APM, RUM)

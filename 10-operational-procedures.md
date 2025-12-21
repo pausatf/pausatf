@@ -102,20 +102,37 @@ wp theme update [theme-name] --path=/var/www/html/ --allow-root
 
 ## BACKUP VERIFICATION
 
-### DigitalOcean Snapshots (Weekly Verification)
+### DigitalOcean Snapshots (Daily Verification)
 
 **Check Snapshot Status:**
 ```bash
-# List recent snapshots
-doctl compute snapshot list --resource droplet
+# List recent droplet backups
+doctl compute droplet backup list 355909945  # Production
+doctl compute droplet backup list 538411208  # Staging
 
-# Expected output: Weekly automated snapshots + manual pre-change snapshots
+# Check droplet features (should show "backups")
+doctl compute droplet list | grep pausatf
 ```
 
-**Snapshot Schedule:**
-- **Automatic:** Weekly (DigitalOcean backups feature)
+**Backup Schedule:**
+- **Automatic:** Daily (DigitalOcean backups feature enabled Dec 21, 2025)
+- **Backup Time:** Automated by DigitalOcean (typically 3-5am UTC)
 - **Manual:** Before any major changes (PHP upgrade, migrations, etc.)
-- **Retention:** Keep 4 weekly + all pre-change snapshots
+- **Retention:** 4 most recent automated backups (rolling) + manual snapshots
+- **Cost:** 20% of droplet cost (included in pricing)
+  - Production: $9.60/month
+  - Staging: $4.80/month
+
+**Backup Verification Commands:**
+```bash
+# Verify backups are enabled
+doctl compute droplet get 355909945  # Check Features column
+doctl compute droplet get 538411208
+
+# List available backups (should see daily backups)
+doctl compute droplet backup list 355909945
+doctl compute droplet backup list 538411208
+```
 
 ---
 

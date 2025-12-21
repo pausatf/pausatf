@@ -60,6 +60,7 @@ Documentation is organized in numbered sequence for logical reading order:
 | 09 | **[09-google-workspace-email-security.md](09-google-workspace-email-security.md)** | Guide | **Google Workspace email security setup (SPF, DKIM, DMARC)** |
 | 10 | **[10-operational-procedures.md](10-operational-procedures.md)** | Guide | **Day-to-day operations, updates, backups, emergency procedures** |
 | 11 | **[11-database-maintenance.md](11-database-maintenance.md)** | Guide | **Database maintenance procedures, primary key requirements, troubleshooting** |
+| 12 | **[12-server-rightsizing-analysis.md](12-server-rightsizing-analysis.md)** | Analysis | **Resource optimization, cost analysis, backup configuration** |
 | -- | **[EXECUTIVE-SUMMARY.md](EXECUTIVE-SUMMARY.md)** | Summary | **Non-technical overview for stakeholders** |
 
 ### 📦 Deployment Package
@@ -115,23 +116,29 @@ deployment-package/
 
 - **Hostname:** prod.pausatf.org
 - **IP Address:** 64.225.40.54
-- **Droplet:** pausatf-prod (DigitalOcean)
-- **Web Server:** Apache 2.4
+- **Droplet:** pausatf-prod (DigitalOcean ID: 355909945)
+- **Size:** 8GB RAM / 4 vCPUs / 160GB SSD ($57.60/month with backups)
+- **Web Server:** Apache 2.4.41
 - **PHP:** 7.4.33
 - **WordPress:** 6.9
 - **Document Root:** /var/www/legacy/public_html/
+- **Backups:** ✅ Daily automated backups enabled
 - **SSH Access:** ✅ Available via `ssh root@prod.pausatf.org`
+- **Resource Usage:** 1.6 GB RAM / 39 GB disk (20% RAM, 26% disk utilization)
 
 ### Staging Server
 
 - **Hostname:** stage.pausatf.org
 - **IP Address:** 64.227.85.73
-- **Droplet:** pausatf-stage (DigitalOcean)
+- **Droplet:** pausatf-stage (DigitalOcean ID: 538411208)
+- **Size:** 4GB RAM / 2 vCPUs / 80GB SSD ($28.80/month with backups)
 - **Web Server:** OpenLiteSpeed 1.8.3
 - **PHP:** 8.4.15
 - **WordPress:** 6.9
 - **Document Root:** /var/www/html/
+- **Backups:** ✅ Daily automated backups enabled
 - **SSH Access:** ✅ Available via `ssh root@stage.pausatf.org`
+- **Resource Usage:** 671 MB RAM / 26 GB disk (16% RAM, 33% disk utilization)
 
 ### Cloudflare Configuration
 
@@ -218,6 +225,7 @@ pausatf-infrastructure-docs/
 ├── 09-google-workspace-email-security.md        # Google Workspace email setup
 ├── 10-operational-procedures.md                 # Day-to-day operations and maintenance
 ├── 11-database-maintenance.md                   # Database maintenance and primary keys
+├── 12-server-rightsizing-analysis.md            # Resource optimization and cost analysis
 ├── EXECUTIVE-SUMMARY.md                         # Non-technical stakeholder summary
 │
 └── deployment-package/
@@ -226,7 +234,7 @@ pausatf-infrastructure-docs/
     └── DEPLOYMENT_INSTRUCTIONS.txt              # Deployment steps
 ```
 
-**Reading Order:** Files are numbered 01-11 in recommended reading sequence. Start with the README, then follow the numbered guides as needed. Check CHANGELOG.md for recent changes.
+**Reading Order:** Files are numbered 01-12 in recommended reading sequence. Start with the README, then follow the numbered guides as needed. Check CHANGELOG.md for recent changes.
 
 ---
 
