@@ -64,6 +64,21 @@ Documentation is organized in numbered sequence for logical reading order:
 | 13 | **[13-digitalocean-optimization-guide.md](13-digitalocean-optimization-guide.md)** | Guide | **DigitalOcean infrastructure improvements, security, monitoring, DR** |
 | -- | **[EXECUTIVE-SUMMARY.md](EXECUTIVE-SUMMARY.md)** | Summary | **Non-technical overview for stakeholders** |
 
+### 🔧 Additional Documentation
+
+| Document | Type | Description |
+|----------|------|-------------|
+| **[PHASE1-IMPLEMENTATION-REPORT.md](PHASE1-IMPLEMENTATION-REPORT.md)** | Report | **Phase 1 security improvements implementation summary (Dec 21, 2025)** |
+| **[INFRASTRUCTURE-AS-CODE-UPDATES.md](INFRASTRUCTURE-AS-CODE-UPDATES.md)** | Guide | **Terraform/Ansible configurations for Phase 1 changes** |
+| **[THEME-DROPDOWN-FIX.md](THEME-DROPDOWN-FIX.md)** | Guide | **WordPress theme dropdown menu background color fix** |
+| **[COMMIT-STANDARDS.md](COMMIT-STANDARDS.md)** | Standards | **Conventional commit message standards and enforcement** |
+| **[GITHUB-ACTIONS.md](GITHUB-ACTIONS.md)** | Documentation | **Complete GitHub Actions workflows documentation** |
+| **[CHANGELOG.md](CHANGELOG.md)** | Changelog | **Infrastructure change history** |
+| **[CONTRIBUTING.md](CONTRIBUTING.md)** | Guide | **Contribution guidelines** |
+| **[AUTOMATION.md](AUTOMATION.md)** | Guide | **Automation tools and scripts** |
+| **[TESTING.md](TESTING.md)** | Guide | **Testing procedures** |
+| **[GETTING_STARTED.md](GETTING_STARTED.md)** | Guide | **Getting started for new contributors** |
+
 ### 📦 Deployment Package
 
 **Location:** `deployment-package/`
