@@ -1,0 +1,79 @@
+# Terraform Files
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfplan.*
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# Terraform Directories
+.terraform/
+.terraform.lock.hcl
+**/.terraform/*
+
+# Variable Files (contain secrets)
+*.tfvars
+*.tfvars.json
+!*.tfvars.example
+!terraform.tfvars.example
+
+# Sensitive Files
+*.pem
+*.key
+*.cert
+*.crt
+id_rsa
+id_rsa.pub
+*.p12
+*.pfx
+
+# Environment Files
+.env
+.env.*
+*.env
+!.env.example
+
+# Secrets
+secrets.yaml
+vault.yml
+credentials.json
+*-credentials.json
+service-account*.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Backup Files
+*.backup
+*.bak
+*~
+
+# Module Cache
+.terraform.d/
+.terraform.tfstate.lock.info
+
+# Test Files
+**/*.test.js
+**/*.spec.js
+
+# OS Files
+Thumbs.db
+.DS_Store
+
+# Crash Files
+crash.log
