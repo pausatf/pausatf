@@ -18,3 +18,19 @@ repos:
     rev: v8.18.1
     hooks:
       - id: gitleaks
+
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+
+  - repo: https://github.com/bridgecrewio/checkov
+    rev: 3.1.34
+    hooks:
+      - id: checkov
+        args:
+          - '--quiet'
+          - '--compact'
+          - '--framework'
+          - 'secrets'
