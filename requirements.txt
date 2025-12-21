@@ -1,0 +1,49 @@
+# Python dependencies for Ansible and tooling
+# Used by Dependabot to track Python dependency updates
+
+# Ansible and related tools
+ansible>=8.0.0,<9.0.0
+ansible-lint>=6.22.0
+ansible-core>=2.15.0
+
+# Pre-commit and linting
+pre-commit>=3.5.0
+yamllint>=1.33.0
+
+# Terraform tooling
+python-hcl2>=4.3.0
+terraform-compliance>=1.3.44
+
+# Utilities
+jinja2>=3.1.2
+requests>=2.31.0
+pyyaml>=6.0.1
+
+# Security scanning
+safety>=2.3.5
+bandit>=1.7.5
+
+# Testing framework
+pytest>=7.4.3
+pytest-cov>=4.1.0
+pytest-xdist>=3.5.0
+pytest-ansible>=4.1.1
+pytest-timeout>=2.2.0
+
+# Molecule for Ansible testing
+molecule>=6.0.2
+molecule-plugins[docker]>=23.5.0
+molecule-docker>=2.1.0
+
+# Integration testing
+paramiko>=3.4.0
+dnspython>=2.4.2
+
+# Cloud SDKs
+python-digitalocean>=1.17.0
+cloudflare>=2.11.7
+
+# Documentation
+mkdocs>=1.5.3
+mkdocs-material>=9.4.14
+mkdocs-mermaid2-plugin>=1.1.1
