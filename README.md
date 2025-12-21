@@ -16,6 +16,7 @@ This repository contains Terraform configurations for managing PAUSATF.org infra
 - **DigitalOcean Databases** - MySQL clusters for WordPress
 - **DigitalOcean Networking** - VPC, firewalls, load balancers
 - **Cloudflare** - DNS, CDN, security, and SSL configuration
+- **GitHub Repositories** - Repository settings, branch protection, Dependabot
 - **Monitoring** - Uptime monitoring and alerting
 
 ---
@@ -35,6 +36,11 @@ pausatf-terraform/
 │   │   ├── variables.tf
 │   │   ├── terraform.tfvars.example
 │   │   └── backend.tf
+│   ├── github/              # GitHub repository management
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   ├── terraform.tfvars.example
+│   │   └── README.md
 │   └── shared/              # Shared resources (DNS, etc.)
 │       ├── main.tf
 │       └── variables.tf
