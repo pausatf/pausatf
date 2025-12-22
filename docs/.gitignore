@@ -1,0 +1,57 @@
+# Secrets and credentials
+*.env
+*.env.local
+*.env.*.local
+.env
+.env.local
+.env.production
+.env.development
+secrets.yaml
+vault.yml
+**/vault.yml
+credentials.json
+*.pem
+*.key
+*.cert
+*.crt
+id_rsa
+id_rsa.pub
+*.p12
+*.pfx
+
+# API tokens and keys
+*token*.txt
+*key*.txt
+*secret*.txt
+api-tokens/
+.secrets/
+
+# Database credentials
+db-credentials.txt
+mysql-pass.txt
+
+# Pre-commit
+.secrets.baseline
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Development tools
+.claude

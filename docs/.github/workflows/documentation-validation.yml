@@ -1,0 +1,164 @@
+name: Documentation Validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**.md'
+      - '.github/workflows/documentation-validation.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - '**.md'
+  workflow_dispatch:
+
+jobs:
+  validate-links:
+    name: Validate Documentation Links
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Check for broken internal links
+        run: |
+          echo "=== Checking Internal Documentation Links ==="
+
+          # Check for broken internal file references
+          grep -r '\[.*\](.*\.md)' *.md | while read -r line; do
+            file=$(echo "$line" | cut -d: -f1)
+            link=$(echo "$line" | sed -n 's/.*(\(.*\.md\)).*/\1/p')
+
+            if [ -n "$link" ] && [ ! -f "$link" ]; then
+              echo "❌ Broken link in $file: $link"
+              exit 1
+            fi
+          done
+
+          echo "✅ All internal links valid"
+
+      - name: Check for documentation consistency
+        run: |
+          echo "=== Checking Documentation Consistency ==="
+
+          # Check that all numbered docs are referenced in README
+          for doc in [0-9][0-9]-*.md; do
+            if ! grep -q "$doc" README.md; then
+              echo "⚠️  Warning: $doc not referenced in README.md"
+            fi
+          done
+
+          echo "✅ Documentation consistency check complete"
+
+  validate-structure:
+    name: Validate Repository Structure
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Verify required files exist
+        run: |
+          echo "=== Verifying Required Files ==="
+
+          required_files=(
+            "README.md"
+            "CHANGELOG.md"
+            "EXECUTIVE-SUMMARY.md"
+            "01-cache-implementation-guide.md"
+            "02-cache-audit-report.md"
+            "03-cache-verification-report.md"
+            "04-security-audit-report.md"
+            "05-server-migration-guide.md"
+            "06-cloudflare-configuration-guide.md"
+            "07-performance-optimization-complete.md"
+            "08-recommended-upgrades-roadmap.md"
+            "09-google-workspace-email-security.md"
+            "10-operational-procedures.md"
+            "11-database-maintenance.md"
+            "12-server-rightsizing-analysis.md"
+          )
+
+          missing=0
+          for file in "${required_files[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "❌ Missing: $file"
+              missing=$((missing + 1))
+            else
+              echo "✅ Found: $file"
+            fi
+          done
+
+          if [ $missing -gt 0 ]; then
+            echo ""
+            echo "❌ $missing required file(s) missing"
+            exit 1
+          fi
+
+          echo ""
+          echo "✅ All required files present"
+
+      - name: Check deployment package
+        run: |
+          echo "=== Checking Deployment Package ==="
+
+          if [ ! -d "deployment-package" ]; then
+            echo "❌ deployment-package directory missing"
+            exit 1
+          fi
+
+          required_deploy_files=(
+            "deployment-package/data_2025_htaccess"
+            "deployment-package/purge_cloudflare_cache.sh"
+            "deployment-package/DEPLOYMENT_INSTRUCTIONS.txt"
+          )
+
+          for file in "${required_deploy_files[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "❌ Missing: $file"
+              exit 1
+            else
+              echo "✅ Found: $file"
+            fi
+          done
+
+          echo "✅ Deployment package complete"
+
+  markdown-lint:
+    name: Markdown Linting
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Run markdownlint
+        uses: DavidAnson/markdownlint-cli2-action@v22
+        continue-on-error: true
+        with:
+          globs: '**/*.md'
+
+  check-secrets-exposure:
+    name: Check for Exposed Secrets
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Scan for potential secrets
+        run: |
+          echo "=== Scanning for Exposed Secrets ==="
+
+          # Check for common secret patterns (excluding known safe documentation examples)
+          if grep -r -i "password\s*=" --include="*.md" .; then
+            echo "⚠️  Warning: Found 'password=' in documentation"
+          fi
+
+          if grep -r -E "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}" --include="*.md" . | grep -v "64.225.40.54\|64.227.85.73\|10.138.0"; then
+            echo "⚠️  Warning: Found unexpected IP addresses"
+          fi
+
+          echo "✅ Secret exposure check complete"

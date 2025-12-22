@@ -1,0 +1,119 @@
+name: Bug Report
+description: Report a problem with PAUSATF infrastructure
+title: "[Bug] "
+labels: ["bug", "needs-triage"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Bug Report
+
+        Thanks for taking the time to report a bug. This helps us maintain infrastructure quality.
+
+        **For security vulnerabilities**, please use the Security Issue template instead.
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: How severe is this bug?
+      options:
+        - Critical (Site down / Data loss risk)
+        - High (Major feature broken)
+        - Medium (Feature partially broken)
+        - Low (Minor issue / Cosmetic)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which component is affected?
+      options:
+        - Website (pausatf.org)
+        - WordPress Admin
+        - Database
+        - Email
+        - DNS
+        - CDN/Caching
+        - Backups
+        - Monitoring
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      description: Where is the bug occurring?
+      options:
+        - Production (www.pausatf.org)
+        - Staging (stage.pausatf.org)
+        - Both
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: Clear description of what went wrong
+      placeholder: |
+        What happened?
+        What did you expect to happen instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this bug?
+      placeholder: |
+        1. Go to...
+        2. Click on...
+        3. See error...
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+      description: Who/what is affected by this bug?
+      placeholder: |
+        - How many users affected?
+        - What functionality is broken?
+        - Any workarounds available?
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Logs/Errors
+      description: Include any error messages, logs, or screenshots
+      placeholder: |
+        Paste error messages here...
+        Or describe what you see...
+      render: shell
+
+  - type: input
+    id: first-seen
+    attributes:
+      label: When First Noticed
+      description: When did you first notice this issue?
+      placeholder: "2025-12-21 around 3pm PT"
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other relevant information
+      placeholder: |
+        - Recent changes that might be related
+        - Screenshots
+        - Browser/device information (if relevant)
