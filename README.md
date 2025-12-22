@@ -1,134 +1,197 @@
 # PAUSATF.org Infrastructure Documentation
 
-**Comprehensive technical documentation for pausatf.org production and staging infrastructure**
+**Comprehensive technical documentation and collaboration hub for pausatf.org infrastructure**
 
-**Repository:** https://github.com/pausatf/pausatf-infrastructure-docs
-**Created:** 2025-12-20
-**Maintained by:** Thomas Vincent
-
----
-
-## ⚠️ SECURITY NOTICE
-
-**This is a PUBLIC repository.** Do NOT commit:
-- API tokens or keys
-- Passwords or credentials
-- Private keys or certificates
-- Database connection strings with passwords
-- Any sensitive infrastructure information
-
-**Pre-commit hooks are configured** to detect secrets. Install them:
-```bash
-pip install pre-commit
-pre-commit install
-```
-
-All sensitive values should use placeholders like `your-cloudflare-api-token`.
-
-**Git History:** This repository's history was cleaned on 2025-12-21 to remove accidentally committed secrets. All exposed tokens have been rotated.
+[![GitHub](https://img.shields.io/badge/GitHub-pausatf-blue)](https://github.com/pausatf)
+[![Discussions](https://img.shields.io/badge/Discussions-Q&A-green)](https://github.com/pausatf/pausatf-infrastructure-docs/discussions)
+[![Wiki](https://img.shields.io/badge/Wiki-Quick%20Reference-orange)](https://github.com/pausatf/pausatf-infrastructure-docs/wiki)
+[![Issues](https://img.shields.io/badge/Issues-Track%20Work-red)](https://github.com/pausatf/pausatf-infrastructure-docs/issues)
+[![Projects](https://img.shields.io/badge/Projects-Roadmap-purple)](https://github.com/orgs/pausatf/projects)
 
 ---
 
-## Overview
+## 🚀 Quick Navigation
 
-This repository contains complete infrastructure documentation, deployment guides, security audits, and operational procedures for the Pacific Association of USA Track and Field (PAUSATF) website infrastructure.
-
-### What's Documented
-
-- 🖥️ **Server Infrastructure** - DigitalOcean droplets, Apache/OpenLiteSpeed configuration
-- 🌐 **Cloudflare CDN** - DNS, caching, security, Page Rules, API automation
-- 🔒 **Security** - WordPress theme audits, vulnerability assessments, compliance
-- 📦 **Deployments** - Cache fixes, migrations, updates, rollback procedures
-- 🔍 **Troubleshooting** - Common issues, resolution steps, verification tests
-
----
-
-## Repository Contents
-
-Documentation is organized in numbered sequence for logical reading order:
-
-| # | Document | Type | Description |
-|---|----------|------|-------------|
-| 01 | **[01-cache-implementation-guide.md](01-cache-implementation-guide.md)** | Guide | Complete cache fix implementation and technical details |
-| 02 | **[02-cache-audit-report.md](02-cache-audit-report.md)** | Report | Pre-fix audit of cache configurations across all servers |
-| 03 | **[03-cache-verification-report.md](03-cache-verification-report.md)** | Report | Production deployment verification (Dec 20, 2025) |
-| 04 | **[04-security-audit-report.md](04-security-audit-report.md)** | Report | WordPress theme security assessment (9 findings) |
-| 05 | **[05-server-migration-guide.md](05-server-migration-guide.md)** | Guide | Complete 10-phase DigitalOcean migration process |
-| 06 | **[06-cloudflare-configuration-guide.md](06-cloudflare-configuration-guide.md)** | Guide | DNS, SSL, caching, firewall, API automation |
-| 07 | **[07-performance-optimization-complete.md](07-performance-optimization-complete.md)** | Report | **Complete WordPress performance optimization (93% faster)** |
-| 08 | **[08-recommended-upgrades-roadmap.md](08-recommended-upgrades-roadmap.md)** | Roadmap | **Infrastructure upgrade plan (PHP 8.3, Ubuntu 24.04, security hardening)** |
-| 09 | **[09-google-workspace-email-security.md](09-google-workspace-email-security.md)** | Guide | **Google Workspace email security setup (SPF, DKIM, DMARC)** |
-| 10 | **[10-operational-procedures.md](10-operational-procedures.md)** | Guide | **Day-to-day operations, updates, backups, emergency procedures** |
-| 11 | **[11-database-maintenance.md](11-database-maintenance.md)** | Guide | **Database maintenance procedures, primary key requirements, troubleshooting** |
-| 12 | **[12-server-rightsizing-analysis.md](12-server-rightsizing-analysis.md)** | Analysis | **Resource optimization, cost analysis, backup configuration** |
-| 13 | **[13-digitalocean-optimization-guide.md](13-digitalocean-optimization-guide.md)** | Guide | **DigitalOcean infrastructure improvements, security, monitoring, DR** |
-| 14 | **[14-wordpress-security-audit-2025.md](14-wordpress-security-audit-2025.md)** | Report | **WordPress security audit and remediation (Dec 21, 2025)** |
-| -- | **[EXECUTIVE-SUMMARY.md](EXECUTIVE-SUMMARY.md)** | Summary | **Non-technical overview for stakeholders** |
-
-### 🔧 Additional Documentation
-
-| Document | Type | Description |
-|----------|------|-------------|
-| **[PHASE1-IMPLEMENTATION-REPORT.md](PHASE1-IMPLEMENTATION-REPORT.md)** | Report | **Phase 1 security improvements implementation summary (Dec 21, 2025)** |
-| **[INFRASTRUCTURE-AS-CODE-UPDATES.md](INFRASTRUCTURE-AS-CODE-UPDATES.md)** | Guide | **Terraform/Ansible configurations for Phase 1 changes** |
-| **[THEME-DROPDOWN-FIX.md](THEME-DROPDOWN-FIX.md)** | Guide | **WordPress theme dropdown menu background color fix** |
-| **[COMMIT-STANDARDS.md](COMMIT-STANDARDS.md)** | Standards | **Conventional commit message standards and enforcement** |
-| **[GITHUB-ACTIONS.md](GITHUB-ACTIONS.md)** | Documentation | **Complete GitHub Actions workflows documentation** |
-| **[GITHUB-WORKFLOW-STRATEGY.md](GITHUB-WORKFLOW-STRATEGY.md)** | Strategy | **GitHub-native workflow and documentation organization strategy** |
-| **[CHANGELOG.md](CHANGELOG.md)** | Changelog | **Infrastructure change history** |
-| **[CONTRIBUTING.md](CONTRIBUTING.md)** | Guide | **Contribution guidelines** |
-| **[AUTOMATION.md](AUTOMATION.md)** | Guide | **Automation tools and scripts** |
-| **[TESTING.md](TESTING.md)** | Guide | **Testing procedures** |
-| **[GETTING_STARTED.md](GETTING_STARTED.md)** | Guide | **Getting started for new contributors** |
-
-### 📦 Deployment Package
-
-**Location:** `deployment-package/`
-
-Ready-to-deploy files for production server:
-
-```
-deployment-package/
-├── data_2025_htaccess              # Cache headers for race results
-├── purge_cloudflare_cache.sh      # Cloudflare cache purge script
-└── DEPLOYMENT_INSTRUCTIONS.txt    # Step-by-step deployment guide
-```
+| I want to... | Go here... | Skill Level |
+|--------------|------------|-------------|
+| **Ask a question** | [💬 Discussions (Q&A)](https://github.com/pausatf/pausatf-infrastructure-docs/discussions) | 🟢 Beginner |
+| **Find quick commands** | [📚 Wiki (Quick Reference)](https://github.com/pausatf/pausatf-infrastructure-docs/wiki) | 🟢 Beginner |
+| **Report a bug** | [🐛 Issues (Bug Report)](https://github.com/pausatf/pausatf-infrastructure-docs/issues/new?template=bug_report.yml) | 🟢 Beginner |
+| **Request infrastructure change** | [🏗️ Issues (Change Request)](https://github.com/pausatf/pausatf-infrastructure-docs/issues/new?template=infrastructure_change.yml) | 🟡 Intermediate |
+| **See what's being worked on** | [📋 Projects (Roadmap)](https://github.com/orgs/pausatf/projects) | 🟡 Intermediate |
+| **Read technical documentation** | [📖 Documentation](#documentation-index) | 🟡 Intermediate |
+| **Contribute to documentation** | [✏️ Contributing Guide](governance/CONTRIBUTING.md) | 🔴 Advanced |
+| **Learn the workflow** | [🎯 Quick Start Guide](governance/GITHUB-WORKFLOW-QUICKSTART.md) | 🟢 Beginner |
 
 ---
 
-## Quick Start Guides
+## 📢 For New Users - Start Here!
 
-### For Cache Fix Deployment
+**First Time Here?**
+1. ✅ Read the [Executive Summary](EXECUTIVE-SUMMARY.md) (non-technical overview)
+2. ✅ Check out the [Getting Started Guide](getting-started/GETTING_STARTED.md)
+3. ✅ Explore the [Wiki (Quick Reference)](https://github.com/pausatf/pausatf-infrastructure-docs/wiki)
+4. ✅ Learn the [GitHub Workflow](governance/GITHUB-WORKFLOW-QUICKSTART.md)
 
-1. **Read implementation guide:** [01-cache-implementation-guide.md](01-cache-implementation-guide.md)
-2. **Review verification:** [03-cache-verification-report.md](03-cache-verification-report.md)
-3. **Deploy to production:** Follow `deployment-package/DEPLOYMENT_INSTRUCTIONS.txt`
-4. **Test deployment:** Use verification commands from guide
-
-### For Server Migration
-
-1. **Planning phase:** Review [05-server-migration-guide.md](05-server-migration-guide.md)
-2. **Cloudflare setup:** [06-cloudflare-configuration-guide.md](06-cloudflare-configuration-guide.md)
-3. **Backup first:** Always create DigitalOcean snapshots before migration
-4. **Test thoroughly:** Validate on new server before DNS cutover
-
-### For Security Review
-
-1. **Theme audit:** [04-security-audit-report.md](04-security-audit-report.md)
-2. **Risk level:** 🟡 Medium (2 high priority items to address)
-3. **Quick fixes:** ~10 minutes to resolve main issues
-4. **Next review:** June 2026 (6 months)
-
-### For Infrastructure Upgrades
-
-1. **Review roadmap:** [08-recommended-upgrades-roadmap.md](08-recommended-upgrades-roadmap.md)
-2. **Critical priority:** PHP 8.3 upgrade (Q1 2026)
-3. **High priority:** Ubuntu 24.04 migration (Q2 2026)
-4. **Track changes:** [CHANGELOG.md](CHANGELOG.md)
+**Want to Contribute?**
+1. ✅ Read [How to Contribute](governance/CONTRIBUTING.md)
+2. ✅ Join the [Discussions](https://github.com/pausatf/pausatf-infrastructure-docs/discussions)
+3. ✅ Check the [Projects Board](https://github.com/orgs/pausatf/projects) for open work
 
 ---
 
-## Server Environment
+## 🗂️ Documentation Index
+
+### 📖 Guides & How-Tos
+
+**Step-by-step guides for infrastructure operations:**
+
+| Guide | Description | Last Updated |
+|-------|-------------|--------------|
+| [01 - Cache Implementation](docs/guides/01-cache-implementation-guide.md) | Complete cache fix implementation and technical details | Dec 20, 2025 |
+| [05 - Server Migration](docs/guides/05-server-migration-guide.md) | Complete 10-phase DigitalOcean migration process | Dec 20, 2025 |
+| [06 - Cloudflare Configuration](docs/guides/06-cloudflare-configuration-guide.md) | DNS, SSL, caching, firewall, API automation | Dec 20, 2025 |
+| [09 - Google Workspace Email](docs/guides/09-google-workspace-email-security.md) | SPF, DKIM, DMARC email security setup | Dec 20, 2025 |
+| [10 - Operational Procedures](docs/guides/10-operational-procedures.md) | Day-to-day operations, updates, backups, emergencies | Dec 21, 2025 |
+| [11 - Database Maintenance](docs/guides/11-database-maintenance.md) | Database procedures, primary keys, troubleshooting | Dec 21, 2025 |
+| [13 - DigitalOcean Optimization](docs/guides/13-digitalocean-optimization-guide.md) | Infrastructure improvements, security, monitoring, DR | Dec 21, 2025 |
+
+### 📊 Reports & Audits
+
+**Historical audits, assessments, and implementation summaries:**
+
+| Report | Description | Date |
+|--------|-------------|------|
+| [02 - Cache Audit](docs/reports/02-cache-audit-report.md) | Pre-fix audit of cache configurations | Dec 20, 2025 |
+| [03 - Cache Verification](docs/reports/03-cache-verification-report.md) | Production deployment verification | Dec 20, 2025 |
+| [04 - Security Audit](docs/reports/04-security-audit-report.md) | WordPress theme security assessment (9 findings) | Dec 20, 2025 |
+| [07 - Performance Optimization](docs/reports/07-performance-optimization-complete.md) | **Complete WordPress optimization (93% faster)** | Dec 20, 2025 |
+| [12 - Server Rightsizing](docs/reports/12-server-rightsizing-analysis.md) | Resource optimization and cost analysis | Dec 21, 2025 |
+| [14 - WordPress Security Audit](docs/reports/14-wordpress-security-audit-2025.md) | **WordPress security audit and remediation** | Dec 21, 2025 |
+| [Phase 1 Implementation](docs/reports/PHASE1-IMPLEMENTATION-REPORT.md) | Phase 1 security improvements summary | Dec 21, 2025 |
+| [IaC Updates](docs/reports/INFRASTRUCTURE-AS-CODE-UPDATES.md) | Terraform/Ansible configurations | Dec 21, 2025 |
+
+### 🗺️ Planning & Roadmaps
+
+**Future roadmaps and strategic planning:**
+
+| Document | Description |
+|----------|-------------|
+| [08 - Upgrade Roadmap](docs/planning/08-recommended-upgrades-roadmap.md) | PHP 8.3, Ubuntu 24.04, security hardening |
+
+### 📝 Procedures
+
+**Specific step-by-step procedures:**
+
+| Procedure | Description |
+|-----------|-------------|
+| [Theme Dropdown Fix](docs/procedures/THEME-DROPDOWN-FIX.md) | WordPress theme dropdown menu background color fix |
+
+### 📚 Runbooks
+
+**Operational runbooks for common tasks:**
+
+| Runbook | Description |
+|---------|-------------|
+| [Deployment](runbooks/deployment.md) | Deployment procedures |
+| [Disaster Recovery](runbooks/disaster-recovery.md) | Disaster recovery procedures |
+
+---
+
+## 🛠️ GitHub Collaboration Features
+
+### 💬 GitHub Discussions
+
+**Ask questions, share ideas, brainstorm solutions**
+
+**Categories:**
+- **📢 Announcements** - Infrastructure updates and news
+- **💡 Ideas** - Propose features and improvements
+- **🙏 Q&A** - Ask questions, get answers
+- **🏗️ Infrastructure** - Discuss infrastructure changes
+- **📚 Documentation** - Documentation improvements
+- **💬 General** - Everything else
+
+**Get Started:**
+[Start a Discussion →](https://github.com/pausatf/pausatf-infrastructure-docs/discussions)
+
+**Popular Discussions:**
+- Coming soon...
+
+### 📚 GitHub Wiki
+
+**Quick reference guides and troubleshooting**
+
+**Wiki Pages:**
+- Common Commands Cheat Sheet
+- SSH Connection Quick Start
+- Server Quick Reference
+- Cloudflare Cache Purge Guide
+- Troubleshooting Common Issues
+- FAQ
+- Glossary
+
+**Get Started:**
+[Browse the Wiki →](https://github.com/pausatf/pausatf-infrastructure-docs/wiki)
+
+**Note:** Wiki is for quick reference. For detailed technical docs, see [Documentation Index](#documentation-index).
+
+### 🐛 GitHub Issues
+
+**Track bugs, feature requests, and work items**
+
+**Issue Templates:**
+- [🐛 Bug Report](https://github.com/pausatf/pausatf-infrastructure-docs/issues/new?template=bug_report.yml) - Report broken functionality
+- [🏗️ Infrastructure Change](https://github.com/pausatf/pausatf-infrastructure-docs/issues/new?template=infrastructure_change.yml) - Request infrastructure modifications
+- [📝 Documentation Update](https://github.com/pausatf/pausatf-infrastructure-docs/issues/new?template=documentation.yml) - Report doc issues
+
+**Get Started:**
+[View Open Issues →](https://github.com/pausatf/pausatf-infrastructure-docs/issues)
+
+**Recently Closed:**
+- Coming soon...
+
+### 📋 GitHub Projects
+
+**Visual work tracking and roadmap planning**
+
+**Active Projects:**
+
+**1. Infrastructure Roadmap** (Organization-level)
+- Track major initiatives across all 4 repos
+- Quarterly planning and milestones
+- Cross-repository coordination
+
+[View Infrastructure Roadmap →](https://github.com/orgs/pausatf/projects)
+
+**2. Documentation Maintenance**
+- Track documentation review schedule
+- Document update requests
+- Content improvement backlog
+
+**Get Started:**
+[Browse All Projects →](https://github.com/orgs/pausatf/projects)
+
+---
+
+## 🏛️ Repository Governance
+
+**How we work, contribute, and maintain quality:**
+
+| Document | Description |
+|----------|-------------|
+| [Contributing Guide](governance/CONTRIBUTING.md) | How to contribute to this repository |
+| [Commit Standards](governance/COMMIT-STANDARDS.md) | Conventional commit message standards |
+| [Testing Procedures](governance/TESTING.md) | How we test documentation and automation |
+| [Automation Guide](governance/AUTOMATION.md) | Automation tools and scripts |
+| [GitHub Actions](governance/GITHUB-ACTIONS.md) | CI/CD workflows documentation |
+| [GitHub Workflow Strategy](governance/GITHUB-WORKFLOW-STRATEGY.md) | **Comprehensive workflow and collaboration strategy** |
+| [GitHub Workflow Quick Start](governance/GITHUB-WORKFLOW-QUICKSTART.md) | **Quick guide to using GitHub features** |
+| [Documentation Refactor Plan](governance/DOCUMENTATION-REFACTOR-PLAN.md) | **Documentation reorganization plan** |
+
+---
+
+## 🖥️ Server Environment
 
 ### Production Server
 
@@ -141,7 +204,7 @@ deployment-package/
 - **WordPress:** 6.9
 - **Document Root:** /var/www/legacy/public_html/
 - **Backups:** ✅ Daily automated backups enabled
-- **SSH Access:** ✅ Available via `ssh root@prod.pausatf.org`
+- **SSH Access:** `ssh root@prod.pausatf.org`
 - **Resource Usage:** 1.6 GB RAM / 39 GB disk (20% RAM, 26% disk utilization)
 
 ### Staging Server
@@ -155,7 +218,7 @@ deployment-package/
 - **WordPress:** 6.9
 - **Document Root:** /var/www/html/
 - **Backups:** ✅ Daily automated backups enabled
-- **SSH Access:** ✅ Available via `ssh root@stage.pausatf.org`
+- **SSH Access:** `ssh root@stage.pausatf.org`
 - **Resource Usage:** 671 MB RAM / 26 GB disk (16% RAM, 33% disk utilization)
 
 ### Cloudflare Configuration
@@ -167,172 +230,57 @@ deployment-package/
 
 ---
 
-## Current Status
+## ✅ Current Status & Recent Updates
 
-### ✅ Completed Projects
-
-**Cache Fix Deployment (Dec 20, 2025):**
-- ✅ Improved .htaccess deployed to production `/data/2025/`
-- ✅ HTML race results never cached (aggressive no-cache headers)
-- ✅ Static assets cached for 30 days (down from 1 year)
-- ✅ Cloudflare respecting cache directives via CF-Cache-Control headers
-- ✅ All verification tests passing
-- ✅ Page Rules not required (CF-Cache-Control headers sufficient)
-
-**Server Access:**
-- ✅ SSH restored to production server (prod.pausatf.org)
-- ✅ Staging server fully accessible (stage.pausatf.org)
-
-**Security Audit:**
-- ✅ TheSource themes scanned (no critical vulnerabilities)
-- ✅ All WordPress plugins up to date
-- ✅ PHP deprecated functions check (all clear)
-
-**Performance Optimization (Dec 20, 2025):**
-- ✅ Response time reduced from 1,357ms to ~220ms (6x faster)
-- ✅ WP Super Cache 3.0.3 installed and configured
-- ✅ Homepage well below 600ms recommended threshold
-- ✅ **Autoloaded options: 4.54 MB → 298 KB (93% reduction)**
-- ✅ **Admin performance: 1,490ms → 232ms (84% faster)**
-- ✅ Disabled 8 unnecessary Jetpack modules (35 → 28)
-- ✅ Set widget_custom_html (4.04 MB) to not autoload
-- ✅ All WordPress Site Health critical issues resolved
-- See: [07-performance-optimization-complete.md](07-performance-optimization-complete.md)
-
-**Cloudflare Performance Features (Verified Active):**
-- ✅ HTTP/3 with QUIC protocol enabled
-- ✅ 0-RTT (Zero Round Trip Time) connection resumption
-- ✅ TLS 1.3 with Zero Round Trip (zrt mode)
-- ✅ Brotli compression (15-20% better than gzip)
-- ✅ Early Hints (103 status code for faster loading)
-- ✅ Rocket Loader (async JavaScript loading)
-- ✅ Always Use HTTPS + Automatic HTTPS Rewrites
-- ✅ Aggressive cache level with origin header respect
-- See: [06-cloudflare-configuration-guide.md](06-cloudflare-configuration-guide.md)
-
-**Server Right-Sizing and Backups (Dec 21, 2025):**
-- ✅ Daily automated backups enabled on both servers
-- ✅ Disk cleanup: freed 54 GB total (32 GB prod, 22 GB staging)
-- ✅ Resource usage analysis: both servers over-provisioned (20% RAM, 26% disk)
-- ✅ Cost optimization: $460.80/year savings potential identified
-- ✅ Migration strategy documented for Q2 2026 (with Ubuntu 24.04 upgrade)
-- See: [12-server-rightsizing-analysis.md](12-server-rightsizing-analysis.md)
-
-**CI/CD and Automation (Dec 21, 2025):**
-- ✅ GitHub Actions workflows configured
-- ✅ Daily infrastructure health monitoring (backups, droplets, Cloudflare)
-- ✅ Automated documentation validation on commits
-- ✅ 7 GitHub secrets configured (DigitalOcean, Cloudflare, server details)
-- ✅ Read-only API tokens for security
-- ✅ Secret rotation procedures documented
-- See: [.github/SECRETS.md](.github/SECRETS.md)
-
-**WordPress Security Audit and Remediation (Dec 21, 2025):**
+### WordPress Security Audit (Dec 21, 2025)
 - ✅ Comprehensive backup created: 13.5 GB (database + files + legacy)
 - ✅ wp-config.php permissions secured: 644 → 640
 - ✅ 3 unexpected files removed from WordPress core
-- ✅ Test user account deleted (thomastest)
+- ✅ Test user account deleted
 - ✅ Administrator accounts documented (11 admins - needs review)
 - ✅ Auto-updates enabled for all plugins
 - ✅ Database integrity verified (133 tables)
 - ✅ File security audit completed
-- See: [14-wordpress-security-audit-2025.md](14-wordpress-security-audit-2025.md)
+- 📖 [Full Report](docs/reports/14-wordpress-security-audit-2025.md)
 
-### ⏳ Pending Items
+### GitHub Workflow Enabled (Dec 21, 2025)
+- ✅ GitHub Wiki enabled for quick reference
+- ✅ GitHub Discussions enabled for Q&A and collaboration
+- ✅ Issue templates created (Bug, Infrastructure, Documentation)
+- ✅ Pull request template created
+- ✅ Documentation reorganized into logical structure
+- ✅ Quick start guide created for team
+- 📖 [Workflow Strategy](governance/GITHUB-WORKFLOW-STRATEGY.md)
 
-**Theme Cleanup (Optional):**
-- ⏳ Remove IE6 PNG fix library (5 min)
-- ⏳ Delete backup files from child theme (5 min)
-- See: [04-security-audit-report.md](04-security-audit-report.md)
+### Performance Optimization (Dec 20, 2025)
+- ✅ Response time reduced from 1,357ms to ~220ms (6x faster)
+- ✅ WP Super Cache 3.0.3 installed and configured
+- ✅ **Autoloaded options: 4.54 MB → 298 KB (93% reduction)**
+- ✅ **Admin performance: 1,490ms → 232ms (84% faster)**
+- ✅ All WordPress Site Health critical issues resolved
+- 📖 [Full Report](docs/reports/07-performance-optimization-complete.md)
 
-**PHP Upgrade (Long-term):**
-- ⏳ PHP 7.4 reached EOL (Nov 2022)
-- ⏳ Plan migration to PHP 8.1 or 8.3
-- See: [05-server-migration-guide.md](05-server-migration-guide.md)
+### Server Right-Sizing & Backups (Dec 21, 2025)
+- ✅ Daily automated backups enabled on both servers
+- ✅ Disk cleanup: freed 54 GB total (32 GB prod, 22 GB staging)
+- ✅ Resource usage analysis: both servers over-provisioned
+- ✅ Cost optimization: $460.80/year savings potential identified
+- 📖 [Analysis Report](docs/reports/12-server-rightsizing-analysis.md)
 
----
-
-## Documentation Structure
-
-```
-pausatf-infrastructure-docs/
-│
-├── README.md                                    # This file - start here
-├── CHANGELOG.md                                 # All infrastructure changes (Keep a Changelog format)
-│
-├── 01-cache-implementation-guide.md             # Cache fix implementation details
-├── 02-cache-audit-report.md                     # Pre-fix cache configuration audit
-├── 03-cache-verification-report.md              # Production deployment verification
-├── 04-security-audit-report.md                  # WordPress theme security assessment
-├── 05-server-migration-guide.md                 # 10-phase DigitalOcean migration
-├── 06-cloudflare-configuration-guide.md         # Complete CDN configuration
-├── 07-performance-optimization-complete.md      # Complete WordPress optimization
-├── 08-recommended-upgrades-roadmap.md           # Infrastructure upgrade roadmap
-├── 09-google-workspace-email-security.md        # Google Workspace email setup
-├── 10-operational-procedures.md                 # Day-to-day operations and maintenance
-├── 11-database-maintenance.md                   # Database maintenance and primary keys
-├── 12-server-rightsizing-analysis.md            # Resource optimization and cost analysis
-├── 13-digitalocean-optimization-guide.md        # DigitalOcean infrastructure improvements
-├── 14-wordpress-security-audit-2025.md          # WordPress security audit and remediation
-├── EXECUTIVE-SUMMARY.md                         # Non-technical stakeholder summary
-│
-└── deployment-package/
-    ├── data_2025_htaccess                       # Production .htaccess
-    ├── purge_cloudflare_cache.sh                # Cache purge script
-    └── DEPLOYMENT_INSTRUCTIONS.txt              # Deployment steps
-```
-
-**Reading Order:** Files are numbered 01-13 in recommended reading sequence. Start with the README, then follow the numbered guides as needed. Check CHANGELOG.md for recent changes.
+### CI/CD and Automation (Dec 21, 2025)
+- ✅ GitHub Actions workflows configured
+- ✅ Daily infrastructure health monitoring
+- ✅ Automated documentation validation
+- ✅ Secret scanning and prevention
+- 📖 [GitHub Actions Guide](governance/GITHUB-ACTIONS.md)
 
 ---
 
-## Key Technical Details
+## 🎯 Quick Operations
 
-### Cache Control Strategy
+### Common Tasks
 
-**HTML Race Results:**
-```apache
-Header set Cache-Control "no-cache, no-store, must-revalidate, max-age=0"
-Header set Pragma "no-cache"
-Header set Expires "0"
-Header set CF-Cache-Control "no-cache"
-```
-**Result:** Never cached, always fresh ✓
-
-**Static Assets (Images, CSS, JS):**
-```apache
-Header set Cache-Control "public, max-age=2592000, immutable"
-```
-**Result:** Cached for 30 days (2,592,000 seconds) ✓
-
-### Cloudflare Cache Behavior
-
-**HTML Files:**
-- `cf-cache-status: DYNAMIC` (not cached) ✅
-
-**Static Assets:**
-- `cf-cache-status: HIT` (cached) ✅
-
-### Critical File Locations
-
-```bash
-# Production Server
-/var/www/legacy/public_html/data/2025/.htaccess  # Cache headers
-/usr/local/bin/purge_cloudflare_cache.sh         # Purge script
-/var/log/cloudflare_purge.log                    # Purge log
-
-# WordPress Installation
-/var/www/html/                                    # WordPress root
-/var/www/html/wp-content/themes/TheSource/        # Parent theme
-/var/www/html/wp-content/themes/TheSource-child/  # Active child theme
-```
-
----
-
-## Common Operations
-
-### Test Cache Headers
-
+**Test Cache Headers:**
 ```bash
 # HTML file (should show no-cache)
 curl -I https://www.pausatf.org/data/2025/RR5KH2025.html | grep -i cache
@@ -341,91 +289,67 @@ curl -I https://www.pausatf.org/data/2025/RR5KH2025.html | grep -i cache
 curl -I https://www.pausatf.org/data/2025/sf-rec-park.jpg | grep -i cache
 ```
 
-### Purge Cloudflare Cache
-
+**Purge Cloudflare Cache:**
 ```bash
-# On production server
+# On production server - all files
 ssh root@prod.pausatf.org "/usr/local/bin/purge_cloudflare_cache.sh all"
 
 # Specific file
 ssh root@prod.pausatf.org "/usr/local/bin/purge_cloudflare_cache.sh 2025/filename.html"
-
-# Check purge log
-ssh root@prod.pausatf.org "tail /var/log/cloudflare_purge.log"
 ```
 
-### Verify Apache Configuration
-
-```bash
-# Check mod_headers enabled
-ssh root@prod.pausatf.org "apachectl -M | grep headers"
-
-# Test Apache config
-ssh root@prod.pausatf.org "apachectl configtest"
-
-# View error log
-ssh root@prod.pausatf.org "tail -f /var/log/apache2/error.log"
-```
-
-### WordPress Health Check
-
+**WordPress Health Check:**
 ```bash
 # List themes
-ssh root@prod.pausatf.org "wp theme list --path=/var/www/html/ --allow-root"
+wp theme list --path=/var/www/html/ --allow-root
 
 # List plugins
-ssh root@prod.pausatf.org "wp plugin list --path=/var/www/html/ --allow-root"
+wp plugin list --path=/var/www/html/ --allow-root
 
 # Check for updates
-ssh root@prod.pausatf.org "wp core check-update --path=/var/www/html/ --allow-root"
+wp core check-update --path=/var/www/html/ --allow-root
 ```
+
+💡 **For more commands, see the [Wiki: Common Commands](https://github.com/pausatf/pausatf-infrastructure-docs/wiki)**
 
 ---
 
-## Troubleshooting
+## 🐛 Troubleshooting
 
-### Cache Not Working
+**Quick Troubleshooting:**
+- 📚 [Wiki: Troubleshooting Guide](https://github.com/pausatf/pausatf-infrastructure-docs/wiki/Troubleshooting)
+- 💬 [Ask in Discussions](https://github.com/pausatf/pausatf-infrastructure-docs/discussions)
+- 🐛 [Report an Issue](https://github.com/pausatf/pausatf-infrastructure-docs/issues/new?template=bug_report.yml)
 
-**Symptoms:** Users still seeing stale content
-
-**Checks:**
-```bash
-# 1. Verify .htaccess exists
-ssh root@prod.pausatf.org "cat /var/www/legacy/public_html/data/2025/.htaccess"
-
-# 2. Check Apache mod_headers
-ssh root@prod.pausatf.org "apachectl -M | grep headers"
-
-# 3. Test headers
-curl -I https://www.pausatf.org/data/2025/test.html | grep -i cache
-
-# 4. Purge Cloudflare cache
-ssh root@prod.pausatf.org "/usr/local/bin/purge_cloudflare_cache.sh all"
-```
-
-### SSH Connection Issues
-
-**Symptoms:** Connection refused on port 22
-
-**Solutions:**
-```bash
-# Test connectivity
-nc -zv prod.pausatf.org 22
-
-# Check from DigitalOcean
-doctl compute droplet get REDACTED_DROPLET_ID --format Status
-
-# Use DigitalOcean console if SSH fails
-# https://cloud.digitalocean.com/droplets → Launch Droplet Console
-```
-
-### WordPress Issues
-
-**See:** [05-server-migration-guide.md](05-server-migration-guide.md) - Troubleshooting section
+**Common Issues:**
+- Cache not working → See [Cache Guide](docs/guides/01-cache-implementation-guide.md)
+- SSH connection issues → See [Server Migration Guide](docs/guides/05-server-migration-guide.md#troubleshooting)
+- WordPress issues → See [Operational Procedures](docs/guides/10-operational-procedures.md)
 
 ---
 
-## Support Resources
+## 🌐 Infrastructure as Code Ecosystem
+
+This documentation repository is part of a complete IaC ecosystem:
+
+| Repository | Purpose | Technologies |
+|------------|---------|--------------|
+| **[pausatf-infrastructure-docs](https://github.com/pausatf/pausatf-infrastructure-docs)** | **Documentation, guides, and procedures** | Markdown, GitHub Wiki |
+| [pausatf-terraform](https://github.com/pausatf/pausatf-terraform) | Infrastructure provisioning | Terraform, DigitalOcean, Cloudflare |
+| [pausatf-ansible](https://github.com/pausatf/pausatf-ansible) | Configuration management | Ansible, WordPress, Apache, MySQL |
+| [pausatf-scripts](https://github.com/pausatf/pausatf-scripts) | Automation and operations | Bash, Python |
+
+**All repositories include:**
+- ✅ Pre-commit hooks for security (shellcheck, ansible-lint, terraform fmt/validate)
+- ✅ Dependabot for dependency updates
+- ✅ GitHub Actions for CI/CD
+- ✅ Secret detection and prevention
+- ✅ Required GPG signed commits on main branch
+- ✅ Comprehensive documentation and CHANGELOGs
+
+---
+
+## 📖 Additional Resources
 
 ### Official Documentation
 - **DigitalOcean:** https://docs.digitalocean.com/
@@ -433,140 +357,66 @@ doctl compute droplet get REDACTED_DROPLET_ID --format Status
 - **WordPress:** https://wordpress.org/documentation/
 - **Apache:** https://httpd.apache.org/docs/2.4/
 
-### API Documentation
-- **Cloudflare API:** https://developers.cloudflare.com/api/
-- **DigitalOcean API:** https://docs.digitalocean.com/reference/api/
-
-### Tools Used
-- **WP-CLI:** https://wp-cli.org/
-- **doctl:** https://docs.digitalocean.com/reference/doctl/
+### PAUSATF Resources
+- **Website:** https://www.pausatf.org
+- **Staging Site:** https://stage.pausatf.org
+- **Cloudflare Dashboard:** https://dash.cloudflare.com/
+- **DigitalOcean Console:** https://cloud.digitalocean.com/
 
 ---
 
-## Security & Compliance
+## 📝 Changelog
 
-### Current Security Posture
+See [CHANGELOG.md](CHANGELOG.md) for all infrastructure changes.
 
-- **WordPress:** 6.9 (latest) ✅
-- **Plugins:** All up to date ✅
-- **PHP:** 7.4.33 (EOL - plan upgrade) ⚠️
-- **Themes:** No critical vulnerabilities ✅
-- **Firewall:** wp-fail2ban + Cloudflare ✅
-- **SSL:** Let's Encrypt (auto-renew) ✅
-
-### OWASP Top 10 Compliance
-
-See: [04-security-audit-report.md](04-security-audit-report.md) - Compliance section
-
-### Security Plugins Active
-- wp-fail2ban 3.5.3 (brute force protection)
-- Cloudflare 4.14.1 (DDoS protection)
+**Recent Changes:**
+- Dec 21, 2025: WordPress security audit and remediation
+- Dec 21, 2025: GitHub workflow features enabled (Wiki, Discussions, Projects)
+- Dec 21, 2025: Documentation reorganized into logical structure
+- Dec 21, 2025: Database maintenance and primary keys
+- Dec 20, 2025: Performance optimization (93% faster)
 
 ---
 
-## Changelog
+## 🤝 Contributing
 
-### 2025-12-20
-- ✅ Cache fix deployed to production
-- ✅ SSH access restored to production server
-- ✅ Cloudflare cache purged
-- ✅ TheSource security audit completed
-- ✅ Server migration guide created
-- ✅ Cloudflare configuration guide created
-- ✅ All documentation committed to repository
+We welcome contributions from the PAUSATF community!
 
-### Next Review
-- **Cache Configuration:** Ongoing monitoring
-- **Security Audit:** June 2026 (6 months)
-- **PHP Upgrade:** Q2 2026 (plan migration to 8.x)
+**Ways to Contribute:**
+- 💬 **Ask/Answer Questions** in [Discussions](https://github.com/pausatf/pausatf-infrastructure-docs/discussions)
+- 📚 **Improve Wiki Pages** (no Git required!)
+- 🐛 **Report Bugs** via [Issues](https://github.com/pausatf/pausatf-infrastructure-docs/issues)
+- 📝 **Update Documentation** via Pull Requests
+- 💡 **Propose Ideas** in [Discussions](https://github.com/pausatf/pausatf-infrastructure-docs/discussions)
 
----
-
-## Contributing
-
-This is a private documentation repository for pausatf.org infrastructure.
-
-**For updates:**
-1. SSH into servers to verify current state
-2. Update relevant documentation files
-3. Commit with descriptive messages
-4. Include verification steps and test results
-
-**Commit Message Format:**
-```
-[Category] Brief description
-
-- Change 1
-- Change 2
-- Verification: test results
-
-```
+**Getting Started:**
+1. Read the [Contributing Guide](governance/CONTRIBUTING.md)
+2. Check the [GitHub Workflow Quick Start](governance/GITHUB-WORKFLOW-QUICKSTART.md)
+3. Browse [Open Issues](https://github.com/pausatf/pausatf-infrastructure-docs/issues) or [Discussions](https://github.com/pausatf/pausatf-infrastructure-docs/discussions)
 
 ---
 
-## License
+## 📞 Contact & Support
+
+**For Infrastructure Questions:**
+- 💬 [Start a Discussion](https://github.com/pausatf/pausatf-infrastructure-docs/discussions)
+- 🐛 [Open an Issue](https://github.com/pausatf/pausatf-infrastructure-docs/issues)
+- 📚 [Check the Wiki](https://github.com/pausatf/pausatf-infrastructure-docs/wiki)
+
+**For PAUSATF Organization:**
+- 🌐 **Website:** https://www.pausatf.org
+- 📧 **Email:** (see website contact page)
+
+---
+
+## 📄 License
 
 Internal documentation for pausatf.org infrastructure. Not for public distribution.
 
 **Maintained by:** Thomas Vincent
 **Organization:** Pacific Association of USA Track and Field (PAUSATF)
-**Last Updated:** 2025-12-21
+**Last Updated:** December 21, 2025
 
 ---
 
-## Infrastructure as Code Repositories
-
-This documentation repository is part of a complete IaC ecosystem:
-
-| Repository | Purpose | Technologies |
-|------------|---------|--------------|
-| **[pausatf-infrastructure-docs](https://github.com/pausatf/pausatf-infrastructure-docs)** | Documentation, guides, and procedures | Markdown |
-| **[pausatf-terraform](https://github.com/pausatf/pausatf-terraform)** | Infrastructure provisioning | Terraform, DigitalOcean, Cloudflare |
-| **[pausatf-ansible](https://github.com/pausatf/pausatf-ansible)** | Configuration management | Ansible, WordPress, Apache, MySQL |
-| **[pausatf-scripts](https://github.com/pausatf/pausatf-scripts)** | Automation and operations | Bash, Python |
-
-All repositories include:
-- ✅ Pre-commit hooks for security (shellcheck, ansible-lint, terraform fmt/validate, tfsec, tflint)
-- ✅ Dependabot for dependency updates (managed via Terraform)
-- ✅ GitHub Actions for CI/CD (validation, testing, security scanning)
-- ✅ Secret detection and prevention (gitleaks, detect-secrets, checkov)
-- ✅ Required GPG signed commits on main branch
-- ✅ Comprehensive documentation and CHANGELOGs
-
-### GitHub Actions Workflows
-
-**Terraform Repository:**
-- `terraform-validate.yml`: Format check, validation, tfsec, tflint
-- `terraform-plan.yml`: Generate plans on pull requests
-
-**Ansible Repository:**
-- `ansible-lint.yml`: Ansible and YAML linting, syntax checks
-
-**Scripts Repository:**
-- `shellcheck.yml`: Shell script linting and syntax validation
-
-**Documentation Repository:**
-- `markdown-lint.yml`: Markdown linting and link checking
-
-### GitHub Repository Management
-
-All GitHub repositories are managed as code using Terraform:
-- Repository settings (visibility, features, branch protection)
-- Branch protection rules (GPG signing, status checks)
-- Dependabot security updates
-- Required status checks per repository type
-
-See [pausatf-terraform/environments/github](https://github.com/pausatf/pausatf-terraform/tree/main/environments/github) for configuration.
-
----
-
-## Quick Links
-
-- **Documentation:** https://github.com/pausatf/pausatf-infrastructure-docs
-- **Terraform:** https://github.com/pausatf/pausatf-terraform
-- **Ansible:** https://github.com/pausatf/pausatf-ansible
-- **Scripts:** https://github.com/pausatf/pausatf-scripts
-- **Production Site:** https://www.pausatf.org
-- **Staging Site:** https://stage.pausatf.org
-- **Cloudflare Dashboard:** https://dash.cloudflare.com/
-- **DigitalOcean Console:** https://cloud.digitalocean.com/
+**🚀 Ready to get started? Check out the [Quick Start Guide](governance/GITHUB-WORKFLOW-QUICKSTART.md)!**
