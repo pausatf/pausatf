@@ -1,0 +1,132 @@
+name: Parent Theme Update
+description: Track an update or security patch for TheSource parent theme
+title: "[Update] TheSource v"
+labels: ["parent-theme-update", "needs-review"]
+assignees:
+  - thomasvincent
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## ⚠️ Parent Theme Update Tracking
+
+        This template is for tracking official TheSource theme updates from Elegant Themes.
+
+        **Not what you're looking for?**
+        - For PAUSATF customizations → [Child Theme Issues](https://github.com/pausatf/pausatf-theme-thesource-child/issues)
+        - For bug reports → [Child Theme Issues](https://github.com/pausatf/pausatf-theme-thesource-child/issues)
+
+  - type: input
+    id: version
+    attributes:
+      label: TheSource Version
+      description: What version is being updated?
+      placeholder: "e.g., 4.8.14 or 4.9.0"
+    validations:
+      required: true
+
+  - type: input
+    id: release-date
+    attributes:
+      label: Release Date
+      description: When was this version released by Elegant Themes?
+      placeholder: "YYYY-MM-DD"
+    validations:
+      required: true
+
+  - type: input
+    id: release-url
+    attributes:
+      label: Release Notes URL
+      description: Link to Elegant Themes release notes
+      placeholder: "https://www.elegantthemes.com/..."
+
+  - type: dropdown
+    id: update-type
+    attributes:
+      label: Update Type
+      description: What kind of update is this?
+      options:
+        - Security Patch
+        - Bug Fix
+        - Feature Update
+        - Major Version
+        - Critical Update
+    validations:
+      required: true
+
+  - type: textarea
+    id: changes
+    attributes:
+      label: Changes Summary
+      description: What changed in this version?
+      placeholder: |
+        - Security fix for XSS vulnerability
+        - Improved mobile responsiveness
+        - Fixed footer widget display issue
+    validations:
+      required: true
+
+  - type: dropdown
+    id: compatibility
+    attributes:
+      label: Child Theme Compatibility
+      description: Will this break our child theme customizations?
+      options:
+        - Compatible (no child theme changes needed)
+        - Mostly compatible (minor child theme adjustments needed)
+        - Requires review (child theme changes may be needed)
+        - Breaking changes (significant child theme work required)
+        - Unknown (needs testing)
+    validations:
+      required: true
+
+  - type: textarea
+    id: testing-plan
+    attributes:
+      label: Testing Plan
+      description: How will we test this update?
+      placeholder: |
+        1. Deploy to staging environment
+        2. Test all custom templates (header, footer, single, page-blog)
+        3. Verify club listings functionality
+        4. Check all color schemes (Blue, Light, Red)
+        5. Test on mobile devices
+        6. Monitor error logs
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: update-checklist
+    attributes:
+      label: Update Checklist
+      description: Steps to complete this update
+      options:
+        - label: Download new version from Elegant Themes
+        - label: Review changelog for breaking changes
+        - label: Create backup of current production theme
+        - label: Test on local/staging environment
+        - label: Verify child theme compatibility
+        - label: Test all custom functionality
+        - label: Update this repository
+        - label: Deploy to staging
+        - label: QA testing on staging
+        - label: Deploy to production
+        - label: Monitor for 24-48 hours
+
+  - type: textarea
+    id: rollback-plan
+    attributes:
+      label: Rollback Plan
+      description: What's the plan if something goes wrong?
+      placeholder: |
+        - Backup location: /root/theme-backup-YYYYMMDD/
+        - Rollback command: [specific steps]
+        - Estimated rollback time: X minutes
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional Notes
+      description: Any other relevant information

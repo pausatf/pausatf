@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 🎨 Theme Customization or Bug Report
+    url: https://github.com/pausatf/pausatf-theme-thesource-child/issues/new/choose
+    about: For customizations or bugs in PAUSATF site, use the child theme repository
+  - name: 📚 Development Guidelines
+    url: https://github.com/pausatf/pausatf-theme-thesource-child/blob/main/CONTRIBUTING.md
+    about: Read how to contribute to the PAUSATF child theme
+  - name: 💬 Questions and Discussion
+    url: https://github.com/pausatf/pausatf-infrastructure-docs/discussions
+    about: Ask questions or discuss PAUSATF infrastructure
+  - name: 🐛 Elegant Themes Support
+    url: https://www.elegantthemes.com/contact/
+    about: For issues with TheSource parent theme itself, contact Elegant Themes
