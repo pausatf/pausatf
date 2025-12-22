@@ -1,0 +1,18 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: '\.(html|txt|pdf|doc|docx|xls|xlsx)$'
+      - id: end-of-file-fixer
+        exclude: '\.(html|txt|pdf|doc|docx|xls|xlsx|gif|jpg|jpeg|png|swf|mpg|mp4)$'
+      - id: check-added-large-files
+        args: ['--maxkb=10240']  # 10MB limit
+      - id: check-merge-conflict
+      - id: detect-private-key
+
+  - repo: https://github.com/zricethezav/gitleaks
+    rev: v8.18.1
+    hooks:
+      - id: gitleaks
+        exclude: '\.(gif|jpg|jpeg|png|pdf|swf|mpg|mp4|doc|docx|xls|xlsx|secrets\.baseline)$'
