@@ -1,0 +1,103 @@
+name: CSS Linting
+
+on:
+  pull_request:
+    paths:
+      - '**.css'
+      - '.github/workflows/css-lint.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - '**.css'
+      - '.github/workflows/css-lint.yml'
+
+jobs:
+  stylelint:
+    name: StyleLint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install stylelint
+        run: |
+          npm install --save-dev stylelint stylelint-config-standard
+
+      - name: Create stylelint config
+        run: |
+          cat > .stylelintrc.json << 'EOF'
+          {
+            "extends": "stylelint-config-standard",
+            "rules": {
+              "indentation": null,
+              "no-descending-specificity": null,
+              "selector-class-pattern": null,
+              "color-function-notation": null,
+              "alpha-value-notation": null
+            }
+          }
+          EOF
+
+      - name: Run stylelint
+        run: npx stylelint "**/*.css" --ignore-pattern "vendor/**"
+        continue-on-error: true
+
+  css-validator:
+    name: W3C CSS Validator
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate CSS files
+        run: |
+          for file in $(find . -name "*.css" -not -path "./vendor/*"); do
+            echo "Validating $file"
+            curl -s -F "file=@$file" -F "output=json" https://jigsaw.w3.org/css-validator/validator || true
+          done
+
+  css-complexity:
+    name: CSS Complexity Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install parker
+        run: npm install -g parker
+
+      - name: Analyze CSS complexity
+        run: |
+          for file in $(find . -name "*.css" -not -path "./vendor/*"); do
+            echo "Analyzing $file"
+            parker "$file" || true
+          done
+
+  duplicate-selectors:
+    name: Check for Duplicate Selectors
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for duplicates
+        run: |
+          for file in $(find . -name "*.css" -not -path "./vendor/*"); do
+            echo "Checking $file for duplicate selectors"
+            grep -o '^[^{]*{' "$file" | sort | uniq -d | head -10 || true
+          done

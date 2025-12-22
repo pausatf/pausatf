@@ -1,0 +1,31 @@
+{
+    "name": "pausatf/theme-thesource-child",
+    "description": "TheSource Child WordPress theme for pausatf.org - Custom modifications and overrides",
+    "type": "wordpress-theme",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "PAUSATF",
+            "email": "noreply@pausatf.org"
+        }
+    ],
+    "require": {
+        "php": ">=7.4"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.7",
+        "wp-coding-standards/wpcs": "^3.0",
+        "phpcompatibility/php-compatibility": "^9.3",
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    },
+    "scripts": {
+        "lint": "phpcs --standard=WordPress --extensions=php --ignore=vendor/ .",
+        "lint-fix": "phpcbf --standard=WordPress --extensions=php --ignore=vendor/ .",
+        "compat": "phpcs --standard=PHPCompatibility --runtime-set testVersion 7.4- --extensions=php --ignore=vendor/ ."
+    }
+}
