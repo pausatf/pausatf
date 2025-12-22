@@ -1,0 +1,19 @@
+# Staging Environment Variables
+# Copy this file to terraform.tfvars and fill in actual values
+
+# Required
+do_token             = "your-digitalocean-token-here"
+cloudflare_api_token = "your-cloudflare-api-token-here"
+cloudflare_zone_id   = "your-cloudflare-zone-id-here"
+
+# Staging Configuration (smaller than production)
+region        = "sfo2"
+droplet_size  = "s-2vcpu-4gb"   # Half of production
+database_size = "db-s-1vcpu-1gb" # Smaller than production
+
+# SSH Configuration (more permissive for staging)
+ssh_key_fingerprints = [
+  # Add your SSH key fingerprints here
+]
+
+environment = "staging"
