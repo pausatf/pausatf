@@ -1,0 +1,175 @@
+---
+# Deploy Legacy Content Sync to Production Server
+#
+# This playbook deploys the legacy content sync scripts and configures
+# automatic syncing of /var/www/legacy/public_html/ to GitHub.
+#
+# Usage:
+#   ansible-playbook playbooks/deploy-legacy-content-sync.yml
+#
+# Options:
+#   --tags watcher    - Deploy only the watcher service
+#   --tags cron       - Deploy only the cron job
+#   --tags both       - Deploy both (default)
+#
+
+- name: Deploy Legacy Content Sync
+  hosts: production
+  become: yes
+  vars:
+    legacy_dir: "/var/www/legacy/public_html"
+    git_repo_path: "/opt/pausatf-legacy-content"
+    git_repo_url: "git@github.com:pausatf/pausatf-legacy-content.git"
+    scripts_source: "https://raw.githubusercontent.com/pausatf/pausatf-scripts/main/legacy-content"
+    sync_method: "both"  # Options: watcher, cron, both
+    cron_schedule: "0 */6 * * *"  # Every 6 hours
+
+  tasks:
+    - name: Install required packages
+      apt:
+        name:
+          - git
+          - rsync
+          - inotify-tools
+        state: present
+        update_cache: yes
+      tags: [always]
+
+    - name: Ensure git repository directory exists
+      file:
+        path: "{{ git_repo_path }}"
+        state: directory
+        owner: root
+        group: www-data
+        mode: '0755'
+      tags: [always]
+
+    - name: Clone legacy content repository
+      git:
+        repo: "{{ git_repo_url }}"
+        dest: "{{ git_repo_path }}"
+        version: main
+        accept_hostkey: yes
+      register: git_clone
+      ignore_errors: yes
+      tags: [always]
+
+    - name: Configure git user for repository
+      git_config:
+        scope: local
+        repo: "{{ git_repo_path }}"
+        name: "{{ item.name }}"
+        value: "{{ item.value }}"
+      loop:
+        - { name: 'user.name', value: 'Legacy Content Sync Bot' }
+        - { name: 'user.email', value: 'noreply@pausatf.org' }
+      tags: [always]
+
+    - name: Download watcher script
+      get_url:
+        url: "{{ scripts_source }}/sync-legacy-content-watcher.sh"
+        dest: /usr/local/bin/sync-legacy-content-watcher.sh
+        mode: '0700'
+        owner: root
+        group: root
+      when: sync_method in ['watcher', 'both']
+      tags: [watcher, both]
+
+    - name: Download watcher systemd service
+      get_url:
+        url: "{{ scripts_source }}/sync-legacy-content-watcher.service"
+        dest: /etc/systemd/system/sync-legacy-content-watcher.service
+        mode: '0644'
+        owner: root
+        group: root
+      when: sync_method in ['watcher', 'both']
+      tags: [watcher, both]
+
+    - name: Reload systemd daemon
+      systemd:
+        daemon_reload: yes
+      when: sync_method in ['watcher', 'both']
+      tags: [watcher, both]
+
+    - name: Enable and start watcher service
+      systemd:
+        name: sync-legacy-content-watcher
+        enabled: yes
+        state: started
+      when: sync_method in ['watcher', 'both']
+      tags: [watcher, both]
+
+    - name: Download cron script
+      get_url:
+        url: "{{ scripts_source }}/sync-legacy-content-cron.sh"
+        dest: /usr/local/bin/sync-legacy-content-cron.sh
+        mode: '0700'
+        owner: root
+        group: root
+      when: sync_method in ['cron', 'both']
+      tags: [cron, both]
+
+    - name: Create cron job for legacy content sync
+      cron:
+        name: "Sync legacy content to GitHub"
+        minute: "{{ cron_schedule.split()[0] }}"
+        hour: "{{ cron_schedule.split()[1] }}"
+        day: "{{ cron_schedule.split()[2] }}"
+        month: "{{ cron_schedule.split()[3] }}"
+        weekday: "{{ cron_schedule.split()[4] }}"
+        job: "/usr/local/bin/sync-legacy-content-cron.sh >> /var/log/legacy-content-sync-cron.log 2>&1"
+        user: root
+        state: present
+      when: sync_method in ['cron', 'both']
+      tags: [cron, both]
+
+    - name: Create log files
+      file:
+        path: "{{ item }}"
+        state: touch
+        owner: root
+        group: root
+        mode: '0640'
+      loop:
+        - /var/log/legacy-content-sync.log
+        - /var/log/legacy-content-sync-cron.log
+      tags: [always]
+
+    - name: Setup logrotate for sync logs
+      copy:
+        dest: /etc/logrotate.d/legacy-content-sync
+        content: |
+          /var/log/legacy-content-sync.log
+          /var/log/legacy-content-sync-cron.log {
+              daily
+              rotate 30
+              compress
+              delaycompress
+              missingok
+              notifempty
+              create 0640 root root
+          }
+        mode: '0644'
+      tags: [always]
+
+    - name: Display deployment summary
+      debug:
+        msg:
+          - "Legacy Content Sync Deployment Complete"
+          - "========================================"
+          - "Legacy directory: {{ legacy_dir }}"
+          - "Git repository: {{ git_repo_path }}"
+          - "Sync method: {{ sync_method }}"
+          - ""
+          - "{% if sync_method in ['watcher', 'both'] %}Watcher service: ENABLED{% endif %}"
+          - "{% if sync_method in ['cron', 'both'] %}Cron schedule: {{ cron_schedule }}{% endif %}"
+          - ""
+          - "Logs:"
+          - "  Watcher: /var/log/legacy-content-sync.log"
+          - "  Cron: /var/log/legacy-content-sync-cron.log"
+          - ""
+          - "Commands:"
+          - "  systemctl status sync-legacy-content-watcher"
+          - "  tail -f /var/log/legacy-content-sync.log"
+          - "  tail -f /var/log/legacy-content-sync-cron.log"
+      tags: [always]
