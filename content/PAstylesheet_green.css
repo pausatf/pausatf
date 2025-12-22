@@ -1,0 +1,105 @@
+body {
+	margin-left:20px;
+	margin-top:30px;
+	font-size:13px;
+	font-family:Tahoma, Arial, San Sarif;
+	font-variant: none;
+	color:black;
+	background-image:url(/images/USATFlogoBG.jpg);
+	background-position: top-left;
+	background-repeat: no-repeat;
+	scrollbar-face-color:#D81C3F ;
+	scrollbar-shadow-color: black;
+	scrollbar-highlight-color: white;
+	scrollbar-3dlight-color:white;
+	scrollbar-darkshadow-color:black;
+	scrollbar-track-color:#ffffff;
+	scrollbar-base-color:#D81C3F 0;
+	scrollbar-arrow-color:white}
+
+P {
+	color: black;
+	font-variant: normal;}
+
+menu {
+	color: green;
+	font-size: 20px;
+	font-variant: normal;}
+
+td {	border: 1px blue solid;
+	padding: 3px;
+	border-left:0;
+	border-right:0;
+	empty-cells: show;
+	rule: row;
+	font-size:13px;
+	font-family:Tahoma;
+	font-variant: none;
+	color:#060050}
+
+
+a:link,a:visited,a:active {
+	text-decoration:none;
+	color:blue;
+	font-weight:normal;
+	border: none}
+
+a:hover {
+	color:red;
+	font-weight:normal; 	
+	text-decoration:none;}
+
+.title {
+	font-size:20px;
+	font-family:Verdana,Arial,Helvetica,Sans-Serif;
+	color:#9B4D71;
+	font-weight:bold}
+
+hr {  height: 2px;
+	border: none;
+	color:blue;
+	 background-color: blue; }
+
+TABLE {
+	border-collapse: collapse;
+	empty-cells: show;
+	border: 0px solid blue;
+	frame:hsides;
+	 rule:rows;
+	}
+ul {list-style-image:url(____.gif);list-style-position:outside}
+
+tt,pre {
+	font-size:12px;
+	font-family:Courier New, Courier;
+	font-variant: normal;
+	color:#000000;
+	background-color:#ffffff}
+
+td.photos {border:none}
+
+a:href {border:none}
+
+H1, H2, H3, H4, H5 {
+	font-weight: bold;
+	color: #D81C3F ;
+	line-height: 20%;
+	 }
+
+TH {
+	font-size:  14px;
+	font-weight:bold;
+	color: white;
+	background-color: #D81C3F ;
+	font-variant: small-caps;}
+
+#hotlist img {width: 40px;
+			height: 20px;
+		}
+
+/* Following appended to show green color in headings and
+  table headers for XC pages (instead of red) */
+
+H1, H2, H3, H4, H5 {color: green;}
+
+th {background-color: green;}

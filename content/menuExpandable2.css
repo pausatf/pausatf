@@ -1,0 +1,66 @@
+body {
+  font-family: tahoma, verdana, helvetica, arial, sans-serif;
+}
+
+#mainMenu {
+  background-color: transparent;
+  border: 0px solid #CCC;
+  color: #00f;
+  width: 140px;
+}
+
+#menuList {
+  margin: 0px;
+
+}
+
+li.menubar {
+  font-size: 12px;
+  line-height: 1.4em;
+border-width: 0;
+  list-style: none outside;
+}
+
+.menu {
+  display: none;
+  margin-left:25px;
+  padding: 0px;
+}
+
+.menu li {
+  background: url(/images/square.gif) no-repeat 0em 0.3em;
+  list-style: none outside;
+}
+
+a.actuator {
+  background-color: transparent;
+  color: #000;
+  font-size: 12px;
+  padding-left: 0px;
+  text-decoration: none;
+}
+
+a.actuator:hover {
+  text-decoration:underline;
+  padding: 0;
+}
+
+.menu li a {
+  background-color: transparent;
+  border: 0px;
+  color: #03f;
+  font-size: 13px;
+  padding: 0px;
+  text-decoration: none;
+}
+
+.menu li a:hover {
+  border: 1px solid #ffdd00;
+  color: #cc3300;
+  margin: 0px;
+  padding: 1px;
+}
+
+span.key {
+  text-decoration: underline;
+}
