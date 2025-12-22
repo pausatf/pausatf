@@ -1,0 +1,42 @@
+# Backup files
+*.bak
+*.bak.*
+*~
+
+# System files
+.DS_Store
+Thumbs.db
+._*
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+temp/
+tmp/
+
+# WordPress specific
+.htaccess
+wp-config.php
+wp-content/uploads/
+wp-content/blogs.dir/
+wp-content/upgrade/
+wp-content/backup-db/
+wp-content/cache/
+wp-content/cache/supercache/
+
+# Node
+node_modules/
+package-lock.json
+
+# Composer
+/vendor/
+composer.lock

@@ -1,0 +1,83 @@
+name: PHP Linting
+
+on:
+  pull_request:
+    paths:
+      - '**.php'
+      - '.github/workflows/php-lint.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - '**.php'
+      - '.github/workflows/php-lint.yml'
+
+jobs:
+  php-syntax:
+    name: PHP Syntax Check
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php-version: ['7.4', '8.0', '8.1']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP ${{ matrix.php-version }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          tools: parallel-lint
+
+      - name: Check PHP syntax
+        run: |
+          find . -name "*.php" -not -path "./vendor/*" -print0 | xargs -0 -n1 php -l
+
+  phpcs:
+    name: WordPress Coding Standards
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+
+      - name: Install Composer dependencies
+        run: |
+          composer require --dev squizlabs/php_codesniffer
+          composer require --dev wp-coding-standards/wpcs
+          vendor/bin/phpcs --config-set installed_paths vendor/wp-coding-standards/wpcs
+
+      - name: Run PHPCS
+        run: |
+          vendor/bin/phpcs --standard=WordPress --extensions=php --ignore=vendor/ .
+        continue-on-error: true
+
+  php-compatibility:
+    name: PHP Compatibility Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+
+      - name: Install dependencies
+        run: |
+          composer require --dev phpcompatibility/php-compatibility
+          composer require --dev dealerdirect/phpcodesniffer-composer-installer
+
+      - name: Check PHP 7.4+ compatibility
+        run: |
+          vendor/bin/phpcs --standard=PHPCompatibility --runtime-set testVersion 7.4- --extensions=php --ignore=vendor/ .
+        continue-on-error: true
