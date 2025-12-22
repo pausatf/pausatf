@@ -1,0 +1,110 @@
+body {
+	margin-left:15px;
+	margin-top:67px;
+	font-size:14px;
+	font-family:Verdana, Arial, Helvetica, sans-serif;
+	font-variant: none;
+	color:#021625;
+	background-position: top left;
+	background-repeat: no-repeat;
+	scrollbar-face-color:blue;
+	scrollbar-shadow-color: #021625;
+	scrollbar-highlight-color: white;
+	scrollbar-3dlight-color:white;
+	scrollbar-darkshadow-color:#021625;
+	scrollbar-track-color:#ffffff;
+	scrollbar-base-color:#021625;
+	scrollbar-arrow-color:white
+}
+
+P { color: black;
+	font-variant: normal;}
+
+menu {
+	color: green;
+	font-size: 20px;
+	font-variant: normal;}
+
+td {
+	padding: 10px;
+	border-left: 5;
+	border-right: 5;
+    border-top: 5;
+	empty-cells: show;
+	font-size:12px;
+	font-family:Verdana;
+	font-variant: none;
+	color:#021625}
+
+
+a:link,a:visited,a:active {
+	text-decoration:none;
+	color:#006699;
+	font-weight:bold;
+	border: none}
+
+a:hover {
+	color:red;
+	font-weight:normal; 	
+	text-decoration:none;}
+
+.title {
+	font-size:20px;
+	font-family:Verdana,Arial,Helvetica,Sans-Serif;
+	color:#c41200;
+	font-weight:bold}
+
+hr {  height: 2px;
+	border: none;
+	color: #c41200;
+	 background-color: blue; }
+
+TABLE.1 {
+	border-collapse: collapse;
+	empty-cells: show;
+	border-color: #c41200;
+     border-style:solid;
+     border-width:1px; }
+     
+TABLE.2 {
+	border-collapse: collapse;
+	empty-cells: show;
+    border-style:solid;
+    border-width:0px; }
+
+ul {list-style-image:url(____.gif);list-style-position:outside}
+
+tt,pre {
+	font-size:12px;
+	font-family:Courier New, Courier;
+	font-variant: normal;
+	color:#000000;
+	background-color:#ffffff}
+
+td.photos {border:none}
+
+a:href {border:none}
+
+H1, H2, H3, H4, H5 {
+	font-weight: bold;
+	color: #c41200;
+	line-height: 130%;
+	 }
+
+TH {
+	font-size:  14 px;
+	font-weight:bold;
+	color: white;
+	background-color: blue;
+	font-variant: small-caps;}
+
+#hotlist img {width: 40px;
+			height: 20px;
+		}
+
+.xstory {
+	width: 600px;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-style: normal;
+}

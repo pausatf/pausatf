@@ -1,0 +1,5 @@
+User-Agent: *
+Disallow: /data/members.php
+Disallow: /PHP/
+Disallow: /cms/
+
