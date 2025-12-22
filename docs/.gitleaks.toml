@@ -1,0 +1,47 @@
+# Gitleaks configuration for detecting secrets
+title = "PAUSATF Infrastructure Docs - Secret Detection"
+
+[[rules]]
+id = "cloudflare-api-token"
+description = "Cloudflare API Token"
+regex = '''(?i)(CF_API_TOKEN|cloudflare.*token).*[=:]\s*['"]?[A-Za-z0-9_-]{40,}['"]?'''
+tags = ["api", "cloudflare"]
+
+[[rules]]
+id = "digitalocean-token"
+description = "DigitalOcean API Token"
+regex = '''(?i)(DO_TOKEN|DIGITALOCEAN.*TOKEN).*[=:]\s*['"]?[A-Za-z0-9_-]{64,}['"]?'''
+tags = ["api", "digitalocean"]
+
+[[rules]]
+id = "generic-api-key"
+description = "Generic API Key"
+regex = '''(?i)(api_key|apikey|api-key).*[=:]\s*['"]?[A-Za-z0-9_-]{20,}['"]?'''
+tags = ["api", "key"]
+
+[[rules]]
+id = "password"
+description = "Password in plaintext"
+regex = '''(?i)(password|passwd|pwd).*[=:]\s*['"][^'"]{8,}['"]'''
+tags = ["password"]
+
+[[rules]]
+id = "mysql-password"
+description = "MySQL Password"
+regex = '''AVNS_[A-Za-z0-9_-]{20,}'''
+tags = ["database", "password"]
+
+[[rules]]
+id = "private-key"
+description = "Private Key"
+regex = '''-----BEGIN (RSA|OPENSSH|DSA|EC|PGP) PRIVATE KEY-----'''
+tags = ["key", "private"]
+
+[allowlist]
+description = "Allowlist for non-sensitive patterns"
+regexes = [
+  '''your-cloudflare-api-token''',
+  '''your-cloudflare-zone-id''',
+  '''example.com''',
+  '''localhost''',
+]

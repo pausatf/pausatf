@@ -1,0 +1,83 @@
+name: Documentation Update
+description: Report missing, incorrect, or outdated documentation
+title: "[Docs] "
+labels: ["documentation", "needs-triage"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Documentation Update Request
+
+        Use this template to report issues with documentation or request new documentation.
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type of Update
+      description: What kind of documentation issue is this?
+      options:
+        - Missing documentation (feature not documented)
+        - Incorrect information (docs don't match reality)
+        - Outdated information (docs need updating)
+        - Unclear/confusing (docs need clarification)
+        - New guide needed
+        - Broken links
+        - Formatting/typo
+    validations:
+      required: true
+
+  - type: input
+    id: document
+    attributes:
+      label: Affected Document(s)
+      description: Which document(s) need updating? (e.g., 05-server-migration-guide.md, README.md)
+      placeholder: "05-server-migration-guide.md"
+    validations:
+      required: true
+
+  - type: textarea
+    id: issue
+    attributes:
+      label: What's Wrong?
+      description: Describe the documentation issue
+      placeholder: |
+        - What information is missing/incorrect/unclear?
+        - What did you expect to find?
+        - What did you actually find?
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested Improvement
+      description: How should the documentation be improved?
+      placeholder: |
+        - What should be added/changed/clarified?
+        - Any specific wording suggestions?
+        - Links to relevant resources?
+
+  - type: input
+    id: location
+    attributes:
+      label: Section/Line Number
+      description: Specific section heading or line number if known
+      placeholder: "Line 123 or section 'Database Configuration'"
+
+  - type: checkboxes
+    id: volunteer
+    attributes:
+      label: Contribution
+      description: Can you help fix this?
+      options:
+        - label: I can submit a PR to fix this documentation issue
+        - label: I need someone else to make this change
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other relevant information
+      placeholder: |
+        Screenshots, examples, related documentation, etc.
