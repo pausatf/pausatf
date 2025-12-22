@@ -62,6 +62,7 @@ Documentation is organized in numbered sequence for logical reading order:
 | 11 | **[11-database-maintenance.md](11-database-maintenance.md)** | Guide | **Database maintenance procedures, primary key requirements, troubleshooting** |
 | 12 | **[12-server-rightsizing-analysis.md](12-server-rightsizing-analysis.md)** | Analysis | **Resource optimization, cost analysis, backup configuration** |
 | 13 | **[13-digitalocean-optimization-guide.md](13-digitalocean-optimization-guide.md)** | Guide | **DigitalOcean infrastructure improvements, security, monitoring, DR** |
+| 14 | **[14-wordpress-security-audit-2025.md](14-wordpress-security-audit-2025.md)** | Report | **WordPress security audit and remediation (Dec 21, 2025)** |
 | -- | **[EXECUTIVE-SUMMARY.md](EXECUTIVE-SUMMARY.md)** | Summary | **Non-technical overview for stakeholders** |
 
 ### 🔧 Additional Documentation
@@ -225,6 +226,17 @@ deployment-package/
 - ✅ Secret rotation procedures documented
 - See: [.github/SECRETS.md](.github/SECRETS.md)
 
+**WordPress Security Audit and Remediation (Dec 21, 2025):**
+- ✅ Comprehensive backup created: 13.5 GB (database + files + legacy)
+- ✅ wp-config.php permissions secured: 644 → 640
+- ✅ 3 unexpected files removed from WordPress core
+- ✅ Test user account deleted (thomastest)
+- ✅ Administrator accounts documented (11 admins - needs review)
+- ✅ Auto-updates enabled for all plugins
+- ✅ Database integrity verified (133 tables)
+- ✅ File security audit completed
+- See: [14-wordpress-security-audit-2025.md](14-wordpress-security-audit-2025.md)
+
 ### ⏳ Pending Items
 
 **Theme Cleanup (Optional):**
@@ -260,6 +272,7 @@ pausatf-infrastructure-docs/
 ├── 11-database-maintenance.md                   # Database maintenance and primary keys
 ├── 12-server-rightsizing-analysis.md            # Resource optimization and cost analysis
 ├── 13-digitalocean-optimization-guide.md        # DigitalOcean infrastructure improvements
+├── 14-wordpress-security-audit-2025.md          # WordPress security audit and remediation
 ├── EXECUTIVE-SUMMARY.md                         # Non-technical stakeholder summary
 │
 └── deployment-package/
