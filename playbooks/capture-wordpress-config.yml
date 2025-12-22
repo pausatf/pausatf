@@ -5,10 +5,14 @@
 # staging and production servers, including:
 # - WordPress version and installed plugins/themes
 # - PHP version and configuration
-# - Apache/web server configuration
+# - Apache/OpenLiteSpeed web server configuration
 # - Database configuration (sanitized)
 # - File permissions and ownership
 # - wp-config.php settings (sanitized)
+# - Cron jobs and systemd timers
+# - Scripts referenced by cron jobs (full inventory)
+# - .htaccess files
+# - SSL certificates
 #
 # Usage:
 #   ansible-playbook playbooks/capture-wordpress-config.yml
@@ -199,6 +203,144 @@
     - name: Get systemd timers
       shell: systemctl list-timers --all --no-pager
       register: systemd_timers
+      changed_when: false
+      failed_when: false
+
+    - name: Extract script paths from cron jobs
+      shell: |
+        # Create a temporary file to collect all cron content
+        TEMP_CRON_FILE=$(mktemp)
+
+        # Collect all cron content
+        crontab -l 2>/dev/null >> "$TEMP_CRON_FILE" || true
+        cat /etc/crontab 2>/dev/null >> "$TEMP_CRON_FILE" || true
+        cat /etc/cron.d/* 2>/dev/null >> "$TEMP_CRON_FILE" || true
+
+        # Check user crontabs
+        for user in $(cut -f1 -d: /etc/passwd 2>/dev/null); do
+          crontab -u "$user" -l 2>/dev/null >> "$TEMP_CRON_FILE" || true
+        done
+
+        # Extract script paths (look for .sh, .py, .php, .pl files and paths starting with /)
+        # Filter out comments and empty lines
+        grep -v "^#" "$TEMP_CRON_FILE" 2>/dev/null | \
+        grep -v "^$" | \
+        grep -oE '(/[^ ]+\.(sh|py|php|pl|rb)|/usr/local/bin/[^ ]+|/usr/bin/[^ ]+|/opt/[^ ]+|/home/[^ ]+/[^ ]+\.(sh|py|php|pl|rb))' | \
+        sort -u || true
+
+        # Cleanup
+        rm -f "$TEMP_CRON_FILE"
+      register: cron_script_paths
+      changed_when: false
+      failed_when: false
+
+    - name: Find scripts in cron.hourly/daily/weekly/monthly directories
+      shell: |
+        echo "=== Cron.hourly Scripts ==="
+        find /etc/cron.hourly -type f -executable 2>/dev/null || echo "No scripts found"
+        echo ""
+        echo "=== Cron.daily Scripts ==="
+        find /etc/cron.daily -type f -executable 2>/dev/null || echo "No scripts found"
+        echo ""
+        echo "=== Cron.weekly Scripts ==="
+        find /etc/cron.weekly -type f -executable 2>/dev/null || echo "No scripts found"
+        echo ""
+        echo "=== Cron.monthly Scripts ==="
+        find /etc/cron.monthly -type f -executable 2>/dev/null || echo "No scripts found"
+      register: cron_dir_scripts
+      changed_when: false
+      failed_when: false
+
+    - name: Capture content of cron-referenced scripts
+      shell: |
+        echo "# Cron-Referenced Scripts Inventory"
+        echo "# Captured: {{ ansible_date_time.iso8601 }}"
+        echo "# Server: {{ inventory_hostname }}"
+        echo ""
+        echo "============================================"
+        echo "SCRIPTS REFERENCED IN CRON JOBS"
+        echo "============================================"
+        echo ""
+
+        {% for script in cron_script_paths.stdout_lines %}
+        if [ -f "{{ script }}" ]; then
+          echo "=== {{ script }} ==="
+          echo "File: {{ script }}"
+          echo "Permissions: $(ls -lh {{ script }} 2>/dev/null | awk '{print $1, $3, $4}')"
+          echo "Size: $(ls -lh {{ script }} 2>/dev/null | awk '{print $5}')"
+          echo "Modified: $(ls -l --time-style=long-iso {{ script }} 2>/dev/null | awk '{print $6, $7}')"
+          echo ""
+          echo "--- Content ---"
+          cat "{{ script }}" 2>/dev/null || echo "Unable to read file"
+          echo ""
+          echo ""
+        else
+          echo "=== {{ script }} (NOT FOUND) ==="
+          echo "Script referenced in cron but does not exist on filesystem"
+          echo ""
+        fi
+        {% endfor %}
+
+        echo ""
+        echo "============================================"
+        echo "SCRIPTS IN CRON DIRECTORIES"
+        echo "============================================"
+        echo ""
+
+        for dir in /etc/cron.hourly /etc/cron.daily /etc/cron.weekly /etc/cron.monthly; do
+          if [ -d "$dir" ]; then
+            echo "=== Directory: $dir ==="
+            echo ""
+            for script in "$dir"/*; do
+              if [ -f "$script" ] && [ -x "$script" ]; then
+                echo "--- $script ---"
+                echo "Permissions: $(ls -lh "$script" 2>/dev/null | awk '{print $1, $3, $4}')"
+                echo "Size: $(ls -lh "$script" 2>/dev/null | awk '{print $5}')"
+                echo ""
+                echo "Content:"
+                cat "$script" 2>/dev/null || echo "Unable to read"
+                echo ""
+                echo ""
+              fi
+            done
+          fi
+        done
+
+        echo ""
+        echo "============================================"
+        echo "SYSTEMD TIMER UNITS"
+        echo "============================================"
+        echo ""
+
+        # Find and capture systemd service files referenced by timers
+        for timer in $(systemctl list-timers --all --no-legend 2>/dev/null | awk '{print $NF}'); do
+          service_name="${timer%.timer}.service"
+          echo "=== Timer: $timer → Service: $service_name ==="
+
+          # Get the service file location
+          service_file=$(systemctl cat "$service_name" 2>/dev/null | grep -m1 "^# " | sed 's/^# //')
+          if [ -n "$service_file" ]; then
+            echo "Service File: $service_file"
+            echo ""
+            systemctl cat "$service_name" 2>/dev/null || echo "Unable to read service"
+            echo ""
+
+            # Extract ExecStart line to find script
+            exec_start=$(systemctl cat "$service_name" 2>/dev/null | grep "^ExecStart=" | sed 's/ExecStart=//')
+            if [ -n "$exec_start" ]; then
+              # Extract the script path (first word after any = sign)
+              script_path=$(echo "$exec_start" | awk '{print $1}')
+              if [ -f "$script_path" ]; then
+                echo "Referenced Script: $script_path"
+                echo "--- Content ---"
+                cat "$script_path" 2>/dev/null || echo "Unable to read"
+                echo ""
+              fi
+            fi
+          fi
+          echo ""
+        done
+      register: cron_scripts_content
       changed_when: false
       failed_when: false
 
@@ -524,6 +666,13 @@
         dest: "{{ output_dir }}/{{ inventory_hostname }}/cron-config-{{ timestamp }}.txt"
       become: no
 
+    - name: Save cron scripts inventory
+      local_action:
+        module: copy
+        content: "{{ cron_scripts_content.stdout }}"
+        dest: "{{ output_dir }}/{{ inventory_hostname }}/cron-scripts-inventory-{{ timestamp }}.txt"
+      become: no
+
     - name: Save .htaccess files
       local_action:
         module: copy
@@ -586,7 +735,8 @@
           - "    - themes-{{ timestamp }}.json"
           - "    - constants-{{ timestamp }}.json"
           - "  System Configuration:"
-          - "    - cron-config-{{ timestamp }}.txt"
+          - "    - cron-config-{{ timestamp }}.txt (cron jobs configuration)"
+          - "    - cron-scripts-inventory-{{ timestamp }}.txt (scripts referenced by cron jobs)"
           - "    - htaccess-files-{{ timestamp }}.txt"
           - "    - php-config-{{ timestamp }}.txt"
           - "    - ssl-certs-{{ timestamp }}.txt"
