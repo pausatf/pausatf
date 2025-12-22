@@ -1,0 +1,263 @@
+---
+# Capture WordPress Configuration from Servers
+#
+# This playbook captures the current WordPress configuration from both
+# staging and production servers, including:
+# - WordPress version and installed plugins/themes
+# - PHP version and configuration
+# - Apache/web server configuration
+# - Database configuration (sanitized)
+# - File permissions and ownership
+# - wp-config.php settings (sanitized)
+#
+# Usage:
+#   ansible-playbook playbooks/capture-wordpress-config.yml
+#   ansible-playbook playbooks/capture-wordpress-config.yml --limit production
+#   ansible-playbook playbooks/capture-wordpress-config.yml --limit staging
+#
+
+- name: Capture WordPress Configuration
+  hosts: wordpress
+  become: yes
+  vars:
+    output_dir: "./wordpress-config-capture"
+    timestamp: "{{ ansible_date_time.iso8601_basic_short }}"
+
+  tasks:
+    - name: Create local output directory
+      local_action:
+        module: file
+        path: "{{ output_dir }}/{{ inventory_hostname }}"
+        state: directory
+        mode: '0755'
+      run_once: no
+      become: no
+
+    - name: Gather WordPress core version
+      command: wp core version --path={{ wordpress_path }} --allow-root
+      register: wp_version
+      changed_when: false
+
+    - name: Gather WordPress database version
+      command: wp core version --path={{ wordpress_path }} --allow-root --extra --field=db_version
+      register: wp_db_version
+      changed_when: false
+
+    - name: List installed plugins
+      command: wp plugin list --path={{ wordpress_path }} --allow-root --format=json
+      register: wp_plugins
+      changed_when: false
+
+    - name: List installed themes
+      command: wp theme list --path={{ wordpress_path }} --allow-root --format=json
+      register: wp_themes
+      changed_when: false
+
+    - name: Get WordPress site URL
+      command: wp option get siteurl --path={{ wordpress_path }} --allow-root
+      register: wp_siteurl
+      changed_when: false
+
+    - name: Get WordPress home URL
+      command: wp option get home --path={{ wordpress_path }} --allow-root
+      register: wp_home
+      changed_when: false
+
+    - name: Get active theme
+      command: wp theme list --path={{ wordpress_path }} --allow-root --status=active --field=name
+      register: wp_active_theme
+      changed_when: false
+
+    - name: Get PHP version
+      command: php -v
+      register: php_version
+      changed_when: false
+
+    - name: Get PHP modules
+      command: php -m
+      register: php_modules
+      changed_when: false
+
+    - name: Get Apache version
+      command: apache2 -v
+      register: apache_version
+      changed_when: false
+      ignore_errors: yes
+
+    - name: Get Apache modules
+      command: apache2ctl -M
+      register: apache_modules
+      changed_when: false
+      ignore_errors: yes
+
+    - name: Get MySQL version
+      command: mysql --version
+      register: mysql_version
+      changed_when: false
+
+    - name: Read wp-config.php (sanitized)
+      shell: |
+        grep -E "define\(|^\\\$table_prefix" {{ wordpress_path }}/wp-config.php | \
+        sed 's/DB_PASSWORD.*/DB_PASSWORD", "***REDACTED***");/' | \
+        sed 's/AUTH_KEY.*/AUTH_KEY", "***REDACTED***");/' | \
+        sed 's/SECURE_AUTH_KEY.*/SECURE_AUTH_KEY", "***REDACTED***");/' | \
+        sed 's/LOGGED_IN_KEY.*/LOGGED_IN_KEY", "***REDACTED***");/' | \
+        sed 's/NONCE_KEY.*/NONCE_KEY", "***REDACTED***");/' | \
+        sed 's/AUTH_SALT.*/AUTH_SALT", "***REDACTED***");/' | \
+        sed 's/SECURE_AUTH_SALT.*/SECURE_AUTH_SALT", "***REDACTED***");/' | \
+        sed 's/LOGGED_IN_SALT.*/LOGGED_IN_SALT", "***REDACTED***");/' | \
+        sed 's/NONCE_SALT.*/NONCE_SALT", "***REDACTED***");/'
+      register: wp_config_sanitized
+      changed_when: false
+
+    - name: Get WordPress file permissions
+      shell: |
+        ls -la {{ wordpress_path }} | head -20
+        echo "---"
+        ls -la {{ wordpress_path }}/wp-content/ | head -10
+        echo "---"
+        ls -la {{ wordpress_path }}/wp-content/themes/
+        echo "---"
+        ls -la {{ wordpress_path }}/wp-content/plugins/ | head -10
+      register: wp_permissions
+      changed_when: false
+
+    - name: Get disk usage
+      command: du -sh {{ wordpress_path }}
+      register: wp_disk_usage
+      changed_when: false
+
+    - name: Get WordPress constants
+      command: wp config list --path={{ wordpress_path }} --allow-root --format=json
+      register: wp_constants
+      changed_when: false
+      ignore_errors: yes
+
+    - name: Get database tables
+      command: wp db tables --path={{ wordpress_path }} --allow-root
+      register: wp_db_tables
+      changed_when: false
+
+    - name: Get database size
+      shell: wp db size --path={{ wordpress_path }} --allow-root --format=json
+      register: wp_db_size
+      changed_when: false
+      ignore_errors: yes
+
+    - name: Create configuration summary
+      local_action:
+        module: copy
+        content: |
+          # WordPress Configuration - {{ inventory_hostname }}
+          # Captured: {{ timestamp }}
+          # ==============================================
+
+          ## System Information
+          - Hostname: {{ inventory_hostname }}
+          - IP Address: {{ ansible_default_ipv4.address }}
+          - OS: {{ ansible_distribution }} {{ ansible_distribution_version }}
+          - Kernel: {{ ansible_kernel }}
+
+          ## WordPress Core
+          - Version: {{ wp_version.stdout }}
+          - Database Version: {{ wp_db_version.stdout }}
+          - Site URL: {{ wp_siteurl.stdout }}
+          - Home URL: {{ wp_home.stdout }}
+          - Document Root: {{ wordpress_path }}
+          - Disk Usage: {{ wp_disk_usage.stdout }}
+
+          ## Active Theme
+          {{ wp_active_theme.stdout }}
+
+          ## PHP Configuration
+          {{ php_version.stdout_lines[0] }}
+
+          ## Web Server
+          {% if apache_version.stdout is defined %}
+          {{ apache_version.stdout_lines[0] }}
+          {% endif %}
+
+          ## Database
+          {{ mysql_version.stdout }}
+          {% if wp_db_size.stdout %}
+          Database Size: {{ wp_db_size.stdout }}
+          {% endif %}
+
+          ## Installed Plugins ({{ (wp_plugins.stdout | from_json) | length }} total)
+          {{ wp_plugins.stdout | from_json | selectattr('status', 'equalto', 'active') | list | length }} active plugins:
+          {% for plugin in wp_plugins.stdout | from_json | selectattr('status', 'equalto', 'active') %}
+          - {{ plugin.name }} ({{ plugin.version }}) - {{ plugin.title }}
+          {% endfor %}
+
+          ## Installed Themes ({{ (wp_themes.stdout | from_json) | length }} total)
+          {% for theme in wp_themes.stdout | from_json %}
+          - {{ theme.name }} ({{ theme.version }}) - {{ theme.title }}{% if theme.status == 'active' %} [ACTIVE]{% endif %}
+          {% endfor %}
+
+          ## Database Tables ({{ wp_db_tables.stdout_lines | length }} total)
+          {{ wp_db_tables.stdout }}
+
+          ## wp-config.php Settings (Sanitized)
+          ```php
+          {{ wp_config_sanitized.stdout }}
+          ```
+
+          ## File Permissions
+          ```
+          {{ wp_permissions.stdout }}
+          ```
+
+          ## PHP Modules Loaded
+          {{ php_modules.stdout_lines | join('\n') }}
+
+          {% if apache_modules.stdout is defined %}
+          ## Apache Modules Loaded
+          {{ apache_modules.stdout }}
+          {% endif %}
+
+          ---
+          Generated by Ansible playbook: capture-wordpress-config.yml
+        dest: "{{ output_dir }}/{{ inventory_hostname }}/wordpress-config-{{ timestamp }}.md"
+      become: no
+
+    - name: Save plugins list as JSON
+      local_action:
+        module: copy
+        content: "{{ wp_plugins.stdout }}"
+        dest: "{{ output_dir }}/{{ inventory_hostname }}/plugins-{{ timestamp }}.json"
+      become: no
+
+    - name: Save themes list as JSON
+      local_action:
+        module: copy
+        content: "{{ wp_themes.stdout }}"
+        dest: "{{ output_dir }}/{{ inventory_hostname }}/themes-{{ timestamp }}.json"
+      become: no
+
+    - name: Save WordPress constants as JSON
+      local_action:
+        module: copy
+        content: "{{ wp_constants.stdout | default('[]') }}"
+        dest: "{{ output_dir }}/{{ inventory_hostname }}/constants-{{ timestamp }}.json"
+      become: no
+      when: wp_constants.stdout is defined
+
+    - name: Display summary
+      debug:
+        msg:
+          - "WordPress Configuration Captured Successfully"
+          - "============================================="
+          - "Server: {{ inventory_hostname }}"
+          - "WordPress Version: {{ wp_version.stdout }}"
+          - "Active Theme: {{ wp_active_theme.stdout }}"
+          - "Active Plugins: {{ (wp_plugins.stdout | from_json | selectattr('status', 'equalto', 'active') | list | length) }}"
+          - "Total Plugins: {{ (wp_plugins.stdout | from_json) | length }}"
+          - ""
+          - "Output saved to:"
+          - "  {{ output_dir }}/{{ inventory_hostname }}/"
+          - ""
+          - "Files created:"
+          - "  - wordpress-config-{{ timestamp }}.md"
+          - "  - plugins-{{ timestamp }}.json"
+          - "  - themes-{{ timestamp }}.json"
+          - "  - constants-{{ timestamp }}.json"
