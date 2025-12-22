@@ -351,6 +351,7 @@ This documentation repository is part of a complete IaC ecosystem:
 | [pausatf-scripts](https://github.com/pausatf/pausatf-scripts) | Automation and operations | Bash, Python |
 | [pausatf-theme-thesource](https://github.com/pausatf/pausatf-theme-thesource) | WordPress parent theme (TheSource v4.8.13) | PHP, CSS, WordPress |
 | [pausatf-theme-thesource-child](https://github.com/pausatf/pausatf-theme-thesource-child) | WordPress child theme (PAUSATF customizations) | PHP, CSS, WordPress |
+| [pausatf-legacy-content](https://github.com/pausatf/pausatf-legacy-content) | Legacy static content archive (2000-2025) | HTML, PHP, CSS, Historical data |
 
 **All repositories include:**
 - ✅ Pre-commit hooks for security (shellcheck, ansible-lint, terraform fmt/validate)
