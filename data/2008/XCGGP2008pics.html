@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+		"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>Golden Gate Park XC 2008 Picture Gallery</title>
+
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.5.1/build/assets/skins/sam/skin.css">
+<script type="text/javascript" src="http://yui.yahooapis.com/2.5.1/build/utilities/utilities.js"></script> 
+<script type="text/javascript" src="http://yui.yahooapis.com/2.5.1/build/container/container-min.js"></script> 
+<link rel="stylesheet" type="text/css" href="/javascript/lightbox/lightbox.css">
+<script type="text/javascript" src="/javascript/lightbox/Lightbox-min.js"></script>
+<script type="text/javascript">
+
+init = function(){
+	/**
+	 * Format:
+	 * Image_ID : {url : 'point_to_original_image', title: 'optional title', text:'optional text'}
+	 */
+   //creating a data source object
+var dataSource = {
+	image1:{url:"/images/2008/pa-ggp/MenStart.JPG", title:"Men's Start", text: "Photo Credit: Spencer Allen"},
+	image2:{url:"/images/2008/pa-ggp/Wason.JPG", title:"Tim Wason, Meet Director", text: "Photo Credit: Spencer Allen"} ,
+	image3:{url:"/images/2008/pa-ggp/Men5thJohnston.JPG", title:"Men's 5th Place Sky Johnston", text: "Photo Credit: Spencer Allen"},
+	image4:{url:"/images/2008/pa-ggp/Men4thhawkins.JPG", title:"Men's 4th Place Keith Hankins", text: "Photo Credit: Spencer Allen"},
+	image5:{url:"/images/2008/pa-ggp/Men3rdMoreno.JPG", title:"Men's 3rd Place Vicente Moreno", text: "Photo Credit: Spencer Allen"},
+	image6:{url:"/images/2008/pa-ggp/Men2ndElam.JPG", title:"Men's 2nd Place Jimmy Elam", text: "Photo Credit: Spencer Allen"},
+	image7:{url:"/images/2008/pa-ggp/Men1stCorrigan.JPG", title:"Men's 1st Place Frank Carrigan", text: "Photo Credit: Spencer Allen"},
+	image8:{url:"/images/2008/pa-ggp/Master5thWaller.JPG", title:"Men's Masters 5th Place Tim Wallen", text: "Photo Credit: Spencer Allen"},
+	image9:{url:"/images/2008/pa-ggp/Master4thPilcher.JPG", title:"Men's Masters 4th Place Brian Pilcher", text: "Photo Credit: Spencer Allen"},
+	image10:{url:"/images/2008/pa-ggp/Master3rdLeary.JPG", title:"Men's Masters 3rd Place Cliff Lentz", text: "Photo Credit: Spencer Allen"},
+	image11:{url:"/images/2008/pa-ggp/Master2ndHongo.JPG", title:"Men's Masters 2nd Place Jeff Hongo", text: "Photo Credit: Spencer Allen"},
+	image13:{url:"/images/2008/pa-ggp/Master1stTowae.JPG", title:"Men's Masters 1st Place Gary Towne", text: "Photo Credit: Spencer Allen"},
+	image14:{url:"/images/2008/pa-ggp/Women5thWells.JPG", title:"Women's Masters 5th Place Brooke Wells", text: "Photo Credit: Spencer Allen"},
+	image15:{url:"/images/2008/pa-ggp/Women4thLagunas.JPG", title:"Women's 4th Place Rosemarie Lagunas", text: "Photo Credit: Spencer Allen"},
+	image16:{url:"/images/2008/pa-ggp/Women3rdGallagher.JPG", title:"Women's 3rd Place Michelle Gallagher", text: "Photo Credit: Spencer Allen"},
+	image17:{url:"/images/2008/pa-ggp/Women2ndDaly.JPG", title:"Women's 2nd Place Megan Daly", text: "Photo Credit: Spencer Allen"},
+	image18:{url:"/images/2008/pa-ggp/Women1stMorales.JPG", title:"Women's 1st Place Ana Morales", text: "Photo Credit: Spencer Allen"},
+  };
+
+  //Instantiate a Lightbox object
+  var lightbox = new YAHOO.com.thecodecentral.Lightbox(dataSource, {
+	id: 'showtcc',
+	maskOpacity: 1,
+	maskBgColor: '#000',
+	modal: true,
+	hasThumbnails: false,
+	ctrlVisible: true,
+	ctrlOpacity: .5,
+	effect: true,
+	effectDuration: 1,
+	tooltip: true,
+	tooltipOpacity: .9
+  });
+$E.on('btnShow', 'click', function(){ this.blur();lightbox.show();});
+}
+YAHOO.util.Event.on(window, 'load', init);
+</script>
+<style type="text/css" title="text/css" media="screen">
+.imageTable {margin-top:1em; margin-bottom:1em}
+.imageTable tr td{border:1px solid #CCCCCC; padding: 1em}
+</style>
+<link href="/PAstylesheetpg2.css" type="text/css" rel="stylesheet">
+
+
+</head>
+
+<body>
+
+<div align="left">
+
+<table border="0" cellspacing="0" cellpadding="0">
+
+<tr>
+					<td valign="top" width="60"><font size="2"><a href="/"><b>Home</b></a><br>
+
+<a href="http://www.pausatf.org/data/pacontacts.html"><b>Contacts</b></a></font></td>
+					<td valign="top">
+						<div align="left">
+							<br>
+							<br>
+							<h2>Golden Gate Park XC 2008 Picture Gallery</h2>
+							<h3>PA XC Grand Prix Event  &#x2022;	 September 6, 2008</h3>
+							<div class="story" align ="left">
+							<h6>Photo Credit: Spencer Allen</h6>
+							<input type="button" value="Launch Slideshow" id="btnShow" style="float:top"/>
+<p><table class="imageTable">
+<tr>
+<td>
+											<h6><img src="/images/2008/pa-ggp/Wason.JPG" id="image1" alt="Wason" width="125" height="100" /><br/>
+												Tim Wason, Meet Director</h6>
+										</td>
+										<td>
+											<h6><img src="/images/2008/pa-ggp/MenStart.JPG" id="image2" alt="Men's Start to Golden Gate XC Grand Prix" width="125" height="100"/><br/>Men's Start to Golden Gate XC </h6>
+										</td>
+									</tr>
+<tr> 
+<td><h6><img src="/images/2008/pa-ggp/Men5thJohnston.JPG" id="image3" alt="Johnston" width="125" height="100" /><br/>Open Men 5th - Sky Johnston</h6></td>
+<td><h6><img src="/images/2008/pa-ggp/Men4thhawkins.JPG" id="image4" alt="Hawkins" width="125" height="93"/><br/>Open Men 4th - Keith Hankins</h6></td>
+<td><h6><img src="/images/2008/pa-ggp/Men3rdMoreno.JPG" id="image5"alt="Moreno" width="125" height="100" /><br/>Open Men 3rd - Vicente Moreno</h6></td>
+<td><h6><img src="/images/2008/pa-ggp/Men2ndElam.JPG" id="image6" alt="Elam" width="125" height="100"/><br/>Open Men 2nd - Jimmy Elam</h6></td>
+<td><h6><img src="/images/2008/pa-ggp/Men1stCorrigan.JPG" id="image7" alt="Corrigan" width="125" height="93"/><br/>Open Men 1st - Frank Carrigan</h6></td>
+</tr>
+<tr>
+<td><h6><img src="/images/2008/pa-ggp/Master5thWaller.JPG" id="image8" alt="Waller" width="125" height="95"/><br/>Master Men 5th - Tim Wallen</h6></td>
+<td><h6><img src="/images/2008/pa-ggp/Master4thPilcher.JPG" id="image9" alt="Pilcher" width="125" height="100"/><br/>Master Men 4th - Brian Pilcher</h6></td>
+<td><h6><img src="/images/2008/pa-ggp/Master3rdLeary.JPG" id="image10" alt="Leary" width="125" height="96"/><br/>Master Men 3rd - Cliff Lentz</h6></td>
+<td><h6><img src="/images/2008/pa-ggp/Master2ndHongo.JPG" id="image11" alt="Hongo" width="125" height="100"/><br/>Master Men 2nd - Jeff Hongo</h6></td>
+<td><h6><img src="/images/2008/pa-ggp/Master1stTowae.JPG" id="image12" alt="Towae" width="125" height="100"/><br/>Master Men 1st - Gary Towne</h6></td>
+</tr>
+<tr>
+<td><h6><img src="/images/2008/pa-ggp/Women5thWells.JPG" id="image13" alt="Wells" width="125" height="100"/><br/>Open Women 5th - Brooke Wells</h6></td>
+<td><h6><img src="/images/2008/pa-ggp/Women4thLagunas.JPG" id="image14" alt="Lagunas" width="125" height="91"/><br/>Open Women 4th - Rosemarie Lagunas</h6></td>
+<td><h6><img src="/images/2008/pa-ggp/Women3rdGallagher.JPG" id="image15" alt="Gallagher" width="125" height="95"/><br/>Open Women 3rd - Michelle Gallagher</h6></td>
+<td><h6><img src="/images/2008/pa-ggp/Women2ndDaly.JPG" id="image16" alt="Daly" width="125" height="81"/><br/>Open Women 2nd - Megan Daly</h6></td>
+<td><h6><img src="/images/2008/pa-ggp/Women1stMorales.JPG" id="image17" alt="Morales" width="95" height="115"/><br/>Open Women 1st - Ana Morales</h6></td>
+</tr>
+</table></p>
+<p><a href="http://www.usatf.org"></a></p>
+<p>#&nbsp; #&nbsp; #</p>
+</div>
+						
+						
+</td>					
+<!-- Start Quantcast tag -->
+
+<script type="text/javascript" src="http://edge.quantserve.com/quant.js"></script><script type="text/javascript">_qacct="p-72cL-7RSrrmhE";quantserve();</script>
+
+<noscript>
+
+	<a href="http://www.quantcast.com/p-72cL-7RSrrmhE" target="_blank">
+
+		<img src="http://pixel.quantserve.com/pixel/p-72cL-7RSrrmhE.gif" style="display: none;" border="0" height="1" width="1" alt="Quantcast" />
+
+	</a>
+
+</noscript>
+
+<!-- End Quantcast tag -->
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-2651783-1");
+pageTracker._initData();
+pageTracker._trackPageview();
+</script>
+</body>
+</HTML>
+</body>
+</html>

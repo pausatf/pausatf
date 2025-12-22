@@ -1,0 +1,3791 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+	<title>PA Youth Cross Country &amp; Track and Field</title>
+	<link href="/menuExpandable2.css" type="text/css" rel="stylesheet">
+	<link href="/pastylesheetyouth.css" type="text/css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="http://yui09.yahooapis.com/2.8.0r4/build/reset/reset.css">
+	<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.8.0r4/build/fonts/fonts-min.css">
+	<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?2.8.0r4/build/menu/assets/skins/sam/menu.css">
+ 
+<!-- Combo-handled YUI JS files: -->
+<script type="text/javascript" src="http://yui.yahooapis.com/combo?2.8.0r4/build/yahoo-dom-event/yahoo-dom-event.js&amp;2.8.0r4/build/container/container_core-min.js&amp;2.8.0r4/build/menu/menu-min.js"> 
+</script> <style type="text/css">
+ 
+ 
+  /*margin and padding on body element can introduce errors in determining element position and are not recommended;we turn them off as a foundation for YUICSS treatments. */
+ 
+ 
+  body {
+ 
+ 
+       background-color: #262A39;
+ 
+       word-break: normal;
+ 
+ 
+       font-family: "Lucida Grande", Verdana, Arial, sans-serif;
+ 
+       font-weight:bold;
+ 
+ 
+  }
+ 
+  #hd, .yui-layout-unit-top {
+ 
+ 
+    background-color: #262A39;
+ 
+  }
+ 
+  #bd, .yui-layout-unit-center {
+ 
+    color: black;
+ 
+    border-color: 6192c8;
+ 
+ 
+    border-style: solid;
+ 
+    font-family: "Lucida Grande", Verdana, Arial;
+ 
+    background-color: white;
+ 
+  }
+  #ft, .yui-layout-unit-bottom {
+ 
+    background-color: 6192c8;
+ 
+    color: #fff;
+ 
+  }
+ 
+ 
+  </style>
+<!-- Combo-handled YUI CSS files: -->
+	<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?2.8.0r4/build/reset-fonts-grids/reset-fonts-grids.css&amp;2.8.0r4/build/layout/assets/skins/sam/layout.css">
+<!-- Combo-handled YUI JS files: -->
+<script type="text/javascript" src="http://yui.yahooapis.com/combo?2.8.0r4/build/yahoo-dom-event/yahoo-dom-event.js&amp;2.8.0r4/build/element/element-min.js&amp;2.8.0r4/build/selector/selector-min.js&amp;2.8.0r4/build/layout/layout-min.js"> 
+</script> 
+</head>
+<body class="yui-skin-sam">
+ 
+<!-- the id on the containing div determines the page width. -->
+<!-- #doc = 750px; #doc2 = 950px; #doc3 = 100%; #doc4 = 974px -->
+<div id="doc4" class="yui-t7">
+<!---Expandable.Menu.Script-->
+<script type="text/javascript" src="/javascript/menuExpandable2.js"> 
+</script> <script type="text/javascript">
+ 
+    <!--
+                       window.onload = function() {
+ 
+                              initializeMenu("xcMenu", "xcActuator");
+ 
+                              initializeMenu("archiveMenu", "archiveActuator");
+ 
+                             initializeMenu("infoMenu", "infoActuator");
+ 
+ 
+                              initializeMenu("tfMenu", "tfActuator");
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+                              initializeMenu("linksMenu", "linksActuator");
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+                       }
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+                //-->
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+               <!--
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+        function MM_reloadPage(init) {  //reloads the window if Nav4 resized
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+       if (init==true) with (navigator) {if ((appName=="Netscape")&&(parseInt(appVersion)==4)) {
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+        document.MM_pgW=innerWidth; document.MM_pgH=innerHeight; onresize=MM_reloadPage; }}
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+        else if (innerWidth!=document.MM_pgW || innerHeight!=document.MM_pgH) history.go(0);
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+       }MM_reloadPage(true);//-->
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+    </script> 
+<!--End.Expandable.Menu.Script-->
+	<div align="center">
+		<div align="center">
+			<div align="center">
+				<div id="flashcontent">
+					<div align="center">
+<!-- flash replacement.  This section filled in with flash by javascript -->
+<script type="text/javascript">
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              <!-- Begin
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              rnd.today=new Date();
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              rnd.seed=rnd.today.getTime();
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              function rnd() {
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              rnd.seed = (rnd.seed*9301+49297) % 233280;
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              return rnd.seed/(233280.0);
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              };
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              function rand(number) {
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              var result = Math.ceil(rnd()*number);
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              if (!result)result++;
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              return result
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              };
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              var ad_cnt1 = 23;
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              var ad1 = rand(ad_cnt1);
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              var link1;
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              var adBanner1;
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              var width1
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              var height1
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              if (ad1==1) {
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              link1="http://pausatf.org/indexyouth.html";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              adBanner1="http://pausatf.org/images/youthbannerC.jpg";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              width1="800";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              height1="219";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              alt1="PAUSATF Youth Site";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              }
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              if (ad1==2) {
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              link1="http://pausatf.org/indexyouth.html";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              adBanner1="http://pausatf.org/images/youthbannerC12.jpg";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              width1="800";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              height1="219";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              alt1="PAUSATF Youth Site";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              }
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              if (ad1==3) {
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              link1="http://pausatf.org/indexyouth.html";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              adBanner1="http://pausatf.org/images/youthbannerC2.jpg";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              width1="800";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              height1="219";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              alt1="PAUSATF Youth Site";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              }
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              if (ad1==4) {
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              link1="http://pausatf.org/indexyouth.html";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              adBanner1="http://pausatf.org/images/youthbannerC3.jpg";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              width1="800";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              height1="219";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              alt1="PAUSATF Youth Site";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              }
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              if (ad1==5) {
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              link1="http://pausatf.org/indexyouth.html";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              adBanner1="http://pausatf.org/images/youthbannerC4.jpg";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              width1="800";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              height1="219";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              alt1="PAUSATF Youth Site";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              }
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              if (ad1==6) {
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              link1="http://pausatf.org/indexyouth.html";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              adBanner1="http://pausatf.org/images/youthbannerC6.jpg";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              width1="800";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              height1="219";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              alt1="PAUSATF Youth Site";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              }
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              if (ad1==7) {
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              link1="http://pausatf.org/indexyouth.html";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              adBanner1="http://pausatf.org/images/youthbannerC7.jpg";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              width1="800";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              height1="219";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              alt1="PAUSATF Youth Site";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              }
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              if (ad1==8) {
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              link1="http://pausatf.org/indexyouth.html";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              adBanner1="http://pausatf.org/images/youthbannerC8.jpg";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              width1="800";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              height1="219";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              alt1="PAUSATF Youth Site";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              }
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              if (ad1==9) {
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              link1="http://pausatf.org/indexyouth.html";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              adBanner1="http://pausatf.org/images/youthbannerC9.jpg";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              width1="800";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              height1="219";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              alt1="PAUSATF Youth Site";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              }
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              if (ad1==10) {
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              link1="http://pausatf.org/indexyouth.html";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              adBanner1="http://pausatf.org/images/youthbannerC11.jpg";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              width1="800";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              height1="219";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              alt1="PAUSATF Youth Site";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              }
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              if (ad1==11) {
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              link1="http://pausatf.org/indexyouth.html";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              adBanner1="http://pausatf.org/images/youthbannerC14.jpg";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              width1="800";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              height1="219";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              alt1="PAUSATF Youth Site";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              }
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              if (ad1==12) {
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              link1="http://pausatf.org/indexyouth.html";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              adBanner1="http://pausatf.org/images/youthbannerC15.jpg";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              width1="800";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              height1="219";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              alt1="PAUSATF Youth Site";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              }
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              if (ad1==13) {
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              link1="http://pausatf.org/indexyouth.html";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              adBanner1="http://pausatf.org/images/youthbannerC13.jpg";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              width1="800";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              height1="219";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              alt1="PAUSATF Youth Site";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              }
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              if (ad1==14) {
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              link1="http://pausatf.org/indexyouth.html";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              adBanner1="http://pausatf.org/images/youthbannerC16.jpg";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              width1="800";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              height1="219";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              alt1="PAUSATF Youth Site";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              }
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              if (ad1==15) {
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              link1="http://pausatf.org/indexyouth.html";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              adBanner1="http://pausatf.org/images/youthbannerC17.jpg";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              width1="800";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              height1="219";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              alt1="PAUSATF Youth Site";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              }
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              if (ad1==16) {
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              link1="http://pausatf.org/indexyouth.html";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              adBanner1="http://pausatf.org/images/youthbannerC18.jpg";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              width1="800";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              height1="219";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              alt1="PAUSATF Youth Site";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              }
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              if (ad1==17) {
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              link1="http://pausatf.org/indexyouth.html";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              adBanner1="http://pausatf.org/images/youthbannerC19.jpg";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              width1="800";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              height1="219";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              alt1="PAUSATF Youth Site";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              }
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              if (ad1==18) {
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              link1="http://pausatf.org/indexyouth.html";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              adBanner1="http://pausatf.org/images/youthbannerC20.jpg";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              width1="800";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              height1="219";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              alt1="PAUSATF Youth Site";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              }
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              if (ad1==19) {
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              link1="http://pausatf.org/indexyouth.html";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              adBanner1="http://pausatf.org/images/youthbannerC21.jpg";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              width1="800";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              height1="219";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              alt1="PAUSATF Youth Site";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              }
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              if (ad1==20) {
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              link1="http://pausatf.org/indexyouth.html";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              adBanner1="http://pausatf.org/images/youthbannerC22.jpg";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              width1="800";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              height1="219";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              alt1="PAUSATF Youth Site";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              }
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              if (ad1==21) {
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              link1="http://pausatf.org/indexyouth.html";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              adBanner1="http://pausatf.org/images/youthbannerC23.jpg";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              width1="800";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              height1="219";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              alt1="PAUSATF Youth Site";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              }
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              if (ad1==22) {
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              link1="http://pausatf.org/indexyouth.html";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              adBanner1="http://pausatf.org/images/youthbannerC24.jpg";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              width1="800";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              height1="219";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              alt1="PAUSATF Youth Site";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              }
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              if (ad1==23) {
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              link1="http://pausatf.org/indexyouth.html";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              adBanner1="http://pausatf.org/images/youthbannerC25.jpg";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              width1="800";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              height1="219";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              alt1="PAUSATF Youth Site";
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              }
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              document.write('<center><a href="' + link1 + '" target="_top">');
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              document.write('<img src="' + adBanner1 + '" width=' + width1 + ' height=' + height1 + ' border=0 alt="' + alt1 + '"><\/a>');
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+              document.write('<\/center>');
+              // End -->
+ 
+              </script><br>
+						<a href="javascript:replayFlash()"></a><a href="/Flash/YouthFlash3.swf"><font size="1" color="white">Play flash video</font>.</a> 
+<!-- was InsertFlashMovie('youthFlashMovie') -->
+					</div>
+				</div>
+				<div align="center">
+<!--===  menu table ===-->
+					<table width="930" height="19">
+						<tr>
+							<td valign="top" width="68"> 
+							<div align="center">
+								<a href="/"><font color="white"><strong>HOME</strong></font></a> 
+							</div>
+							</td>
+							<td valign="top" nowrap width="140"> 
+							<div align="center">
+ 
+<!--=== TRACK and FIELD MENU =====-->
+								<p>
+									<a id="tfActuator" class="actuator" href="/" accesskey="h" name="tfActuator"><strong><font color="white">TRACK &amp; FIELD</font></strong></a>
+								</p>
+							</div>
+							<div align="left">
+								<ul id="tfMenu" class="menu">
+									<li><a href="http://www.usatf.org/groups/Youth/ageDivisions.asp"><font size="2" color="white">Youth Age Groups</font></a></li>
+									<li><a href="/data/2009/ytfcompguide.html"><font size="2" color="white">Youth TF Guide</font></a></li>
+									<li><a href="/data/2009/ytf3daysched.pdf"><font size="2" color="white"><u>3-Day Meet Schedule</u></font></a></li>
+									<li><a href="/data/2009/ytfbidform9.17.09.pdf"><font size="2" color="white"><u>TF Meet Bid Form</u></font></a></li>
+									<li><a href="/data/ytfrecords.html"><font size="2" color="white">Records</font></a></li>
+								</ul>
+							</div>
+							<div style="margin-left: 2em" class="menu" id="menuList">
+								<ul id="tfMenu" class="menu">
+								</ul>
+							</div>
+							<div style="margin-left: 2em" class="menu" id="menuList">
+								<ul id="tfMenu" class="menu">
+								</ul>
+							</div>
+							<div style="margin-left: 2em" class="menu" id="menuList">
+								<ul id="tfMenu" class="menu">
+								</ul>
+							</div>
+							<div style="margin-left: 2em" class="menu" id="menuList">
+								<ul id="tfMenu" class="menu">
+								</ul>
+							</div>
+							<div style="margin-left: 2em" class="menu" id="menuList">
+								<ul id="tfMenu" class="menu">
+								</ul>
+							</div>
+							</td>
+ 
+<!--=== TRACK COUNTRY MENU =====-->
+							<td align="right" valign="top" width="160"> 
+							<div align="center">
+								<p>
+									<a id="archiveActuator" class="actuator" href="/" accesskey="h" name="archiveActuator"><font color="white"><strong>PAST SEASONS</strong></font></a>
+								</p>
+							</div>
+							<div align="left">
+								<ul id="archiveMenu" class="menu">
+								<li><a href="http://pausatf.org/data/2013/youth/yxcschedule2013.html">2013 Cross Country Meet Schedule/Results</a></li>
+								<li><a href="/data/2013/youth/ytf2013sched.html">2013 Track &amp; Field Meet Schedule/Results</a></li> 
+								<li><a href="/data/2013/mtfmeetsched2013.html">2013 All Comers Track &amp; Field Meet Schedule</a></li>
+									<li><a href="/yfxcountry2012.html"><font size="2" color="white">2012 XC Season</font></a></li>
+								     <li><a href="/youthtrackandfield2012.html"><font size="2" color="white">2012 T &amp; F Season</font></a></li>
+									<li><a href="/yfxcountry2011.html"><font size="2" color="white">2011 XC Season</font></a></li>
+									<li><a href="/yftrackandfield2011.html"><font size="2" color="white">2011 T&amp;F Season</font></a></li>
+									<li><a href="/yfxcountry2010.html"><font size="2" color="white">2010 XC Season</font></a></li>
+									<li><a href="/yftrackandfield.html"><font size="2" color="white">2010 T&amp;F Season</font></a></li>
+									<li><a href="/indexyouth033009.html"><font size="2" color="white">2009 XC and T&amp;F Season</font></a></li>
+								</ul>
+							</div>
+							<ul class="menu" id="menuList">
+							</ul>
+							<ul class="menu" id="menuList">
+							</ul>
+							<ul class="menu" id="menuList">
+							</ul>
+							<ul class="menu" id="menuList">
+							</ul>
+							</td>
+ 
+<!---COACHES CORNER=-->
+							<td align="right" valign="top" width="76"> 
+							<div align="center">
+								<a href="http://www.pausatf.org/yca.html"><font color="white"><strong>COACH&nbsp;CORNER</strong></font></a> 
+							</div>
+							</td>
+ 
+<!---YOUTH PHOTOS=-->
+							<td align="right" valign="top" width="160"> 
+							<div align="center">
+								<a href="/pagallery/index.html"><font color="white"><strong>YOUTH&nbsp;PHOTOS</strong></font></a> 
+							</div>
+							</td>
+							<td valign="top" nowrap width="170"> 
+							<div align="center">
+ 
+<!--=== COOL YOUTH LINKS MENU =====-->
+								<p>
+									<a id="linksActuator" class="actuator" href="/" accesskey="h" name="linksActuator"><font color="white"><strong>COOL YOUTH LINKS</strong></font></a>
+								</p>
+							</div>
+							<div align="left">
+								<ul id="linksMenu" class="menu">
+									<li><a href="http://www.dyestatcal.com"><font size="2" color="white">DyeStat Cal</font></a></li>
+									<li><a href="http://www.cifstate.org"><font size="2" color="white">CIF Track &amp;&nbsp;Field / XC</font></a></li>
+									<li><a href="http://www.wdphotog.com/xc/hsxc_links.html"><font size="2" color="white">CA HS Track/XC Links</font></a></li>
+									<li><a href="http://www.caltrack.com/prep/05103Maylist.html"><font size="2" color="white">CTRN/Prep Articles</font></a></li>
+									<li><a href="http://www.ncsasports.org/student-athletes-families/track/track-guidelines"><font size="2" color="white">NCSA Student-athlete Info</font></a></li>
+									<li><a href="http://www.dyestatcal.com/ATHLETICS/TRACK/2007/2007.htm"><font size="2" color="white">DyestatCal Track</font></a></li>
+									<li><a href="http://www.maxpreps.com"><font size="2" color="white">MaxPreps.com</font></a></li>
+									<li><a href="http://www.studentsports.com"><font size="2" color="white">StudentSports.com</font></a></li>
+									<li><a href="http://www.highschoolsports.net"><font size="2" color="white">HighSchoolSports.com</font></a></li>
+									<li><a href="http://www.youthrunner.com/"><font size="2" color="white">YouthRunner.com</font></a></li>
+									<li><a href="http://www.kidsrunning.com/"><font size="2" color="white">KidsRunning.com</font></a></li>
+								</ul>
+							</div>
+							</td>
+						</tr>
+					</table>
+					<div id="bd">
+						<div id="yui-main">
+							<div class="yui-b">
+								<div class="yui-g">
+									<div class="yui-u first">
+										<div align="left">
+											<div align="center">
+												<br>
+												<font size="5"><img src="/images/patitle01.jpg"></font> 
+											</div>
+										</div>
+										<br>
+										<p>
+											<a href="http://www.usatf.org/events/2011/USATFJuniorOlympicTFChampionships/index.asp"><img src="/images/tflogo.jpg" alt="2011 jo champs logo" longdesc="http://www.usatf.org/events/2011/USATFJuniorOlympicTFChampionships/index.asp"></a>
+										</p>
+										<br>
+										<br>
+										<div align="left" style="padding-left:20px; padding-top:7px">
+											<font size="-1">Today's youth athletes are tomorrow's champions! As the #1 high school and junior high school participatory sport, Track &amp; Field, Cross Country, and Race walking offer a variety of competitive and fitness opportunities.</font> 
+											<p>
+												<font size="-1">&nbsp;</font>
+											</p>
+											<font size="-1">The Pacific Association is the largest youth program Northern California, where nearly 4,000 youth athletes compete each year in Track &amp; Field and Cross Country. Many of America's Collegiate Athletes began as youth athletes, including stars such as Ashton Purvis, Amber Purvis, Javis Best, Jordan Hasay and Olympians such as Jeremy Wariner, Allyson Felix, Sanya Richards, and Lauryn Williams.</font> 
+											<p>
+												<font size="-1">&nbsp;</font>
+											</p>
+											<p>
+												<font size="-1"><a href="http://www.usatf.org/membership/?sc=TM" style="color:#8A0808;">Join USATF today</a> and make your Olympic dreams come true!</font>
+											</p>
+										</div>
+										<hr>
+										<p>
+											&nbsp;
+										</p>
+										
+<p>&nbsp;</p>
+<p><font size="-1">Video of Miles Jones 3MTC 7-8B New National Record 5:11.00</font></p>
+<p>&nbsp;</p>
+<script height="278px" width="370px" src="http://player.ooyala.com/iframe.js#pbid=NTg2YzIxYWIyYmE2MzE1ODlhYjc1Njgz&ec=FkaDJwZDqibKlGU5hJRZUcaPMpH4vzEA"></script>
+<br>
+<br>
+ 
+										<hr>
+										<br>
+										<p align="center">
+											<a href="data/2012/youth/yxcschedresults2012.html"><font size="4" align="top"><img src="/images/patitle04.jpg"></font></a>
+										</p>
+										<div align="left" style="padding-left:20px; padding-top:7px">
+											<p>&nbsp;</p>
+ 
+
+<font size="-1">Sat-Sun, July, 13-14: Annual Track City Classic<br>
+<font size="-1">Mon-Sun, July, 22-28: USATF Junior Olympic Nationals <br>
+
+
+<br>
+</font>
+											</p>
+ 
+<p>&nbsp;</p>
+											</p>
+											
+										</div>
+										<hr>
+										<p>
+											&nbsp;
+										</p>
+										<div align="center">
+											<h3 id="connect-with-us-title">
+												Connect with Us
+											</h3><br>
+											<ul id="blog-social-icons">
+												<li><a href="http://www.facebook.com/pausatf" rel="nofollow" target="_blank"><img src="blog-icon-facebook.jpg" alt="Follow Youth PAUSATF on Facebook"></a> <a href="http://twitter.com/youthpausatf" rel="nofollow" target="_blank"><img src="blog-icon-twitter.jpg" alt="Follow Youth PAUSATF on Twitter"></a> <a href="http://www.youtube.com/user/pausatf1" rel="nofollow" target="_blank"><img src="blog-icon-youtube.jpg" alt="Youth PAUSATF YouTube Profile"></a></li>
+											</ul>
+										</div>
+ 
+<!-- end #column-left -->
+									</div>
+									<div class="yui-u" align="left">
+										<p>
+											<br>
+ 
+											<div align="center"><img src="/images/patitle02.jpg"></div>
+										</p><br> <div style="padding-left:20px">
+<!-- BEGIN: Constant Contact Bubble Opt-in Email List Form -->
+										<div align="left">
+											<table width="175" border="0" cellspacing="0" cellpadding="0">
+												<tr bgcolor="#006699" valign="top">
+													<td width="9" rowspan="2"><img src="http://img.constantcontact.com/ui/images/visitor/tl_brdr2_trans.gif" width="9" height="9" border="0"></td>
+													<td width="152" height="1" bgcolor="#006699"><img src="http://img.constantcontact.com/ui/images/spacer.gif" border="0" width="1" height="1"></td>
+													<td width="9" rowspan="2" align="right"><img src="http://img.constantcontact.com/ui/images/visitor/tr_brdr2_trans.gif" width="9" height="9" border="0"></td>
+												</tr>
+												<tr>
+													<td width="152" height="8" bgcolor="#FFFFFF"><img src="http://img.constantcontact.com/ui/images/spacer.gif" border="0" width="1" height="1"></td>
+												</tr>
+												<tr>
+													<td width="170" colspan="3" style="border-left: 1px solid #006699;border-right: 1px solid #006699;"> 
+													<div align="center">
+														<form name="ccoptin" action="http://visitor.constantcontact.com/d.jsp" target="_blank" method="post" style="margin-bottom:3;">
+															<font style="font-weight: bold; font-family:Arial; font-size:10px; color:#006699;">Join our PA/USATF Youth Newsletter</font><br>
+															<font style="font-weight: normal; font-family:Arial; font-size:10px; color:#000000;">Email:</font> 
+															<input type="text" name="ea" size="14" value="" style="font-family: Arial; font-size:10px; border:1px solid #999999;">
+															&nbsp;
+															<input type="submit" name="go" value="Join" class="submit" style="font-family:Arial,Helvetica,sans-serif; font-size:11px;">
+															<input type="hidden" name="m" value="1102742452830">
+															<input type="hidden" name="p" value="oi">
+														</form>
+													</div>
+													</td>
+												</tr>
+												<tr bgcolor="#006699" valign="bottom">
+													<td rowspan="2"><img src="http://img.constantcontact.com/ui/images/visitor/bl_brdr2_trans.gif" width="9" height="9" border="0"></td>
+													<td width="152" height="8" bgcolor="#FFFFFF"><img src="http://img.constantcontact.com/ui/images/spacer.gif" border="0" width="1" height="1"></td>
+													<td rowspan="2" align="right"><img src="http://img.constantcontact.com/ui/images/visitor/br_brdr2_trans.gif" width="9" height="9" border="0"></td>
+												</tr>
+												<tr>
+													<td width="152" bgcolor="#006699"><img src="http://img.constantcontact.com/ui/images/spacer.gif" border="0" width="1" height="1"></td>
+												</tr>
+											</table>
+										</div>
+ 
+<!-- END: Constant Contact Bubble Opt-in Email List Form -->
+<!-- BEGIN: SafeSubscribe -->
+										<div align="left" style="padding-top:5px;">
+											<a href="http://www.constantcontact.com/safesubscribe.jsp" target="_blank"><img src="http://img.constantcontact.com/ui/images1/safe_subscribe_logo.gif" border="0" width="168" height="14" alt=""></a> 
+										</div>
+ 
+<!-- END: SafeSubscribe -->
+<br>
+ 					     <div style="padding-left:20px; padding-top:7px">
+						<a href="/data/2014/youth/ytf2014sched.results.html" style="color:#8A0808;">2014 Track &amp; Field Meet Schedule/Results</a> 
+										</div>
+					     <div style="padding-left:20px; padding-top:7px">
+					    <a href="http://www.usatf.org/groups/Youth/ageDivisions.asp" style="color:#8A0808;">Youth Age Groups</a>
+					    </div>
+					    <div style="padding-left:20px; padding-top:7px">
+									<a href="/data/2009/ytfcompguide.html" style="color:#8A0808;">Youth TF Guide</a>
+									</div>
+					    <div style="padding-left:20px; padding-top:7px">
+									<a href="/data/2009/ytf3daysched.pdf" style="color:#8A0808;">3-Day Meet Schedule</a>
+									</div>
+					    <div style="padding-left:20px; padding-top:7px">
+									<a href="/data/2009/ytfbidform9.17.09.pdf" style="color:#8A0808;">TF Meet Bid Form</a>
+									</div>
+					    <div style="padding-left:20px; padding-top:7px">									
+									<a href="/data/ytfrecords.html" style="color:#8A0808;">Records</a>
+									</div>
+                       <div style="padding-left:20px; padding-top:7px">
+									<a href="http://pausatf.org/data/ybckchks.html" style="color:#8A0808;">PA Coaches, Volunteers, Officials Cleared Background Check List</a> 
+										</div>
+						<div style="padding-left:20px; padding-top:7px">
+								<b>Important!</b> <a href="/data/ybckchkprocedure.html" style="color:#8A0808;">Updated Background Check Procedure</a><br>
+											As of November, 2013 both the PA/USATF Livescan and <br>the National USATF TCI Logiq check are required for all <br>Youth Coaches, Volunteers, Officials.
+										</div>
+
+<div style="padding-left:20px; padding-top:7px">
+											<a href="/data/2013/youth/Youth.Code.of.Conduct.pdf" style="color:#8A0808;">Youth Code of Conduct</a><br>
+											 
+										</div>
+<div style="padding-left:20px; padding-top:7px">
+											<a href="/data/2013/youth/youth.committee.op.procedures.2009.pdf" style="color:#8A0808;">Youth Committee Operational Procedures</a><br>
+											
+										</div>
+
+
+										<div style="padding-left:20px; padding-top:7px">
+											<a href="/data/2013/youth/indexyouth2013.html" style="color:#8A0808;">2013 Youth Archives</a> (updated 1/25 w/2013 PA JOXC results &amp; PA Youth XC Grand Prix standings)
+										</div>
+														
+										<div style="padding-left:20px; padding-top:7px">
+											<a href="/data/coach/indexcoach.html" style="color:#8A0808;">Coaching Contacts</a> 
+										</div>
+										<div style="padding-left:20px; padding-top:7px">
+											<a href="http://coachoregistration.com/calendar/meet/calendar.html" style="color:#8A0808;">CoachO Registrations</a> 
+										</div>
+										<div style="padding-left:20px; padding-top:7px">
+										<a href="http://www.athletic.net/TrackAndField/Division/Top.aspx?DivID=35510" style="color:#8A0808;">2013 PAUSATF Athletic.net Performance List</a> 
+										</div>
+										<div style="padding-left:20px; padding-top:7px">
+										<a href="/data/Age Group Records.pdf" style="color:#8A0808;">PAUSATF Track & Field Records</a> 
+										</div><br>
+										<hr>
+										<div align="left">
+											<p>
+												<br>
+											</p>
+											<p>
+ 								<div align="center"><img src="/images/patitle06.jpg"></div>
+ 								<p>&nbsp;</p><br>
+<div style="padding-right:10px; padding-top:1px">
+<p><font size="-1"><img src="http://pausatf.org/lilpointer.png"><font color="black">  <img src="/images/new2ani.gif">T&amp;F Schedule updated with PA Youth Championships (PAC) Meet Info</font> <a href="http://pausatf.org/data/2014/youth/3M_2014_ANNUAL_TRACK_MEET_INFORMATION.pdf" style="color:#8A0808;">Visit TF Schedule;</a> </font></font></div>
+<div style="padding-right:10px; padding-top:1px">
+
+<div style="padding-right:10px; padding-top:1px">
+<p><font size="-1"><img src="http://pausatf.org/lilpointer.png"><font color="black">  <img src="/images/new2ani.gif">Background Checklist Updated 4/6</a></font> <a href="/data/ybckchks.html" style="color:#8A0808;">Link</a> </font></font></div>
+<div style="padding-right:10px; padding-top:1px">
+
+<div style="padding-right:10px; padding-top:1px">
+<p><font size="-1"><img src="http://pausatf.org/lilpointer.png"><font color="black">  <img src="/images/new2ani.gif">A "Thank You!" from Big Valley Meet Director Coach E.</font> <a href="http://pausatf.org/data/2014/youth/ytfthankyouBigValleyTC.pdf" style="color:#8A0808;">Read now;</a> </font></font></div>
+<div style="padding-right:10px; padding-top:1px">
+
+<div style="padding-right:10px; padding-top:1px">
+<p><font size="-1"><img src="http://pausatf.org/lilpointer.png"><font color="black">T&amp;F Schedule updated with 3M Invitational Meet Info</font> <a href="http://pausatf.org/data/2014/youth/3M_2014_ANNUAL_TRACK_MEET_INFORMATION.pdf" style="color:#8A0808;">Visit TF Schedule;</a> </font></font></div>
+<div style="padding-right:10px; padding-top:1px">
+
+ 								<div style="padding-right:10px; padding-top:1px">
+<p><font size="-1"><img src="http://pausatf.org/lilpointer.png"><font color="black"> Big Valley Meet</font> <a href="/data/2014/youth/ytf2014sched.results.html" style="color:#8A0808;"> Results</a> </font></font></div>
+<div style="padding-right:10px; padding-top:1px">
+
+<div style="padding-right:10px; padding-top:1px">
+<p><font size="-1"><img src="http://pausatf.org/lilpointer.png"><font color="black"> T&amp;F Schedule updated with Subbantam Champs, Hampton Phillips and Shor Sheppard Meet Info</font> <a href="/data/2014/youth/ytf2014sched.results.html" style="color:#8A0808;">Visit TF Schedule;</a> </font></font></div>
+<div style="padding-right:10px; padding-top:1px">
+
+<div style="padding-right:10px; padding-top:1px">
+<p><font size="-1"><img src="http://pausatf.org/lilpointer.png"><font color="black">T&amp;F Schedule updated with April 12 Stockton Saints Meet Info</font> <a href="/data/2014/youth/ytf2014sched.results.html" style="color:#8A0808;">Visit TF Schedule;</a> </font></font></div>
+<div style="padding-right:10px; padding-top:1px">
+
+<div style="padding-right:10px; padding-top:1px">
+<p><font size="-1"><img src="http://pausatf.org/lilpointer.png">  <font color="black">Celebration Services:  Coach Harvey</font> <a href="/data/2014/youth/3mharvey.html" style="color:#8A0808;">Read More;</a> </font></font></div>
+<div style="padding-right:10px; padding-top:1px">
+
+<div style="padding-right:10px; padding-top:1px">
+<p><font size="-1"><img src="http://pausatf.org/lilpointer.png"><font color="black">  T&amp;F Schedule updated with a new meet in Stockton for April 12 (previously a bye week)</font> <a href="/data/2014/youth/ytf2014sched.results.html" style="color:#8A0808;">Visit TF Schedule;</a> </font></font></div>
+<div style="padding-right:10px; padding-top:1px">
+
+<div style="padding-right:10px; padding-top:1px">
+<p><font size="-1"><img src="http://pausatf.org/lilpointer.png"><font color="black">  T&amp;F Schedule updated with Speed Factory, Big Valley Ford and RPM Legacy Meets Info</font> <a href="/data/2014/youth/ytf2014sched.results.html" style="color:#8A0808;">Visit TF Schedule;</a> </font></font></div>
+<div style="padding-right:10px; padding-top:1px">
+
+<div style="padding-right:10px; padding-top:1px">
+<font size="-1"><img src="http://pausatf.org/lilpointer.png">  Suzy Powell Throws Clinic on 3/16 in Oakdale, CA: <font color="black"><a href="/data/2014/youth/ytfP1TC3.16.jpg" style="color:#8A0808;">Clinic Flyer</a><br>
+<div style="padding-right:10px; padding-top:1px">
+
+<div style="padding-right:10px; padding-top:1px">
+<p><font size="-1"><img src="http://pausatf.org/lilpointer.png">  <font color="black">3M and The Harvey Family</font> <a href="/data/2014/youth/coachharvey.html" style="color:#8A0808;">Read More;</a> </font></font></div>
+<div style="padding-right:10px; padding-top:1px">
+
+<div style="padding-right:10px; padding-top:1px">
+<p><font size="-1"><img src="http://pausatf.org/lilpointer.png"><font color="black">March 1 Acorn Oscar Bailey Meet <font color="red">cancelled</font> due to rain.</font></font></font></div>
+<div style="padding-right:10px; padding-top:1px">
+
+<div style="padding-right:10px; padding-top:1px">
+<p><font size="-1"><img src="http://pausatf.org/lilpointer.png"><font color="black">T&amp;F Schedule updated with information for Acorn All Comer and RPM Legacy Meets</font> <a href="/data/2014/youth/ytf2014sched.results.html" style="color:#8A0808;">Visit TF Schedule;</a> </font></font></div>
+<div style="padding-right:10px; padding-top:1px">
+
+<div style="padding-right:10px; padding-top:1px">
+<p><font size="-1"><img src="http://pausatf.org/lilpointer.png"><font color="black">T&amp;F Schedule updated with information for RETC, Shor/Sheppard Classic and PAC Meets</font> <a href="/data/2014/youth/ytf2014sched.results.html" style="color:#8A0808;">Visit TF Schedule;</a> </font></font></div>
+<div style="padding-right:10px; padding-top:1px">
+
+<div style="padding-right:10px; padding-top:1px">
+<p><font size="-1"><img src="http://pausatf.org/lilpointer.png"> <font color="black">Feb. 22 PA/USATF Speed Development Coaches Clinic</font> <a href="/data/2014/youth/ytfcoachclinic2.22.14.pdf" style="color:#8A0808;">Info;</a> </font></font></div>
+<div style="padding-right:10px; padding-top:1px">
+
+<div style="padding-right:10px; padding-top:1px">
+<p><font size="-1"><img src="http://pausatf.org/lilpointer.png"> <font color="black">Feb. 8 "Learn by Doing" T&amp;F Clinic</font> <a href="/data/2014/youth/ytfwilliedavenportclinic2014.pdf" style="color:#8A0808;">Info;</a> </font></font></div>
+<div style="padding-right:10px; padding-top:1px">
+
+<div style="padding-right:10px; padding-top:1px">
+<p><font size="-1"><img src="http://pausatf.org/lilpointer.png"> <font color="black"> Agenda/Info for Feb. 22, 2014 XC Meeting</font> <a href="/data/2014/youth/2014 xc mtg agenda.pdf" style="color:#8A0808;">Read More;</a> </font></font></div>
+<div style="padding-right:10px; padding-top:1px">
+
+<div style="padding-right:10px; padding-top:1px">
+<p><font size="-1"><img src="http://pausatf.org/lilpointer.png"><font color="black">2013 Annual USATF Conference Notes</font> <a href="/data/2013/youth/2013 Annual Conference Notes.pdf" style="color:#8A0808;">Read More;</a> </font></font></div>
+<div style="padding-right:10px; padding-top:1px">
+
+<div style="padding-right:10px; padding-top:1px">
+<p><font size="-1"><img src="http://pausatf.org/lilpointer.png"><font color="black">2014 PA Youth Track & Field Schedule Posted</font> <a href="/data/2014/youth/ytf2014sched.results.html" style="color:#8A0808;">Read More;</a> </font></font></div>
+<div style="padding-right:10px; padding-top:1px">
+
+<div style="padding-right:10px; padding-top:1px">
+<p><font size="-1"><img src="http://pausatf.org/lilpointer.png"><font color="black">2014 Season Opening Memo</font> <a href="http://pausatf.org/data/2014/2014seasonmemo.pdf" style="color:#8A0808;">Read More;</a> </font></font></div>
+
+						</p>
+<br><br><hr><br><br>
+											
+													<div align="center">
+													<img src="/images/patitle03.jpg"></div>
+												</p>
+
+
+
+<div style="padding-right:10px; padding-top:1px">
+<p><font size="-1"><img src="http://pausatf.org/lilpointer.png"><font color="black">2013 World Youth Championships</font> <a href="http://worldyouthchampionships.runnerspace.com/eprofile.php?do=videos&event_id=722&folder_id=3295" style="color:#8A0808;">Video Archive &raquo;</a> </font></font></div>
+
+<div style="padding-right:10px; padding-top:1px">
+<p><font size="-1"><img src="http://pausatf.org/lilpointer.png"><font color="black">Track City Classic</font> <a href="http://www.runnerspace.com/eprofile.php?event_id=7820&year=2013&do=videos" style="color:#8A0808;">Video Archive &raquo;</a> </font></font></div>
+
+<div style="padding-right:10px; padding-top:1px">
+<p><font size="-1"><img src="http://pausatf.org/lilpointer.png"> <font color="black">World Youth Championships</font> <a href="http://tv.usatf.org/" style="color:#8A0808;">Watch LIVE! &raquo;</a> </font></font></div>
+
+
+<div style="padding-right:10px; padding-top:1px">
+<p><font size="-1"><img src="http://pausatf.org/lilpointer.png"> <font color="black">2013 World Youth Championships</font> <a href="/data/2013/youth/ytf2013worldsFAQ.pdf" style="color:#8A0808;">FAQs</a> </font></font></div>
+
+<div style="padding-right:10px; padding-top:1px">
+<p>
+<font size="-1"><img src="lilpointer.png"> PA Athletes Shine at CIF Championships <a href="/data/2013/youth/piedmont.html" style="color:#8A0808;">Read more &raquo;</a></font>
+</p></div>
+<div style="padding-right:10px; padding-top:1px">
+<p>
+<font size="-1"><img src="lilpointer.png"> Former PA Athlete Hasay In the News! <a href="http://pausatf.org/data/2013/rrhasay.or.dist.project.html" style="color:#8A0808;">Read more &raquo;</a></font>
+</p></div>
+<div style="padding-right:10px; padding-top:1px">
+<p>
+<font size="-1"><img src="lilpointer.png"> Tips on Track Etiquette <a href="/data/2011/youth/etiquette.html" style="color:#8A0808;">Oh Behave! &raquo;</a></font>
+</p></div>
+<div style="padding-right:10px; padding-top:1px">
+<p>
+<font size="-1"><img src="lilpointer.png"> What to bring to a Track Meet <a href="/data/2011/youth/trackbag.html" style="color:#8A0808;">Track Bag! &raquo;</a></font>
+</p></div>
+<div style="padding-right:10px; padding-top:1px">
+<p>
+<font size="-1"><img src="http://pausatf.org/lilpointer.png"> The 10 Minute Resolution <a href="http://pausatf.org/data/2012/youth/tenminuteresolution.html" style="color:#8A0808;">Read More &raquo;</a></font>
+</p></div>
+<div style="padding-right:10px; padding-top:1px">
+<p>
+<font size="-1"><img src="lilpointer.png"> How Wind Assistance Works in T&F <a href="http://pausatf.org/data/2012/youth/windadjustment.html" style="color:#8A0808;">Read More &raquo;</a>
+</font>
+</p></div>
+
+												<p>
+													&nbsp;
+												</p>
+ <p>
+												<p>
+													&nbsp;
+												</p>
+																						
+											
+										</div>
+									</div>
+									<p>
+													&nbsp;
+												</p>
+												<p>
+													&nbsp;
+												</p>
+												<p>
+													&nbsp;
+												</p>
+												<hr><br><br>
+												<div align="center">
+												<font size="-1">Copyright 2013 Pacific Association/USATF</font> 											
+										</div>
+ 
+								<script type="text/javascript">
+ 
+                  (function() {
+                  var Dom = YAHOO.util.Dom,
+                  Event = YAHOO.util.Event;
+ 
+                  Event.onDOMReady(function() {
+                  var layout = new YAHOO.widget.Layout('doc1', {
+                height: Dom.getClientHeight(), //Height of the viewport
+                  width: Dom.get('doc1').offsetWidth, //Width of the outer element
+                  minHeight: 150, //So it doesn't get too small
+                  units: [
+                  { position: 'top', height: 120, body: 'hd' },
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+                  { position: 'bottom', height: 25, body: 'ft' },
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+                  { position: 'center', body: 'bd', width: 300 grids: true },
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+                  ]
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+                  });
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+                  layout.on('beforeResize', function() {
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+                  Dom.setStyle('doc1', 'height', Dom.getClientHeight() + 'px');
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+                  });
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+                  layout.render();
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+                  //Handle the resizing of the window
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+                  Event.on(window, 'resize', layout.resize, layout, true);
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+                  });
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+                  })();
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+                  </script> 
+    <!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-2651783-1');  // Replace with your property ID.
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->      
+							</font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font> 
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+</body>
+</html>
+ 
+

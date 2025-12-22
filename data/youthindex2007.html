@@ -1,0 +1,224 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+
+<head>
+<title>PA Youth Page</title>
+<link href="/pastylesheetyouth.css" type="text/css" rel="stylesheet">
+<script type="text/javascript" src="swfobject.js"></script>
+</head>
+
+<body onUnload="javascript:FoundUnload()">
+<div align="center">
+<div id="flashcontent">
+<!-- flash replacement.  This section filled in with flash by javascript -->
+<img src="/images/youthbannerB.jpg" width="800" height="250"><br />
+<a href="javascript:replayFlash()"><font size="1" color="white">Play flash video</font></a>.
+<!-- was InsertFlashMovie('youthFlashMovie') -->
+</div>
+<table width="800" bgcolor="black" height="19">
+<tr>
+<td valign="top" width="80">
+<div align="center">
+<b><a href="/"><font size="2" color="white">HOME</font></a></b></div>
+</td>
+<td  valign="top" width="120">
+<div align="center">
+<font color="white">&nbsp;TRACK&nbsp;&amp;&nbsp;FIELD</font></div>
+</td>
+<td valign="top" width="140">
+<div align="center">
+<font color="white">&nbsp;CROSS&nbsp;COUNTRY</font></div>
+</td>
+<td valign="top" width="80 ">
+<div align="center">
+<a href="data/aboutpausatf.html"><font color="white">YOUTH&nbsp;BLOG</font></a></div>
+</td>
+<td valign="top" width="100">
+<div align="center">
+<font color="white">YOUTH&nbsp;INFO</font></div>
+</td>
+<td valign="top" width="140">
+<div align="center">
+<a href="/data/youthlinks.html"><font color="white">GREAT&nbsp;YOUTH&nbsp;PHOTOS</font></a></div>
+</td>
+<td valign="top" width="140">
+<div align="center">
+<font color="white">COOL&nbsp;YOUTH&nbsp;LINKS</font></div>
+</td>
+</tr>
+</table>
+<table width="800" border="1" color="white" cellspacing="0" cellpadding="0" bgcolor="black">
+<tr>
+<td bgcolor="#ff0033">
+<div align="center">
+<table width="800"  height="19" border="0" cellspacing="2" cellpadding="2" bgcolor="black">
+<tr>
+<td>
+<div align="center">
+<img src="/images/Ybpic4.jpg" alt="" border="0" width="144" height="303"></div>
+</td>
+<td width="270">
+<table width="260" border="1" cellspacing="2" cellpadding="9" bgcolor="#fff0f5">
+<tr>
+<td width="260">
+<div align="center">
+<b><font size="4" color="red">HOT NEWS </font></b></div>
+</td>
+</tr>
+<tr height="270">
+<td valign="top" bgcolor="#cccccc" width="260" height="270">
+<ul>
+<li><a href="/data/2007/pacommIntern.pdf">PA Communication Intern Opps</a>
+<li><a href="/data/2007/ytfschedule2007.html">Tom Moore Classic adds PV</a>
+<li><a href="/data/2007/ytfschedule2007.html">NV Trackfest adds Subbantams</a>
+<li><a href="http://www.modestorelays.org/events/07youth.htm">Modesto Relays Youth Results</a>
+<li><a href="/data/2007/ytflivescanupdate.html">Final Livescan Opp - May 19</a>
+<li><a href="/data/2007/ytfusatfgrants.html">USATF Youth Grants!</a>
+<li><a href="/data/meetings.html">PA BofA Meeting 5/22</a>
+<li><a href="/data/2007/ybckchks.html">Cleared Background Check List</a><br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+</ul>
+</td>
+</tr>
+</table>
+</td>
+<td>
+<div align="center">
+<img src="/images/tori-anim.gif" alt="" border="0" width="218" height="332"></div>
+</td>
+</tr>
+<tr>
+<td>
+<div align="center">
+<table width="120" border="1" cellspacing="2" cellpadding="0" bgcolor="white" height="50">
+<tr>
+<td>
+<div align="center">
+News Item</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td width="270"></td>
+<td>
+<div align="center">
+<table width="120" border="1" cellspacing="2" cellpadding="0" bgcolor="white" height="50">
+<tr>
+<td>
+<div align="center">
+News Item</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+</tr>
+</table>
+<p><font size="2" color="white">copyright PAUSATF @ 2007</font></p>
+</div>
+<p></p>
+
+<!-- Javascript to control playing of flash -->
+
+<script type="text/javascript">
+<!--
+  // alert("Executing main javascript");
+  var saw_flash = getCookie('SAW_FLASH');
+  if(saw_flash) {
+     // alert("Found cookie");
+    // do nothing, just leave image in place
+  } else {
+    // alert("no cookie, setting it now");
+    SetCookie('SAW_FLASH', 1, 30);
+    InsertFlashMovie();
+  }
+
+function InsertFlashMovie(movieName) {
+  // from: http://blog.deconcept.com/swfobject/#howitworks
+  var fo = new FlashObject("/Flash/YouthFlash3.swf", "youthFlashMovie", "800", "271", 6, "#000000");
+  // fo.addParam("play", "false");
+  // fo.addParam('swliveconnect', "true");
+  fo.write("flashcontent");
+}
+
+// original object / embed
+// <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0" height="271" width="800" id="youthFlashMovie">
+// <param name="movie" value="/Flash/YouthFlash3.swf">
+// <param name="quality" value="best">
+// <param name="play" value="false">
+// <embed height="271" pluginspage="http://www.macromedia.com/go/getflashplayer" src="/Flash/YouthFlash3.swf" type="application/x-shockwave-flash" width="800" quality="best" play="false" name="youthFlashMovie" swliveconnect="true"> 
+// </object>
+
+
+function FoundUnload() {
+  // do nothing.  But unload event processing seems to be needed to force load when going to new page
+}
+
+function replayFlash() {
+  SetCookie('SAW_FLASH',0,-1);
+  window.location.reload();
+}
+
+function SetCookie(cookieName,cookieValue,nDays) {
+ var today = new Date();
+ var expire = new Date();
+ if (nDays==null || nDays==0) nDays=1;
+ expire.setTime(today.getTime() + 3600000*24*nDays);
+ document.cookie = cookieName+"="+escape(cookieValue)
+                 + ";expires="+expire.toGMTString();
+}
+
+function getCookie(c_name)
+{
+if (document.cookie.length>0)
+  {
+  c_start=document.cookie.indexOf(c_name + "=")
+  if (c_start!=-1)
+    { 
+    c_start=c_start + c_name.length+1 
+    c_end=document.cookie.indexOf(";",c_start)
+    if (c_end==-1) c_end=document.cookie.length
+    return unescape(document.cookie.substring(c_start,c_end))
+    } 
+  }
+return ""
+}
+
+</script>
+
+<!-- Start Quantcast tag -->
+
+<script type="text/javascript" src="http://edge.quantserve.com/quant.js"></script><script type="text/javascript">_qacct="p-72cL-7RSrrmhE";quantserve();</script>
+
+<noscript>
+
+	<a href="http://www.quantcast.com/p-72cL-7RSrrmhE" target="_blank">
+
+		<img src="http://pixel.quantserve.com/pixel/p-72cL-7RSrrmhE.gif" style="display: none;" border="0" height="1" width="1" alt="Quantcast" />
+
+	</a>
+
+</noscript>
+
+<!-- End Quantcast tag --><script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-2651783-1");
+pageTracker._initData();
+pageTracker._trackPageview();
+</script></body>
+
+</html>
