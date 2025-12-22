@@ -6,8 +6,8 @@
 // public_html so it is not available to the public.                           *
 // ----------------------------------------------------------------------------*
 $servername = "localhost";
-$username = "dbuser";
-$password = "9*ku&^hH54%";
+$username = "YOUR_DB_USERNAME";
+$password = "YOUR_DB_PASSWORD";
 
 $mysqli = new mysqli($servername, $username, $password);;
   if ($mysqli->connect_errno) {
