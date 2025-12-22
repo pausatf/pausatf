@@ -1,0 +1,52 @@
+#cloud-config
+# Cloud-init configuration for PAUSATF droplets
+# Environment: ${environment}
+# Hostname: ${hostname}
+
+hostname: ${hostname}
+fqdn: ${hostname}.pausatf.org
+manage_etc_hosts: true
+
+package_update: true
+package_upgrade: true
+
+packages:
+  - nginx
+  - mysql-client
+  - php-fpm
+  - php-mysql
+  - php-curl
+  - php-gd
+  - php-mbstring
+  - php-xml
+  - php-xmlrpc
+  - php-soap
+  - php-intl
+  - php-zip
+  - certbot
+  - python3-certbot-nginx
+  - fail2ban
+  - ufw
+
+write_files:
+  - path: /etc/environment
+    content: |
+      ENVIRONMENT=${environment}
+      HOSTNAME=${hostname}
+    append: true
+
+runcmd:
+  - systemctl enable nginx
+  - systemctl start nginx
+  - systemctl enable fail2ban
+  - systemctl start fail2ban
+  - ufw allow OpenSSH
+  - ufw allow 'Nginx Full'
+  - echo "y" | ufw enable
+  - echo "${environment} environment provisioned successfully" > /var/log/cloud-init-${environment}.log
+
+# Set timezone
+timezone: America/Los_Angeles
+
+# Enable automatic security updates
+package_reboot_if_required: true

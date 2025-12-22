@@ -31,7 +31,7 @@ resource "digitalocean_droplet" "this" {
   lifecycle {
     create_before_destroy = true
     ignore_changes = [
-      user_data,  # Ignore user_data changes after initial creation
+      user_data, # Ignore user_data changes after initial creation
     ]
   }
 }
