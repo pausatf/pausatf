@@ -1,0 +1,44 @@
+name: ShellCheck
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/**.sh'
+      - '.github/workflows/shellcheck.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'scripts/**.sh'
+      - '.github/workflows/shellcheck.yml'
+
+jobs:
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: './scripts'
+          severity: warning
+          format: gcc
+
+  bash-syntax:
+    name: Bash Syntax Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Check bash syntax
+        run: |
+          shopt -s globstar nullglob
+          for script in **/*.sh; do
+            echo "Checking $script"
+            bash -n "$script"
+          done
+        working-directory: scripts
