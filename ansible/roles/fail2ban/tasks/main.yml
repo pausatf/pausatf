@@ -1,0 +1,40 @@
+---
+# Fail2ban role - Intrusion prevention for PAUSATF
+
+- name: Install fail2ban
+  apt:
+    name: fail2ban
+    state: present
+
+- name: Deploy fail2ban configuration
+  template:
+    src: jail.local.j2
+    dest: /etc/fail2ban/jail.local
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart fail2ban
+
+- name: Deploy WordPress fail2ban filter
+  template:
+    src: wordpress.conf.j2
+    dest: /etc/fail2ban/filter.d/wordpress.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart fail2ban
+
+- name: Deploy WordPress hard fail2ban filter
+  template:
+    src: wordpress-hard.conf.j2
+    dest: /etc/fail2ban/filter.d/wordpress-hard.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart fail2ban
+
+- name: Ensure fail2ban is started and enabled
+  service:
+    name: fail2ban
+    state: started
+    enabled: yes

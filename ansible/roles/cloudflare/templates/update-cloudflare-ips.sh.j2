@@ -1,0 +1,85 @@
+#!/bin/bash
+# Cloudflare IP Update Script
+# Managed by Ansible - do not edit manually
+# Updates Apache's trusted proxy list with current Cloudflare IP ranges
+
+set -euo pipefail
+
+CONF_FILE="/etc/apache2/conf-available/cloudflare-ips.conf"
+TEMP_FILE=$(mktemp)
+LOG_FILE="/var/log/cloudflare-ip-update.log"
+
+log() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> "$LOG_FILE"
+}
+
+log "Starting Cloudflare IP update"
+
+# Fetch current IP ranges
+IPV4=$(curl -sf https://www.cloudflare.com/ips-v4 2>/dev/null) || {
+    log "ERROR: Failed to fetch IPv4 ranges"
+    exit 1
+}
+
+IPV6=$(curl -sf https://www.cloudflare.com/ips-v6 2>/dev/null) || {
+    log "ERROR: Failed to fetch IPv6 ranges"
+    exit 1
+}
+
+# Generate new configuration
+cat > "$TEMP_FILE" << 'HEADER'
+# Cloudflare IP Configuration
+# Managed by Ansible + auto-updated via cron
+# Last updated: TIMESTAMP
+# This allows Apache to see the real client IP behind Cloudflare
+
+<IfModule mod_remoteip.c>
+    # Trust Cloudflare's connecting IP header
+    RemoteIPHeader CF-Connecting-IP
+
+    # Cloudflare IPv4 Ranges (auto-updated)
+HEADER
+
+sed -i "s/TIMESTAMP/$(date '+%Y-%m-%d %H:%M:%S')/" "$TEMP_FILE"
+
+# Add IPv4 ranges
+while IFS= read -r ip; do
+    [ -n "$ip" ] && echo "    RemoteIPTrustedProxy $ip" >> "$TEMP_FILE"
+done <<< "$IPV4"
+
+cat >> "$TEMP_FILE" << 'MIDDLE'
+
+    # Cloudflare IPv6 Ranges (auto-updated)
+MIDDLE
+
+# Add IPv6 ranges
+while IFS= read -r ip; do
+    [ -n "$ip" ] && echo "    RemoteIPTrustedProxy $ip" >> "$TEMP_FILE"
+done <<< "$IPV6"
+
+cat >> "$TEMP_FILE" << 'FOOTER'
+</IfModule>
+
+# Log format that includes the real IP
+LogFormat "%a %l %u %t \"%r\" %>s %O \"%{Referer}i\" \"%{User-Agent}i\"" cloudflare_combined
+FOOTER
+
+# Check if configuration changed
+if ! diff -q "$CONF_FILE" "$TEMP_FILE" > /dev/null 2>&1; then
+    log "IP ranges changed, updating configuration"
+    cp "$TEMP_FILE" "$CONF_FILE"
+
+    # Test Apache configuration
+    if apache2ctl configtest 2>&1 | grep -q "Syntax OK"; then
+        systemctl reload apache2
+        log "Apache reloaded successfully"
+    else
+        log "ERROR: Apache config test failed, reverting"
+        # Revert would happen on next Ansible run
+    fi
+else
+    log "No changes detected"
+fi
+
+rm -f "$TEMP_FILE"
+log "Cloudflare IP update complete"

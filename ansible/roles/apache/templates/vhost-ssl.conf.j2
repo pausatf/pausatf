@@ -1,0 +1,57 @@
+# SSL Virtual Host Configuration for {{ item.domain }}
+# Managed by Ansible - Do not edit manually
+
+<VirtualHost *:{{ apache_listen_port_ssl }}>
+    ServerName {{ item.domain }}
+{% if item.aliases is defined %}
+{% for alias in item.aliases %}
+    ServerAlias {{ alias }}
+{% endfor %}
+{% endif %}
+    ServerAdmin {{ apache_server_admin }}
+
+    DocumentRoot {{ item.path }}
+
+    # SSL Configuration
+    SSLEngine on
+    SSLCertificateFile {{ item.ssl_certificate }}
+    SSLCertificateKeyFile {{ item.ssl_certificate_key }}
+
+    # Modern SSL Configuration
+    SSLProtocol {{ ssl_protocol | default('all -SSLv3 -TLSv1 -TLSv1.1') }}
+    SSLCipherSuite {{ ssl_cipher_suite | default('ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384') }}
+    SSLHonorCipherOrder off
+    SSLSessionTickets off
+
+    # HSTS (uncomment when SSL is properly configured)
+    # Header always set Strict-Transport-Security "max-age=63072000"
+
+    <Directory {{ item.path }}>
+        Options FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    # PHP settings via mod_php
+    <FilesMatch "\.php$">
+        SSLOptions +StdEnvVars
+    </FilesMatch>
+
+    # Logging
+    ErrorLog ${APACHE_LOG_DIR}/{{ item.name }}-ssl-error.log
+    CustomLog ${APACHE_LOG_DIR}/{{ item.name }}-ssl-access.log combined
+
+    # Security headers
+    <IfModule mod_headers.c>
+        Header always set X-Content-Type-Options "nosniff"
+        Header always set X-Frame-Options "SAMEORIGIN"
+        Header always set X-XSS-Protection "1; mode=block"
+        Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    </IfModule>
+
+    # Cloudflare headers (for upload support)
+    <IfModule mod_headers.c>
+        SetEnvIf X-Forwarded-For "^.*\..*\..*\..*" CLOUDFLARE=1
+        Header set X-Upload-Allowed "1" env=CLOUDFLARE
+    </IfModule>
+</VirtualHost>

@@ -1,0 +1,159 @@
+---
+# Apache role - Web server configuration for PAUSATF
+
+- name: Install Apache packages
+  apt:
+    name:
+      - apache2
+      - apache2-utils
+      - libapache2-mod-security2
+    state: present
+
+- name: Ensure Apache modules directory exists
+  file:
+    path: /etc/apache2/mods-available
+    state: directory
+
+- name: Enable required Apache modules
+  apache2_module:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ apache_modules }}"
+  notify: Restart Apache
+
+- name: Disable conflicting MPM modules
+  apache2_module:
+    name: "{{ item }}"
+    state: absent
+  loop:
+    - mpm_event
+    - mpm_worker
+  notify: Restart Apache
+  ignore_errors: yes
+
+- name: Deploy Apache main configuration
+  template:
+    src: apache2.conf.j2
+    dest: /etc/apache2/apache2.conf
+    owner: root
+    group: root
+    mode: '0644'
+    backup: yes
+  notify: Reload Apache
+
+- name: Deploy ports configuration
+  template:
+    src: ports.conf.j2
+    dest: /etc/apache2/ports.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload Apache
+
+- name: Deploy MPM prefork configuration
+  template:
+    src: mpm_prefork.conf.j2
+    dest: /etc/apache2/mods-available/mpm_prefork.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart Apache
+
+- name: Deploy security configuration
+  template:
+    src: security.conf.j2
+    dest: /etc/apache2/conf-available/security.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload Apache
+
+- name: Enable security configuration
+  file:
+    src: /etc/apache2/conf-available/security.conf
+    dest: /etc/apache2/conf-enabled/security.conf
+    state: link
+  notify: Reload Apache
+
+- name: Deploy SSL configuration
+  template:
+    src: ssl.conf.j2
+    dest: /etc/apache2/mods-available/ssl.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload Apache
+
+- name: Remove default virtual host
+  file:
+    path: /etc/apache2/sites-enabled/000-default.conf
+    state: absent
+  notify: Reload Apache
+
+- name: Deploy virtual host configurations
+  template:
+    src: vhost.conf.j2
+    dest: "/etc/apache2/sites-available/{{ item.name }}.conf"
+    owner: root
+    group: root
+    mode: '0644'
+  loop: "{{ wordpress_installs }}"
+  notify: Reload Apache
+
+- name: Deploy SSL virtual host configurations
+  template:
+    src: vhost-ssl.conf.j2
+    dest: "/etc/apache2/sites-available/{{ item.name }}-ssl.conf"
+    owner: root
+    group: root
+    mode: '0644'
+  loop: "{{ wordpress_installs }}"
+  when: item.ssl_enabled | default(false)
+  notify: Reload Apache
+
+- name: Enable virtual hosts
+  file:
+    src: "/etc/apache2/sites-available/{{ item.name }}.conf"
+    dest: "/etc/apache2/sites-enabled/{{ item.name }}.conf"
+    state: link
+  loop: "{{ wordpress_installs }}"
+  notify: Reload Apache
+
+- name: Enable SSL virtual hosts
+  file:
+    src: "/etc/apache2/sites-available/{{ item.name }}-ssl.conf"
+    dest: "/etc/apache2/sites-enabled/{{ item.name }}-ssl.conf"
+    state: link
+  loop: "{{ wordpress_installs }}"
+  when: item.ssl_enabled | default(false)
+  notify: Reload Apache
+
+- name: Deploy block-xmlrpc configuration
+  copy:
+    dest: /etc/apache2/conf-available/block-xmlrpc.conf
+    content: |
+      # Block WordPress XML-RPC attacks
+      <Files xmlrpc.php>
+          Require all denied
+      </Files>
+    mode: '0644'
+  notify: Reload Apache
+
+- name: Enable block-xmlrpc configuration
+  file:
+    src: /etc/apache2/conf-available/block-xmlrpc.conf
+    dest: /etc/apache2/conf-enabled/block-xmlrpc.conf
+    state: link
+  notify: Reload Apache
+
+- name: Ensure Apache is started and enabled
+  service:
+    name: apache2
+    state: started
+    enabled: yes
+
+- name: Verify Apache configuration
+  command: apache2ctl configtest
+  register: apache_configtest
+  changed_when: false
+  failed_when: "'Syntax OK' not in apache_configtest.stderr"

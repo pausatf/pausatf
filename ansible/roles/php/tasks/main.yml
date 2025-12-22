@@ -1,0 +1,126 @@
+---
+# PHP role - PHP configuration for PAUSATF WordPress
+
+- name: Add Ondrej PHP repository
+  apt_repository:
+    repo: "ppa:ondrej/php"
+    state: present
+    update_cache: yes
+
+- name: Install PHP {{ php_version }} packages
+  apt:
+    name:
+      - "php{{ php_version }}"
+      - "php{{ php_version }}-cli"
+      - "php{{ php_version }}-common"
+      - "php{{ php_version }}-curl"
+      - "php{{ php_version }}-gd"
+      - "php{{ php_version }}-imagick"
+      - "php{{ php_version }}-json"
+      - "php{{ php_version }}-mbstring"
+      - "php{{ php_version }}-mysql"
+      - "php{{ php_version }}-opcache"
+      - "php{{ php_version }}-soap"
+      - "php{{ php_version }}-xml"
+      - "php{{ php_version }}-zip"
+      - "php{{ php_version }}-bcmath"
+      - "php{{ php_version }}-intl"
+      - "libapache2-mod-php{{ php_version }}"
+    state: present
+  notify: Restart Apache
+
+# Also install PHP 7.2 (currently active in Apache)
+- name: Install PHP 7.2 packages (legacy compatibility)
+  apt:
+    name:
+      - php7.2
+      - php7.2-cli
+      - php7.2-common
+      - php7.2-curl
+      - php7.2-gd
+      - php7.2-json
+      - php7.2-mbstring
+      - php7.2-mysql
+      - php7.2-opcache
+      - php7.2-xml
+      - php7.2-zip
+      - libapache2-mod-php7.2
+    state: present
+  notify: Restart Apache
+
+- name: Deploy PHP {{ php_version }} configuration
+  template:
+    src: php.ini.j2
+    dest: "/etc/php/{{ php_version }}/apache2/php.ini"
+    owner: root
+    group: root
+    mode: '0644'
+    backup: yes
+  notify: Restart Apache
+
+- name: Deploy PHP 7.2 configuration
+  template:
+    src: php.ini.j2
+    dest: /etc/php/7.2/apache2/php.ini
+    owner: root
+    group: root
+    mode: '0644'
+    backup: yes
+  notify: Restart Apache
+
+- name: Deploy CLI PHP configuration
+  template:
+    src: php-cli.ini.j2
+    dest: "/etc/php/{{ php_version }}/cli/php.ini"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Deploy OPcache configuration
+  template:
+    src: opcache.ini.j2
+    dest: "/etc/php/{{ php_version }}/mods-available/opcache.ini"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart Apache
+
+- name: Deploy OPcache configuration for PHP 7.2
+  template:
+    src: opcache.ini.j2
+    dest: /etc/php/7.2/mods-available/opcache.ini
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart Apache
+
+- name: Check if OPcache is enabled
+  stat:
+    path: "/etc/php/{{ item }}/apache2/conf.d/10-opcache.ini"
+  loop:
+    - "7.2"
+    - "{{ php_version }}"
+  register: opcache_enabled
+  changed_when: false
+
+- name: Enable OPcache module
+  command: "phpenmod -v {{ item.item }} opcache"
+  loop: "{{ opcache_enabled.results }}"
+  loop_control:
+    label: "PHP {{ item.item }}"
+  when: not item.stat.exists
+  changed_when: true
+
+- name: Set default PHP CLI version
+  alternatives:
+    name: php
+    path: "/usr/bin/php{{ php_version }}"
+  ignore_errors: yes
+
+- name: Create PHP session directory
+  file:
+    path: /var/lib/php/sessions
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0770'

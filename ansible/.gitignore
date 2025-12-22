@@ -1,0 +1,83 @@
+# Ansible specific
+*.retry
+*.log
+.vault_pass
+.vault_password
+vault_pass.txt
+vault-password.txt
+
+# Vault files (encrypted secrets)
+**/vault.yml
+**/vault.yaml
+group_vars/*/vault.yml
+host_vars/*/vault.yml
+!**/vault.yml.example
+!**/vault.yaml.example
+
+# Sensitive files
+*.pem
+*.key
+*.cert
+*.crt
+id_rsa
+id_rsa.pub
+*.p12
+*.pfx
+credentials.json
+*-credentials.json
+
+# Environment files
+.env
+.env.*
+*.env
+!.env.example
+
+# Secrets
+secrets.yaml
+secrets.yml
+*secret*
+!secrets.yml.example
+
+# Roles downloaded from Galaxy
+roles/galaxy/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+
+# Testing
+.molecule/
+.cache/
+.pytest_cache/
+
+# Logs
+logs/
+*.log
+
+# Temporary
+tmp/
+temp/
+*.tmp
+*.bak
+*.backup
+
+# Development tools
+.claude

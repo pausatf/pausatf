@@ -1,0 +1,63 @@
+---
+# New Relic role - Application monitoring for PAUSATF
+
+- name: Add New Relic repository key
+  apt_key:
+    url: https://download.newrelic.com/infrastructure_agent/gpg/newrelic-infra.gpg
+    state: present
+
+- name: Add New Relic repository
+  apt_repository:
+    repo: "deb https://download.newrelic.com/infrastructure_agent/linux/apt focal main"
+    state: present
+    filename: newrelic-infra
+
+- name: Install New Relic infrastructure agent
+  apt:
+    name: newrelic-infra
+    state: present
+    update_cache: yes
+
+- name: Deploy New Relic infrastructure configuration
+  template:
+    src: newrelic-infra.yml.j2
+    dest: /etc/newrelic-infra.yml
+    owner: root
+    group: root
+    mode: '0600'
+  notify: Restart New Relic infrastructure
+
+- name: Install New Relic PHP agent
+  apt:
+    name: newrelic-php5
+    state: present
+  notify: Restart Apache
+
+- name: Configure New Relic PHP agent
+  template:
+    src: newrelic.ini.j2
+    dest: "/etc/php/{{ php_version }}/mods-available/newrelic.ini"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart Apache
+
+- name: Check if New Relic PHP module is enabled
+  stat:
+    path: "/etc/php/{{ php_version }}/apache2/conf.d/20-newrelic.ini"
+  register: newrelic_module_enabled
+  changed_when: false
+
+- name: Enable New Relic PHP module
+  command: "phpenmod -v {{ php_version }} newrelic"
+  when: not newrelic_module_enabled.stat.exists
+  changed_when: true
+  notify: Restart Apache
+
+- name: Ensure New Relic services are started
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  loop:
+    - newrelic-infra

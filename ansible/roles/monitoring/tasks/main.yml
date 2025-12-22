@@ -1,0 +1,31 @@
+---
+- name: Install monitoring tools
+  apt:
+    name:
+      - htop
+      - iotop
+      - iftop
+      - nethogs
+      - sysstat
+      - vnstat
+    state: present
+
+- name: Enable sysstat
+  lineinfile:
+    path: /etc/default/sysstat
+    regexp: '^ENABLED='
+    line: 'ENABLED="true"'
+    state: present
+  notify: restart sysstat
+
+- name: Start and enable vnstat
+  systemd:
+    name: vnstat
+    state: started
+    enabled: yes
+
+- name: Start and enable sysstat
+  systemd:
+    name: sysstat
+    state: started
+    enabled: yes

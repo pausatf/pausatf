@@ -1,0 +1,123 @@
+---
+# PAUSATF WordPress Server Deployment Playbook
+# ==============================================
+# Based on audit of ftp.pausatf.org (pausatforg20230516-primary)
+#
+# Server Details:
+#   - Ubuntu 20.04.6 LTS (Focal Fossa)
+#   - 4 CPU cores, 8GB RAM
+#   - DigitalOcean Droplet (sfo2)
+#   - Apache 2.4.63 with mod_php7.2
+#   - PHP 7.4.33 (with 7.2, 8.1, 8.4 also available)
+#   - MySQL 5.7.42
+#   - WordPress 6.8.3 (main site at www.pausatf.org)
+#   - Cloudflare CDN/DNS (Free plan, SSL Full)
+#
+# Usage:
+#   ansible-playbook -i inventory site.yml
+#   ansible-playbook -i inventory site.yml --tags "apache"
+#   ansible-playbook -i inventory site.yml --tags "cloudflare"
+#   ansible-playbook -i inventory site.yml --check --diff
+
+- name: Deploy PAUSATF WordPress Server
+  hosts: webservers
+  become: yes
+  gather_facts: yes
+
+  vars_files:
+    - group_vars/all.yml
+    - group_vars/vault.yml
+
+  pre_tasks:
+    - name: Validate target is Ubuntu
+      assert:
+        that:
+          - ansible_distribution == "Ubuntu"
+          - ansible_distribution_major_version | int >= 20
+        fail_msg: "This playbook is designed for Ubuntu 20.04+"
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Display infrastructure info
+      debug:
+        msg: |
+          Infrastructure Details:
+          =======================
+          Hosting: DigitalOcean ({{ digitalocean_region }})
+          Droplet: {{ digitalocean_droplet_name }} ({{ digitalocean_size }})
+          CDN/DNS: Cloudflare ({{ cloudflare_zone }})
+          SSL Mode: {{ cloudflare_ssl_mode }}
+      tags: always
+
+  roles:
+    - role: common
+      tags: [common, base]
+
+    - role: fail2ban
+      tags: [fail2ban, security]
+
+    - role: mysql
+      tags: [mysql, database]
+
+    - role: php
+      tags: [php, web]
+
+    - role: apache
+      tags: [apache, web]
+
+    - role: cloudflare
+      tags: [cloudflare, cdn, dns]
+      when: cloudflare_enabled | default(false)
+
+    - role: wordpress
+      tags: [wordpress, app]
+
+    - role: newrelic
+      tags: [newrelic, monitoring]
+      when: newrelic_enabled | default(false)
+
+    - role: monitoring
+      tags: [monitoring]
+
+  post_tasks:
+    - name: Verify all services are running
+      service:
+        name: "{{ item }}"
+        state: started
+        enabled: yes
+      loop:
+        - apache2
+        - mysql
+        - fail2ban
+        - cron
+      tags: verify
+
+    - name: Display deployment summary
+      debug:
+        msg: |
+          Deployment Complete!
+          ====================
+
+          Infrastructure:
+            - DigitalOcean: {{ digitalocean_droplet_name }}
+            - Region: {{ digitalocean_region_name }}
+            - Size: {{ digitalocean_size }} ({{ digitalocean_vcpus }} vCPU, {{ digitalocean_memory_mb }}MB RAM)
+
+          Cloudflare:
+            - Zone: {{ cloudflare_zone }}
+            - SSL Mode: {{ cloudflare_ssl_mode }}
+            - Plan: {{ cloudflare_plan }}
+
+          Websites:
+            - Main: https://www.pausatf.org (/var/www/html)
+            - Transit: /var/www/transit/html (legacy)
+
+          Stack:
+            - Apache: 2.4.x
+            - PHP: {{ php_version }}
+            - MySQL: {{ mysql_version }}
+            - WordPress: 6.8.3
+      tags: always

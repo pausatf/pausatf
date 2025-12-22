@@ -1,0 +1,12 @@
+---
+# Fail2ban handlers
+
+- name: Restart fail2ban
+  service:
+    name: fail2ban
+    state: restarted
+
+- name: Reload fail2ban
+  service:
+    name: fail2ban
+    state: reloaded

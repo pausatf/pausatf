@@ -1,0 +1,590 @@
+---
+# PAUSATF Global Variables
+# ========================
+# Complete configuration from server audit of ftp.pausatf.org
+# Generated: 2025-12-06
+
+# =============================================================================
+# INFRASTRUCTURE / HOSTING
+# =============================================================================
+
+# DigitalOcean Configuration
+hosting_provider: "digitalocean"
+digitalocean_droplet_id: "{{ vault_digitalocean_droplet_id }}"
+digitalocean_droplet_name: "pausatforg20230516-primary"
+digitalocean_region: "sfo2"
+digitalocean_region_name: "San Francisco 2"
+digitalocean_size: "s-4vcpu-8gb"
+digitalocean_vcpus: 4
+digitalocean_memory_mb: 8192
+digitalocean_disk_gb: 160
+digitalocean_image: "pausatf.org 2023-05-16"
+digitalocean_public_ip: "64.225.40.54"
+digitalocean_private_ip: "10.138.0.2"
+digitalocean_vpc_uuid: "4ee39499-dc85-11e8-9f23-3cfdfea9fff1"
+digitalocean_features:
+  - backups
+  - droplet_agent
+  - private_networking
+digitalocean_tags:
+  - test
+  - pausatf
+  - production
+  - web
+digitalocean_api_token: "{{ vault_digitalocean_api_token }}"
+
+# Cloudflare DNS/CDN Configuration
+cloudflare_enabled: true
+cloudflare_zone: "pausatf.org"
+cloudflare_zone_id: "{{ vault_cloudflare_zone_id }}"
+cloudflare_api_token: "{{ vault_cloudflare_api_token }}"
+cloudflare_email: "{{ vault_cloudflare_email }}"
+cloudflare_plan: "Free Website"
+cloudflare_status: "active"
+cloudflare_nameservers:
+  - curt.ns.cloudflare.com
+  - eva.ns.cloudflare.com
+
+# Cloudflare SSL/TLS Settings
+cloudflare_ssl_mode: "full"
+cloudflare_min_tls_version: "1.2"
+cloudflare_always_use_https: true
+
+# Cloudflare Security Settings
+cloudflare_security_level: "medium"
+cloudflare_waf_enabled: false
+
+# Cloudflare Caching Settings
+cloudflare_cache_level: "aggressive"
+cloudflare_browser_cache_ttl: 0
+
+# DNS Records managed by Cloudflare
+cloudflare_dns_records:
+  - name: "@"
+    type: "A"
+    content: "64.225.40.54"
+    proxied: true
+  - name: "www"
+    type: "A"
+    content: "64.225.40.54"
+    proxied: true
+  - name: "ftp"
+    type: "A"
+    content: "64.225.40.54"
+    proxied: false
+  - name: "mail"
+    type: "A"
+    content: "64.225.40.54"
+    proxied: false
+  - name: "monitor"
+    type: "A"
+    content: "64.225.40.54"
+    proxied: false
+
+# =============================================================================
+# SYSTEM
+# =============================================================================
+timezone: "America/Los_Angeles"
+hostname: "pausatforg20230516-primary"
+os_distribution: "ubuntu"
+os_version: "20.04"
+os_codename: "focal"
+
+# =============================================================================
+# APACHE CONFIGURATION
+# =============================================================================
+apache_service_name: apache2
+apache_user: www-data
+apache_group: www-data
+apache_listen_port: 80
+apache_listen_port_ssl: 443
+apache_server_admin: "webmaster@pausatf.org"
+apache_server_name: "www.pausatf.org"
+apache_conf_dir: "/etc/apache2"
+
+# MPM Prefork settings (from audit)
+apache_mpm_prefork:
+  start_servers: 5
+  min_spare_servers: 5
+  max_spare_servers: 8
+  max_request_workers: 256
+  max_connections_per_child: 0
+
+# Apache modules to enable
+apache_modules:
+  - access_compat
+  - alias
+  - auth_basic
+  - authn_core
+  - authn_file
+  - authz_core
+  - authz_host
+  - authz_user
+  - autoindex
+  - deflate
+  - dir
+  - env
+  - filter
+  - headers
+  - mime
+  - mpm_prefork
+  - negotiation
+  - php7.2
+  - reqtimeout
+  - rewrite
+  - setenvif
+  - socache_shmcb
+  - ssl
+  - status
+
+# =============================================================================
+# PHP CONFIGURATION
+# =============================================================================
+php_version: "7.4"
+php_default_version: "7.2"
+php_available_versions:
+  - "7.2"
+  - "7.4"
+  - "8.1"
+  - "8.4"
+
+# PHP settings (for WordPress optimization)
+php_memory_limit: "256M"
+php_max_execution_time: 300
+php_max_input_time: 300
+php_max_input_vars: 3000
+php_upload_max_filesize: "64M"
+php_post_max_size: "64M"
+php_date_timezone: "America/Los_Angeles"
+
+# PHP modules to ensure installed
+php_modules:
+  - bcmath
+  - cli
+  - common
+  - curl
+  - gd
+  - imagick
+  - json
+  - mbstring
+  - mysql
+  - opcache
+  - soap
+  - xml
+  - zip
+
+# OPcache settings
+php_opcache_enable: 1
+php_opcache_memory_consumption: 128
+php_opcache_interned_strings_buffer: 16
+php_opcache_max_accelerated_files: 10000
+php_opcache_revalidate_freq: 2
+php_opcache_save_comments: 1
+
+# =============================================================================
+# MYSQL CONFIGURATION
+# =============================================================================
+mysql_version: "5.7"
+mysql_service_name: mysql
+mysql_bind_address: "127.0.0.1"
+mysql_port: 3306
+mysql_socket: /var/run/mysqld/mysqld.sock
+mysql_datadir: /var/lib/mysql
+
+# MySQL tuning (based on audit - 8GB RAM server)
+mysql_key_buffer_size: "16M"
+mysql_max_allowed_packet: "16M"
+mysql_thread_stack: "192K"
+mysql_thread_cache_size: 8
+mysql_query_cache_limit: "1M"
+mysql_query_cache_size: "16M"
+mysql_expire_logs_days: 10
+mysql_max_binlog_size: "100M"
+
+# MySQL credentials
+mysql_root_password: "{{ vault_mysql_root_password }}"
+
+# =============================================================================
+# WORDPRESS INSTALLATIONS
+# =============================================================================
+wordpress_installs:
+  # Main PAUSATF website
+  - name: "pausatf-main"
+    domain: "www.pausatf.org"
+    aliases:
+      - "pausatf.org"
+    path: "/var/www/html"
+    db_name: "wordpress"
+    db_user: "wordpress"
+    db_password: "{{ vault_wp_main_db_password }}"
+    db_host: "localhost"
+    table_prefix: "wp_"
+    wp_version: "6.8.3"
+    wp_memory_limit: "256M"
+    wp_max_memory_limit: "512M"
+    ssl_enabled: true
+    ssl_certificate: "/etc/ssl/certs/6025998eb5098-key.pem"
+    ssl_certificate_key: "/etc/ssl/private/6025998eb5098-key.key"
+    active_theme: "TheSource-child"
+    cron_enabled: true
+    debug_mode: false
+    disallow_file_edit: true
+    disallow_file_mods: false
+    auto_update_core: "minor"
+    fs_method: "direct"
+    # Auth keys and salts
+    auth_key: "{{ vault_wp_main_auth_key }}"
+    secure_auth_key: "{{ vault_wp_main_secure_auth_key }}"
+    logged_in_key: "{{ vault_wp_main_logged_in_key }}"
+    nonce_key: "{{ vault_wp_main_nonce_key }}"
+    auth_salt: "{{ vault_wp_main_auth_salt }}"
+    secure_auth_salt: "{{ vault_wp_main_secure_auth_salt }}"
+    logged_in_salt: "{{ vault_wp_main_logged_in_salt }}"
+    nonce_salt: "{{ vault_wp_main_nonce_salt }}"
+
+  # Transit site (legacy - WordPress 5.0.3)
+  - name: "pausatf-transit"
+    domain: "transit.pausatf.org"
+    path: "/var/www/transit/html"
+    db_name: "wordpress"
+    db_user: "wordpress"
+    db_password: "{{ vault_wp_transit_db_password }}"
+    db_host: "localhost"
+    table_prefix: "wp_"
+    wp_version: "5.0.3"
+    ssl_enabled: false
+    active_theme: "TheSource-child"
+    cron_enabled: false
+    debug_mode: false
+    disallow_file_edit: true
+    disallow_file_mods: true
+    auto_update_core: false
+    # Auth keys and salts
+    auth_key: "{{ vault_wp_transit_auth_key }}"
+    secure_auth_key: "{{ vault_wp_transit_secure_auth_key }}"
+    logged_in_key: "{{ vault_wp_transit_logged_in_key }}"
+    nonce_key: "{{ vault_wp_transit_nonce_key }}"
+    auth_salt: "{{ vault_wp_transit_auth_salt }}"
+    secure_auth_salt: "{{ vault_wp_transit_secure_auth_salt }}"
+    logged_in_salt: "{{ vault_wp_transit_logged_in_salt }}"
+    nonce_salt: "{{ vault_wp_transit_nonce_salt }}"
+
+# =============================================================================
+# WORDPRESS THEMES (Main Site)
+# =============================================================================
+wp_main_themes:
+  # Active theme
+  - name: "TheSource-child"
+    status: "active"
+    version: "0.2"
+    parent: "TheSource"
+    author: "Sean Dulany | SMDdesigns"
+    auto_update: false
+  # Parent theme (required)
+  - name: "TheSource"
+    status: "parent"
+    version: "4.8.13"
+    author: "Elegant Themes"
+    auto_update: true
+  # Inactive themes (kept for reference/fallback)
+  - name: "oceanwp"
+    status: "inactive"
+    version: "4.1.4"
+    auto_update: true
+  - name: "pausatf-oceanwp-child-v2"
+    status: "inactive"
+    version: "1.1.0"
+    parent: "oceanwp"
+    auto_update: false
+  - name: "pausatf-oceanwp-child"
+    status: "inactive"
+    version: "1.0.0"
+    parent: "oceanwp"
+    auto_update: false
+  - name: "pausatf-oceanwp-theme"
+    status: "inactive"
+    version: "1.0.0"
+    parent: "oceanwp"
+    auto_update: false
+
+# =============================================================================
+# WORDPRESS PLUGINS (Main Site)
+# =============================================================================
+wp_main_plugins:
+  # Active plugins
+  - name: "accordions"
+    slug: "accordions"
+    status: "active"
+    version: "2.3.17"
+    auto_update: true
+    description: "Accordion grid for WordPress"
+  - name: "app-for-cf"
+    slug: "app-for-cf"
+    status: "active"
+    version: "1.9.6.2"
+    auto_update: true
+    description: "Cloudflare app integration"
+  - name: "category-posts"
+    slug: "category-posts"
+    status: "active"
+    version: "4.9.22"
+    auto_update: true
+    description: "Widget showing recent posts from a category"
+  - name: "classic-editor"
+    slug: "classic-editor"
+    status: "active"
+    version: "1.6.7"
+    auto_update: true
+    description: "Restores the classic WordPress editor"
+  - name: "cloudflare"
+    slug: "cloudflare"
+    status: "active"
+    version: "4.13.0"
+    auto_update: true
+    description: "Cloudflare integration plugin"
+  - name: "contact-form-7"
+    slug: "contact-form-7"
+    status: "active"
+    version: "6.1.4"
+    auto_update: true
+    description: "Contact form management"
+  - name: "jetpack"
+    slug: "jetpack"
+    status: "active"
+    version: "15.3.1"
+    auto_update: true
+    description: "WordPress.com features for self-hosted sites"
+  - name: "media-library-plus"
+    slug: "media-library-plus"
+    status: "active"
+    version: "8.3.6"
+    auto_update: true
+    description: "Enhanced media library with folders"
+  - name: "ml-slider"
+    slug: "ml-slider"
+    status: "active"
+    version: "3.103.0"
+    auto_update: true
+    description: "Slider and carousel plugin"
+  - name: "tablepress-premium"
+    slug: "tablepress-premium"
+    status: "active"
+    version: "3.2.5"
+    auto_update: true
+    description: "Table management (premium)"
+  - name: "updraftplus"
+    slug: "updraftplus"
+    status: "active"
+    version: "2.25.9.0"
+    auto_update: true
+    description: "Backup and restore plugin"
+  - name: "version-info"
+    slug: "version-info"
+    status: "active"
+    version: "1.3.2"
+    auto_update: true
+    description: "Displays version information"
+  - name: "widget-logic"
+    slug: "widget-logic"
+    status: "active"
+    version: "6.02"
+    auto_update: true
+    description: "Control widgets with conditional tags"
+  - name: "widget-options"
+    slug: "widget-options"
+    status: "active"
+    version: "4.1.3"
+    auto_update: true
+    description: "Extended widget control options"
+  - name: "wp-file-manager-pro"
+    slug: "wp-file-manager-pro"
+    status: "active"
+    version: "8.4.3"
+    auto_update: true
+    description: "File manager for WordPress"
+  - name: "wpforms-lite"
+    slug: "wpforms-lite"
+    status: "active"
+    version: "1.9.8.4"
+    auto_update: true
+    description: "Form builder plugin"
+  - name: "wp-mail-smtp"
+    slug: "wp-mail-smtp"
+    status: "active"
+    version: "4.7.1"
+    auto_update: true
+    description: "SMTP email configuration"
+  - name: "google-sitemap-generator"
+    slug: "google-sitemap-generator"
+    status: "active"
+    version: "4.1.21"
+    auto_update: true
+    description: "XML sitemap generator"
+  # Inactive plugins
+  - name: "ocean-extra"
+    slug: "ocean-extra"
+    status: "inactive"
+    version: "2.5.2"
+    auto_update: false
+    description: "OceanWP theme extras"
+
+# Must-Use Plugins (loaded automatically)
+wp_main_mu_plugins:
+  - name: "fix-translations"
+    version: "1.0"
+    description: "Fixes translation loading issues"
+  - name: "wp-fail2ban"
+    version: "3.5.3"
+    description: "Fail2ban integration for WordPress"
+
+# Drop-ins
+wp_main_dropins:
+  - name: "advanced-cache.php"
+    description: "Advanced caching drop-in"
+
+# =============================================================================
+# WP-CLI CONFIGURATION
+# =============================================================================
+wpcli_enabled: true
+wpcli_path: "/usr/local/bin/wp"
+wpcli_auto_update: true
+
+# WP-CLI update settings
+wpcli_update_plugins: true
+wpcli_update_themes: true
+wpcli_update_core: "minor"  # false, true, or "minor"
+wpcli_update_schedule: "weekly"  # daily, weekly, monthly
+
+# Plugins to exclude from auto-updates (premium/custom)
+wpcli_exclude_plugins:
+  - "tablepress-premium"
+  - "wp-file-manager-pro"
+
+# Themes to exclude from auto-updates (custom child themes)
+wpcli_exclude_themes:
+  - "TheSource-child"
+  - "pausatf-oceanwp-child"
+  - "pausatf-oceanwp-child-v2"
+  - "pausatf-oceanwp-theme"
+
+# =============================================================================
+# LEGACY/STATIC CONTENT
+# =============================================================================
+legacy_content_path: "/var/www/legacy"
+legacy_sites:
+  - name: "legacy-public"
+    path: "/var/www/legacy/public_html"
+    type: "mixed_html_php"
+    description: "Legacy PAUSATF public site"
+  - name: "legacy-data"
+    path: "/var/www/legacy/data"
+    type: "mixed_html_php"
+    description: "Athletic results and records (1994-2025)"
+  - name: "legacy-calendar"
+    path: "/var/www/legacy/calendar"
+    type: "mixed_html_php"
+    description: "Legacy calendar application"
+
+# =============================================================================
+# SSL CONFIGURATION
+# =============================================================================
+ssl_enabled: true
+ssl_protocol: "all -SSLv3 -TLSv1 -TLSv1.1"
+ssl_cipher_suite: "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384"
+ssl_certificate: "/etc/ssl/certs/6025998eb5098-key.pem"
+ssl_certificate_key: "/etc/ssl/private/6025998eb5098-key.key"
+
+# =============================================================================
+# SECURITY
+# =============================================================================
+
+# Fail2ban
+fail2ban_enabled: true
+fail2ban_bantime: 3600
+fail2ban_findtime: 600
+fail2ban_maxretry: 5
+fail2ban_jails:
+  - name: sshd
+    enabled: true
+  - name: apache-auth
+    enabled: true
+  - name: apache-badbots
+    enabled: true
+  - name: wordpress
+    enabled: true
+
+# UFW Firewall
+ufw_enabled: false  # Currently disabled on server
+ufw_allowed_ports:
+  - "22/tcp"
+  - "80/tcp"
+  - "443/tcp"
+
+# =============================================================================
+# MONITORING
+# =============================================================================
+
+# New Relic APM
+newrelic_enabled: true
+newrelic_license_key: "{{ vault_newrelic_license_key }}"
+newrelic_app_name: "PAUSATF WordPress"
+
+# Monit
+monit_enabled: true
+monit_check_interval: 120
+monit_start_delay: 240
+
+# Health Check Endpoint
+healthcheck_enabled: true
+healthcheck_token: "{{ vault_healthcheck_token }}"
+healthcheck_allowed_ips:
+  - "127.0.0.1"
+  - "::1"
+# Add your uptime monitoring service IPs here (e.g., UptimeRobot, Pingdom)
+#  - "216.245.221.0/24"  # UptimeRobot
+#  - "52.0.0.0/8"        # AWS (various monitoring services)
+
+# =============================================================================
+# BACKUP
+# =============================================================================
+backup_enabled: true
+backup_retention_days: 30
+backup_destination: "/var/backups/wordpress"
+backup_schedule: "0 2 * * *"  # 2 AM daily
+backup_items:
+  - name: "wordpress-main"
+    path: "/var/www/html"
+    db_name: "wordpress"
+  - name: "wordpress-transit"
+    path: "/var/www/transit/html"
+    db_name: "wordpress"
+
+# =============================================================================
+# EMAIL (Google Workspace)
+# =============================================================================
+email_provider: "google_workspace"
+email_mx_records:
+  - priority: 1
+    server: "aspmx.l.google.com"
+  - priority: 5
+    server: "alt1.aspmx.l.google.com"
+  - priority: 5
+    server: "alt2.aspmx.l.google.com"
+  - priority: 10
+    server: "alt3.aspmx.l.google.com"
+  - priority: 10
+    server: "alt4.aspmx.l.google.com"
+
+# SendGrid for transactional email
+sendgrid_enabled: true
+sendgrid_subdomain: "em5172"
+
+# =============================================================================
+# ADDITIONAL SERVICES
+# =============================================================================
+
+# FTP (vsftpd)
+vsftpd_enabled: true
+
+# Postfix (mail)
+postfix_enabled: true

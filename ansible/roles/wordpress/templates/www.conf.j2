@@ -1,0 +1,31 @@
+[www]
+user = www-data
+group = www-data
+listen = /var/run/php/php8.3-fpm.sock
+listen.owner = www-data
+listen.group = www-data
+pm = dynamic
+pm.max_children = 50
+pm.start_servers = 5
+pm.min_spare_servers = 5
+pm.max_spare_servers = 35
+pm.max_requests = 500
+
+; Security
+php_admin_value[disable_functions] = exec,passthru,shell_exec,system
+php_admin_flag[allow_url_fopen] = off
+
+; Error logging
+php_admin_value[error_log] = /var/log/php-fpm/www-error.log
+php_admin_flag[log_errors] = on
+
+; Session
+php_value[session.save_handler] = files
+php_value[session.save_path] = /var/lib/php/sessions
+
+; Upload limits
+php_value[upload_max_filesize] = 100M
+php_value[post_max_size] = 100M
+php_value[max_execution_time] = 300
+php_value[max_input_time] = 300
+php_value[memory_limit] = 256M

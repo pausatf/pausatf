@@ -1,0 +1,12 @@
+# MPM Prefork Configuration
+# Managed by Ansible - Do not edit manually
+# Server: {{ ansible_hostname }}
+
+<IfModule mpm_prefork_module>
+    StartServers             {{ apache_mpm_prefork.start_servers | default(5) }}
+    MinSpareServers          {{ apache_mpm_prefork.min_spare_servers | default(5) }}
+    MaxSpareServers          {{ apache_mpm_prefork.max_spare_servers | default(10) }}
+    MaxRequestWorkers        {{ apache_mpm_prefork.max_request_workers | default(256) }}
+    MaxConnectionsPerChild   {{ apache_mpm_prefork.max_connections_per_child | default(0) }}
+    ServerLimit              {{ apache_mpm_prefork.max_request_workers | default(256) }}
+</IfModule>

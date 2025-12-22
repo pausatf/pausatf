@@ -1,0 +1,59 @@
+# MySQL Server Configuration
+# Managed by Ansible - Do not edit manually
+# Server: {{ ansible_hostname }}
+
+[mysqld_safe]
+socket = {{ mysql_socket }}
+nice = 0
+
+[mysqld]
+# Basic Settings
+user = mysql
+pid-file = /var/run/mysqld/mysqld.pid
+socket = {{ mysql_socket }}
+port = {{ mysql_port }}
+basedir = /usr
+datadir = {{ mysql_datadir }}
+tmpdir = /tmp
+lc-messages-dir = /usr/share/mysql
+skip-external-locking
+
+# Network
+bind-address = {{ mysql_bind_address }}
+
+# Fine Tuning
+key_buffer_size = {{ mysql_key_buffer_size }}
+max_allowed_packet = {{ mysql_max_allowed_packet }}
+thread_stack = {{ mysql_thread_stack }}
+thread_cache_size = {{ mysql_thread_cache_size }}
+myisam-recover-options = BACKUP
+
+# Query Cache (deprecated in MySQL 8.0, but still used in 5.7)
+query_cache_limit = {{ mysql_query_cache_limit }}
+query_cache_size = {{ mysql_query_cache_size }}
+
+# Logging
+log_error = /var/log/mysql/error.log
+slow_query_log = 1
+slow_query_log_file = /var/log/mysql/mysql-slow.log
+long_query_time = 2
+
+# Binary Logging
+expire_logs_days = {{ mysql_expire_logs_days }}
+max_binlog_size = {{ mysql_max_binlog_size }}
+
+# InnoDB Settings
+innodb_buffer_pool_size = 512M
+innodb_log_file_size = 128M
+innodb_log_buffer_size = 16M
+innodb_flush_log_at_trx_commit = 1
+innodb_lock_wait_timeout = 50
+innodb_file_per_table = 1
+
+# Character Set
+character-set-server = utf8mb4
+collation-server = utf8mb4_unicode_ci
+
+# Security
+symbolic-links = 0
+local-infile = 0

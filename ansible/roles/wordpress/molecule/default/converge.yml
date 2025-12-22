@@ -1,0 +1,25 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+  roles:
+    - role: wordpress
+
+  post_tasks:
+    - name: Ensure Nginx is started for tests
+      service:
+        name: nginx
+        state: started
+
+    - name: Ensure PHP-FPM is started for tests
+      service:
+        name: php8.3-fpm
+        state: started

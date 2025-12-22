@@ -1,0 +1,35 @@
+---
+# WordPress default variables
+wordpress_version: "latest"
+wordpress_install_dir: "/var/www/html"
+wordpress_db_name: "wordpress"
+wordpress_db_user: "wpuser"
+wordpress_db_host: "localhost"
+wordpress_table_prefix: "wp_"
+wordpress_memory_limit: "256M"
+wordpress_max_memory_limit: "512M"
+
+# WordPress site configuration
+wordpress_site_url: "{{ inventory_hostname }}"
+wordpress_admin_email: "admin@{{ inventory_hostname }}"
+
+# PHP configuration
+php_version: "8.3"
+php_upload_max_filesize: "100M"
+php_post_max_size: "100M"
+php_max_execution_time: "300"
+php_memory_limit: "256M"
+
+# Nginx configuration
+nginx_client_max_body_size: "100M"
+
+# Security: These should be overridden in group_vars with vault-encrypted values
+wordpress_db_password: "CHANGEME"
+wordpress_auth_key: "CHANGEME"
+wordpress_secure_auth_key: "CHANGEME"
+wordpress_logged_in_key: "CHANGEME"
+wordpress_nonce_key: "CHANGEME"
+wordpress_auth_salt: "CHANGEME"
+wordpress_secure_auth_salt: "CHANGEME"
+wordpress_logged_in_salt: "CHANGEME"
+wordpress_nonce_salt: "CHANGEME"

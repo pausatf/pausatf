@@ -1,0 +1,68 @@
+/* Chrome-specific fixes for dropdown menus */
+
+/* Force Chrome to properly display dropdown menus */
+.browser-chrome ul.nav li ul {
+    display: none !important;
+}
+
+.browser-chrome ul.nav li:hover > ul {
+    display: block !important;
+}
+
+/* Fix z-index issues in Chrome */
+.browser-chrome #page-menu,
+.browser-chrome #cat-nav-content {
+    z-index: 99999 !important;
+}
+
+.browser-chrome ul.nav {
+    z-index: 100000 !important;
+}
+
+.browser-chrome ul.nav ul {
+    z-index: 100001 !important;
+}
+
+/* Fix positioning in Chrome */
+.browser-chrome ul.nav ul {
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    width: 200px !important;
+}
+
+.browser-chrome ul.nav ul ul {
+    top: 0 !important;
+    left: 100% !important;
+}
+
+/* Fix hover behavior in Chrome */
+.browser-chrome ul.nav li:hover > ul {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Fix background and text colors in Chrome */
+.browser-chrome #page-menu ul.nav ul,
+.browser-chrome #cat-nav-content ul.nav ul {
+    background: #232323 !important;
+    border: 0px !important;
+}
+
+.browser-chrome #cat-nav-content ul.nav li li a,
+.browser-chrome #page-menu ul.nav li li a {
+    color: #fefefe !important;
+}
+
+.browser-chrome #cat-nav-content ul.nav li li a:hover,
+.browser-chrome #page-menu ul.nav li li a:hover {
+    color: #ce0010 !important;
+    background-color: transparent !important;
+}
+
+/* Force hardware acceleration for smoother animations in Chrome */
+.browser-chrome ul.nav ul {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
