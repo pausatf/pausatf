@@ -1,0 +1,154 @@
+<?php
+/**
+ * Health Check Endpoint
+ * Managed by Ansible - do not edit manually
+ *
+ * Returns JSON status of critical services for uptime monitoring.
+ * Access: /health-check.php
+ *
+ * Response codes:
+ *   200 - All services healthy
+ *   503 - One or more services unhealthy
+ */
+
+header('Content-Type: application/json');
+header('Cache-Control: no-cache, no-store, must-revalidate');
+header('X-Robots-Tag: noindex, nofollow');
+
+// Restrict to allowed IPs (Cloudflare, localhost, monitoring services)
+$allowed_ips = [
+    '127.0.0.1',
+    '::1',
+{% for ip in healthcheck_allowed_ips | default(['127.0.0.1']) %}
+    '{{ ip }}',
+{% endfor %}
+];
+
+// Check if request is from Cloudflare (real IP in header)
+$client_ip = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['REMOTE_ADDR'] ?? '';
+
+// Allow if IP is in allowed list or if coming through Cloudflare
+$is_cloudflare = isset($_SERVER['HTTP_CF_RAY']);
+$is_allowed = in_array($client_ip, $allowed_ips) || $is_cloudflare;
+
+// Also allow with secret token
+$token = $_GET['token'] ?? $_SERVER['HTTP_X_HEALTH_TOKEN'] ?? '';
+$valid_token = '{{ healthcheck_token | default("") }}';
+if (!empty($valid_token) && $token === $valid_token) {
+    $is_allowed = true;
+}
+
+if (!$is_allowed) {
+    http_response_code(403);
+    echo json_encode(['error' => 'Forbidden']);
+    exit;
+}
+
+$checks = [];
+$all_healthy = true;
+
+// Check 1: PHP is running (implicit - we're here)
+$checks['php'] = [
+    'status' => 'healthy',
+    'version' => PHP_VERSION,
+];
+
+// Check 2: MySQL connection
+try {
+    $db_host = '{{ wp_main_db_host | default("localhost") }}';
+    $db_name = '{{ wp_main_db_name | default("wordpress") }}';
+    $db_user = '{{ wp_main_db_user | default("wordpress") }}';
+    $db_pass = '{{ vault_wp_main_db_password | default("") }}';
+
+    $pdo = new PDO(
+        "mysql:host=$db_host;dbname=$db_name;charset=utf8mb4",
+        $db_user,
+        $db_pass,
+        [PDO::ATTR_TIMEOUT => 5]
+    );
+    $pdo->query('SELECT 1');
+    $checks['mysql'] = [
+        'status' => 'healthy',
+        'connection' => 'ok',
+    ];
+} catch (PDOException $e) {
+    $checks['mysql'] = [
+        'status' => 'unhealthy',
+        'error' => 'Connection failed',
+    ];
+    $all_healthy = false;
+}
+
+// Check 3: WordPress files exist
+$wp_path = '{{ wp_main_document_root | default("/var/www/html") }}';
+$wp_files = ['wp-config.php', 'wp-includes/version.php', 'index.php'];
+$wp_healthy = true;
+
+foreach ($wp_files as $file) {
+    if (!file_exists("$wp_path/$file")) {
+        $wp_healthy = false;
+        break;
+    }
+}
+
+if ($wp_healthy) {
+    // Get WordPress version
+    $version_file = "$wp_path/wp-includes/version.php";
+    if (file_exists($version_file)) {
+        include $version_file;
+        $wp_version = $wp_version ?? 'unknown';
+    }
+    $checks['wordpress'] = [
+        'status' => 'healthy',
+        'version' => $wp_version ?? 'unknown',
+        'path' => $wp_path,
+    ];
+} else {
+    $checks['wordpress'] = [
+        'status' => 'unhealthy',
+        'error' => 'Core files missing',
+    ];
+    $all_healthy = false;
+}
+
+// Check 4: Disk space
+$disk_free = disk_free_space('/');
+$disk_total = disk_total_space('/');
+$disk_percent = round((1 - ($disk_free / $disk_total)) * 100, 1);
+
+if ($disk_percent < 90) {
+    $checks['disk'] = [
+        'status' => 'healthy',
+        'used_percent' => $disk_percent,
+        'free_gb' => round($disk_free / 1024 / 1024 / 1024, 2),
+    ];
+} else {
+    $checks['disk'] = [
+        'status' => 'unhealthy',
+        'used_percent' => $disk_percent,
+        'warning' => 'Disk usage above 90%',
+    ];
+    $all_healthy = false;
+}
+
+// Check 5: Memory (if available)
+if (function_exists('sys_getloadavg')) {
+    $load = sys_getloadavg();
+    $checks['load'] = [
+        'status' => $load[0] < 4 ? 'healthy' : 'warning',
+        '1min' => $load[0],
+        '5min' => $load[1],
+        '15min' => $load[2],
+    ];
+}
+
+// Build response
+$response = [
+    'status' => $all_healthy ? 'healthy' : 'unhealthy',
+    'timestamp' => date('c'),
+    'hostname' => gethostname(),
+    'checks' => $checks,
+];
+
+http_response_code($all_healthy ? 200 : 503);
+echo json_encode($response, JSON_PRETTY_PRINT);

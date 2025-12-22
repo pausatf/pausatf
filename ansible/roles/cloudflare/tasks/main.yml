@@ -1,0 +1,161 @@
+---
+# Cloudflare Configuration Tasks
+# Manages DNS, SSL, and CDN settings via Cloudflare API
+
+- name: Install required Python packages
+  pip:
+    name:
+      - cloudflare
+      - requests
+    state: present
+  tags: cloudflare
+
+- name: Configure Apache to trust Cloudflare IPs
+  template:
+    src: cloudflare-ips.conf.j2
+    dest: /etc/apache2/conf-available/cloudflare-ips.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload Apache
+  tags: cloudflare
+
+- name: Enable Cloudflare IP configuration
+  command: a2enconf cloudflare-ips
+  args:
+    creates: /etc/apache2/conf-enabled/cloudflare-ips.conf
+  notify: Reload Apache
+  tags: cloudflare
+
+- name: Update Cloudflare IP ranges
+  get_url:
+    url: "https://www.cloudflare.com/ips-v4"
+    dest: /etc/apache2/cloudflare-ips-v4.txt
+    mode: '0644'
+  register: cf_ips_v4
+  tags: cloudflare
+
+- name: Update Cloudflare IPv6 ranges
+  get_url:
+    url: "https://www.cloudflare.com/ips-v6"
+    dest: /etc/apache2/cloudflare-ips-v6.txt
+    mode: '0644'
+  register: cf_ips_v6
+  tags: cloudflare
+
+- name: Verify Cloudflare zone is active
+  uri:
+    url: "https://api.cloudflare.com/client/v4/zones/{{ cloudflare_zone_id }}"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ cloudflare_api_token }}"
+      Content-Type: "application/json"
+    return_content: yes
+  register: cf_zone_status
+  tags: cloudflare
+
+- name: Display Cloudflare zone status
+  debug:
+    msg: "Zone {{ cloudflare_zone }} is {{ cf_zone_status.json.result.status }}"
+  tags: cloudflare
+
+- name: Ensure SSL mode is set correctly
+  uri:
+    url: "https://api.cloudflare.com/client/v4/zones/{{ cloudflare_zone_id }}/settings/ssl"
+    method: PATCH
+    headers:
+      Authorization: "Bearer {{ cloudflare_api_token }}"
+      Content-Type: "application/json"
+    body_format: json
+    body:
+      value: "{{ cloudflare_ssl_mode }}"
+  when: cloudflare_ssl_mode is defined
+  tags: cloudflare
+
+- name: Ensure minimum TLS version
+  uri:
+    url: "https://api.cloudflare.com/client/v4/zones/{{ cloudflare_zone_id }}/settings/min_tls_version"
+    method: PATCH
+    headers:
+      Authorization: "Bearer {{ cloudflare_api_token }}"
+      Content-Type: "application/json"
+    body_format: json
+    body:
+      value: "{{ cloudflare_min_tls_version }}"
+  when: cloudflare_min_tls_version is defined
+  tags: cloudflare
+
+- name: Ensure Always Use HTTPS is enabled
+  uri:
+    url: "https://api.cloudflare.com/client/v4/zones/{{ cloudflare_zone_id }}/settings/always_use_https"
+    method: PATCH
+    headers:
+      Authorization: "Bearer {{ cloudflare_api_token }}"
+      Content-Type: "application/json"
+    body_format: json
+    body:
+      value: "{{ 'on' if cloudflare_always_use_https else 'off' }}"
+  when: cloudflare_always_use_https is defined
+  tags: cloudflare
+
+- name: Set security level
+  uri:
+    url: "https://api.cloudflare.com/client/v4/zones/{{ cloudflare_zone_id }}/settings/security_level"
+    method: PATCH
+    headers:
+      Authorization: "Bearer {{ cloudflare_api_token }}"
+      Content-Type: "application/json"
+    body_format: json
+    body:
+      value: "{{ cloudflare_security_level }}"
+  when: cloudflare_security_level is defined
+  tags: cloudflare
+
+- name: Deploy Cloudflare IP update script
+  template:
+    src: update-cloudflare-ips.sh.j2
+    dest: /usr/local/bin/update-cloudflare-ips.sh
+    owner: root
+    group: root
+    mode: '0755'
+  tags: cloudflare
+
+- name: Create log file for Cloudflare IP updates
+  file:
+    path: /var/log/cloudflare-ip-update.log
+    state: touch
+    owner: root
+    group: root
+    mode: '0644'
+  changed_when: false
+  tags: cloudflare
+
+- name: Schedule weekly Cloudflare IP update
+  cron:
+    name: "Update Cloudflare IP ranges"
+    special_time: weekly
+    job: "/usr/local/bin/update-cloudflare-ips.sh"
+    user: root
+  tags: cloudflare
+
+- name: Run initial Cloudflare IP update
+  command: /usr/local/bin/update-cloudflare-ips.sh
+  register: cf_ip_update
+  changed_when: "'IP ranges changed' in cf_ip_update.stdout"
+  failed_when: false
+  tags: cloudflare
+
+- name: Purge Cloudflare cache (optional)
+  uri:
+    url: "https://api.cloudflare.com/client/v4/zones/{{ cloudflare_zone_id }}/purge_cache"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ cloudflare_api_token }}"
+      Content-Type: "application/json"
+    body_format: json
+    body:
+      purge_everything: true
+  when: cloudflare_purge_cache | default(false)
+  tags:
+    - cloudflare
+    - cloudflare-purge

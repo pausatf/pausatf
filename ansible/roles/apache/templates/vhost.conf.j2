@@ -1,0 +1,31 @@
+# Virtual Host Configuration for {{ item.domain }}
+# Managed by Ansible - Do not edit manually
+
+<VirtualHost *:{{ apache_listen_port }}>
+    ServerName {{ item.domain }}
+{% if item.aliases is defined %}
+{% for alias in item.aliases %}
+    ServerAlias {{ alias }}
+{% endfor %}
+{% endif %}
+    ServerAdmin {{ apache_server_admin }}
+
+    DocumentRoot {{ item.path }}
+
+    <Directory {{ item.path }}>
+        Options FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    # Logging
+    ErrorLog ${APACHE_LOG_DIR}/{{ item.name }}-error.log
+    CustomLog ${APACHE_LOG_DIR}/{{ item.name }}-access.log combined
+
+{% if item.ssl_enabled | default(false) %}
+    # Redirect to HTTPS
+    RewriteEngine On
+    RewriteCond %{HTTPS} off
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+{% endif %}
+</VirtualHost>

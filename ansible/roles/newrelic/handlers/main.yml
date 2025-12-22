@@ -1,0 +1,12 @@
+---
+# New Relic handlers
+
+- name: Restart New Relic infrastructure
+  service:
+    name: newrelic-infra
+    state: restarted
+
+- name: Restart Apache
+  service:
+    name: apache2
+    state: restarted

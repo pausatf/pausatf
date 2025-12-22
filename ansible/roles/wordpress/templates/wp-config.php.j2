@@ -1,0 +1,71 @@
+<?php
+/**
+ * WordPress Configuration File
+ * Managed by Ansible
+ * Environment: {{ environment }}
+ */
+
+// ** MySQL settings ** //
+define( 'DB_NAME', '{{ wordpress_db_name | default("wordpress") }}' );
+define( 'DB_USER', '{{ wordpress_db_user | default("wpuser") }}' );
+define( 'DB_PASSWORD', '{{ wordpress_db_password }}' );
+define( 'DB_HOST', '{{ wordpress_db_host | default("localhost") }}' );
+define( 'DB_CHARSET', 'utf8mb4' );
+define( 'DB_COLLATE', '' );
+
+// ** Authentication Unique Keys and Salts ** //
+define('AUTH_KEY',         '{{ wordpress_auth_key }}');
+define('SECURE_AUTH_KEY',  '{{ wordpress_secure_auth_key }}');
+define('LOGGED_IN_KEY',    '{{ wordpress_logged_in_key }}');
+define('NONCE_KEY',        '{{ wordpress_nonce_key }}');
+define('AUTH_SALT',        '{{ wordpress_auth_salt }}');
+define('SECURE_AUTH_SALT', '{{ wordpress_secure_auth_salt }}');
+define('LOGGED_IN_SALT',   '{{ wordpress_logged_in_salt }}');
+define('NONCE_SALT',       '{{ wordpress_nonce_salt }}');
+
+// ** WordPress Database Table prefix ** //
+$table_prefix = '{{ wordpress_table_prefix | default("wp_") }}';
+
+// ** WordPress debugging mode ** //
+define( 'WP_DEBUG', {{ 'true' if environment == 'staging' else 'false' }} );
+define( 'WP_DEBUG_LOG', {{ 'true' if environment == 'staging' else 'false' }} );
+define( 'WP_DEBUG_DISPLAY', false );
+define( 'SCRIPT_DEBUG', false );
+
+// ** WordPress Security ** //
+define( 'DISALLOW_FILE_EDIT', true );
+define( 'DISALLOW_FILE_MODS', {{ 'false' if environment == 'staging' else 'true' }} );
+define( 'FORCE_SSL_ADMIN', true );
+
+// ** WordPress Performance ** //
+define( 'WP_MEMORY_LIMIT', '{{ wordpress_memory_limit | default("256M") }}' );
+define( 'WP_MAX_MEMORY_LIMIT', '{{ wordpress_max_memory_limit | default("512M") }}' );
+define( 'WP_CACHE', true );
+
+// ** WordPress Auto-Updates ** //
+define( 'WP_AUTO_UPDATE_CORE', {{ 'true' if environment == 'staging' else 'minor' }} );
+
+// ** WordPress Content Directory ** //
+define( 'WP_CONTENT_DIR', dirname(__FILE__) . '/wp-content' );
+define( 'WP_CONTENT_URL', 'https://{{ wordpress_site_url }}/wp-content' );
+
+// ** WordPress Site URLs ** //
+define( 'WP_HOME', 'https://{{ wordpress_site_url }}' );
+define( 'WP_SITEURL', 'https://{{ wordpress_site_url }}' );
+
+// ** Increase PHP limits ** //
+@ini_set( 'upload_max_filesize' , '100M' );
+@ini_set( 'post_max_size', '100M');
+@ini_set( 'memory_limit', '256M' );
+@ini_set( 'max_execution_time', '300' );
+@ini_set( 'max_input_time', '300' );
+
+/* That's all, stop editing! Happy publishing. */
+
+/** Absolute path to the WordPress directory. */
+if ( ! defined( 'ABSPATH' ) ) {
+    define( 'ABSPATH', __DIR__ . '/' );
+}
+
+/** Sets up WordPress vars and included files. */
+require_once ABSPATH . 'wp-settings.php';

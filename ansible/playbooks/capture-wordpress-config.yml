@@ -1,0 +1,744 @@
+---
+# Capture WordPress Configuration from Servers
+#
+# This playbook captures the current WordPress configuration from both
+# staging and production servers, including:
+# - WordPress version and installed plugins/themes
+# - PHP version and configuration
+# - Apache/OpenLiteSpeed web server configuration
+# - Database configuration (sanitized)
+# - File permissions and ownership
+# - wp-config.php settings (sanitized)
+# - Cron jobs and systemd timers
+# - Scripts referenced by cron jobs (full inventory)
+# - .htaccess files
+# - SSL certificates
+#
+# Usage:
+#   ansible-playbook playbooks/capture-wordpress-config.yml
+#   ansible-playbook playbooks/capture-wordpress-config.yml --limit production
+#   ansible-playbook playbooks/capture-wordpress-config.yml --limit staging
+#
+
+- name: Capture WordPress Configuration
+  hosts: wordpress
+  become: yes
+  vars:
+    output_dir: "./wordpress-config-capture"
+    timestamp: "{{ ansible_date_time.iso8601_basic_short }}"
+
+  tasks:
+    - name: Create local output directory
+      local_action:
+        module: file
+        path: "{{ output_dir }}/{{ inventory_hostname }}"
+        state: directory
+        mode: '0755'
+      run_once: no
+      become: no
+
+    - name: Gather WordPress core version
+      command: wp core version --path={{ wordpress_path }} --allow-root
+      register: wp_version
+      changed_when: false
+
+    - name: Gather WordPress database version
+      command: wp core version --path={{ wordpress_path }} --allow-root --extra --field=db_version
+      register: wp_db_version
+      changed_when: false
+
+    - name: List installed plugins
+      command: wp plugin list --path={{ wordpress_path }} --allow-root --format=json
+      register: wp_plugins
+      changed_when: false
+
+    - name: List installed themes
+      command: wp theme list --path={{ wordpress_path }} --allow-root --format=json
+      register: wp_themes
+      changed_when: false
+
+    - name: Get WordPress site URL
+      command: wp option get siteurl --path={{ wordpress_path }} --allow-root
+      register: wp_siteurl
+      changed_when: false
+
+    - name: Get WordPress home URL
+      command: wp option get home --path={{ wordpress_path }} --allow-root
+      register: wp_home
+      changed_when: false
+
+    - name: Get active theme
+      command: wp theme list --path={{ wordpress_path }} --allow-root --status=active --field=name
+      register: wp_active_theme
+      changed_when: false
+
+    - name: Get PHP version
+      command: php -v
+      register: php_version
+      changed_when: false
+
+    - name: Get PHP modules
+      command: php -m
+      register: php_modules
+      changed_when: false
+
+    - name: Get Apache version
+      command: apache2 -v
+      register: apache_version
+      changed_when: false
+      ignore_errors: yes
+
+    - name: Get Apache modules
+      command: apache2ctl -M
+      register: apache_modules
+      changed_when: false
+      ignore_errors: yes
+
+    - name: Get MySQL version
+      command: mysql --version
+      register: mysql_version
+      changed_when: false
+
+    - name: Read wp-config.php (sanitized)
+      shell: |
+        grep -E "define\(|^\\\$table_prefix" {{ wordpress_path }}/wp-config.php | \
+        sed 's/DB_PASSWORD.*/DB_PASSWORD", "***REDACTED***");/' | \
+        sed 's/AUTH_KEY.*/AUTH_KEY", "***REDACTED***");/' | \
+        sed 's/SECURE_AUTH_KEY.*/SECURE_AUTH_KEY", "***REDACTED***");/' | \
+        sed 's/LOGGED_IN_KEY.*/LOGGED_IN_KEY", "***REDACTED***");/' | \
+        sed 's/NONCE_KEY.*/NONCE_KEY", "***REDACTED***");/' | \
+        sed 's/AUTH_SALT.*/AUTH_SALT", "***REDACTED***");/' | \
+        sed 's/SECURE_AUTH_SALT.*/SECURE_AUTH_SALT", "***REDACTED***");/' | \
+        sed 's/LOGGED_IN_SALT.*/LOGGED_IN_SALT", "***REDACTED***");/' | \
+        sed 's/NONCE_SALT.*/NONCE_SALT", "***REDACTED***");/'
+      register: wp_config_sanitized
+      changed_when: false
+
+    - name: Get WordPress file permissions
+      shell: |
+        ls -la {{ wordpress_path }} | head -20
+        echo "---"
+        ls -la {{ wordpress_path }}/wp-content/ | head -10
+        echo "---"
+        ls -la {{ wordpress_path }}/wp-content/themes/
+        echo "---"
+        ls -la {{ wordpress_path }}/wp-content/plugins/ | head -10
+      register: wp_permissions
+      changed_when: false
+
+    - name: Get disk usage
+      command: du -sh {{ wordpress_path }}
+      register: wp_disk_usage
+      changed_when: false
+
+    - name: Get WordPress constants
+      command: wp config list --path={{ wordpress_path }} --allow-root --format=json
+      register: wp_constants
+      changed_when: false
+      ignore_errors: yes
+
+    - name: Get database tables
+      command: wp db tables --path={{ wordpress_path }} --allow-root
+      register: wp_db_tables
+      changed_when: false
+
+    - name: Get database size
+      shell: wp db size --path={{ wordpress_path }} --allow-root --format=json
+      register: wp_db_size
+      changed_when: false
+      ignore_errors: yes
+
+    - name: Get root crontab
+      command: crontab -l
+      register: root_crontab
+      changed_when: false
+      failed_when: false
+
+    - name: Get system crontab
+      command: cat /etc/crontab
+      register: system_crontab
+      changed_when: false
+      failed_when: false
+
+    - name: List cron.d jobs
+      shell: ls -la /etc/cron.d/ && echo "---" && for f in /etc/cron.d/*; do echo "=== $f ==="; cat "$f" 2>/dev/null || echo "Unable to read"; echo ""; done
+      register: crond_jobs
+      changed_when: false
+      failed_when: false
+
+    - name: List cron.hourly scripts
+      shell: ls -la /etc/cron.hourly/
+      register: cron_hourly
+      changed_when: false
+      failed_when: false
+
+    - name: List cron.daily scripts
+      shell: ls -la /etc/cron.daily/
+      register: cron_daily
+      changed_when: false
+      failed_when: false
+
+    - name: List cron.weekly scripts
+      shell: ls -la /etc/cron.weekly/
+      register: cron_weekly
+      changed_when: false
+      failed_when: false
+
+    - name: List cron.monthly scripts
+      shell: ls -la /etc/cron.monthly/
+      register: cron_monthly
+      changed_when: false
+      failed_when: false
+
+    - name: Get all user crontabs
+      shell: |
+        echo "=== Checking for user crontabs ==="
+        for user in $(cut -f1 -d: /etc/passwd); do
+          crontab -u $user -l 2>/dev/null && echo "User: $user" || true
+        done
+      register: user_crontabs
+      changed_when: false
+      failed_when: false
+
+    - name: Get systemd timers
+      shell: systemctl list-timers --all --no-pager
+      register: systemd_timers
+      changed_when: false
+      failed_when: false
+
+    - name: Extract script paths from cron jobs
+      shell: |
+        # Create a temporary file to collect all cron content
+        TEMP_CRON_FILE=$(mktemp)
+
+        # Collect all cron content
+        crontab -l 2>/dev/null >> "$TEMP_CRON_FILE" || true
+        cat /etc/crontab 2>/dev/null >> "$TEMP_CRON_FILE" || true
+        cat /etc/cron.d/* 2>/dev/null >> "$TEMP_CRON_FILE" || true
+
+        # Check user crontabs
+        for user in $(cut -f1 -d: /etc/passwd 2>/dev/null); do
+          crontab -u "$user" -l 2>/dev/null >> "$TEMP_CRON_FILE" || true
+        done
+
+        # Extract script paths (look for .sh, .py, .php, .pl files and paths starting with /)
+        # Filter out comments and empty lines
+        grep -v "^#" "$TEMP_CRON_FILE" 2>/dev/null | \
+        grep -v "^$" | \
+        grep -oE '(/[^ ]+\.(sh|py|php|pl|rb)|/usr/local/bin/[^ ]+|/usr/bin/[^ ]+|/opt/[^ ]+|/home/[^ ]+/[^ ]+\.(sh|py|php|pl|rb))' | \
+        sort -u || true
+
+        # Cleanup
+        rm -f "$TEMP_CRON_FILE"
+      register: cron_script_paths
+      changed_when: false
+      failed_when: false
+
+    - name: Find scripts in cron.hourly/daily/weekly/monthly directories
+      shell: |
+        echo "=== Cron.hourly Scripts ==="
+        find /etc/cron.hourly -type f -executable 2>/dev/null || echo "No scripts found"
+        echo ""
+        echo "=== Cron.daily Scripts ==="
+        find /etc/cron.daily -type f -executable 2>/dev/null || echo "No scripts found"
+        echo ""
+        echo "=== Cron.weekly Scripts ==="
+        find /etc/cron.weekly -type f -executable 2>/dev/null || echo "No scripts found"
+        echo ""
+        echo "=== Cron.monthly Scripts ==="
+        find /etc/cron.monthly -type f -executable 2>/dev/null || echo "No scripts found"
+      register: cron_dir_scripts
+      changed_when: false
+      failed_when: false
+
+    - name: Capture content of cron-referenced scripts
+      shell: |
+        echo "# Cron-Referenced Scripts Inventory"
+        echo "# Captured: {{ ansible_date_time.iso8601 }}"
+        echo "# Server: {{ inventory_hostname }}"
+        echo ""
+        echo "============================================"
+        echo "SCRIPTS REFERENCED IN CRON JOBS"
+        echo "============================================"
+        echo ""
+
+        {% for script in cron_script_paths.stdout_lines %}
+        if [ -f "{{ script }}" ]; then
+          echo "=== {{ script }} ==="
+          echo "File: {{ script }}"
+          echo "Permissions: $(ls -lh {{ script }} 2>/dev/null | awk '{print $1, $3, $4}')"
+          echo "Size: $(ls -lh {{ script }} 2>/dev/null | awk '{print $5}')"
+          echo "Modified: $(ls -l --time-style=long-iso {{ script }} 2>/dev/null | awk '{print $6, $7}')"
+          echo ""
+          echo "--- Content ---"
+          cat "{{ script }}" 2>/dev/null || echo "Unable to read file"
+          echo ""
+          echo ""
+        else
+          echo "=== {{ script }} (NOT FOUND) ==="
+          echo "Script referenced in cron but does not exist on filesystem"
+          echo ""
+        fi
+        {% endfor %}
+
+        echo ""
+        echo "============================================"
+        echo "SCRIPTS IN CRON DIRECTORIES"
+        echo "============================================"
+        echo ""
+
+        for dir in /etc/cron.hourly /etc/cron.daily /etc/cron.weekly /etc/cron.monthly; do
+          if [ -d "$dir" ]; then
+            echo "=== Directory: $dir ==="
+            echo ""
+            for script in "$dir"/*; do
+              if [ -f "$script" ] && [ -x "$script" ]; then
+                echo "--- $script ---"
+                echo "Permissions: $(ls -lh "$script" 2>/dev/null | awk '{print $1, $3, $4}')"
+                echo "Size: $(ls -lh "$script" 2>/dev/null | awk '{print $5}')"
+                echo ""
+                echo "Content:"
+                cat "$script" 2>/dev/null || echo "Unable to read"
+                echo ""
+                echo ""
+              fi
+            done
+          fi
+        done
+
+        echo ""
+        echo "============================================"
+        echo "SYSTEMD TIMER UNITS"
+        echo "============================================"
+        echo ""
+
+        # Find and capture systemd service files referenced by timers
+        for timer in $(systemctl list-timers --all --no-legend 2>/dev/null | awk '{print $NF}'); do
+          service_name="${timer%.timer}.service"
+          echo "=== Timer: $timer → Service: $service_name ==="
+
+          # Get the service file location
+          service_file=$(systemctl cat "$service_name" 2>/dev/null | grep -m1 "^# " | sed 's/^# //')
+          if [ -n "$service_file" ]; then
+            echo "Service File: $service_file"
+            echo ""
+            systemctl cat "$service_name" 2>/dev/null || echo "Unable to read service"
+            echo ""
+
+            # Extract ExecStart line to find script
+            exec_start=$(systemctl cat "$service_name" 2>/dev/null | grep "^ExecStart=" | sed 's/ExecStart=//')
+            if [ -n "$exec_start" ]; then
+              # Extract the script path (first word after any = sign)
+              script_path=$(echo "$exec_start" | awk '{print $1}')
+              if [ -f "$script_path" ]; then
+                echo "Referenced Script: $script_path"
+                echo "--- Content ---"
+                cat "$script_path" 2>/dev/null || echo "Unable to read"
+                echo ""
+              fi
+            fi
+          fi
+          echo ""
+        done
+      register: cron_scripts_content
+      changed_when: false
+      failed_when: false
+
+    - name: Find all .htaccess files
+      shell: find {{ wordpress_path }} -name ".htaccess" -type f
+      register: htaccess_files
+      changed_when: false
+      failed_when: false
+
+    - name: Read all .htaccess files
+      shell: |
+        for f in $(find {{ wordpress_path }} -name ".htaccess" -type f); do
+          echo "=== $f ==="
+          cat "$f"
+          echo ""
+          echo ""
+        done
+      register: htaccess_contents
+      changed_when: false
+      failed_when: false
+
+    - name: Get Apache configuration (if Apache)
+      shell: |
+        echo "=== Apache Version ==="
+        apache2 -v
+        echo ""
+        echo "=== Apache Modules ==="
+        apache2ctl -M
+        echo ""
+        echo "=== Main Apache Config ==="
+        cat /etc/apache2/apache2.conf
+        echo ""
+        echo "=== Available Sites ==="
+        ls -la /etc/apache2/sites-available/
+        echo ""
+        echo "=== Enabled Sites ==="
+        ls -la /etc/apache2/sites-enabled/
+        echo ""
+        for f in /etc/apache2/sites-enabled/*; do
+          echo "=== $f ==="
+          cat "$f"
+          echo ""
+        done
+        echo ""
+        echo "=== Ports Configuration ==="
+        cat /etc/apache2/ports.conf
+        echo ""
+        echo "=== Available Modules ==="
+        ls -la /etc/apache2/mods-available/ | head -50
+        echo ""
+        echo "=== Enabled Modules ==="
+        ls -la /etc/apache2/mods-enabled/
+      register: apache_config
+      changed_when: false
+      failed_when: false
+      when: web_server == "apache"
+
+    - name: Get OpenLiteSpeed configuration (if OLS)
+      shell: |
+        echo "=== OpenLiteSpeed Version ==="
+        /usr/local/lsws/bin/lshttpd -v
+        echo ""
+        echo "=== Main Configuration ==="
+        cat /usr/local/lsws/conf/httpd_config.conf
+        echo ""
+        echo "=== Virtual Host Configurations ==="
+        ls -la /usr/local/lsws/conf/vhosts/
+        echo ""
+        for vhost in /usr/local/lsws/conf/vhosts/*/vhconf.conf; do
+          echo "=== $vhost ==="
+          cat "$vhost"
+          echo ""
+        done
+        echo ""
+        echo "=== Admin Configuration ==="
+        cat /usr/local/lsws/admin/conf/admin_config.conf 2>/dev/null || echo "Unable to read admin config"
+        echo ""
+        echo "=== PHP Configuration ==="
+        ls -la /usr/local/lsws/lsphp*/etc/php.ini 2>/dev/null || echo "PHP config not found in standard location"
+      register: ols_config
+      changed_when: false
+      failed_when: false
+      when: web_server == "openlitespeed"
+
+    - name: Get PHP configuration files
+      shell: |
+        echo "=== PHP CLI Configuration ==="
+        php --ini
+        echo ""
+        echo "=== PHP-FPM Pools (if exists) ==="
+        ls -la /etc/php/*/fpm/pool.d/ 2>/dev/null || echo "No PHP-FPM pools found"
+        echo ""
+        for pool in /etc/php/*/fpm/pool.d/*.conf; do
+          if [ -f "$pool" ]; then
+            echo "=== $pool ==="
+            cat "$pool"
+            echo ""
+          fi
+        done
+        echo ""
+        echo "=== Main php.ini ==="
+        php -i | grep "Loaded Configuration File"
+        php -i | grep "Configuration File"
+      register: php_config
+      changed_when: false
+      failed_when: false
+
+    - name: Get SSL certificates information
+      shell: |
+        echo "=== SSL Certificates ==="
+        ls -la /etc/letsencrypt/live/ 2>/dev/null || echo "No Let's Encrypt certs found"
+        echo ""
+        for cert in /etc/letsencrypt/live/*/cert.pem; do
+          if [ -f "$cert" ]; then
+            echo "=== $cert ==="
+            openssl x509 -in "$cert" -text -noout | grep -E "(Subject:|Issuer:|Not Before|Not After)"
+            echo ""
+          fi
+        done
+      register: ssl_certs
+      changed_when: false
+      failed_when: false
+
+    - name: Create configuration summary
+      local_action:
+        module: copy
+        content: |
+          # WordPress Configuration - {{ inventory_hostname }}
+          # Captured: {{ timestamp }}
+          # ==============================================
+
+          ## System Information
+          - **Environment**: {% if 'production' in group_names %}PRODUCTION{% elif 'staging' in group_names %}STAGING{% else %}{{ inventory_hostname }}{% endif %}
+          - Hostname: {{ inventory_hostname }}
+          - IP Address: {{ ansible_default_ipv4.address }}
+          - OS: {{ ansible_distribution }} {{ ansible_distribution_version }}
+          - Kernel: {{ ansible_kernel }}
+          - Web Server: {{ web_server | upper }}
+
+          ## WordPress Core
+          - Version: {{ wp_version.stdout }}
+          - Database Version: {{ wp_db_version.stdout }}
+          - Site URL: {{ wp_siteurl.stdout }}
+          - Home URL: {{ wp_home.stdout }}
+          - Document Root: {{ wordpress_path }}
+          - Disk Usage: {{ wp_disk_usage.stdout }}
+
+          ## Active Theme
+          {{ wp_active_theme.stdout }}
+
+          ## PHP Configuration
+          {{ php_version.stdout_lines[0] }}
+
+          ## Web Server
+          {% if apache_version.stdout is defined %}
+          {{ apache_version.stdout_lines[0] }}
+          {% endif %}
+
+          ## Database
+          {{ mysql_version.stdout }}
+          {% if wp_db_size.stdout %}
+          Database Size: {{ wp_db_size.stdout }}
+          {% endif %}
+
+          ## Installed Plugins ({{ (wp_plugins.stdout | from_json) | length }} total)
+          {{ wp_plugins.stdout | from_json | selectattr('status', 'equalto', 'active') | list | length }} active plugins:
+          {% for plugin in wp_plugins.stdout | from_json | selectattr('status', 'equalto', 'active') %}
+          - {{ plugin.name }} ({{ plugin.version }}) - {{ plugin.title }}
+          {% endfor %}
+
+          ## Installed Themes ({{ (wp_themes.stdout | from_json) | length }} total)
+          {% for theme in wp_themes.stdout | from_json %}
+          - {{ theme.name }} ({{ theme.version }}) - {{ theme.title }}{% if theme.status == 'active' %} [ACTIVE]{% endif %}
+          {% endfor %}
+
+          ## Database Tables ({{ wp_db_tables.stdout_lines | length }} total)
+          {{ wp_db_tables.stdout }}
+
+          ## wp-config.php Settings (Sanitized)
+          ```php
+          {{ wp_config_sanitized.stdout }}
+          ```
+
+          ## File Permissions
+          ```
+          {{ wp_permissions.stdout }}
+          ```
+
+          ## PHP Modules Loaded
+          {{ php_modules.stdout_lines | join('\n') }}
+
+          {% if apache_modules.stdout is defined %}
+          ## Apache Modules Loaded
+          {{ apache_modules.stdout }}
+          {% endif %}
+
+          ## Cron Configuration
+
+          ### Root Crontab
+          ```
+          {% if root_crontab.stdout %}
+          {{ root_crontab.stdout }}
+          {% else %}
+          No crontab for root
+          {% endif %}
+          ```
+
+          ### System Crontab (/etc/crontab)
+          ```
+          {{ system_crontab.stdout }}
+          ```
+
+          ### Cron.d Jobs
+          ```
+          {{ crond_jobs.stdout }}
+          ```
+
+          ### Scheduled Scripts
+          - Hourly: {{ cron_hourly.stdout_lines | length }} scripts
+          - Daily: {{ cron_daily.stdout_lines | length }} scripts
+          - Weekly: {{ cron_weekly.stdout_lines | length }} scripts
+          - Monthly: {{ cron_monthly.stdout_lines | length }} scripts
+
+          ### User Crontabs
+          ```
+          {{ user_crontabs.stdout }}
+          ```
+
+          ### Systemd Timers
+          ```
+          {{ systemd_timers.stdout }}
+          ```
+
+          ## .htaccess Files
+
+          Found {{ htaccess_files.stdout_lines | length }} .htaccess file(s):
+          {% for file in htaccess_files.stdout_lines %}
+          - {{ file }}
+          {% endfor %}
+
+          ### .htaccess Contents
+          ```
+          {{ htaccess_contents.stdout }}
+          ```
+
+          {% if web_server == "apache" %}
+          ## Apache Configuration (Detailed)
+
+          ```
+          {{ apache_config.stdout }}
+          ```
+          {% endif %}
+
+          {% if web_server == "openlitespeed" %}
+          ## OpenLiteSpeed Configuration (Detailed)
+
+          ```
+          {{ ols_config.stdout }}
+          ```
+          {% endif %}
+
+          ## PHP Configuration (Detailed)
+
+          ```
+          {{ php_config.stdout }}
+          ```
+
+          ## SSL Certificates
+
+          ```
+          {{ ssl_certs.stdout }}
+          ```
+
+          ---
+          Generated by Ansible playbook: capture-wordpress-config.yml
+          Environment: {% if 'production' in group_names %}PRODUCTION{% elif 'staging' in group_names %}STAGING{% else %}{{ inventory_hostname }}{% endif %}
+        dest: "{{ output_dir }}/{{ inventory_hostname }}/wordpress-config-{{ timestamp }}.md"
+      become: no
+
+    - name: Save plugins list as JSON
+      local_action:
+        module: copy
+        content: "{{ wp_plugins.stdout }}"
+        dest: "{{ output_dir }}/{{ inventory_hostname }}/plugins-{{ timestamp }}.json"
+      become: no
+
+    - name: Save themes list as JSON
+      local_action:
+        module: copy
+        content: "{{ wp_themes.stdout }}"
+        dest: "{{ output_dir }}/{{ inventory_hostname }}/themes-{{ timestamp }}.json"
+      become: no
+
+    - name: Save WordPress constants as JSON
+      local_action:
+        module: copy
+        content: "{{ wp_constants.stdout | default('[]') }}"
+        dest: "{{ output_dir }}/{{ inventory_hostname }}/constants-{{ timestamp }}.json"
+      become: no
+      when: wp_constants.stdout is defined
+
+    - name: Save cron configuration
+      local_action:
+        module: copy
+        content: |
+          # Cron Configuration - {{ inventory_hostname }}
+          # Captured: {{ timestamp }}
+
+          ## Root Crontab
+          {{ root_crontab.stdout | default('No crontab for root') }}
+
+          ## System Crontab
+          {{ system_crontab.stdout }}
+
+          ## Cron.d Jobs
+          {{ crond_jobs.stdout }}
+
+          ## User Crontabs
+          {{ user_crontabs.stdout }}
+
+          ## Systemd Timers
+          {{ systemd_timers.stdout }}
+        dest: "{{ output_dir }}/{{ inventory_hostname }}/cron-config-{{ timestamp }}.txt"
+      become: no
+
+    - name: Save cron scripts inventory
+      local_action:
+        module: copy
+        content: "{{ cron_scripts_content.stdout }}"
+        dest: "{{ output_dir }}/{{ inventory_hostname }}/cron-scripts-inventory-{{ timestamp }}.txt"
+      become: no
+
+    - name: Save .htaccess files
+      local_action:
+        module: copy
+        content: "{{ htaccess_contents.stdout }}"
+        dest: "{{ output_dir }}/{{ inventory_hostname }}/htaccess-files-{{ timestamp }}.txt"
+      become: no
+
+    - name: Save Apache configuration
+      local_action:
+        module: copy
+        content: "{{ apache_config.stdout }}"
+        dest: "{{ output_dir }}/{{ inventory_hostname }}/apache-config-{{ timestamp }}.txt"
+      become: no
+      when: web_server == "apache" and apache_config.stdout is defined
+
+    - name: Save OpenLiteSpeed configuration
+      local_action:
+        module: copy
+        content: "{{ ols_config.stdout }}"
+        dest: "{{ output_dir }}/{{ inventory_hostname }}/openlitespeed-config-{{ timestamp }}.txt"
+      become: no
+      when: web_server == "openlitespeed" and ols_config.stdout is defined
+
+    - name: Save PHP configuration
+      local_action:
+        module: copy
+        content: "{{ php_config.stdout }}"
+        dest: "{{ output_dir }}/{{ inventory_hostname }}/php-config-{{ timestamp }}.txt"
+      become: no
+
+    - name: Save SSL certificates info
+      local_action:
+        module: copy
+        content: "{{ ssl_certs.stdout }}"
+        dest: "{{ output_dir }}/{{ inventory_hostname }}/ssl-certs-{{ timestamp }}.txt"
+      become: no
+
+    - name: Display summary
+      debug:
+        msg:
+          - "WordPress Configuration Captured Successfully"
+          - "============================================="
+          - "Environment: {% if 'production' in group_names %}PRODUCTION{% elif 'staging' in group_names %}STAGING{% else %}{{ inventory_hostname }}{% endif %}"
+          - "Server: {{ inventory_hostname }}"
+          - "Web Server: {{ web_server | upper }}"
+          - "WordPress Version: {{ wp_version.stdout }}"
+          - "Active Theme: {{ wp_active_theme.stdout }}"
+          - "Active Plugins: {{ (wp_plugins.stdout | from_json | selectattr('status', 'equalto', 'active') | list | length) }}"
+          - "Total Plugins: {{ (wp_plugins.stdout | from_json) | length }}"
+          - ".htaccess Files: {{ htaccess_files.stdout_lines | length }}"
+          - ""
+          - "Output saved to:"
+          - "  {{ output_dir }}/{{ inventory_hostname }}/"
+          - ""
+          - "Files created:"
+          - "  Main Configuration:"
+          - "    - wordpress-config-{{ timestamp }}.md (complete summary)"
+          - "  WordPress Data:"
+          - "    - plugins-{{ timestamp }}.json"
+          - "    - themes-{{ timestamp }}.json"
+          - "    - constants-{{ timestamp }}.json"
+          - "  System Configuration:"
+          - "    - cron-config-{{ timestamp }}.txt (cron jobs configuration)"
+          - "    - cron-scripts-inventory-{{ timestamp }}.txt (scripts referenced by cron jobs)"
+          - "    - htaccess-files-{{ timestamp }}.txt"
+          - "    - php-config-{{ timestamp }}.txt"
+          - "    - ssl-certs-{{ timestamp }}.txt"
+          - "{% if web_server == 'apache' %}    - apache-config-{{ timestamp }}.txt{% endif %}"
+          - "{% if web_server == 'openlitespeed' %}    - openlitespeed-config-{{ timestamp }}.txt{% endif %}"
