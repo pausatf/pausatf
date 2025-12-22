@@ -53,31 +53,64 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SPACES_SECRET_ACCESS_KEY }}
 
       - name: Terraform Plan
-        run: terraform plan -no-color
+        id: plan
+        run: terraform plan -no-color -out=tfplan
+        continue-on-error: true
         working-directory: environments/${{ matrix.environment }}
         env:
           TF_VAR_do_token: ${{ secrets.DIGITALOCEAN_TOKEN }}
           TF_VAR_github_token: ${{ secrets.GH_PAT }}
           TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 
+      - name: Save Terraform Plan Output
+        if: github.event_name == 'pull_request'
+        run: |
+          terraform show -no-color tfplan > plan_output.txt 2>&1 || echo "Plan output not available" > plan_output.txt
+        continue-on-error: true
+        working-directory: environments/${{ matrix.environment }}
+
       - name: Comment PR with Plan
         uses: actions/github-script@v7
         if: github.event_name == 'pull_request'
+        env:
+          PLAN_OUTPUT: ${{ matrix.environment }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = `#### Terraform Plan for \`${{ matrix.environment }}\`
-            
+            const fs = require('fs');
+            const path = require('path');
+
+            let planOutput = 'Plan output not available';
+            try {
+              const planPath = path.join('environments', '${{ matrix.environment }}', 'plan_output.txt');
+              if (fs.existsSync(planPath)) {
+                planOutput = fs.readFileSync(planPath, 'utf8');
+                // Truncate if too long (GitHub comment limit is 65536 chars)
+                if (planOutput.length > 60000) {
+                  planOutput = planOutput.substring(0, 60000) + '\n\n... (truncated)';
+                }
+              }
+            } catch (error) {
+              planOutput = `Error reading plan: ${error.message}`;
+            }
+
+            const planStatus = '${{ steps.plan.outcome }}';
+            const statusEmoji = planStatus === 'success' ? '✅' : '❌';
+
+            const output = `#### ${statusEmoji} Terraform Plan for \`${{ matrix.environment }}\`
+
+            **Status:** ${planStatus}
+
             <details><summary>Show Plan</summary>
-            
+
             \`\`\`terraform
-            ${{ steps.plan.outputs.stdout }}
+            ${planOutput}
             \`\`\`
-            
+
             </details>
-            
+
             *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
-            
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
