@@ -11,12 +11,6 @@ plugin "terraform" {
   preset  = "recommended"
 }
 
-plugin "digitalocean" {
-  enabled = false
-  version = "0.4.0"
-  source  = "github.com/terraform-linters/tflint-ruleset-digitalocean"
-}
-
 # Naming Conventions
 rule "terraform_naming_convention" {
   enabled = true
