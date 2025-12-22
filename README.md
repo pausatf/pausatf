@@ -68,6 +68,7 @@
 | [07 - Performance Optimization](docs/reports/07-performance-optimization-complete.md) | **Complete WordPress optimization (93% faster)** | Dec 20, 2025 |
 | [12 - Server Rightsizing](docs/reports/12-server-rightsizing-analysis.md) | Resource optimization and cost analysis | Dec 21, 2025 |
 | [14 - WordPress Security Audit](docs/reports/14-wordpress-security-audit-2025.md) | **WordPress security audit and remediation** | Dec 21, 2025 |
+| [15 - Theme Repository Workflows](docs/reports/15-theme-repository-github-workflows.md) | **GitHub workflows for WordPress theme repos** | Dec 21, 2025 |
 | [Phase 1 Implementation](docs/reports/PHASE1-IMPLEMENTATION-REPORT.md) | Phase 1 security improvements summary | Dec 21, 2025 |
 | [IaC Updates](docs/reports/INFRASTRUCTURE-AS-CODE-UPDATES.md) | Terraform/Ansible configurations | Dec 21, 2025 |
 
@@ -252,6 +253,16 @@
 - ✅ Quick start guide created for team
 - 📖 [Workflow Strategy](governance/GITHUB-WORKFLOW-STRATEGY.md)
 
+### WordPress Theme Repositories with CI/CD (Dec 21, 2025)
+- ✅ Parent theme (TheSource v4.8.13) version controlled
+- ✅ Child theme (PAUSATF customizations) version controlled
+- ✅ Automated PHP linting workflows (syntax, PHPCS, compatibility)
+- ✅ Automated CSS linting workflows (StyleLint, W3C, complexity)
+- ✅ Issue templates for bug reports and feature requests
+- ✅ Pull request templates with comprehensive checklists
+- ✅ CONTRIBUTING.md guides for WordPress development
+- 📖 [Theme Workflow Report](docs/reports/15-theme-repository-github-workflows.md)
+
 ### Performance Optimization (Dec 20, 2025)
 - ✅ Response time reduced from 1,357ms to ~220ms (6x faster)
 - ✅ WP Super Cache 3.0.3 installed and configured
@@ -338,6 +349,8 @@ This documentation repository is part of a complete IaC ecosystem:
 | [pausatf-terraform](https://github.com/pausatf/pausatf-terraform) | Infrastructure provisioning | Terraform, DigitalOcean, Cloudflare |
 | [pausatf-ansible](https://github.com/pausatf/pausatf-ansible) | Configuration management | Ansible, WordPress, Apache, MySQL |
 | [pausatf-scripts](https://github.com/pausatf/pausatf-scripts) | Automation and operations | Bash, Python |
+| [pausatf-theme-thesource](https://github.com/pausatf/pausatf-theme-thesource) | WordPress parent theme (TheSource v4.8.13) | PHP, CSS, WordPress |
+| [pausatf-theme-thesource-child](https://github.com/pausatf/pausatf-theme-thesource-child) | WordPress child theme (PAUSATF customizations) | PHP, CSS, WordPress |
 
 **All repositories include:**
 - ✅ Pre-commit hooks for security (shellcheck, ansible-lint, terraform fmt/validate)
@@ -346,6 +359,13 @@ This documentation repository is part of a complete IaC ecosystem:
 - ✅ Secret detection and prevention
 - ✅ Required GPG signed commits on main branch
 - ✅ Comprehensive documentation and CHANGELOGs
+
+**Theme repositories additionally include:**
+- ✅ Issue templates for bug reports and feature requests
+- ✅ Pull request templates with comprehensive testing checklists
+- ✅ Automated PHP linting (syntax, PHPCS, compatibility)
+- ✅ Automated CSS linting (StyleLint, W3C validation, complexity checks)
+- ✅ CONTRIBUTING.md with WordPress development guidelines
 
 ---
 
