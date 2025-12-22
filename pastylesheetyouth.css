@@ -1,0 +1,87 @@
+body     { color: black; font-size: 10px; font-family: Tahoma, Arial, "San Sarif"; 
+           font-variant: none; background-color: black; background-image: none; 
+           background-repeat: no-repeat; background-position: center top; margin-top: 5px; 
+           margin-left: 5px; border-style: solid; border-color: black; outline-style: solid; 
+         }
+
+P {
+	color: black;
+	font-variant: normal;}
+
+menu {
+	color: red;
+	font-size: 20px;
+	font-variant: normal;
+	font-family:Tahoma;
+	border: solid 2px
+	border-style:solid;
+	border-width:5px;
+	border-color:red;
+	}
+
+td {
+	padding: 3px;
+	border-left:0;
+	border-right:0;
+       border-top: 0;
+	empty-cells: show;
+	rule: row;
+	font-size:13px;
+	font-family:Tahoma;
+	font-variant: none;
+	}
+
+
+a:link,a:visited,a:active {
+	text-decoration:underline;
+	font-weight:normal;
+	border: none}
+
+a:hover {
+	color:red;
+	font-weight:normal; 	
+	text-decoration:none;}
+
+.title {
+	font-size:20px;
+	font-family:Verdana,Arial,Helvetica,Sans-Serif;
+	color:black;
+	font-weight:bold}
+
+TABLE    { margin: 5px; padding: 2px; border: solid 2px border-collapse: collapse; empty-cells: show; frame: hsides; rule: rows   }
+ul  { list-style-image: url("____.gif"); list-style-position: outside }
+
+tt,pre {
+	font-size:12px;
+	font-family:Courier New, Courier;
+	font-variant: normal;
+	}
+
+
+a:href {border:none}
+
+H1, H2, H3, H4, H5 {
+	font-weight: bold;
+	color: black;
+	line-height: 80%;
+	 }
+
+TH {
+	font-size:  14 px;
+	font-weight:bold;
+	color: green;
+	background-color: black;
+	font-variant: small-caps;}
+
+
+
+
+
+
+
+
+
+
+
+
+

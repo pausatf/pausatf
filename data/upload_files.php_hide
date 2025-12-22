@@ -1,0 +1,38 @@
+<?php
+// this script added by Jeff Teeters.  It was used to test uploading of files to this server
+// from the new online scoring program.  It probably is not needed anymore (so the extension
+// was changed from php to php_hide).  But I'm leaving it here in case I need to use it again.
+// (In which case, I would need to change the extension back to php).
+// This script is replaced by script "scorer_upload.php" which requires a hash code generated
+// by the scoring program, so the script can't be used by any other application (i.e. so that
+// script is secure from hackers using it to upload files).
+
+function process_form() {
+	// first get the year
+  	if(!isset($_REQUEST["year"])) {
+  		die("Year not specified");
+  	}
+  	$year = $_REQUEST["year"];
+  	if(!preg_match("/^\d\d\d\d$/", $year)) {
+  		die("Invalid year: '$year'");
+  	}
+  	if(!is_dir($year)) {
+  		die("Directory '$year' not found");
+  	}
+  	$uploads_dir = getcwd();  // '/uploads';
+  	$files_uploaded = [];
+	foreach ($_FILES["files"]["error"] as $key => $error) {
+	    if ($error == UPLOAD_ERR_OK) {
+	        $tmp_name = $_FILES["files"]["tmp_name"][$key];
+	        // basename() may prevent filesystem traversal attacks;
+	        // further validation/sanitation of the filename may be appropriate
+	        $name = basename($_FILES["files"]["name"][$key]);
+	        move_uploaded_file($tmp_name, "$uploads_dir/$year/$name");
+	        $files_uploaded[] = $name;
+	    }
+	}
+	echo "<p>Files uploaded to directory '$year': " . implode(",", $files_uploaded) . "</p>";
+}
+
+process_form();
+?>

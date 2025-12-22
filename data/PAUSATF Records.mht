@@ -1,0 +1,4794 @@
+MIME-Version: 1.0
+X-Document-Type: Workbook
+Content-Type: multipart/related; boundary="----=_NextPart_01CE4A5D.F71CD940"
+
+This document is a Single File Web Page, also known as a Web Archive file.  If you are seeing this message, your browser or editor doesn't support Web Archive files.  Please download a browser that supports Web Archive, such as Windows® Internet Explorer®.
+
+------=_NextPart_01CE4A5D.F71CD940
+Content-Location: file:///C:/506954F3/PAUSATFRecords.htm
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/html; charset="windows-1252"
+
+<html xmlns:v=3D"urn:schemas-microsoft-com:vml"
+xmlns:o=3D"urn:schemas-microsoft-com:office:office"
+xmlns:x=3D"urn:schemas-microsoft-com:office:excel"
+xmlns=3D"http://www.w3.org/TR/REC-html40">
+
+<head>
+<meta name=3D"Excel Workbook Frameset">
+<meta http-equiv=3DContent-Type content=3D"text/html; charset=3Dwindows-125=
+2">
+<meta name=3DProgId content=3DExcel.Sheet>
+<meta name=3DGenerator content=3D"Microsoft Excel 14">
+<link rel=3DFile-List href=3D"PAUSATFRecords_files/filelist.xml">
+<![if !supportTabStrip]>
+<link id=3D"shLink" href=3D"PAUSATFRecords_files/sheet001.htm">
+<link id=3D"shLink" href=3D"PAUSATFRecords_files/sheet002.htm">
+<link id=3D"shLink" href=3D"PAUSATFRecords_files/sheet003.htm">
+
+<link id=3D"shLink">
+
+<script language=3D"JavaScript">
+<!--
+ var c_lTabs=3D3;
+
+ var c_rgszSh=3Dnew Array(c_lTabs);
+ c_rgszSh[0] =3D "Sheet1";
+ c_rgszSh[1] =3D "Sheet2";
+ c_rgszSh[2] =3D "Sheet3";
+
+
+
+ var c_rgszClr=3Dnew Array(8);
+ c_rgszClr[0]=3D"window";
+ c_rgszClr[1]=3D"buttonface";
+ c_rgszClr[2]=3D"windowframe";
+ c_rgszClr[3]=3D"windowtext";
+ c_rgszClr[4]=3D"threedlightshadow";
+ c_rgszClr[5]=3D"threedhighlight";
+ c_rgszClr[6]=3D"threeddarkshadow";
+ c_rgszClr[7]=3D"threedshadow";
+
+ var g_iShCur;
+ var g_rglTabX=3Dnew Array(c_lTabs);
+
+function fnGetIEVer()
+{
+ var ua=3Dwindow.navigator.userAgent
+ var msie=3Dua.indexOf("MSIE")
+ if (msie>0 && window.navigator.platform=3D=3D"Win32")
+  return parseInt(ua.substring(msie+5,ua.indexOf(".", msie)));
+ else
+  return 0;
+}
+
+function fnBuildFrameset()
+{
+ var szHTML=3D"<frameset rows=3D\"*,18\" border=3D0 width=3D0 frameborder=
+=3Dno framespacing=3D0>"+
+  "<frame src=3D\""+document.all.item("shLink")[0].href+"\" name=3D\"frShee=
+t\" noresize>"+
+  "<frameset cols=3D\"54,*\" border=3D0 width=3D0 frameborder=3Dno framespa=
+cing=3D0>"+
+  "<frame src=3D\"\" name=3D\"frScroll\" marginwidth=3D0 marginheight=3D0 s=
+crolling=3Dno>"+
+  "<frame src=3D\"\" name=3D\"frTabs\" marginwidth=3D0 marginheight=3D0 scr=
+olling=3Dno>"+
+  "</frameset></frameset><plaintext>";
+
+ with (document) {
+  open("text/html","replace");
+  write(szHTML);
+  close();
+ }
+
+ fnBuildTabStrip();
+}
+
+function fnBuildTabStrip()
+{
+ var szHTML=3D
+  "<html><head><style>.clScroll {font:8pt Courier New;color:"+c_rgszClr[6]+=
+";cursor:default;line-height:10pt;}"+
+  ".clScroll2 {font:10pt Arial;color:"+c_rgszClr[6]+";cursor:default;line-h=
+eight:11pt;}</style></head>"+
+  "<body onclick=3D\"event.returnValue=3Dfalse;\" ondragstart=3D\"event.ret=
+urnValue=3Dfalse;\" onselectstart=3D\"event.returnValue=3Dfalse;\" bgcolor=
+=3D"+c_rgszClr[4]+" topmargin=3D0 leftmargin=3D0><table cellpadding=3D0 cel=
+lspacing=3D0 width=3D100%>"+
+  "<tr><td colspan=3D6 height=3D1 bgcolor=3D"+c_rgszClr[2]+"></td></tr>"+
+  "<tr><td style=3D\"font:1pt\">&nbsp;<td>"+
+  "<td valign=3Dtop id=3DtdScroll class=3D\"clScroll\" onclick=3D\"parent.f=
+nFastScrollTabs(0);\" onmouseover=3D\"parent.fnMouseOverScroll(0);\" onmous=
+eout=3D\"parent.fnMouseOutScroll(0);\"><a>&#171;</a></td>"+
+  "<td valign=3Dtop id=3DtdScroll class=3D\"clScroll2\" onclick=3D\"parent.=
+fnScrollTabs(0);\" ondblclick=3D\"parent.fnScrollTabs(0);\" onmouseover=3D\=
+"parent.fnMouseOverScroll(1);\" onmouseout=3D\"parent.fnMouseOutScroll(1);\=
+"><a>&lt</a></td>"+
+  "<td valign=3Dtop id=3DtdScroll class=3D\"clScroll2\" onclick=3D\"parent.=
+fnScrollTabs(1);\" ondblclick=3D\"parent.fnScrollTabs(1);\" onmouseover=3D\=
+"parent.fnMouseOverScroll(2);\" onmouseout=3D\"parent.fnMouseOutScroll(2);\=
+"><a>&gt</a></td>"+
+  "<td valign=3Dtop id=3DtdScroll class=3D\"clScroll\" onclick=3D\"parent.f=
+nFastScrollTabs(1);\" onmouseover=3D\"parent.fnMouseOverScroll(3);\" onmous=
+eout=3D\"parent.fnMouseOutScroll(3);\"><a>&#187;</a></td>"+
+  "<td style=3D\"font:1pt\">&nbsp;<td></tr></table></body></html>";
+
+ with (frames['frScroll'].document) {
+  open("text/html","replace");
+  write(szHTML);
+  close();
+ }
+
+ szHTML =3D
+  "<html><head>"+
+  "<style>A:link,A:visited,A:active {text-decoration:none;"+"color:"+c_rgsz=
+Clr[3]+";}"+
+  ".clTab {cursor:hand;background:"+c_rgszClr[1]+";font:9pt Arial;padding-l=
+eft:3px;padding-right:3px;text-align:center;}"+
+  ".clBorder {background:"+c_rgszClr[2]+";font:1pt;}"+
+  "</style></head><body onload=3D\"parent.fnInit();\" onselectstart=3D\"eve=
+nt.returnValue=3Dfalse;\" ondragstart=3D\"event.returnValue=3Dfalse;\" bgco=
+lor=3D"+c_rgszClr[4]+
+  " topmargin=3D0 leftmargin=3D0><table id=3DtbTabs cellpadding=3D0 cellspa=
+cing=3D0>";
+
+ var iCellCount=3D(c_lTabs+1)*2;
+
+ var i;
+ for (i=3D0;i<iCellCount;i+=3D2)
+  szHTML+=3D"<col width=3D1><col>";
+
+ var iRow;
+ for (iRow=3D0;iRow<6;iRow++) {
+
+  szHTML+=3D"<tr>";
+
+  if (iRow=3D=3D5)
+   szHTML+=3D"<td colspan=3D"+iCellCount+"></td>";
+  else {
+   if (iRow=3D=3D0) {
+    for(i=3D0;i<iCellCount;i++)
+     szHTML+=3D"<td height=3D1 class=3D\"clBorder\"></td>";
+   } else if (iRow=3D=3D1) {
+    for(i=3D0;i<c_lTabs;i++) {
+     szHTML+=3D"<td height=3D1 nowrap class=3D\"clBorder\">&nbsp;</td>";
+     szHTML+=3D
+      "<td id=3DtdTab height=3D1 nowrap class=3D\"clTab\" onmouseover=3D\"p=
+arent.fnMouseOverTab("+i+");\" onmouseout=3D\"parent.fnMouseOutTab("+i+");\=
+">"+
+      "<a href=3D\""+document.all.item("shLink")[i].href+"\" target=3D\"frS=
+heet\" id=3DaTab>&nbsp;"+c_rgszSh[i]+"&nbsp;</a></td>";
+    }
+    szHTML+=3D"<td id=3DtdTab height=3D1 nowrap class=3D\"clBorder\"><a id=
+=3DaTab>&nbsp;</a></td><td width=3D100%></td>";
+   } else if (iRow=3D=3D2) {
+    for (i=3D0;i<c_lTabs;i++)
+     szHTML+=3D"<td height=3D1></td><td height=3D1 class=3D\"clBorder\"></t=
+d>";
+    szHTML+=3D"<td height=3D1></td><td height=3D1></td>";
+   } else if (iRow=3D=3D3) {
+    for (i=3D0;i<iCellCount;i++)
+     szHTML+=3D"<td height=3D1></td>";
+   } else if (iRow=3D=3D4) {
+    for (i=3D0;i<c_lTabs;i++)
+     szHTML+=3D"<td height=3D1 width=3D1></td><td height=3D1></td>";
+    szHTML+=3D"<td height=3D1 width=3D1></td><td></td>";
+   }
+  }
+  szHTML+=3D"</tr>";
+ }
+
+ szHTML+=3D"</table></body></html>";
+ with (frames['frTabs'].document) {
+  open("text/html","replace");
+  charset=3Ddocument.charset;
+  write(szHTML);
+  close();
+ }
+}
+
+function fnInit()
+{
+ g_rglTabX[0]=3D0;
+ var i;
+ for (i=3D1;i<=3Dc_lTabs;i++)
+  with (frames['frTabs'].document.all.tbTabs.rows[1].cells[fnTabToCol(i-1)])
+   g_rglTabX[i]=3DoffsetLeft+offsetWidth-6;
+}
+
+function fnTabToCol(iTab)
+{
+ return 2*iTab+1;
+}
+
+function fnNextTab(fDir)
+{
+ var iNextTab=3D-1;
+ var i;
+
+ with (frames['frTabs'].document.body) {
+  if (fDir=3D=3D0) {
+   if (scrollLeft>0) {
+    for (i=3D0;i<c_lTabs&&g_rglTabX[i]<scrollLeft;i++);
+    if (i<c_lTabs)
+     iNextTab=3Di-1;
+   }
+  } else {
+   if (g_rglTabX[c_lTabs]+6>offsetWidth+scrollLeft) {
+    for (i=3D0;i<c_lTabs&&g_rglTabX[i]<=3DscrollLeft;i++);
+    if (i<c_lTabs)
+     iNextTab=3Di;
+   }
+  }
+ }
+ return iNextTab;
+}
+
+function fnScrollTabs(fDir)
+{
+ var iNextTab=3DfnNextTab(fDir);
+
+ if (iNextTab>=3D0) {
+  frames['frTabs'].scroll(g_rglTabX[iNextTab],0);
+  return true;
+ } else
+  return false;
+}
+
+function fnFastScrollTabs(fDir)
+{
+ if (c_lTabs>16)
+  frames['frTabs'].scroll(g_rglTabX[fDir?c_lTabs-1:0],0);
+ else
+  if (fnScrollTabs(fDir)>0) window.setTimeout("fnFastScrollTabs("+fDir+");"=
+,5);
+}
+
+function fnSetTabProps(iTab,fActive)
+{
+ var iCol=3DfnTabToCol(iTab);
+ var i;
+
+ if (iTab>=3D0) {
+  with (frames['frTabs'].document.all) {
+   with (tbTabs) {
+    for (i=3D0;i<=3D4;i++) {
+     with (rows[i]) {
+      if (i=3D=3D0)
+       cells[iCol].style.background=3Dc_rgszClr[fActive?0:2];
+      else if (i>0 && i<4) {
+       if (fActive) {
+        cells[iCol-1].style.background=3Dc_rgszClr[2];
+        cells[iCol].style.background=3Dc_rgszClr[0];
+        cells[iCol+1].style.background=3Dc_rgszClr[2];
+       } else {
+        if (i=3D=3D1) {
+         cells[iCol-1].style.background=3Dc_rgszClr[2];
+         cells[iCol].style.background=3Dc_rgszClr[1];
+         cells[iCol+1].style.background=3Dc_rgszClr[2];
+        } else {
+         cells[iCol-1].style.background=3Dc_rgszClr[4];
+         cells[iCol].style.background=3Dc_rgszClr[(i=3D=3D2)?2:4];
+         cells[iCol+1].style.background=3Dc_rgszClr[4];
+        }
+       }
+      } else
+       cells[iCol].style.background=3Dc_rgszClr[fActive?2:4];
+     }
+    }
+   }
+   with (aTab[iTab].style) {
+    cursor=3D(fActive?"default":"hand");
+    color=3Dc_rgszClr[3];
+   }
+  }
+ }
+}
+
+function fnMouseOverScroll(iCtl)
+{
+ frames['frScroll'].document.all.tdScroll[iCtl].style.color=3Dc_rgszClr[7];
+}
+
+function fnMouseOutScroll(iCtl)
+{
+ frames['frScroll'].document.all.tdScroll[iCtl].style.color=3Dc_rgszClr[6];
+}
+
+function fnMouseOverTab(iTab)
+{
+ if (iTab!=3Dg_iShCur) {
+  var iCol=3DfnTabToCol(iTab);
+  with (frames['frTabs'].document.all) {
+   tdTab[iTab].style.background=3Dc_rgszClr[5];
+  }
+ }
+}
+
+function fnMouseOutTab(iTab)
+{
+ if (iTab>=3D0) {
+  var elFrom=3Dframes['frTabs'].event.srcElement;
+  var elTo=3Dframes['frTabs'].event.toElement;
+
+  if ((!elTo) ||
+   (elFrom.tagName=3D=3DelTo.tagName) ||
+   (elTo.tagName=3D=3D"A" && elTo.parentElement!=3DelFrom) ||
+   (elFrom.tagName=3D=3D"A" && elFrom.parentElement!=3DelTo)) {
+
+   if (iTab!=3Dg_iShCur) {
+    with (frames['frTabs'].document.all) {
+     tdTab[iTab].style.background=3Dc_rgszClr[1];
+    }
+   }
+  }
+ }
+}
+
+function fnSetActiveSheet(iSh)
+{
+ if (iSh!=3Dg_iShCur) {
+  fnSetTabProps(g_iShCur,false);
+  fnSetTabProps(iSh,true);
+  g_iShCur=3DiSh;
+ }
+}
+
+ window.g_iIEVer=3DfnGetIEVer();
+ if (window.g_iIEVer>=3D4)
+  fnBuildFrameset();
+//-->
+</script>
+<![endif]><!--[if gte mso 9]><xml>
+ <x:ExcelWorkbook>
+  <x:ExcelWorksheets>
+   <x:ExcelWorksheet>
+    <x:Name>Sheet1</x:Name>
+    <x:WorksheetSource HRef=3D"PAUSATFRecords_files/sheet001.htm"/>
+   </x:ExcelWorksheet>
+   <x:ExcelWorksheet>
+    <x:Name>Sheet2</x:Name>
+    <x:WorksheetSource HRef=3D"PAUSATFRecords_files/sheet002.htm"/>
+   </x:ExcelWorksheet>
+   <x:ExcelWorksheet>
+    <x:Name>Sheet3</x:Name>
+    <x:WorksheetSource HRef=3D"PAUSATFRecords_files/sheet003.htm"/>
+   </x:ExcelWorksheet>
+  </x:ExcelWorksheets>
+  <x:Stylesheet HRef=3D"PAUSATFRecords_files/stylesheet.css"/>
+  <x:WindowHeight>8475</x:WindowHeight>
+  <x:WindowWidth>20835</x:WindowWidth>
+  <x:WindowTopX>360</x:WindowTopX>
+  <x:WindowTopY>435</x:WindowTopY>
+  <x:ProtectStructure>False</x:ProtectStructure>
+  <x:ProtectWindows>False</x:ProtectWindows>
+ </x:ExcelWorkbook>
+</xml><![endif]-->
+</head>
+
+<frameset rows=3D"*,39" border=3D0 width=3D0 frameborder=3Dno framespacing=
+=3D0>
+ <frame src=3D"PAUSATFRecords_files/sheet001.htm" name=3D"frSheet">
+ <frame src=3D"PAUSATFRecords_files/tabstrip.htm" name=3D"frTabs" marginwid=
+th=3D0 marginheight=3D0>
+ <noframes>
+  <body>
+   <p>This page uses frames, but your browser doesn't support them.</p>
+  </body>
+ </noframes>
+</frameset>
+</html>
+
+------=_NextPart_01CE4A5D.F71CD940
+Content-Location: file:///C:/506954F3/PAUSATFRecords_files/stylesheet.css
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/css; charset="windows-1252"
+
+tr
+	{mso-height-source:auto;}
+col
+	{mso-width-source:auto;}
+br
+	{mso-data-placement:same-cell;}
+.style0
+	{mso-number-format:General;
+	text-align:general;
+	vertical-align:bottom;
+	white-space:nowrap;
+	mso-rotate:0;
+	mso-background-source:auto;
+	mso-pattern:auto;
+	color:black;
+	font-size:11.0pt;
+	font-weight:400;
+	font-style:normal;
+	text-decoration:none;
+	font-family:Calibri, sans-serif;
+	mso-font-charset:0;
+	border:none;
+	mso-protection:locked visible;
+	mso-style-name:Normal;
+	mso-style-id:0;}
+td
+	{mso-style-parent:style0;
+	padding-top:1px;
+	padding-right:1px;
+	padding-left:1px;
+	mso-ignore:padding;
+	color:black;
+	font-size:11.0pt;
+	font-weight:400;
+	font-style:normal;
+	text-decoration:none;
+	font-family:Calibri, sans-serif;
+	mso-font-charset:0;
+	mso-number-format:General;
+	text-align:general;
+	vertical-align:bottom;
+	border:none;
+	mso-background-source:auto;
+	mso-pattern:auto;
+	mso-protection:locked visible;
+	white-space:nowrap;
+	mso-rotate:0;}
+.xl65
+	{mso-style-parent:style0;
+	text-align:center;
+	vertical-align:middle;
+	border:.5pt solid windowtext;
+	white-space:normal;}
+.xl66
+	{mso-style-parent:style0;
+	text-align:left;
+	background:yellow;
+	mso-pattern:black none;}
+.xl67
+	{mso-style-parent:style0;
+	text-align:center;
+	border:.5pt solid windowtext;}
+.xl68
+	{mso-style-parent:style0;
+	border:.5pt solid windowtext;}
+.xl69
+	{mso-style-parent:style0;
+	text-align:right;
+	border:.5pt solid windowtext;}
+.xl70
+	{mso-style-parent:style0;
+	mso-number-format:"Short Date";
+	text-align:right;
+	border:.5pt solid windowtext;}
+.xl71
+	{mso-style-parent:style0;
+	mso-number-format:"Short Date";
+	text-align:left;
+	border:.5pt solid windowtext;}
+.xl72
+	{mso-style-parent:style0;
+	mso-number-format:"mm\:ss\.0";
+	text-align:right;
+	border:.5pt solid windowtext;}
+.xl73
+	{mso-style-parent:style0;
+	text-align:center;
+	border-top:none;
+	border-right:.5pt solid windowtext;
+	border-bottom:.5pt solid windowtext;
+	border-left:.5pt solid windowtext;
+	white-space:normal;}
+.xl74
+	{mso-style-parent:style0;
+	text-align:left;
+	border-top:none;
+	border-right:.5pt solid windowtext;
+	border-bottom:.5pt solid windowtext;
+	border-left:.5pt solid windowtext;
+	white-space:normal;}
+.xl75
+	{mso-style-parent:style0;
+	text-align:right;
+	border-top:none;
+	border-right:.5pt solid windowtext;
+	border-bottom:.5pt solid windowtext;
+	border-left:.5pt solid windowtext;
+	white-space:normal;}
+.xl76
+	{mso-style-parent:style0;
+	mso-number-format:"Short Date";
+	text-align:right;
+	border-top:none;
+	border-right:.5pt solid windowtext;
+	border-bottom:.5pt solid windowtext;
+	border-left:.5pt solid windowtext;
+	white-space:normal;}
+.xl77
+	{mso-style-parent:style0;
+	mso-number-format:"Short Date";
+	text-align:left;
+	border-top:none;
+	border-right:.5pt solid windowtext;
+	border-bottom:.5pt solid windowtext;
+	border-left:.5pt solid windowtext;
+	white-space:normal;}
+.xl78
+	{mso-style-parent:style0;
+	text-align:center;
+	border:.5pt solid windowtext;
+	white-space:normal;}
+.xl79
+	{mso-style-parent:style0;
+	text-align:left;
+	border:.5pt solid windowtext;
+	white-space:normal;}
+.xl80
+	{mso-style-parent:style0;
+	mso-number-format:"Short Date";
+	border:.5pt solid windowtext;}
+.xl81
+	{mso-style-parent:style0;
+	mso-number-format:"mm\:ss\.0";
+	text-align:right;
+	border:.5pt solid windowtext;
+	white-space:normal;}
+.xl82
+	{mso-style-parent:style0;
+	mso-number-format:"Short Date";
+	text-align:right;
+	border:.5pt solid windowtext;
+	white-space:normal;}
+.xl83
+	{mso-style-parent:style0;
+	mso-number-format:"Short Date";
+	text-align:left;
+	border:.5pt solid windowtext;
+	white-space:normal;}
+.xl84
+	{mso-style-parent:style0;
+	text-align:right;
+	border:.5pt solid windowtext;
+	white-space:normal;}
+.xl85
+	{mso-style-parent:style0;
+	vertical-align:middle;
+	border:.5pt solid black;
+	white-space:normal;}
+.xl86
+	{mso-style-parent:style0;
+	vertical-align:middle;
+	border:.5pt solid windowtext;
+	white-space:normal;}
+.xl87
+	{mso-style-parent:style0;
+	mso-number-format:"\#\,\#\#0";
+	text-align:right;
+	border:.5pt solid windowtext;}
+.xl88
+	{mso-style-parent:style0;
+	text-align:center;
+	border-top:.5pt solid windowtext;
+	border-right:.5pt solid windowtext;
+	border-bottom:none;
+	border-left:.5pt solid windowtext;
+	white-space:normal;}
+.xl89
+	{mso-style-parent:style0;
+	border-top:.5pt solid windowtext;
+	border-right:.5pt solid windowtext;
+	border-bottom:none;
+	border-left:.5pt solid windowtext;}
+.xl90
+	{mso-style-parent:style0;
+	vertical-align:middle;
+	border-top:.5pt solid black;
+	border-right:.5pt solid black;
+	border-bottom:none;
+	border-left:.5pt solid black;
+	white-space:normal;}
+.xl91
+	{mso-style-parent:style0;
+	text-align:right;
+	border-top:.5pt solid windowtext;
+	border-right:.5pt solid windowtext;
+	border-bottom:none;
+	border-left:.5pt solid windowtext;}
+.xl92
+	{mso-style-parent:style0;
+	text-align:center;
+	border-top:none;
+	border-right:.5pt solid windowtext;
+	border-bottom:.5pt solid windowtext;
+	border-left:.5pt solid windowtext;}
+.xl93
+	{mso-style-parent:style0;
+	border-top:none;
+	border-right:.5pt solid windowtext;
+	border-bottom:.5pt solid windowtext;
+	border-left:.5pt solid windowtext;}
+.xl94
+	{mso-style-parent:style0;
+	mso-number-format:"Short Date";
+	border-top:none;
+	border-right:.5pt solid windowtext;
+	border-bottom:.5pt solid windowtext;
+	border-left:.5pt solid windowtext;}
+.xl95
+	{mso-style-parent:style0;
+	text-align:right;
+	border-top:none;
+	border-right:.5pt solid windowtext;
+	border-bottom:.5pt solid windowtext;
+	border-left:.5pt solid windowtext;}
+.xl96
+	{mso-style-parent:style0;
+	mso-number-format:"Short Date";
+	text-align:right;
+	border-top:none;
+	border-right:.5pt solid windowtext;
+	border-bottom:.5pt solid windowtext;
+	border-left:.5pt solid windowtext;}
+.xl97
+	{mso-style-parent:style0;
+	mso-number-format:"Short Date";
+	text-align:left;
+	border-top:none;
+	border-right:.5pt solid windowtext;
+	border-bottom:.5pt solid windowtext;
+	border-left:.5pt solid windowtext;}
+.xl98
+	{mso-style-parent:style0;
+	mso-number-format:"Short Date";
+	border-top:.5pt solid windowtext;
+	border-right:.5pt solid windowtext;
+	border-bottom:none;
+	border-left:.5pt solid windowtext;}
+.xl99
+	{mso-style-parent:style0;
+	text-align:left;
+	border:.5pt solid windowtext;}
+.xl100
+	{mso-style-parent:style0;
+	color:red;
+	font-style:italic;}
+.xl101
+	{mso-style-parent:style0;
+	mso-number-format:"Short Date";
+	text-align:right;
+	border-top:.5pt solid windowtext;
+	border-right:.5pt solid windowtext;
+	border-bottom:none;
+	border-left:.5pt solid windowtext;}
+.xl102
+	{mso-style-parent:style0;
+	mso-number-format:"Short Date";
+	text-align:left;
+	border-top:.5pt solid windowtext;
+	border-right:.5pt solid windowtext;
+	border-bottom:none;
+	border-left:.5pt solid windowtext;}
+.xl103
+	{mso-style-parent:style0;
+	text-align:center;}
+.xl104
+	{mso-style-parent:style0;
+	vertical-align:middle;
+	border-top:none;
+	border-right:.5pt solid black;
+	border-bottom:none;
+	border-left:.5pt solid black;
+	white-space:normal;}
+.xl105
+	{mso-style-parent:style0;
+	vertical-align:middle;
+	border-top:none;
+	border-right:none;
+	border-bottom:none;
+	border-left:.5pt solid black;
+	white-space:normal;}
+.xl106
+	{mso-style-parent:style0;
+	vertical-align:middle;
+	border-top:none;
+	border-right:.5pt solid black;
+	border-bottom:none;
+	border-left:none;
+	white-space:normal;}
+.xl107
+	{mso-style-parent:style0;
+	vertical-align:middle;
+	border-top:.5pt solid black;
+	border-right:none;
+	border-bottom:.5pt solid black;
+	border-left:.5pt solid black;
+	white-space:normal;}
+.xl108
+	{mso-style-parent:style0;
+	mso-number-format:"Short Date";}
+.xl109
+	{mso-style-parent:style0;
+	text-align:left;}
+.xl110
+	{mso-style-parent:style0;
+	text-align:center;
+	border-top:.5pt solid windowtext;
+	border-right:none;
+	border-bottom:.5pt solid windowtext;
+	border-left:none;
+	background:yellow;
+	mso-pattern:black none;
+	white-space:normal;}
+.xl111
+	{mso-style-parent:style0;
+	text-align:center;
+	border-top:.5pt solid windowtext;
+	border-right:none;
+	border-bottom:none;
+	border-left:.5pt solid windowtext;
+	background:yellow;
+	mso-pattern:black none;
+	white-space:normal;}
+.xl112
+	{mso-style-parent:style0;
+	text-align:center;
+	border-top:.5pt solid windowtext;
+	border-right:none;
+	border-bottom:none;
+	border-left:none;
+	background:yellow;
+	mso-pattern:black none;
+	white-space:normal;}
+.xl113
+	{mso-style-parent:style0;
+	text-align:center;
+	border-top:.5pt solid windowtext;
+	border-right:none;
+	border-bottom:.5pt solid windowtext;
+	border-left:.5pt solid windowtext;
+	background:yellow;
+	mso-pattern:black none;
+	white-space:normal;}
+
+------=_NextPart_01CE4A5D.F71CD940
+Content-Location: file:///C:/506954F3/PAUSATFRecords_files/tabstrip.htm
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/html; charset="windows-1252"
+
+<html>
+<head>
+<meta http-equiv=3DContent-Type content=3D"text/html; charset=3Dwindows-125=
+2">
+<meta name=3DProgId content=3DExcel.Sheet>
+<meta name=3DGenerator content=3D"Microsoft Excel 14">
+<link id=3DMain-File rel=3DMain-File href=3D"../PAUSATFRecords.htm">
+<![if IE]>
+<base href=3D"file:///C:\506954F3\PAUSATFRecords_files\tabstrip.htm"
+id=3D"webarch_temp_base_tag">
+<![endif]>
+<script language=3D"JavaScript">
+<!--
+if (window.name!=3D"frTabs")
+ window.location.replace(document.all.item("Main-File").href);
+//-->
+</script>
+<style>
+<!--
+A {
+    text-decoration:none;
+    color:#000000;
+    font-size:9pt;
+}
+-->
+</style>
+</head>
+<body topmargin=3D0 leftmargin=3D0 bgcolor=3D"#808080">
+<table border=3D0 cellspacing=3D1>
+ <tr>
+ <td bgcolor=3D"#FFFFFF" nowrap><b><small><small>&nbsp;<a href=3D"sheet001.=
+htm" target=3D"frSheet"><font face=3D"Arial" color=3D"#000000">Sheet1</font=
+></a>&nbsp;</small></small></b></td>
+ <td bgcolor=3D"#FFFFFF" nowrap><b><small><small>&nbsp;<a href=3D"sheet002.=
+htm" target=3D"frSheet"><font face=3D"Arial" color=3D"#000000">Sheet2</font=
+></a>&nbsp;</small></small></b></td>
+ <td bgcolor=3D"#FFFFFF" nowrap><b><small><small>&nbsp;<a href=3D"sheet003.=
+htm" target=3D"frSheet"><font face=3D"Arial" color=3D"#000000">Sheet3</font=
+></a>&nbsp;</small></small></b></td>
+
+ </tr>
+</table>
+</body>
+</html>
+
+------=_NextPart_01CE4A5D.F71CD940
+Content-Location: file:///C:/506954F3/PAUSATFRecords_files/sheet001.htm
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/html; charset="windows-1252"
+
+<html xmlns:v=3D"urn:schemas-microsoft-com:vml"
+xmlns:o=3D"urn:schemas-microsoft-com:office:office"
+xmlns:x=3D"urn:schemas-microsoft-com:office:excel"
+xmlns=3D"http://www.w3.org/TR/REC-html40">
+
+<head>
+<meta http-equiv=3DContent-Type content=3D"text/html; charset=3Dwindows-125=
+2">
+<meta name=3DProgId content=3DExcel.Sheet>
+<meta name=3DGenerator content=3D"Microsoft Excel 14">
+<link id=3DMain-File rel=3DMain-File href=3D"../PAUSATFRecords.htm">
+<link rel=3DFile-List href=3Dfilelist.xml>
+<![if IE]>
+<base href=3D"file:///C:\506954F3\PAUSATFRecords_files\sheet001.htm"
+id=3D"webarch_temp_base_tag">
+<![endif]>
+<link rel=3DStylesheet href=3Dstylesheet.css>
+<style>
+<!--table
+	{mso-displayed-decimal-separator:"\.";
+	mso-displayed-thousand-separator:"\,";}
+@page
+	{margin:.75in .7in .75in .7in;
+	mso-header-margin:.3in;
+	mso-footer-margin:.3in;}
+-->
+</style>
+<![if !supportTabStrip]><script language=3D"JavaScript">
+<!--
+function fnUpdateTabs()
+ {
+  if (parent.window.g_iIEVer>=3D4) {
+   if (parent.document.readyState=3D=3D"complete"
+    && parent.frames['frTabs'].document.readyState=3D=3D"complete")
+   parent.fnSetActiveSheet(0);
+  else
+   window.setTimeout("fnUpdateTabs();",150);
+ }
+}
+
+if (window.name!=3D"frSheet")
+ window.location.replace("../PAUSATFRecords.htm");
+else
+ fnUpdateTabs();
+//-->
+</script>
+<![endif]>
+</head>
+
+<body link=3Dblue vlink=3Dpurple>
+
+<table border=3D0 cellpadding=3D0 cellspacing=3D0 width=3D1079 style=3D'bor=
+der-collapse:
+ collapse;table-layout:fixed;width:809pt'>
+ <col width=3D72 style=3D'mso-width-source:userset;mso-width-alt:2633;width=
+:54pt'>
+ <col width=3D135 style=3D'mso-width-source:userset;mso-width-alt:4937;widt=
+h:101pt'>
+ <col width=3D102 style=3D'mso-width-source:userset;mso-width-alt:3730;widt=
+h:77pt'>
+ <col width=3D108 style=3D'mso-width-source:userset;mso-width-alt:3949;widt=
+h:81pt'>
+ <col width=3D180 style=3D'mso-width-source:userset;mso-width-alt:6582;widt=
+h:135pt'>
+ <col width=3D123 style=3D'mso-width-source:userset;mso-width-alt:4498;widt=
+h:92pt'>
+ <col width=3D68 style=3D'mso-width-source:userset;mso-width-alt:2486;width=
+:51pt'>
+ <col class=3Dxl109 width=3D227 style=3D'mso-width-source:userset;mso-width=
+-alt:8301;
+ width:170pt'>
+ <col width=3D64 style=3D'width:48pt'>
+ <tr height=3D60 style=3D'height:45.0pt'>
+  <td height=3D60 class=3Dxl65 width=3D72 style=3D'height:45.0pt;width:54pt=
+'>Age Group</td>
+  <td class=3Dxl65 width=3D135 style=3D'border-left:none;width:101pt'>Event=
+</td>
+  <td class=3Dxl65 width=3D102 style=3D'border-left:none;width:77pt'>Athlet=
+e First</td>
+  <td class=3Dxl65 width=3D108 style=3D'border-left:none;width:81pt'>Athlet=
+e Last</td>
+  <td class=3Dxl65 width=3D180 style=3D'border-left:none;width:135pt'>Club<=
+/td>
+  <td class=3Dxl65 width=3D123 style=3D'border-left:none;width:92pt'>Mark</=
+td>
+  <td class=3Dxl65 width=3D68 style=3D'border-left:none;width:51pt'>Date Se=
+t</td>
+  <td class=3Dxl65 width=3D227 style=3D'border-left:none;width:170pt'>Event=
+</td>
+  <td width=3D64 style=3D'width:48pt'></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td colspan=3D7 height=3D20 class=3Dxl110 width=3D788 style=3D'height:15.=
+0pt;
+  width:591pt'>Sub-Bantam Girls</td>
+  <td class=3Dxl66>&nbsp;</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>SBG<=
+/td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>100m</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Jazlynn</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Gibbs</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Oakland PAL</=
+td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>14.66</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>6/9/2012</td>
+  <td class=3Dxl71 style=3D'border-left:none'>Pacific Association Champions=
+hips</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>SBG<=
+/td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>200m</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Ty'anna</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Oates</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>MP Striders</=
+td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>30.57</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/30/2011</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>SBG<=
+/td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>400m<span
+  style=3D'mso-spacerun:yes'> </span></td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Ty'anna</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Oates</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>MP Striders</=
+td>
+  <td class=3Dxl72 style=3D'border-top:none;border-left:none'>1:11.68</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/29/2011</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>SBG<=
+/td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>800m<span
+  style=3D'mso-spacerun:yes'> </span></td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Alexis</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Lopez</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Fast Forward<=
+/td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>3:02.11</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/30/2011</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>SBG<=
+/td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>1500m</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Sarah</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Skandera</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Unattached</t=
+d>
+  <td class=3Dxl72 style=3D'border-top:none;border-left:none'>5:51.66</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>6/22/2012</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>PA JO Top 12<=
+/td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl73 width=3D72 style=3D'height:15.0pt;width:54pt=
+'>SBG</td>
+  <td class=3Dxl74 width=3D135 style=3D'border-left:none;width:101pt'>4x100=
+m Relay</td>
+  <td class=3Dxl74 width=3D102 style=3D'border-left:none;width:77pt'>&nbsp;=
+</td>
+  <td class=3Dxl74 width=3D108 style=3D'border-left:none;width:81pt'>&nbsp;=
+</td>
+  <td class=3Dxl74 width=3D180 style=3D'border-left:none;width:135pt'>East =
+Palo Alto
+  Greyhounds</td>
+  <td class=3Dxl75 width=3D123 style=3D'border-left:none;width:92pt'>1:07.4=
+9</td>
+  <td class=3Dxl76 width=3D68 style=3D'border-left:none;width:51pt'>6/26/20=
+11</td>
+  <td class=3Dxl77 width=3D227 style=3D'border-left:none;width:170pt'>Pacif=
+ic
+  Association Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl73 width=3D72 style=3D'height:15.0pt;width:54pt=
+'>SBG</td>
+  <td class=3Dxl74 width=3D135 style=3D'border-left:none;width:101pt'>4x400=
+m Relay</td>
+  <td class=3Dxl74 width=3D102 style=3D'border-left:none;width:77pt'>&nbsp;=
+</td>
+  <td class=3Dxl74 width=3D108 style=3D'border-left:none;width:81pt'>&nbsp;=
+</td>
+  <td class=3Dxl74 width=3D180 style=3D'border-left:none;width:135pt'>&nbsp=
+;</td>
+  <td class=3Dxl75 width=3D123 style=3D'border-left:none;width:92pt'>&nbsp;=
+</td>
+  <td class=3Dxl76 width=3D68 style=3D'border-left:none;width:51pt'>&nbsp;<=
+/td>
+  <td class=3Dxl77 width=3D227 style=3D'border-left:none;width:170pt'>&nbsp=
+;</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl78 width=3D72 style=3D'height:15.0pt;border-top=
+:none;
+  width:54pt'>SBG</td>
+  <td class=3Dxl79 width=3D135 style=3D'border-top:none;border-left:none;wi=
+dth:101pt'>Long
+  Jump</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Cameron</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Fields</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Team Zone</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>3.72m / 12' 2=
+.5&quot;</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>6/22/2012</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl73 width=3D72 style=3D'height:15.0pt;width:54pt=
+'>SBG</td>
+  <td class=3Dxl74 width=3D135 style=3D'border-left:none;width:101pt'>Shot =
+Put</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Tinnon</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Sofia</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Napa TC</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>6.18m / 20' 3=
+.5&quot;</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/7/2012</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl73 width=3D72 style=3D'height:15.0pt;width:54pt=
+'>SBG</td>
+  <td class=3Dxl74 width=3D135 style=3D'border-left:none;width:101pt'>Javel=
+in</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Tinnon</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Sofia</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Napa TC</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>17.37m / 57'<=
+/td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/25/2012</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td colspan=3D7 height=3D20 class=3Dxl110 width=3D788 style=3D'height:15.=
+0pt;
+  width:591pt'>Sub-Bantam Boys</td>
+  <td class=3Dxl66>&nbsp;</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>SBB<=
+/td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>100m</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Daunte</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Johnson</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3M</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>13.71</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/31/2011</td>
+  <td class=3Dxl71 style=3D'border-left:none'>USATF Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>SBB<=
+/td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>200m</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Daunte</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Johnson</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3M</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>28.16</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/30/2011</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>SBB<=
+/td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>400m<span
+  style=3D'mso-spacerun:yes'> </span></td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Croix</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Stewart</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Fast Forward<=
+/td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>1:10.16</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/27/2012</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl78 width=3D72 style=3D'height:15.0pt;border-top=
+:none;
+  width:54pt'>SBB</td>
+  <td class=3Dxl79 width=3D135 style=3D'border-top:none;border-left:none;wi=
+dth:101pt'>800m</td>
+  <td class=3Dxl79 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>Nathan</td>
+  <td class=3Dxl79 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>Kent</td>
+  <td class=3Dxl79 width=3D180 style=3D'border-top:none;border-left:none;wi=
+dth:135pt'>Revolution
+  Express</td>
+  <td class=3Dxl81 width=3D123 style=3D'border-top:none;border-left:none;wi=
+dth:92pt'>2:50.05</td>
+  <td class=3Dxl82 width=3D68 style=3D'border-top:none;border-left:none;wid=
+th:51pt'>6/30/2011</td>
+  <td class=3Dxl83 width=3D227 style=3D'border-top:none;border-left:none;wi=
+dth:170pt'>Youth
+  Nationals</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl73 width=3D72 style=3D'height:15.0pt;width:54pt=
+'>SBB</td>
+  <td class=3Dxl74 width=3D135 style=3D'border-left:none;width:101pt'>1500m=
+</td>
+  <td class=3Dxl74 width=3D102 style=3D'border-left:none;width:77pt'>Kailib=
+</td>
+  <td class=3Dxl74 width=3D108 style=3D'border-left:none;width:81pt'>Copes<=
+/td>
+  <td class=3Dxl74 width=3D180 style=3D'border-left:none;width:135pt'>3M</t=
+d>
+  <td class=3Dxl75 width=3D123 style=3D'border-left:none;width:92pt'>5:51.6=
+5</td>
+  <td class=3Dxl76 width=3D68 style=3D'border-left:none;width:51pt'>6/26/20=
+11</td>
+  <td class=3Dxl77 width=3D227 style=3D'border-left:none;width:170pt'>Pacif=
+ic
+  Association Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl78 width=3D72 style=3D'height:15.0pt;border-top=
+:none;
+  width:54pt'>SBB</td>
+  <td class=3Dxl79 width=3D135 style=3D'border-top:none;border-left:none;wi=
+dth:101pt'>4x100m
+  Relay</td>
+  <td class=3Dxl79 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>&nbsp;</td>
+  <td class=3Dxl79 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>&nbsp;</td>
+  <td class=3Dxl79 width=3D180 style=3D'border-top:none;border-left:none;wi=
+dth:135pt'>East
+  Palo Alto Greyhounds</td>
+  <td class=3Dxl81 width=3D123 style=3D'border-top:none;border-left:none;wi=
+dth:92pt'>1:05.54</td>
+  <td class=3Dxl82 width=3D68 style=3D'border-top:none;border-left:none;wid=
+th:51pt'>7/8/2012</td>
+  <td class=3Dxl83 width=3D227 style=3D'border-top:none;border-left:none;wi=
+dth:170pt'>Region
+  14 Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl78 width=3D72 style=3D'height:15.0pt;border-top=
+:none;
+  width:54pt'>SBB</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>4x400m Relay<=
+/td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>East Palo Alto
+  Greyhounds</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>5:41.45</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/27/2012</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl78 width=3D72 style=3D'height:15.0pt;border-top=
+:none;
+  width:54pt'>SBB</td>
+  <td class=3Dxl79 width=3D135 style=3D'border-top:none;border-left:none;wi=
+dth:101pt'>Long
+  Jump</td>
+  <td class=3Dxl79 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>Duante</td>
+  <td class=3Dxl79 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>Johnson</td>
+  <td class=3Dxl79 width=3D180 style=3D'border-top:none;border-left:none;wi=
+dth:135pt'>3M</td>
+  <td class=3Dxl84 width=3D123 style=3D'border-top:none;border-left:none;wi=
+dth:92pt'>3.95m
+  / 12' 11.5&quot;</td>
+  <td class=3Dxl82 width=3D68 style=3D'border-top:none;border-left:none;wid=
+th:51pt'>6/12/2011</td>
+  <td class=3Dxl83 width=3D227 style=3D'border-top:none;border-left:none;wi=
+dth:170pt'>Pacific
+  Association Championships</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>SBB<=
+/td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Shot Put</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Salvador</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Espinoza</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>East Palo Alto
+  Greyhounds</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>5.32m / 17' 5=
+.5&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/7/2012</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl78 width=3D72 style=3D'height:15.0pt;border-top=
+:none;
+  width:54pt'>SBB</td>
+  <td class=3Dxl79 width=3D135 style=3D'border-top:none;border-left:none;wi=
+dth:101pt'>Javelin</td>
+  <td class=3Dxl79 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>Jayzel</td>
+  <td class=3Dxl79 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>Joseph</td>
+  <td class=3Dxl79 width=3D180 style=3D'border-top:none;border-left:none;wi=
+dth:135pt'>Team
+  Onalysis</td>
+  <td class=3Dxl84 width=3D123 style=3D'border-top:none;border-left:none;wi=
+dth:92pt'>19.25m
+  / 63' 2&quot;</td>
+  <td class=3Dxl82 width=3D68 style=3D'border-top:none;border-left:none;wid=
+th:51pt'>7/7/2012</td>
+  <td class=3Dxl83 width=3D227 style=3D'border-top:none;border-left:none;wi=
+dth:170pt'>Region
+  14 Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td colspan=3D7 height=3D20 class=3Dxl111 width=3D788 style=3D'height:15.=
+0pt;
+  width:591pt'>Bantam Girls</td>
+  <td class=3Dxl66>&nbsp;</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt'>BG</td>
+  <td class=3Dxl68 style=3D'border-left:none'>100m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-left:none;width:77pt'>LaRiah=
+</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-left:none;width:81pt'>Crensh=
+aw</td>
+  <td class=3Dxl68 style=3D'border-left:none'>Phenom Elite</td>
+  <td class=3Dxl69 style=3D'border-left:none'>13.23</td>
+  <td class=3Dxl70 style=3D'border-left:none'>6/12/2010</td>
+  <td class=3Dxl71 style=3D'border-left:none'>Pacific Association Champions=
+hips</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>BG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>200m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>KEIANNA</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>TALTON</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Speed City</t=
+d>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>25.72</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/24/2001</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>BG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>400m<span
+  style=3D'mso-spacerun:yes'> </span></td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>TRACY</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>STEWART</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3M</td>
+  <td class=3Dxl72 style=3D'border-top:none;border-left:none'>1:02.29</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>5/30/1998</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Championships</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>BG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>800m</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Taylor</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Rainey</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Umoja</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>2:26.54</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/30/2011</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>BG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>1500m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>Jaxin</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>Woodward</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Full Stride</=
+td>
+  <td class=3Dxl72 style=3D'border-top:none;border-left:none'>5:08.36</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>6/10/2012</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Championships</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>BG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>1500m Race Wa=
+lk</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>CAITLIN</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>PALACIO</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Umoja</td>
+  <td class=3Dxl72 style=3D'border-top:none;border-left:none'>8:01.73</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/18/2008</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>BG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>4x100m Relay<=
+/td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3M</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>54.66</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/11/2008</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>BG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>4x400m Relay<=
+/td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3M</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>4:21.09</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/29/2008</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'mso-height-source:userset;height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>BG</=
+td>
+  <td class=3Dxl79 width=3D135 style=3D'border-top:none;border-left:none;wi=
+dth:101pt'>Long
+  Jump</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>CIARRA</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>BREWER</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Mission Valley
+  T&amp;F Club</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>4.56m / 14'
+  11.5&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>6/29/2003</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'mso-height-source:userset;height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>BG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Shot Put</td>
+  <td class=3Dxl79 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>Hannah-Sophia</td>
+  <td class=3Dxl79 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>Hall</td>
+  <td class=3Dxl79 width=3D180 style=3D'border-top:none;border-left:none;wi=
+dth:135pt'>3M
+  TC</td>
+  <td class=3Dxl75 width=3D123 style=3D'border-left:none;width:92pt'>9.56m =
+/ 31'
+  4.25&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/9/2010</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'mso-height-source:userset;height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>BG</=
+td>
+  <td class=3Dxl79 width=3D135 style=3D'border-top:none;border-left:none;wi=
+dth:101pt'>Javelin</td>
+  <td class=3Dxl79 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>Hannah-Sophia</td>
+  <td class=3Dxl79 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>Hall</td>
+  <td class=3Dxl79 width=3D180 style=3D'border-top:none;border-left:none;wi=
+dth:135pt'>3M
+  TC</td>
+  <td class=3Dxl84 width=3D123 style=3D'border-top:none;border-left:none;wi=
+dth:92pt'>29.03m
+  / 95' 3&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/31/2010</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'mso-height-source:userset;height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>BG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>High Jump</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>DESIRAE</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>PAYTON</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Speed City</t=
+d>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>1.40m / 4' 7&=
+quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/29/2001</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'mso-height-source:userset;height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>BG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Triathlon</td>
+  <td class=3Dxl86 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>DESIRAE</td>
+  <td class=3Dxl86 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>PAYTON</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Speed City</t=
+d>
+  <td class=3Dxl87 style=3D'border-top:none;border-left:none'>1,355</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/29/2001</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'mso-height-source:userset;height:15.0pt'>
+  <td colspan=3D7 height=3D20 class=3Dxl113 width=3D788 style=3D'height:15.=
+0pt;
+  width:591pt'>Bantam Boys</td>
+  <td class=3Dxl66>&nbsp;</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'mso-height-source:userset;height:15.0pt'>
+  <td height=3D20 class=3Dxl78 width=3D72 style=3D'height:15.0pt;border-top=
+:none;
+  width:54pt'>BB</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>100m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>DESEAN</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>WATSON</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3M</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>12.99</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>6/20/1998</td>
+  <td class=3Dxl71 style=3D'border-left:none'>Pacific Association Junior Ol=
+ympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'mso-height-source:userset;height:15.0pt'>
+  <td height=3D20 class=3Dxl78 width=3D72 style=3D'height:15.0pt;border-top=
+:none;
+  width:54pt'>BB</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>200m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>DESEAN</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>WATSON</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3M</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>26.24</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>5/30/1998</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Championships</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'mso-height-source:userset;height:15.0pt'>
+  <td height=3D20 class=3Dxl78 width=3D72 style=3D'height:15.0pt;border-top=
+:none;
+  width:54pt'>BB</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>400m<span
+  style=3D'mso-spacerun:yes'> </span></td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>ANTHONY</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>WILLIAMS</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Speed City</t=
+d>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>1:00.05</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/29/2001</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'mso-height-source:userset;height:15.0pt'>
+  <td height=3D20 class=3Dxl78 width=3D72 style=3D'height:15.0pt;border-top=
+:none;
+  width:54pt'>BB</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>800m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>ROBERT</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>AMICK</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Unattached</t=
+d>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>2:19.74</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/28/2005</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'mso-height-source:userset;height:15.0pt'>
+  <td height=3D20 class=3Dxl78 width=3D72 style=3D'height:15.0pt;border-top=
+:none;
+  width:54pt'>BB</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>1500m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>ROBERT</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>AMICK</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Unattached</t=
+d>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>4:43.70</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/31/2005</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'mso-height-source:userset;height:15.0pt'>
+  <td height=3D20 class=3Dxl78 width=3D72 style=3D'height:15.0pt;border-top=
+:none;
+  width:54pt'>BB</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>1500m Race Wa=
+lk</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>CARL</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>LEDERMAN</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Diablo Valley=
+</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>7:50.0</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>6/19/1993</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'mso-height-source:userset;height:15.0pt'>
+  <td height=3D20 class=3Dxl78 width=3D72 style=3D'height:15.0pt;border-top=
+:none;
+  width:54pt'>BB</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>4x100m Relay<=
+/td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Hilltop Speed=
+</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>50.30</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>6/30/2001</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Championships</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'mso-height-source:userset;height:15.0pt'>
+  <td height=3D20 class=3Dxl78 width=3D72 style=3D'height:15.0pt;border-top=
+:none;
+  width:54pt'>BB</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>4x400m Relay<=
+/td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Speed City</t=
+d>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>4:19.99</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/29/2001</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'mso-height-source:userset;height:15.0pt'>
+  <td height=3D20 class=3Dxl78 width=3D72 style=3D'height:15.0pt;border-top=
+:none;
+  width:54pt'>BB</td>
+  <td class=3Dxl79 width=3D135 style=3D'border-top:none;border-left:none;wi=
+dth:101pt'>Long
+  Jump</td>
+  <td class=3Dxl79 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>Mar'ion</td>
+  <td class=3Dxl79 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>Devore</td>
+  <td class=3Dxl79 width=3D180 style=3D'border-top:none;border-left:none;wi=
+dth:135pt'>Hercules
+  Running Rebels</td>
+  <td class=3Dxl84 width=3D123 style=3D'border-top:none;border-left:none;wi=
+dth:92pt'>4.80m
+  / 15' 9&quot;</td>
+  <td class=3Dxl82 width=3D68 style=3D'border-top:none;border-left:none;wid=
+th:51pt'>6/25/2011</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'mso-height-source:userset;height:15.0pt'>
+  <td height=3D20 class=3Dxl78 width=3D72 style=3D'height:15.0pt;border-top=
+:none;
+  width:54pt'>BB</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Shot Put</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>MICHAEL</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>PHELPS</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3M</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>10.57m / 34'
+  8.25&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/9/2005</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl78 width=3D72 style=3D'height:15.0pt;border-top=
+:none;
+  width:54pt'>BB</td>
+  <td class=3Dxl79 width=3D135 style=3D'border-top:none;border-left:none;wi=
+dth:101pt'>Javelin</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>ARMAND</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>SHANE</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3M</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>41.16m / 135'=
+ 0&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>6/9/2007</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Championships</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl88 width=3D72 style=3D'height:15.0pt;border-top=
+:none;
+  width:54pt'>BB</td>
+  <td class=3Dxl89 style=3D'border-top:none;border-left:none'>High Jump</td>
+  <td class=3Dxl90 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>DAVID</td>
+  <td class=3Dxl90 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>SHORTENHOUSE</td>
+  <td class=3Dxl89 style=3D'border-top:none;border-left:none'>Diablo Valley=
+</td>
+  <td class=3Dxl91 style=3D'border-top:none;border-left:none'>1.40m / 4' 7&=
+quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>5/29/1994</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Championships</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl78 width=3D72 style=3D'height:15.0pt;width:54pt=
+'>BB</td>
+  <td class=3Dxl68 style=3D'border-left:none'>Triathlon</td>
+  <td class=3Dxl86 width=3D102 style=3D'border-left:none;width:77pt'>AUSTIN=
+</td>
+  <td class=3Dxl86 width=3D108 style=3D'border-left:none;width:81pt'>GEORGE=
+</td>
+  <td class=3Dxl68 style=3D'border-left:none'>Westwind Flyers</td>
+  <td class=3Dxl69 style=3D'border-left:none'>677</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/30/1995</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td colspan=3D7 height=3D20 class=3Dxl111 width=3D788 style=3D'height:15.=
+0pt;
+  width:591pt'>Midget Girls</td>
+  <td class=3Dxl66>&nbsp;</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt'>MG</td>
+  <td class=3Dxl68 style=3D'border-left:none'>100m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-left:none;width:77pt'>ATIVA<=
+/td>
+  <td class=3Dxl85 width=3D108 style=3D'border-left:none;width:81pt'>HARVEY=
+</td>
+  <td class=3Dxl68 style=3D'border-left:none'>Mission Valley</td>
+  <td class=3Dxl68 align=3Dright style=3D'border-left:none'>12.23</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-left:none'>7/30/2006</td>
+  <td class=3Dxl71 style=3D'border-left:none'>USATF Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl92 style=3D'height:15.0pt'>MG</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>200m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>KEIANNA</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>TALTON</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Speed City</t=
+d>
+  <td class=3Dxl68 align=3Dright style=3D'border-top:none;border-left:none'=
+>25.77</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/29/2001</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl92 style=3D'height:15.0pt'>MG</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>400m<span
+  style=3D'mso-spacerun:yes'> </span></td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>SASHA</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>WALLACE</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3M</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>57.74</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/1/2007</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl92 style=3D'height:15.0pt'>MG</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>800m</td>
+  <td class=3Dxl79 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>Nicole</td>
+  <td class=3Dxl79 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>Warwick</td>
+  <td class=3Dxl79 width=3D180 style=3D'border-top:none;border-left:none;wi=
+dth:135pt'>Central
+  Valley Roadrunners</td>
+  <td class=3Dxl81 width=3D123 style=3D'border-top:none;border-left:none;wi=
+dth:92pt'>2:19.17</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/31/2010</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>MG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>1500m</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Nicole</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Warwick</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Central Valley
+  Roadrunners</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>4:51.32</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>8/1/2010</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl92 style=3D'height:15.0pt'>MG</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3000m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>CHRISTINE</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>BAYLISS</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Revolution Ex=
+press</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>10:23.56</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/28/2009</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl92 style=3D'height:15.0pt'>MG</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>1500m Race Wa=
+lk</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>ERICKA</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>ACKERET</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Golden Gate
+  Racewalkers</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>7:27.54</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/30/1995</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl92 style=3D'height:15.0pt'>MG</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>80m Hurdles</=
+td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>TRINITY</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>WILSON</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3M</td>
+  <td class=3Dxl68 align=3Dright style=3D'border-top:none;border-left:none'=
+>12.2</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/8/2006</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl92 style=3D'height:15.0pt'>MG</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>4x100m Relay<=
+/td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3M</td>
+  <td class=3Dxl84 width=3D123 style=3D'border-top:none;border-left:none;wi=
+dth:92pt'>50.39</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>8/1/2010</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl92 style=3D'height:15.0pt'>MG</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>4x400m Relay<=
+/td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3M</td>
+  <td class=3Dxl81 width=3D123 style=3D'border-top:none;border-left:none;wi=
+dth:92pt'>3:59.83</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>8/1/2010</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl92 style=3D'height:15.0pt'>MG</td>
+  <td class=3Dxl93 style=3D'border-left:none'>4x800m Relay</td>
+  <td class=3Dxl93 style=3D'border-left:none'>&nbsp;</td>
+  <td class=3Dxl93 style=3D'border-left:none'>&nbsp;</td>
+  <td class=3Dxl93 style=3D'border-left:none'>3M</td>
+  <td class=3Dxl81 width=3D123 style=3D'border-top:none;border-left:none;wi=
+dth:92pt'>9:22.43</td>
+  <td class=3Dxl94 align=3Dright style=3D'border-left:none'>7/30/2010</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>MG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Shot Put</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Addyson</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Smith</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Central Valley
+  Roadrunners</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>13.11m / 43'
+  0.25&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/9/2011</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>MG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Discus</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Addyson</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Smith</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Central Valley
+  Roadrunners</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>32.32m / 106'=
+ 0&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/28/2011</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>MG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Javelin</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>COURTNEY</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>WEBB</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Mission Valley
+  T&amp;F Club</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>36.08m / 118'=
+ 4&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/9/2005</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl92 style=3D'height:15.0pt'>MG</td>
+  <td class=3Dxl93 style=3D'border-left:none'>Long Jump</td>
+  <td class=3Dxl93 style=3D'border-left:none'>Cynthia</td>
+  <td class=3Dxl93 style=3D'border-left:none'>Smith</td>
+  <td class=3Dxl93 style=3D'border-left:none'>Umoja</td>
+  <td class=3Dxl95 style=3D'border-left:none'>5.35m / 17' 6.75&quot;</td>
+  <td class=3Dxl96 style=3D'border-left:none'>7/30/2011</td>
+  <td class=3Dxl97 style=3D'border-left:none'>USATF Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>MG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>High Jump</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Brynley</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Bower</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Central Valley
+  Roadrunners</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>1.55m / 5' 1&=
+quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/28/2011</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>MG</=
+td>
+  <td class=3Dxl79 width=3D135 style=3D'border-top:none;border-left:none;wi=
+dth:101pt'>Pentathlon</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Jada</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Newkirk</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Team Onalysis=
+</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>2,704 points<=
+/td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>6/19/2011</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td colspan=3D7 height=3D20 class=3Dxl111 width=3D788 style=3D'height:15.=
+0pt;
+  width:591pt'>Midget Boys</td>
+  <td class=3Dxl66>&nbsp;</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt'>MB</td>
+  <td class=3Dxl68 style=3D'border-left:none'>100m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-left:none;width:77pt'>MAURIC=
+E</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-left:none;width:81pt'>DOSTY<=
+/td>
+  <td class=3Dxl68 style=3D'border-left:none'>Kids on Track</td>
+  <td class=3Dxl68 align=3Dright style=3D'border-left:none'>11.77</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-left:none'>6/30/1995</td>
+  <td class=3Dxl71 style=3D'border-left:none'>Pacific Association Junior Ol=
+ympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>MB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>200m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>MAURICE</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>DOSTY</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Kids on Track=
+</td>
+  <td class=3Dxl68 align=3Dright style=3D'border-top:none;border-left:none'=
+>23.99</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/30/1995</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>MB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>400m<span
+  style=3D'mso-spacerun:yes'> </span></td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>HILLARY</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>McKENNEY</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>San Francisco
+  Striders</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>56.76</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/13/1997</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>MB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>800m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>ASA</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>JACKSON</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>MP Striders</=
+td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>2:12.74</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/29/2001</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>MB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>1500m</td>
+  <td class=3Dxl79 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>Benjamin</td>
+  <td class=3Dxl79 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>Zaeske</td>
+  <td class=3Dxl79 width=3D180 style=3D'border-top:none;border-left:none;wi=
+dth:135pt'>Pleasanton
+  Heat</td>
+  <td class=3Dxl84 width=3D123 style=3D'border-top:none;border-left:none;wi=
+dth:92pt'>4:39.42</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>8/1/2010</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>MB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3000m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>DOMINIC</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>CHRISTOPHER</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Pleasanton He=
+at</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>9:57.60</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>6/20/1998</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>MB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>1500m Race Wa=
+lk</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>ALIKA</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>OKAMITSU</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Diablo Valley=
+</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>7:30.00</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>6/15/2003</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Championships</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>MB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>80m Hurdles</=
+td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>SAMSON</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>MOORE</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Central Valley
+  Roadrunners</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>12.26</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>6/7/2008</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Championships</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>MB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>4x100m Relay<=
+/td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Speed City</t=
+d>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>49.63</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>6/30/2002</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>MB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>4x400m Relay<=
+/td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Acorn Oscar B=
+ailey</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>3:55.52</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/29/2001</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>MB</=
+td>
+  <td class=3Dxl93 style=3D'border-left:none'>4x800m Relay</td>
+  <td class=3Dxl93 style=3D'border-left:none'>&nbsp;</td>
+  <td class=3Dxl93 style=3D'border-left:none'>&nbsp;</td>
+  <td class=3Dxl93 style=3D'border-left:none'>Speed City</td>
+  <td class=3Dxl95 style=3D'border-left:none'>9:06.40</td>
+  <td class=3Dxl94 align=3Dright style=3D'border-left:none'>7/14/2002</td>
+  <td class=3Dxl97 style=3D'border-left:none'>Region 14 Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>MB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Shot Put</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>GORDON</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>DREW</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Union</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>14.05m / 46'
+  1.25&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/14/2002</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>MB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Discus</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>KYLE</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>HAMMERQUIST</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3M</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>39.04m / 128'=
+ 1&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>5/30/1998</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Championships</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>MB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Javelin</td>
+  <td class=3Dxl79 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>Otis</td>
+  <td class=3Dxl79 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>Statum</td>
+  <td class=3Dxl79 width=3D180 style=3D'border-top:none;border-left:none;wi=
+dth:135pt'>3M
+  TC</td>
+  <td class=3Dxl84 width=3D123 style=3D'border-top:none;border-left:none;wi=
+dth:92pt'>53.30m
+  / 174' 10&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/11/2008</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>MB</=
+td>
+  <td class=3Dxl93 style=3D'border-left:none'>Long Jump</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>DEMONDRE</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>WARD</td>
+  <td class=3Dxl93 style=3D'border-left:none'>Westside Kickers</td>
+  <td class=3Dxl95 style=3D'border-left:none'>5.77m / 18' 11&quot;</td>
+  <td class=3Dxl96 style=3D'border-left:none'>7/24/2001</td>
+  <td class=3Dxl97 style=3D'border-left:none'>USATF Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>MB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>High Jump</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>DAVID</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>SHORTENHAUS</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Diablo Valley=
+</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>1.63m / 5' 4.=
+25&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>5/27/1996</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Championships</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>MB</=
+td>
+  <td class=3Dxl79 width=3D135 style=3D'border-top:none;border-left:none;wi=
+dth:101pt'>Pentathlon</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>RUDY</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>BARTON</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Unattached</t=
+d>
+  <td class=3Dxl87 style=3D'border-top:none;border-left:none'>2,532</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/5/1992</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td colspan=3D7 height=3D20 class=3Dxl110 width=3D788 style=3D'height:15.=
+0pt;
+  width:591pt'>Youth Girls</td>
+  <td class=3Dxl66>&nbsp;</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>100m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>KRISTINA</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>DAVIS</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3M</td>
+  <td class=3Dxl68 align=3Dright style=3D'border-top:none;border-left:none'=
+>11.96</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/24/2001</td>
+  <td class=3Dxl71 style=3D'border-left:none'>USATF Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>200m</td>
+  <td class=3Dxl90 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>CHERI</td>
+  <td class=3Dxl90 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>CRADDOCK</td>
+  <td class=3Dxl89 style=3D'border-top:none;border-left:none'>3M</td>
+  <td class=3Dxl89 align=3Dright style=3D'border-top:none;border-left:none'=
+>24.51</td>
+  <td class=3Dxl98 align=3Dright style=3D'border-top:none;border-left:none'=
+>6/18/2000</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl92 style=3D'height:15.0pt'>YG</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>400m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-left:none;width:77pt'>Iesha<=
+/td>
+  <td class=3Dxl85 width=3D108 style=3D'border-left:none;width:81pt'>Hardim=
+an</td>
+  <td class=3Dxl68 style=3D'border-left:none'>ISC International</td>
+  <td class=3Dxl72 style=3D'border-left:none'>56.29</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-left:none'>7/11/2008</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>800m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>THANDI</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>STEWART</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3M</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>2:13.05</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/9/2005</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>1500m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>JORDAN</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>HASAY</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>San Luis Dist=
+ance
+  Club</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>4:28.79</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/9/2005</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3000m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>JORDAN</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>HASAY</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>San Luis Dist=
+ance
+  Club</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>9:37.24</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>6/26/2005</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3000m Race Wa=
+lk</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>ERICKA</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>ACKERET</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Golden Gate
+  Racewalkers</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>13:57.1</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>6/16/1996</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>100m Hurdles<=
+/td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>TRINITY</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>WILSON</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>EOYDC</td>
+  <td class=3Dxl68 align=3Dright style=3D'border-top:none;border-left:none'=
+>13.76</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/22/2008</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>200m Hurdles<=
+/td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>NATASHA</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>NEAL</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3M</td>
+  <td class=3Dxl68 align=3Dright style=3D'border-top:none;border-left:none'=
+>27.12</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>6/11/1994</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr class=3Dxl100 height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YG</=
+td>
+  <td class=3Dxl99 style=3D'border-top:none;border-left:none'>4x100m Relay<=
+/td>
+  <td class=3Dxl99 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl99 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl99 style=3D'border-top:none;border-left:none'>Miller</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>48.05</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>6/30/2001</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Championships</td>
+  <td class=3Dxl100></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>4x400m Relay<=
+/td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3M</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>3:48.92</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/29/2001</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YG</=
+td>
+  <td class=3Dxl93 style=3D'border-left:none'>4x800m Relay</td>
+  <td class=3Dxl93 style=3D'border-left:none'>&nbsp;</td>
+  <td class=3Dxl93 style=3D'border-left:none'>&nbsp;</td>
+  <td class=3Dxl93 style=3D'border-left:none'>Acorn Oscar Bailey</td>
+  <td class=3Dxl95 style=3D'border-left:none'>9:31.04</td>
+  <td class=3Dxl94 align=3Dright style=3D'border-left:none'>6/30/2002</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Shot Put</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Sierra</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Sheppard</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Unattached</t=
+d>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>14.34m / 47'
+  .75&quot;</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/7/2012</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Discus</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>CHANIQUA</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>ROSS</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Unity</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>40.78m / 133'=
+ 9&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>6/11/1994</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YG</=
+td>
+  <td class=3Dxl89 style=3D'border-top:none;border-left:none'>Javelin</td>
+  <td class=3Dxl90 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>KORI</td>
+  <td class=3Dxl90 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>REID</td>
+  <td class=3Dxl89 style=3D'border-top:none;border-left:none'>Napa TC</td>
+  <td class=3Dxl91 style=3D'border-top:none;border-left:none'>36.88m / 121'=
+ 0&quot;</td>
+  <td class=3Dxl101 style=3D'border-top:none;border-left:none'>6/19/1993</t=
+d>
+  <td class=3Dxl102 style=3D'border-top:none;border-left:none'>Pacific Asso=
+ciation
+  Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl103 style=3D'height:15.0pt'>YG</td>
+  <td class=3Dxl68>Long Jump</td>
+  <td class=3Dxl68 style=3D'border-left:none'>CIARRA</td>
+  <td class=3Dxl68 style=3D'border-left:none'>BREWER</td>
+  <td class=3Dxl68 style=3D'border-left:none'>Mission Valley</td>
+  <td class=3Dxl69 style=3D'border-left:none'>5.74m / 18' 10&quot;</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-left:none'>7/28/2007</td>
+  <td class=3Dxl68 style=3D'border-left:none'>USATF Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt'>YG</td>
+  <td class=3Dxl93 style=3D'border-left:none'>Triple Jump</td>
+  <td class=3Dxl104 width=3D102 style=3D'border-left:none;width:77pt'>CIARR=
+A</td>
+  <td class=3Dxl104 width=3D108 style=3D'border-left:none;width:81pt'>BREWE=
+R</td>
+  <td class=3Dxl93 style=3D'border-left:none'>Mission Valley</td>
+  <td class=3Dxl95 style=3D'border-left:none'>11/96m / 39' 3&quot;</td>
+  <td class=3Dxl96 style=3D'border-left:none'>7/1/2007</td>
+  <td class=3Dxl97 style=3D'border-left:none'>Region 14 Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>High Jump</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-left:none;width:77pt'>JENNA<=
+/td>
+  <td class=3Dxl85 width=3D108 style=3D'border-left:none;width:81pt'>GRIMAL=
+DI</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Unattached</t=
+d>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>1.63m / 5' 4.=
+25&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/13/1997</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Pole Vault</t=
+d>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Melissa</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Maneatis</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Unattached</t=
+d>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>3.20m / 10' 6=
+&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/28/2011</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Pole Vault</t=
+d>
+  <td class=3Dxl105 width=3D102 style=3D'border-left:none;width:77pt'>Makay=
+la<span
+  style=3D'mso-spacerun:yes'> </span></td>
+  <td class=3Dxl106 width=3D108 style=3D'width:81pt'>Linebarger</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Raise the Bar=
+</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>3.20m / 10' 6=
+&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/25/2012</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Pentathlon</t=
+d>
+  <td class=3Dxl85 width=3D102 style=3D'border-left:none;width:77pt'>KRISTE=
+N</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-left:none;width:81pt'>ROBINS=
+ON</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>CA Track Club=
+</td>
+  <td class=3Dxl87 style=3D'border-top:none;border-left:none'>2,905</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>6/21/2009</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td colspan=3D7 height=3D20 class=3Dxl110 width=3D788 style=3D'height:15.=
+0pt;
+  width:591pt'>Youth Boys</td>
+  <td class=3Dxl66>&nbsp;</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>100m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>ANTHONY</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>RIGGINS</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Vallejo PAL</=
+td>
+  <td class=3Dxl68 align=3Dright style=3D'border-top:none;border-left:none'=
+>11.03</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/30/2006</td>
+  <td class=3Dxl71 style=3D'border-left:none'>USATF Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>200m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>ANTHONY</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>RIGGINS</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Vallejo PAL</=
+td>
+  <td class=3Dxl68 align=3Dright style=3D'border-top:none;border-left:none'=
+>22.26</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/30/2006</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>400m<span
+  style=3D'mso-spacerun:yes'> </span></td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>CARLYLE</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>GARRICK</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Oakland PAL</=
+td>
+  <td class=3Dxl68 align=3Dright style=3D'border-top:none;border-left:none'=
+>50.73</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/1/2007</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>800m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>Marcus<span
+  style=3D'mso-spacerun:yes'> </span></td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>Avila</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Mercury Runni=
+ng Club</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>2:02.75</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/7/2012</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>1500m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>Ethan</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>Mark</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Pleasanton He=
+at</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>4:14.03</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/13/2005</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3000m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>SEAN</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>DRAKE</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>City Track Cl=
+ub</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>9:23.02</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>5/30/1998</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Championships</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YB</=
+td>
+  <td class=3Dxl99 style=3D'border-top:none;border-left:none'>3000m Race Wa=
+lk</td>
+  <td class=3Dxl99 style=3D'border-top:none;border-left:none'>Tyler</td>
+  <td class=3Dxl99 style=3D'border-top:none;border-left:none'>Sorenson</td>
+  <td class=3Dxl99 style=3D'border-top:none;border-left:none'>Pleasanton He=
+at</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>13:40.48</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>6/20/2008</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>100m Hurdles<=
+/td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>KENNETH</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>WALKER
+  III</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>ISC Internati=
+onal</td>
+  <td class=3Dxl68 align=3Dright style=3D'border-top:none;border-left:none'=
+>13.48</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/22/2008</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>200m Hurdles<=
+/td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>KENNETH</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>WALKER
+  III</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>ISC Internati=
+onal</td>
+  <td class=3Dxl68 align=3Dright style=3D'border-top:none;border-left:none'=
+>24.28</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/11/2008</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>4x100m Relay<=
+/td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>ISC Internati=
+onal</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>44.36</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/20/2008</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>4x400m Relay<=
+/td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Westside Kick=
+ers</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>3:38.29</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/30/1995</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YB</=
+td>
+  <td class=3Dxl93 style=3D'border-left:none'>4x800m Relay</td>
+  <td class=3Dxl93 style=3D'border-left:none'>&nbsp;</td>
+  <td class=3Dxl93 style=3D'border-left:none'>&nbsp;</td>
+  <td class=3Dxl93 style=3D'border-left:none'>Pleasanton Heat</td>
+  <td class=3Dxl95 style=3D'border-left:none'>8:48.88</td>
+  <td class=3Dxl94 align=3Dright style=3D'border-left:none'>7/27/2005</td>
+  <td class=3Dxl97 style=3D'border-left:none'>USATF Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Shot Put</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>DREW</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>GORDON</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Union</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>16.98m / 55'
+  8.5&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>6/13/2004</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Championships</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Discus</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>DREW</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>GORDON</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Union</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>51.80m / 170'=
+ 0&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>6/13/2004</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Championships</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Javelin</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Armand</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Shyne</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3M</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>48.19m / 158'=
+ 1&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/29/2011</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YB</=
+td>
+  <td class=3Dxl93 style=3D'border-left:none'>Long Jump</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>BYRON</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>MARSHALL</td>
+  <td class=3Dxl93 style=3D'border-left:none'>ISC International</td>
+  <td class=3Dxl95 style=3D'border-left:none'>6.86m / 22' 4.5&quot;</td>
+  <td class=3Dxl96 style=3D'border-left:none'>6/14/2008</td>
+  <td class=3Dxl97 style=3D'border-left:none'>Region 14 Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D40 style=3D'height:30.0pt'>
+  <td height=3D40 class=3Dxl67 style=3D'height:30.0pt;border-top:none'>YB</=
+td>
+  <td class=3Dxl93 style=3D'border-left:none'>Triple Jump</td>
+  <td class=3Dxl79 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>Nathaniel</td>
+  <td class=3Dxl79 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>Moore</td>
+  <td class=3Dxl79 width=3D180 style=3D'border-top:none;border-left:none;wi=
+dth:135pt'>Mission
+  Valley</td>
+  <td class=3Dxl84 width=3D123 style=3D'border-top:none;border-left:none;wi=
+dth:92pt'>12.68m
+  / 41' 7.25&quot;</td>
+  <td class=3Dxl96 style=3D'border-left:none'>6/12/2010</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Championships</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>High Jump</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>CHUCKY</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>RYAN</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Santa Rosa Ex=
+press</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>1.90m / 6' 2.=
+75&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/30/1995</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Pole Vault</t=
+d>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>RYAN</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>SHULER</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Unattached</t=
+d>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>4.12m / 13'
+  6.25&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/24/2001</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Pentathlon</t=
+d>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>NIMROD</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>PIGGEE</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Stockton PAL<=
+/td>
+  <td class=3Dxl87 style=3D'border-top:none;border-left:none'>3,009</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>6/29/2003</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td colspan=3D7 height=3D20 class=3Dxl110 width=3D788 style=3D'height:15.=
+0pt;
+  width:591pt'>Intermediate Girls</td>
+  <td class=3Dxl66>&nbsp;</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>100m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>STRANGENAE</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>CAMPBELL</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Hilltop Speed=
+</td>
+  <td class=3Dxl68 align=3Dright style=3D'border-top:none;border-left:none'=
+>11.78</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>6/13/2009</td>
+  <td class=3Dxl71 style=3D'border-left:none'>Pacific Association Champions=
+hips</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>200m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>SANI</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>ROSBEY</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Monterey Bay =
+Jaguars</td>
+  <td class=3Dxl68 align=3Dright style=3D'border-top:none;border-left:none'=
+>24.04</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>6/16/1997</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>400m<span
+  style=3D'mso-spacerun:yes'> </span></td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>THANDI</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>STEWART</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3M</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>54.24</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/30/2006</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>800m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>JAMIE</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>HARDY</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3M</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>2:12.89</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/30/2006</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>1500m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>JACQUELINE</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>EVANS</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Los Gatos AA<=
+/td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>4:42.21</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/24/2007</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3000m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>TRINA</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>COX</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Santa Rosa Ex=
+press</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>10:15.2</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>6/16/1996</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Championships</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3000m Race Wa=
+lk</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>ROBYN</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>STEVENS</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Westwind Flye=
+rs</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>15:37.66</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>6/30/1998</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>5000m Race Wa=
+lk</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>BEKKA</td>
+  <td class=3Dxl107 width=3D108 style=3D'border-top:none;border-left:none;w=
+idth:81pt'>MARRS</td>
+  <td class=3Dxl68 style=3D'border-top:none'>Diablo Valley</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>29:42.00</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/24/2001</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>100m Hurdles<=
+/td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>DAVEETA</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>SHEPHERD</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Bay Area</td>
+  <td class=3Dxl68 align=3Dright style=3D'border-top:none;border-left:none'=
+>13.72</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/30/1995</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>400m Hurdles<=
+/td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>TALIA</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>STEWART</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3M</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>58.84</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/29/2001</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>2000m Steeple=
+chase</td>
+  <td class=3Dxl79 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>Natalie</td>
+  <td class=3Dxl79 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>Dimits</td>
+  <td class=3Dxl79 width=3D180 style=3D'border-top:none;border-left:none;wi=
+dth:135pt'>Pleasanton
+  Heat</td>
+  <td class=3Dxl81 width=3D123 style=3D'border-top:none;border-left:none;wi=
+dth:92pt'>7:23.55</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/27/2010</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>4x100m Relay<=
+/td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Acorn Oscar B=
+ailey</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>46.63</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/5/1992</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>4x400m Relay<=
+/td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3M</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>3:47.44</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/30/2006</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IG</=
+td>
+  <td class=3Dxl93 style=3D'border-left:none'>4x800m Relay</td>
+  <td class=3Dxl93 style=3D'border-left:none'>&nbsp;</td>
+  <td class=3Dxl93 style=3D'border-left:none'>&nbsp;</td>
+  <td class=3Dxl93 style=3D'border-left:none'>3M</td>
+  <td class=3Dxl95 style=3D'border-left:none'>9:01.83</td>
+  <td class=3Dxl94 align=3Dright style=3D'border-left:none'>7/30/2006</td>
+  <td class=3Dxl97 style=3D'border-left:none'>USATF Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Shot Put</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>CHANIQUA</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>ROSS</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Unity</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>13.61m / 44' =
+8&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/30/1995</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Discus</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>SUZY</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>POWELL</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Unattached</t=
+d>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>48.28m / 158'=
+ 5&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/5/1992</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Javelin</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>SUZY</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>POWELL</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Unattached</t=
+d>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>39.64m / 130'=
+ 1&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/5/1992</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IG</=
+td>
+  <td class=3Dxl93 style=3D'border-left:none'>Hammer</td>
+  <td class=3Dxl79 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>Cara</td>
+  <td class=3Dxl79 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>McClain</td>
+  <td class=3Dxl79 width=3D180 style=3D'border-top:none;border-left:none;wi=
+dth:135pt'>Unattached</td>
+  <td class=3Dxl84 width=3D123 style=3D'border-top:none;border-left:none;wi=
+dth:92pt'>43.14m
+  / 141' 6&quot;</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/9/2010</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IG</=
+td>
+  <td class=3Dxl93 style=3D'border-left:none'>Long Jump</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>CIARRA</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>BREWER</td>
+  <td class=3Dxl93 style=3D'border-left:none'>Mission Valley T&amp;F Club</=
+td>
+  <td class=3Dxl95 style=3D'border-left:none'>6.06m / 19' 10.75&quot;</td>
+  <td class=3Dxl96 style=3D'border-left:none'>7/11/2008</td>
+  <td class=3Dxl97 style=3D'border-left:none'>Region 14 Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl103 style=3D'height:15.0pt'>IG</td>
+  <td>Triple Jump</td>
+  <td>CIARRA</td>
+  <td>BREWER</td>
+  <td>Mission Valley T&amp;F Club</td>
+  <td>12.94m / 42' 5.5&quot;</td>
+  <td class=3Dxl108 align=3Dright>7/30/2009</td>
+  <td>USATF Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt'>IG</td>
+  <td class=3Dxl68 style=3D'border-left:none'>High Jump</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-left:none;width:77pt'>SUSAN<=
+/td>
+  <td class=3Dxl85 width=3D108 style=3D'border-left:none;width:81pt'>JACKSO=
+N</td>
+  <td class=3Dxl68 style=3D'border-left:none'>Napa TC</td>
+  <td class=3Dxl69 style=3D'border-left:none'>1.78m / 5' 10&quot;</td>
+  <td class=3Dxl70 style=3D'border-left:none'>6/28/2004</td>
+  <td class=3Dxl71 style=3D'border-left:none'>Pacific Association Junior Ol=
+ympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Pole Vault</t=
+d>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>MACKENZIE</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>LANDRY</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Unattached</t=
+d>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>3.65m / 11'
+  11.75&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>6/20/2008</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IG</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Heptathlon</t=
+d>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>EVE</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>KING</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>City Track Cl=
+ub</td>
+  <td class=3Dxl87 style=3D'border-top:none;border-left:none'>4,068</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/17/2005</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td colspan=3D7 height=3D20 class=3Dxl110 width=3D788 style=3D'height:15.=
+0pt;
+  width:591pt'>Intermediate Boys</td>
+  <td class=3Dxl66>&nbsp;</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>100m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>ANTHONY</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>RIGGINS</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Vallejo PAL F=
+ast
+  Forward</td>
+  <td class=3Dxl68 align=3Dright style=3D'border-top:none;border-left:none'=
+>10.59</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/1/2007</td>
+  <td class=3Dxl71 style=3D'border-left:none'>Region 14 Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>200m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>JODY</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>CHARLES</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>San Francisco
+  Senators</td>
+  <td class=3Dxl68 align=3Dright style=3D'border-top:none;border-left:none'=
+>21.11</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/7/1994</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>400m<span
+  style=3D'mso-spacerun:yes'> </span></td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>JODY</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>CHARLES</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>San Francisco
+  Senators</td>
+  <td class=3Dxl68 align=3Dright style=3D'border-top:none;border-left:none'=
+>48.22</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/7/1994</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>800m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>ANDREW</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>DAWSON</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Alex Van Dyke=
+</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>1:55.83</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/29/2001</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>1500m</td>
+  <td class=3Dxl79 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>Parker</td>
+  <td class=3Dxl79 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>Duel</td>
+  <td class=3Dxl79 width=3D180 style=3D'border-top:none;border-left:none;wi=
+dth:135pt'>Pleasanton
+  Heat</td>
+  <td class=3Dxl84 width=3D123 style=3D'border-top:none;border-left:none;wi=
+dth:92pt'>4:04.01</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>8/1/2010</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3000m</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Blair</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Hurlock</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Pleasanton He=
+at</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>8:55.62</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/28/2011</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3000m Race Wa=
+lk</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>NATHAN</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>WILLIAMS</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Stockton St. =
+George</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>14:44.0</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>5/26/1997</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Championships</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>5000m Race Wa=
+lk</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>LOEY</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>HAUSWORTH</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>St. Marks Sch=
+ool</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>35:06.97</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>6/12/2005</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Championships</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>110m Hurdles<=
+/td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>KEVIN</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>CRADDOCK</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Alex Van Dyke=
+</td>
+  <td class=3Dxl68 align=3Dright style=3D'border-top:none;border-left:none'=
+>14.22</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>6/29/2003</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>400m Hurdles<=
+/td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>DAVID</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>KLECH</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>San Francisco
+  Striders</td>
+  <td class=3Dxl68 align=3Dright style=3D'border-top:none;border-left:none'=
+>55.47</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>6/28/2004</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>2000m Steeple=
+chase</td>
+  <td class=3Dxl79 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>Parker</td>
+  <td class=3Dxl79 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>Duel</td>
+  <td class=3Dxl79 width=3D180 style=3D'border-top:none;border-left:none;wi=
+dth:135pt'>Pleasanton
+  Heat</td>
+  <td class=3Dxl84 width=3D123 style=3D'border-top:none;border-left:none;wi=
+dth:92pt'>6:14.23</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/27/2010</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>4x100m Relay<=
+/td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>VPAL Fast For=
+ward TC</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>42.08</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/22/2008</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>4x400m Relay<=
+/td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>ACCC TC</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>3:21.07</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/29/2001</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IB</=
+td>
+  <td class=3Dxl93 style=3D'border-left:none'>4x800m Relay</td>
+  <td class=3Dxl93 style=3D'border-left:none'>&nbsp;</td>
+  <td class=3Dxl93 style=3D'border-left:none'>&nbsp;</td>
+  <td class=3Dxl93 style=3D'border-left:none'>Pleasanton Heat</td>
+  <td class=3Dxl95 style=3D'border-left:none'>8:21.17</td>
+  <td class=3Dxl94 align=3Dright style=3D'border-left:none'>7/25/2007</td>
+  <td class=3Dxl97 style=3D'border-left:none'>USATF Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Shot Put</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>COLIN</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>QUIRKE</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Los Gatos AA<=
+/td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>16.54m / 54'
+  3.25&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/8/2006</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Discus</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>KYLE</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>HAMMERQUIST</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3M</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>49.45m / 162'=
+ 3&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/14/2002</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Javelin</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>NATHAN</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>MARUM</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Napa TC</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>53.88m / 176'=
+ 9&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/30/1995</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IB</=
+td>
+  <td class=3Dxl93 style=3D'border-left:none'>Hammer</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>JAKE</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>FULLER</td>
+  <td class=3Dxl93 style=3D'border-left:none'>Unattached</td>
+  <td class=3Dxl95 style=3D'border-left:none'>44.90m / 147' 4&quot;</td>
+  <td class=3Dxl96 style=3D'border-left:none'>7/9/2005</td>
+  <td class=3Dxl97 style=3D'border-left:none'>Region 14 Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IB</=
+td>
+  <td class=3Dxl93 style=3D'border-left:none'>Long Jump</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>CHASE</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>WHEELER</td>
+  <td class=3Dxl93 style=3D'border-left:none'>Oakland PAL</td>
+  <td class=3Dxl95 style=3D'border-left:none'>7.06m / 23' 2&quot;</td>
+  <td class=3Dxl96 style=3D'border-left:none'>6/24/2007</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IB</=
+td>
+  <td class=3Dxl93 style=3D'border-left:none'>Triple Jump</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>NKOSINZA</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>BALUMBU</td>
+  <td class=3Dxl93 style=3D'border-left:none'>Mission Valley</td>
+  <td class=3Dxl95 style=3D'border-left:none'>14.41m / 47' 3.25&quot;</td>
+  <td class=3Dxl96 style=3D'border-left:none'>6/29/2003</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>High Jump</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>MAURICE</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'><span
+  style=3D'mso-spacerun:yes'> </span>VALENTINE<span
+  style=3D'mso-spacerun:yes'> </span></td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Oakland PAL</=
+td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>2.14m / 7' .2=
+5&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>6/24/2007</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Pole Vault</t=
+d>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>SCOTT</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>ROTH</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Unattached</t=
+d>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>4.90m / 16' .=
+75&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>6/28/2004</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>IB</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Decathlon</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>JASON</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>PEASE</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Mission Valle=
+y</td>
+  <td class=3Dxl87 style=3D'border-top:none;border-left:none'>5,207</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/10/1995</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td colspan=3D7 height=3D20 class=3Dxl110 width=3D788 style=3D'height:15.=
+0pt;
+  width:591pt'>Young Women</td>
+  <td class=3Dxl66>&nbsp;</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YW</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>100m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>CHERRELLE</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>GARRETT</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Mission Valle=
+y</td>
+  <td class=3Dxl68 align=3Dright style=3D'border-top:none;border-left:none'=
+>11.56</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/30/2006</td>
+  <td class=3Dxl71 style=3D'border-left:none'>USATF Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YW</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>200m</td>
+  <td class=3Dxl79 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>Strangena</td>
+  <td class=3Dxl79 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>Campbell</td>
+  <td class=3Dxl79 width=3D180 style=3D'border-top:none;border-left:none;wi=
+dth:135pt'>Pacific
+  United</td>
+  <td class=3Dxl84 width=3D123 style=3D'border-top:none;border-left:none;wi=
+dth:92pt'>24.14</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/10/2010</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YW</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>400m<span
+  style=3D'mso-spacerun:yes'> </span></td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>CRISTINA</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>HARDEMAN</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>A Cheetahs St=
+orm</td>
+  <td class=3Dxl68 align=3Dright style=3D'border-top:none;border-left:none'=
+>55.13</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/29/2001</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YW</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>800m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>JAMILLAH</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>TITUS</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Alex Van Dyke=
+</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>2:11.01</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/29/2001</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YW</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>1500m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>TRINA</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>COX</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Santa Rosa Ex=
+press</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>4:40.35</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>6/20/1998</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YW</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3000m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>JULIE</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>STAMPS</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Santa Rosa Ex=
+press</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>9:41.32</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/30/1995</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YW</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3000m Race Wa=
+lk</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>MONICA</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>RUTLEDGE</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Woodside Stri=
+ders</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>16:26.2</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>6/13/1992</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YW</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>5000m Race Wa=
+lk</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>ROBYN</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>STEVENS</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Westwind Flye=
+rs</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>24:58.0</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/24/2001</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YW</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>100m Hurdles<=
+/td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>Daja</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>Pugh</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>ISC Internati=
+onal</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>13.61</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/29/2012</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YW</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>400m Hurdles<=
+/td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>DAVETTA</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>SHEPHERD</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Bay Area</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>1:00.00</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/29/1997</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YW</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>2000m Steeple=
+chase</td>
+  <td class=3Dxl79 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>Jessie</td>
+  <td class=3Dxl79 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>Petersen</td>
+  <td class=3Dxl79 width=3D180 style=3D'border-top:none;border-left:none;wi=
+dth:135pt'>RF
+  United</td>
+  <td class=3Dxl81 width=3D123 style=3D'border-top:none;border-left:none;wi=
+dth:92pt'>7:28.28</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/9/2010</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YW</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>4x100m Relay<=
+/td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Flying Jaguar=
+s</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>46.31</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/11/2008</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YW</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>4x400m Relay<=
+/td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Flying Jaguar=
+s</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>3:46.57</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/22/2008</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YW</=
+td>
+  <td class=3Dxl93 style=3D'border-left:none'>4x800m Relay</td>
+  <td class=3Dxl93 style=3D'border-left:none'>&nbsp;</td>
+  <td class=3Dxl93 style=3D'border-left:none'>&nbsp;</td>
+  <td class=3Dxl93 style=3D'border-left:none'>Salinas Valley</td>
+  <td class=3Dxl95 style=3D'border-left:none'>9:40.0</td>
+  <td class=3Dxl94 align=3Dright style=3D'border-left:none'>7/10/1995</td>
+  <td class=3Dxl97 style=3D'border-left:none'>USATF Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YW</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Shot Put</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>KRISTIN</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>HEASTON</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Unattached</t=
+d>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>14.43m / 47'
+  4.25&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/5/1992</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YW</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Discus</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>SUZY</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>POWELL</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Unattached</t=
+d>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>53.41m / 175'=
+ 2&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/10/1995</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YW</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Javelin</td>
+  <td class=3Dxl79 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>Calynn</td>
+  <td class=3Dxl79 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>Stanford</td>
+  <td class=3Dxl79 width=3D180 style=3D'border-top:none;border-left:none;wi=
+dth:135pt'>Sierra
+  Foothill</td>
+  <td class=3Dxl84 width=3D123 style=3D'border-top:none;border-left:none;wi=
+dth:92pt'>36.69m
+  / 120' 4&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/9/2010</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YW</=
+td>
+  <td class=3Dxl93 style=3D'border-left:none'>Hammer</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>Cara</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>McClain</td>
+  <td class=3Dxl93 style=3D'border-left:none'>Unattached</td>
+  <td class=3Dxl95 style=3D'border-left:none'>49.47m / 162' 4&quot;</td>
+  <td class=3Dxl96 style=3D'border-left:none'>6/28/2011</td>
+  <td class=3Dxl97 style=3D'border-left:none'>Youth Nationals</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YW</=
+td>
+  <td class=3Dxl93 style=3D'border-left:none'>Long Jump</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>LAURYN</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>NEWSOM</td>
+  <td class=3Dxl93 style=3D'border-left:none'>Flying Jaguars</td>
+  <td class=3Dxl95 style=3D'border-left:none'>6.16m / 20' 2.5&quot;</td>
+  <td class=3Dxl96 style=3D'border-left:none'>7/11/2008</td>
+  <td class=3Dxl97 style=3D'border-left:none'>Region 14 Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YW</=
+td>
+  <td class=3Dxl93 style=3D'border-left:none'>Triple Jump</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>ALITTA</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>BOYD</td>
+  <td class=3Dxl93 style=3D'border-left:none'>Oakland PAL</td>
+  <td class=3Dxl95 style=3D'border-left:none'>12.81m / 42' .5&quot;</td>
+  <td class=3Dxl96 style=3D'border-left:none'>7/22/2008</td>
+  <td class=3Dxl97 style=3D'border-left:none'>USATF Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YW</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>High Jump</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>SUSAN</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>JACKSON</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Napa TC</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>1.79m / 5' 10=
+.5&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/8/2006</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YW</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Pole Vault</t=
+d>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>Rachel</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>Simmons</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Revolution Ex=
+press</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>3.91m / 12' 1=
+0&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>6/24/2007</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YW</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Heptathlon</t=
+d>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>TATUM</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>SOUZA</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Napa TC</td>
+  <td class=3Dxl87 style=3D'border-top:none;border-left:none'>4,641</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>6/28/2009</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td colspan=3D7 height=3D20 class=3Dxl110 width=3D788 style=3D'height:15.=
+0pt;
+  width:591pt'>Young Men</td>
+  <td class=3Dxl66>&nbsp;</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YM</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>100m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>RASHAAD</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>ALLEN</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>AC</td>
+  <td class=3Dxl68 align=3Dright style=3D'border-top:none;border-left:none'=
+>10.56</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/24/2001</td>
+  <td class=3Dxl71 style=3D'border-left:none'>USATF Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YM</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>200m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>FELTON</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>CHARLES</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>San Francisco
+  Senators</td>
+  <td class=3Dxl68 align=3Dright style=3D'border-top:none;border-left:none'=
+>20.89</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/10/1995</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YM</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>400m<span
+  style=3D'mso-spacerun:yes'> </span></td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>TIM</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>BROWN</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>ACCC TC</td>
+  <td class=3Dxl68 align=3Dright style=3D'border-top:none;border-left:none'=
+>47.41</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/13/1997</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YM</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>800m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>CHE</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>BALLENGER</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Unattached</t=
+d>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>1:52.28</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/30/2006</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YM</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>1500m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>BOLOTA</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>ASMERON</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>San Francisco
+  Senators</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>4:01.55</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/30/1995</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YM</=
+td>
+  <td class=3Dxl79 width=3D135 style=3D'border-top:none;border-left:none;wi=
+dth:101pt'>3000m</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Zack</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Hummel</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Lodi TC</td>
+  <td class=3Dxl72 style=3D'border-top:none;border-left:none'>9:32.08</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>6/22/2012</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YM</=
+td>
+  <td class=3Dxl79 width=3D135 style=3D'border-top:none;border-left:none;wi=
+dth:101pt'>5000m</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>NATHAN</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>JACKSON</td>
+  <td class=3Dxl79 width=3D180 style=3D'border-top:none;border-left:none;wi=
+dth:135pt'>Central
+  Valley Roadrunners</td>
+  <td class=3Dxl82 width=3D123 style=3D'border-top:none;border-left:none;wi=
+dth:92pt'>13:30/01</td>
+  <td class=3Dxl82 width=3D68 style=3D'border-top:none;border-left:none;wid=
+th:51pt'>6/13/2009</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Championships</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YM</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>3000m Race Wa=
+lk</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>JOSEPH</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>SHEPPARD</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Golden Gate
+  Racewalkers</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>15:10.0</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>6/13/1992</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YM</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>110m Hurdles<=
+/td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>RASHAD</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>SMITH</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Hampton-Phill=
+ips
+  Classic</td>
+  <td class=3Dxl68 align=3Dright style=3D'border-top:none;border-left:none'=
+>13.96</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/8/2006</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YM</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>400m Hurdles<=
+/td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>DAVID</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>KLECH</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Hampton-Phill=
+ips
+  Classic</td>
+  <td class=3Dxl68 align=3Dright style=3D'border-top:none;border-left:none'=
+>51.61</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/30/2006</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YM</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>2000m Steeple=
+chase</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>BONIFACIO</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>RUELAS</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Unattached</t=
+d>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>6:08.0</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>6/21/1997</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YM</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>4x100m Relay<=
+/td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>ACCC TC</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>40.42</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/30/2006</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YM</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>4x400m Relay<=
+/td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>&nbsp;</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>ACCC TC</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>3:12.40</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/13/1997</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YM</=
+td>
+  <td class=3Dxl93 style=3D'border-left:none'>4x800m Relay</td>
+  <td class=3Dxl93 style=3D'border-left:none'>&nbsp;</td>
+  <td class=3Dxl93 style=3D'border-left:none'>&nbsp;</td>
+  <td class=3Dxl93 style=3D'border-left:none'>Reebok Aggie</td>
+  <td class=3Dxl95 style=3D'border-left:none'>7:46.53</td>
+  <td class=3Dxl94 align=3Dright style=3D'border-left:none'>7/29/2001</td>
+  <td class=3Dxl97 style=3D'border-left:none'>USATF Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YM</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Shot Put</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Ryan</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Donnahoe</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Unattached</t=
+d>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>18.27m / 59'
+  11.25&quot;</td>
+  <td class=3Dxl80 align=3Dright style=3D'border-top:none;border-left:none'=
+>7/26/2012</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YM</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Discus</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>LUCIAS</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>MCKAY</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Unattached</t=
+d>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>59.51m / 195'=
+ 3&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>5/30/1998</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Championships</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YM</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Javelin</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>CHIP</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>LILENTHAL</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Napa TC</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>62.48m / 205'=
+ 0&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>5/27/1996</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Championships</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YM</=
+td>
+  <td class=3Dxl93 style=3D'border-left:none'>Hammer</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>BUCK</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>SULLIVAN</td>
+  <td class=3Dxl93 style=3D'border-left:none'>Unattached</td>
+  <td class=3Dxl95 style=3D'border-left:none'>62.77m / 205' 11&quot;</td>
+  <td class=3Dxl96 style=3D'border-left:none'>7/9/2005</td>
+  <td class=3Dxl97 style=3D'border-left:none'>Region 14 Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YM</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Long Jump</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Treyell</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Wallace</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Hilltop Stepp=
+ers</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>7.31m / 23'
+  11.75&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/8/2011</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YM</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Triple Jump</=
+td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>NKOSINZA</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>BALUMBU</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Mission Valle=
+y</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>15.58m / 51'
+  1.5&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/31/2005</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YM</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>High Jump</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>FLETCHER</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>CARLYLE
+  III</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Napa TC</td>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>2.15m / 7' 1&=
+quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>6/26/2005</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Pacific Assoc=
+iation
+  Junior Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YM</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Pole Vault</t=
+d>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>CASEY</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>ROCHE</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Unattached</t=
+d>
+  <td class=3Dxl69 style=3D'border-top:none;border-left:none'>5.31m / 17'
+  5.25&quot;</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>7/30/2006</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>USATF Junior =
+Olympics</td>
+  <td></td>
+ </tr>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 class=3Dxl67 style=3D'height:15.0pt;border-top:none'>YM</=
+td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Decathlon</td>
+  <td class=3Dxl85 width=3D102 style=3D'border-top:none;border-left:none;wi=
+dth:77pt'>JOSHUA</td>
+  <td class=3Dxl85 width=3D108 style=3D'border-top:none;border-left:none;wi=
+dth:81pt'>CUSICK</td>
+  <td class=3Dxl68 style=3D'border-top:none;border-left:none'>Unattached</t=
+d>
+  <td class=3Dxl87 style=3D'border-top:none;border-left:none'>6,411</td>
+  <td class=3Dxl70 style=3D'border-top:none;border-left:none'>6/20/2008</td>
+  <td class=3Dxl71 style=3D'border-top:none;border-left:none'>Region 14 Jun=
+ior
+  Olympics</td>
+  <td></td>
+ </tr>
+ <![if supportMisalignedColumns]>
+ <tr height=3D0 style=3D'display:none'>
+  <td width=3D72 style=3D'width:54pt'></td>
+  <td width=3D135 style=3D'width:101pt'></td>
+  <td width=3D102 style=3D'width:77pt'></td>
+  <td width=3D108 style=3D'width:81pt'></td>
+  <td width=3D180 style=3D'width:135pt'></td>
+  <td width=3D123 style=3D'width:92pt'></td>
+  <td width=3D68 style=3D'width:51pt'></td>
+  <td width=3D227 style=3D'width:170pt'></td>
+  <td width=3D64 style=3D'width:48pt'></td>
+ </tr>
+ <![endif]>
+</table>
+
+</body>
+
+</html>
+
+------=_NextPart_01CE4A5D.F71CD940
+Content-Location: file:///C:/506954F3/PAUSATFRecords_files/sheet002.htm
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/html; charset="windows-1252"
+
+<html xmlns:o=3D"urn:schemas-microsoft-com:office:office"
+xmlns:x=3D"urn:schemas-microsoft-com:office:excel"
+xmlns=3D"http://www.w3.org/TR/REC-html40">
+
+<head>
+<meta http-equiv=3DContent-Type content=3D"text/html; charset=3Dwindows-125=
+2">
+<meta name=3DProgId content=3DExcel.Sheet>
+<meta name=3DGenerator content=3D"Microsoft Excel 14">
+<link id=3DMain-File rel=3DMain-File href=3D"../PAUSATFRecords.htm">
+<link rel=3DFile-List href=3Dfilelist.xml>
+<![if IE]>
+<base href=3D"file:///C:\506954F3\PAUSATFRecords_files\sheet002.htm"
+id=3D"webarch_temp_base_tag">
+<![endif]>
+<link rel=3DStylesheet href=3Dstylesheet.css>
+<style>
+<!--table
+	{mso-displayed-decimal-separator:"\.";
+	mso-displayed-thousand-separator:"\,";}
+@page
+	{margin:.75in .7in .75in .7in;
+	mso-header-margin:.3in;
+	mso-footer-margin:.3in;}
+-->
+</style>
+<![if !supportTabStrip]><script language=3D"JavaScript">
+<!--
+function fnUpdateTabs()
+ {
+  if (parent.window.g_iIEVer>=3D4) {
+   if (parent.document.readyState=3D=3D"complete"
+    && parent.frames['frTabs'].document.readyState=3D=3D"complete")
+   parent.fnSetActiveSheet(1);
+  else
+   window.setTimeout("fnUpdateTabs();",150);
+ }
+}
+
+if (window.name!=3D"frSheet")
+ window.location.replace("../PAUSATFRecords.htm");
+else
+ fnUpdateTabs();
+//-->
+</script>
+<![endif]>
+</head>
+
+<body link=3Dblue vlink=3Dpurple>
+
+<table border=3D0 cellpadding=3D0 cellspacing=3D0 width=3D64 style=3D'borde=
+r-collapse:
+ collapse;table-layout:fixed;width:48pt'>
+ <col width=3D64 style=3D'width:48pt'>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 width=3D64 style=3D'height:15.0pt;width:48pt'></td>
+ </tr>
+ <![if supportMisalignedColumns]>
+ <tr height=3D0 style=3D'display:none'>
+  <td width=3D64 style=3D'width:48pt'></td>
+ </tr>
+ <![endif]>
+</table>
+
+</body>
+
+</html>
+
+------=_NextPart_01CE4A5D.F71CD940
+Content-Location: file:///C:/506954F3/PAUSATFRecords_files/sheet003.htm
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/html; charset="windows-1252"
+
+<html xmlns:o=3D"urn:schemas-microsoft-com:office:office"
+xmlns:x=3D"urn:schemas-microsoft-com:office:excel"
+xmlns=3D"http://www.w3.org/TR/REC-html40">
+
+<head>
+<meta http-equiv=3DContent-Type content=3D"text/html; charset=3Dwindows-125=
+2">
+<meta name=3DProgId content=3DExcel.Sheet>
+<meta name=3DGenerator content=3D"Microsoft Excel 14">
+<link id=3DMain-File rel=3DMain-File href=3D"../PAUSATFRecords.htm">
+<link rel=3DFile-List href=3Dfilelist.xml>
+<![if IE]>
+<base href=3D"file:///C:\506954F3\PAUSATFRecords_files\sheet003.htm"
+id=3D"webarch_temp_base_tag">
+<![endif]>
+<link rel=3DStylesheet href=3Dstylesheet.css>
+<style>
+<!--table
+	{mso-displayed-decimal-separator:"\.";
+	mso-displayed-thousand-separator:"\,";}
+@page
+	{margin:.75in .7in .75in .7in;
+	mso-header-margin:.3in;
+	mso-footer-margin:.3in;}
+-->
+</style>
+<![if !supportTabStrip]><script language=3D"JavaScript">
+<!--
+function fnUpdateTabs()
+ {
+  if (parent.window.g_iIEVer>=3D4) {
+   if (parent.document.readyState=3D=3D"complete"
+    && parent.frames['frTabs'].document.readyState=3D=3D"complete")
+   parent.fnSetActiveSheet(2);
+  else
+   window.setTimeout("fnUpdateTabs();",150);
+ }
+}
+
+if (window.name!=3D"frSheet")
+ window.location.replace("../PAUSATFRecords.htm");
+else
+ fnUpdateTabs();
+//-->
+</script>
+<![endif]>
+</head>
+
+<body link=3Dblue vlink=3Dpurple>
+
+<table border=3D0 cellpadding=3D0 cellspacing=3D0 width=3D64 style=3D'borde=
+r-collapse:
+ collapse;table-layout:fixed;width:48pt'>
+ <col width=3D64 style=3D'width:48pt'>
+ <tr height=3D20 style=3D'height:15.0pt'>
+  <td height=3D20 width=3D64 style=3D'height:15.0pt;width:48pt'></td>
+ </tr>
+ <![if supportMisalignedColumns]>
+ <tr height=3D0 style=3D'display:none'>
+  <td width=3D64 style=3D'width:48pt'></td>
+ </tr>
+ <![endif]>
+</table>
+
+</body>
+
+</html>
+
+------=_NextPart_01CE4A5D.F71CD940
+Content-Location: file:///C:/506954F3/PAUSATFRecords_files/filelist.xml
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/xml; charset="utf-8"
+
+<xml xmlns:o=3D"urn:schemas-microsoft-com:office:office">
+ <o:MainFile HRef=3D"../PAUSATFRecords.htm"/>
+ <o:File HRef=3D"stylesheet.css"/>
+ <o:File HRef=3D"tabstrip.htm"/>
+ <o:File HRef=3D"sheet001.htm"/>
+ <o:File HRef=3D"sheet002.htm"/>
+ <o:File HRef=3D"sheet003.htm"/>
+ <o:File HRef=3D"filelist.xml"/>
+</xml>
+------=_NextPart_01CE4A5D.F71CD940--
