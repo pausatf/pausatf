@@ -1,0 +1,22 @@
+[Unit]
+Description=PAUSATF Legacy Content Git Sync Watcher
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/pausatf-legacy-content
+ExecStart=/usr/local/bin/sync-legacy-content-watcher.sh
+Restart=always
+RestartSec=10
+StandardOutput=append:/var/log/legacy-content-sync.log
+StandardError=append:/var/log/legacy-content-sync.log
+
+# Security hardening
+PrivateTmp=yes
+NoNewPrivileges=yes
+ProtectSystem=strict
+ReadWritePaths=/opt/pausatf-legacy-content /var/log
+
+[Install]
+WantedBy=multi-user.target
