@@ -1,0 +1,121 @@
+# PAUSATF Monorepo Pre-commit Hooks
+# Install: pip install pre-commit && pre-commit install
+# Run: pre-commit run --all-files
+
+repos:
+  # ===========================================================================
+  # General Hooks (apply to all files)
+  # ===========================================================================
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: check-merge-conflict
+      - id: check-yaml
+        args: ['--unsafe']  # Allow custom tags in Ansible YAML
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: mixed-line-ending
+      - id: detect-private-key
+
+  # ===========================================================================
+  # Security Scanning (apply to all files)
+  # ===========================================================================
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        exclude: package.lock.json
+
+  - repo: https://github.com/zricethezav/gitleaks
+    rev: v8.18.1
+    hooks:
+      - id: gitleaks
+
+  # ===========================================================================
+  # Terraform Hooks (terraform/ directory)
+  # ===========================================================================
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.86.0
+    hooks:
+      - id: terraform_fmt
+        files: ^terraform/
+      - id: terraform_validate
+        files: ^terraform/
+      - id: terraform_docs
+        files: ^terraform/
+        args:
+          - '--args=--lockfile=false'
+      - id: terraform_tflint
+        files: ^terraform/
+        args:
+          - '--args=--config=__GIT_WORKING_DIR__/terraform/.tflint.hcl'
+      - id: terraform_tfsec
+        files: ^terraform/
+        args:
+          - '--args=--concise-output'
+          - '--args=--exclude-downloaded-modules'
+
+  - repo: https://github.com/bridgecrewio/checkov
+    rev: 3.1.34
+    hooks:
+      - id: checkov
+        name: checkov (terraform)
+        files: ^terraform/.*\.tf$
+        args:
+          - '--quiet'
+          - '--compact'
+          - '--framework'
+          - 'terraform'
+
+  # ===========================================================================
+  # Ansible Hooks (ansible/ directory)
+  # ===========================================================================
+  - repo: https://github.com/ansible/ansible-lint
+    rev: v6.22.1
+    hooks:
+      - id: ansible-lint
+        files: ^ansible/.*\.(yaml|yml)$
+        args:
+          - '--offline'
+          - '--exclude'
+          - 'roles/galaxy/'
+
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.33.0
+    hooks:
+      - id: yamllint
+        files: ^ansible/.*\.(yaml|yml)$
+        args: ['-d', '{extends: default, rules: {line-length: {max: 120}}}']
+
+  - repo: https://github.com/bridgecrewio/checkov
+    rev: 3.1.34
+    hooks:
+      - id: checkov
+        name: checkov (ansible)
+        files: ^ansible/.*\.(yaml|yml)$
+        args:
+          - '--quiet'
+          - '--compact'
+          - '--framework'
+          - 'ansible'
+
+  # ===========================================================================
+  # Shell Script Hooks (scripts/ directory)
+  # ===========================================================================
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.9.0.6
+    hooks:
+      - id: shellcheck
+        files: ^scripts/.*\.sh$
+
+  # ===========================================================================
+  # Markdown Hooks (docs/ and root README.md)
+  # ===========================================================================
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.38.0
+    hooks:
+      - id: markdownlint
+        args: ['--config', '.markdownlint.json']
+        files: \.md$

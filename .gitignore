@@ -1,0 +1,131 @@
+# PAUSATF Monorepo .gitignore
+
+# ============================================================================
+# Secrets and Credentials (NEVER commit these!)
+# ============================================================================
+*.env
+*.env.*
+*.env.local
+*.env.*.local
+.env
+.env.*
+!.env.example
+secrets.yaml
+secrets.yml
+vault.yml
+**/vault.yml
+!**/vault.yml.example
+!**/vault.yaml.example
+.vault_pass
+.vault_password
+vault_pass.txt
+vault-password.txt
+credentials.json
+*-credentials.json
+service-account*.json
+*.pem
+*.key
+*.cert
+*.crt
+id_rsa
+id_rsa.pub
+*.p12
+*.pfx
+*token*.txt
+*key*.txt
+*secret*.txt
+api-tokens/
+.secrets/
+db-credentials.txt
+mysql-pass.txt
+.secrets.baseline
+
+# ============================================================================
+# Terraform
+# ============================================================================
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfplan.*
+.terraform/
+.terraform.lock.hcl
+**/.terraform/*
+.terraform.d/
+.terraform.tfstate.lock.info
+*.tfvars
+*.tfvars.json
+!*.tfvars.example
+!terraform.tfvars.example
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# ============================================================================
+# Ansible
+# ============================================================================
+*.retry
+group_vars/*/vault.yml
+host_vars/*/vault.yml
+roles/galaxy/
+.molecule/
+.cache/
+.pytest_cache/
+
+# ============================================================================
+# Python
+# ============================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+
+# ============================================================================
+# IDE and Editors
+# ============================================================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ============================================================================
+# Operating System Files
+# ============================================================================
+.DS_Store
+Thumbs.db
+
+# ============================================================================
+# Logs
+# ============================================================================
+*.log
+logs/
+
+# ============================================================================
+# Temporary and Backup Files
+# ============================================================================
+tmp/
+temp/
+*.tmp
+*.bak
+*.backup
+
+# ============================================================================
+# Testing
+# ============================================================================
+**/*.test.js
+**/*.spec.js
+
+# ============================================================================
+# Development Tools
+# ============================================================================
+.claude
