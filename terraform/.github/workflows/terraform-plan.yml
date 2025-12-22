@@ -1,0 +1,120 @@
+name: Terraform Plan
+
+on:
+  pull_request:
+    paths:
+      - 'environments/**/*.tf'
+      - 'modules/**/*.tf'
+      - '.github/workflows/terraform-plan.yml'
+
+env:
+  TF_IN_AUTOMATION: true
+
+jobs:
+  plan:
+    name: Terraform Plan
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.pull_request.title, 'chore(deps):')"
+    strategy:
+      matrix:
+        environment:
+          - production
+          - staging
+          - github
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ~1.6
+
+      - name: Configure DigitalOcean credentials
+        if: matrix.environment != 'github'
+        env:
+          DO_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
+          SPACES_ACCESS_KEY: ${{ secrets.SPACES_ACCESS_KEY_ID }}
+          SPACES_SECRET_KEY: ${{ secrets.SPACES_SECRET_ACCESS_KEY }}
+        run: |
+          echo "Credentials configured for DigitalOcean"
+
+      - name: Configure GitHub credentials
+        if: matrix.environment == 'github'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+          echo "Credentials configured for GitHub"
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: environments/${{ matrix.environment }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.SPACES_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SPACES_SECRET_ACCESS_KEY }}
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color -out=tfplan
+        continue-on-error: true
+        working-directory: environments/${{ matrix.environment }}
+        env:
+          TF_VAR_do_token: ${{ secrets.DIGITALOCEAN_TOKEN }}
+          TF_VAR_github_token: ${{ secrets.GH_PAT }}
+          TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
+      - name: Save Terraform Plan Output
+        if: github.event_name == 'pull_request'
+        run: |
+          terraform show -no-color tfplan > plan_output.txt 2>&1 || echo "Plan output not available" > plan_output.txt
+        continue-on-error: true
+        working-directory: environments/${{ matrix.environment }}
+
+      - name: Comment PR with Plan
+        uses: actions/github-script@v8
+        if: github.event_name == 'pull_request'
+        env:
+          PLAN_OUTPUT: ${{ matrix.environment }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            let planOutput = 'Plan output not available';
+            try {
+              const planPath = path.join('environments', '${{ matrix.environment }}', 'plan_output.txt');
+              if (fs.existsSync(planPath)) {
+                planOutput = fs.readFileSync(planPath, 'utf8');
+                // Truncate if too long (GitHub comment limit is 65536 chars)
+                if (planOutput.length > 60000) {
+                  planOutput = planOutput.substring(0, 60000) + '\n\n... (truncated)';
+                }
+              }
+            } catch (error) {
+              planOutput = `Error reading plan: ${error.message}`;
+            }
+
+            const planStatus = '${{ steps.plan.outcome }}';
+            const statusEmoji = planStatus === 'success' ? '✅' : '❌';
+
+            const output = `#### ${statusEmoji} Terraform Plan for \`${{ matrix.environment }}\`
+
+            **Status:** ${planStatus}
+
+            <details><summary>Show Plan</summary>
+
+            \`\`\`terraform
+            ${planOutput}
+            \`\`\`
+
+            </details>
+
+            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
