@@ -1,0 +1,136 @@
+name: Theme Feature Request
+description: Suggest a new feature or enhancement for the PAUSATF child theme
+title: "[Feature] "
+labels: ["enhancement", "needs-triage"]
+assignees:
+  - thomasvincent
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting a theme enhancement!
+
+        Please provide details about what you'd like to see added or improved.
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Feature Type
+      description: What type of feature is this?
+      options:
+        - New visual component/widget
+        - Layout improvement
+        - Navigation enhancement
+        - Mobile/responsive improvement
+        - Accessibility enhancement
+        - Performance optimization
+        - Custom functionality
+        - Integration with plugin
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature?
+      options:
+        - High (Significant user impact)
+        - Medium (Nice to have)
+        - Low (Minor enhancement)
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: What problem does this feature solve? What pain point does it address?
+      placeholder: "Currently, users have difficulty finding club information because..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the feature you'd like to see implemented
+      placeholder: "Add a searchable club directory widget to the homepage that allows users to..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Have you thought of any alternative solutions or features?
+      placeholder: "We could also consider adding a filter dropdown instead of search..."
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: Examples/References
+      description: Are there any examples of this feature on other sites? Include URLs or screenshots
+      placeholder: "Similar to what [example.com] does with their club listings..."
+
+  - type: dropdown
+    id: pages
+    attributes:
+      label: Affected Pages/Sections
+      description: Where would this feature appear?
+      multiple: true
+      options:
+        - Homepage
+        - Blog pages
+        - Club listings
+        - Single post/page
+        - Header/Navigation
+        - Footer
+        - Sidebar
+        - All pages
+        - Other
+
+  - type: dropdown
+    id: devices
+    attributes:
+      label: Target Devices
+      description: Which devices should this feature support?
+      multiple: true
+      options:
+        - Desktop
+        - Tablet
+        - Mobile Phone
+        - All devices
+    validations:
+      required: true
+
+  - type: textarea
+    id: benefits
+    attributes:
+      label: User Benefits
+      description: How will this feature benefit PAUSATF members and visitors?
+      placeholder: "This will help members quickly find their local club information without having to navigate through multiple pages..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other information that would be helpful
+      placeholder: "This was requested by several club presidents at the last meeting..."
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Pre-submission Checklist
+      description: Please confirm the following
+      options:
+        - label: I have searched existing issues to make sure this hasn't been requested before
+          required: true
+        - label: This feature aligns with PAUSATF's mission and goals
+          required: true
+        - label: I have considered how this would work on mobile devices
+          required: false
