@@ -1,0 +1,137 @@
+name: Infrastructure Change Request
+description: Request a change to PAUSATF infrastructure (servers, DNS, CDN, etc.)
+title: "[Infrastructure] "
+labels: ["infrastructure", "needs-triage"]
+assignees:
+  - thomasvincent
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Infrastructure Change Request
+
+        Use this template to request changes to PAUSATF infrastructure including:
+        - Server configuration changes
+        - DNS modifications
+        - CDN/Cloudflare settings
+        - Database changes
+        - WordPress configuration
+
+        **Note:** For security issues, use the Security Issue template instead.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Infrastructure Area
+      description: Which area of infrastructure needs to be changed?
+      options:
+        - WordPress
+        - Database (MySQL)
+        - Web Server (Apache/OpenLiteSpeed)
+        - DNS
+        - Cloudflare/CDN
+        - DigitalOcean Droplets
+        - Networking/Firewall
+        - Email (Google Workspace)
+        - Backups
+        - Monitoring
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      description: Which environment is affected?
+      options:
+        - Production (pausatf-prod)
+        - Staging (pausatf-stage)
+        - Both
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How urgent is this change?
+      options:
+        - Critical (Service Down)
+        - High (Major Impact)
+        - Medium (Moderate Impact)
+        - Low (Minor Improvement)
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Change Description
+      description: Describe the requested change in detail
+      placeholder: |
+        What needs to change?
+        Why is this change needed?
+        What is the current behavior/state?
+        What is the desired behavior/state?
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact Assessment
+      description: What is the expected impact of this change?
+      placeholder: |
+        - Downtime required: Yes/No (if yes, how long?)
+        - User impact: (will users notice?)
+        - Risk level: (low/medium/high)
+        - Rollback plan: (how to undo if needed)
+    validations:
+      required: true
+
+  - type: textarea
+    id: testing
+    attributes:
+      label: Testing Plan
+      description: How will this change be tested?
+      placeholder: |
+        - Test on staging first?
+        - Verification steps after implementation
+        - Success criteria
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: prerequisites
+    attributes:
+      label: Prerequisites
+      description: Confirm these items before submitting
+      options:
+        - label: I have checked existing issues to avoid duplicates
+          required: true
+        - label: I have reviewed relevant documentation
+          required: true
+        - label: I have considered the impact on production
+          required: true
+        - label: I have a rollback plan if this change fails
+          required: false
+
+  - type: textarea
+    id: related
+    attributes:
+      label: Related Issues/PRs
+      description: Link any related issues, PRs, or documentation
+      placeholder: |
+        - Related to #123
+        - Implements pausatf/pausatf-terraform#45
+        - Documentation: [link]
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other information that would be helpful
+      placeholder: |
+        Screenshots, logs, configuration files, etc.

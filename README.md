@@ -74,6 +74,7 @@ Documentation is organized in numbered sequence for logical reading order:
 | **[THEME-DROPDOWN-FIX.md](THEME-DROPDOWN-FIX.md)** | Guide | **WordPress theme dropdown menu background color fix** |
 | **[COMMIT-STANDARDS.md](COMMIT-STANDARDS.md)** | Standards | **Conventional commit message standards and enforcement** |
 | **[GITHUB-ACTIONS.md](GITHUB-ACTIONS.md)** | Documentation | **Complete GitHub Actions workflows documentation** |
+| **[GITHUB-WORKFLOW-STRATEGY.md](GITHUB-WORKFLOW-STRATEGY.md)** | Strategy | **GitHub-native workflow and documentation organization strategy** |
 | **[CHANGELOG.md](CHANGELOG.md)** | Changelog | **Infrastructure change history** |
 | **[CONTRIBUTING.md](CONTRIBUTING.md)** | Guide | **Contribution guidelines** |
 | **[AUTOMATION.md](AUTOMATION.md)** | Guide | **Automation tools and scripts** |
