@@ -75,7 +75,7 @@ variable "environment" {
 variable "trusted_sources" {
   description = "List of trusted sources for database firewall"
   type = list(object({
-    type  = string  # ip_addr, droplet, k8s, tag
+    type  = string # ip_addr, droplet, k8s, tag
     value = string
   }))
   default = []
