@@ -94,8 +94,8 @@
 
 | Runbook | Description |
 |---------|-------------|
-| [Deployment](runbooks/deployment.md) | Deployment procedures |
-| [Disaster Recovery](runbooks/disaster-recovery.md) | Disaster recovery procedures |
+| [Deployment](docs/runbooks/deployment.md) | Deployment procedures |
+| [Disaster Recovery](docs/runbooks/disaster-recovery.md) | Disaster recovery procedures |
 
 ---
 
