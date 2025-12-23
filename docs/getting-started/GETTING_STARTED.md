@@ -262,11 +262,11 @@ If something goes wrong:
 
 ## Resources
 
-- **Main README**: [README.md](README.md)
-- **Deployment Guide**: [docs/runbooks/deployment.md](docs/runbooks/deployment.md)
-- **Disaster Recovery**: [docs/runbooks/disaster-recovery.md](docs/runbooks/disaster-recovery.md)
-- **Contributing**: [CONTRIBUTING.md](CONTRIBUTING.md)
-- **Changelog**: [CHANGELOG.md](CHANGELOG.md)
+- **Main README**: [README.md](../../README.md)
+- **Deployment Guide**: [docs/runbooks/deployment.md](../runbooks/deployment.md)
+- **Disaster Recovery**: [docs/runbooks/disaster-recovery.md](../runbooks/disaster-recovery.md)
+- **Contributing**: [CONTRIBUTING.md](../../CONTRIBUTING.md)
+- **Changelog**: [CHANGELOG.md](../CHANGELOG.md)
 
 ## Getting Help
 
