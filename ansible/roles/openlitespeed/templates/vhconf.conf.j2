@@ -1,0 +1,20 @@
+docRoot                   {{ wordpress_installs[0].path | default('/var/www/html') }}
+index  {
+  useServer               0
+  indexFiles              index.php, index.html
+}
+
+rewrite  {
+  enable                  1
+  autoLoadHtaccess        1
+}
+
+context /phpmyadmin/ {
+  type                    proxy
+  uri                     /phpmyadmin/
+  location                http://127.0.0.1:8080/
+}
+
+phpIniOverride  {
+  php_admin_value open_basedir "/tmp/:{{ wordpress_installs[0].path | default('/var/www/html') }}/"
+}

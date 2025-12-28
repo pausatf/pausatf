@@ -41,6 +41,7 @@ cloudflare_api_token: "{{ vault_cloudflare_api_token }}"
 cloudflare_email: "{{ vault_cloudflare_email }}"
 cloudflare_plan: "Free Website"
 cloudflare_status: "active"
+cloudflare_manage_dns: false  # DNS is managed via Terraform
 cloudflare_nameservers:
   - curt.ns.cloudflare.com
   - eva.ns.cloudflare.com

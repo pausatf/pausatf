@@ -7,15 +7,15 @@
 #   - Ubuntu 20.04.6 LTS (Focal Fossa)
 #   - 4 CPU cores, 8GB RAM
 #   - DigitalOcean Droplet (sfo2)
-#   - Apache 2.4.63 with mod_php7.2
-#   - PHP 7.4.33 (with 7.2, 8.1, 8.4 also available)
-#   - MySQL 5.7.42
-#   - WordPress 6.8.3 (main site at www.pausatf.org)
-#   - Cloudflare CDN/DNS (Free plan, SSL Full)
+#   - Web Server: Apache or OpenLiteSpeed (per-environment)
+#   - PHP: per-environment (8.3/8.4 for new hosts)
+#   - MySQL: per-environment (8.0+ for new hosts)
+#   - WordPress: per-environment (latest on stage/dev)
+#   - Cloudflare CDN/DNS (Free plan, SSL Full/Strict)
 #
 # Usage:
 #   ansible-playbook -i inventory site.yml
-#   ansible-playbook -i inventory site.yml --tags "apache"
+#   ansible-playbook -i inventory site.yml --tags "webserver"
 #   ansible-playbook -i inventory site.yml --tags "cloudflare"
 #   ansible-playbook -i inventory site.yml --check --diff
 
@@ -62,11 +62,22 @@
     - role: mysql
       tags: [mysql, database]
 
+    # Web server selection per environment
+    - role: lsphp
+      when: web_server | default('apache') == 'openlitespeed'
+      tags: [php, web, webserver]
+
+    - role: openlitespeed
+      when: web_server | default('apache') == 'openlitespeed'
+      tags: [openlitespeed, web, webserver]
+
     - role: php
-      tags: [php, web]
+      when: web_server | default('apache') == 'apache'
+      tags: [php, web, webserver]
 
     - role: apache
-      tags: [apache, web]
+      when: web_server | default('apache') == 'apache'
+      tags: [apache, web, webserver]
 
     - role: cloudflare
       tags: [cloudflare, cdn, dns]
@@ -83,16 +94,12 @@
       tags: [monitoring]
 
   post_tasks:
-    - name: Verify all services are running
+    - name: Verify core services are running
       service:
         name: "{{ item }}"
         state: started
         enabled: yes
-      loop:
-        - apache2
-        - mysql
-        - fail2ban
-        - cron
+      loop: "{{ [ 'mysql', 'fail2ban', 'cron' ] + (web_server == 'openlitespeed' | ternary(['lshttpd'], ['apache2'])) }}"
       tags: verify
 
     - name: Display deployment summary
@@ -116,8 +123,8 @@
             - Transit: /var/www/transit/html (legacy)
 
           Stack:
-            - Apache: 2.4.x
+            - Web: {{ web_server | default('apache') }}
             - PHP: {{ php_version }}
             - MySQL: {{ mysql_version }}
-            - WordPress: 6.8.3
+            - WordPress: {{ wordpress_installs[0].wp_version | default('latest') }}
       tags: always

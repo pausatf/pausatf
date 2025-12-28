@@ -18,6 +18,7 @@
     group: root
     mode: '0644'
   notify: Reload Apache
+  when: web_server | default('apache') == 'apache'
   tags: cloudflare
 
 - name: Enable Cloudflare IP configuration
@@ -25,6 +26,7 @@
   args:
     creates: /etc/apache2/conf-enabled/cloudflare-ips.conf
   notify: Reload Apache
+  when: web_server | default('apache') == 'apache'
   tags: cloudflare
 
 - name: Update Cloudflare IP ranges
@@ -159,3 +161,8 @@
   tags:
     - cloudflare
     - cloudflare-purge
+
+- name: Include DNS management tasks (disabled by default; prefer Terraform)
+  include_tasks: dns.yml
+  when: cloudflare_manage_dns | default(false)
+  tags: [cloudflare, cloudflare-dns]

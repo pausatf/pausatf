@@ -1,3 +1,13 @@
+output "staging_ipv4" {
+  description = "IPv4 of staging droplet"
+  value       = digitalocean_droplet.staging.ipv4_address
+}
+
+output "stage_dns_records" {
+  description = "Created DNS records for staging"
+  value       = module.cloudflare_dns_staging.record_hostnames
+}
+
 output "droplet_id" {
   description = "Staging droplet ID"
   value       = digitalocean_droplet.staging.id

@@ -1,0 +1,49 @@
+name: Infra Staging (Terraform)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  plan-apply:
+    runs-on: ubuntu-latest
+    environment: staging
+    permissions:
+      contents: read
+
+    defaults:
+      run:
+        working-directory: terraform/environments/staging
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.5
+
+      - name: Configure backend credentials (DO Spaces)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.SPACES_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SPACES_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-west-1
+        run: echo "Configured backend creds"
+
+      - name: Terraform Init
+        env:
+          DIGITALOCEAN_TOKEN: ${{ secrets.DO_TOKEN }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: terraform init
+
+      - name: Terraform Plan
+        env:
+          DIGITALOCEAN_TOKEN: ${{ secrets.DO_TOKEN }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: terraform plan -input=false
+
+      - name: Terraform Apply (requires manual dispatch)
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          DIGITALOCEAN_TOKEN: ${{ secrets.DO_TOKEN }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: terraform apply -auto-approve -input=false

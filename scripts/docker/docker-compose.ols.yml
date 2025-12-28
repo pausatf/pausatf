@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  web:
+    image: litespeedtech/openlitespeed:ols1.7.19-lsphp84
+    container_name: ols-wordpress
+    environment:
+      - LSWS_ADMIN_USER=${LSWS_ADMIN_USER:-admin}
+      - LSWS_ADMIN_PASS=${LSWS_ADMIN_PASS}
+    volumes:
+      - wp-data:/var/www/vhosts/localhost/html
+      - ./ols/conf:/usr/local/lsws/conf
+    ports:
+      - "8080:80"
+      - "8443:443"
+      - "7080:7080" # OLS admin
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  db:
+    image: mariadb:11.4
+    environment:
+      - MARIADB_DATABASE=${WORDPRESS_DB_NAME:-wordpress}
+      - MARIADB_USER=${WORDPRESS_DB_USER:-wp}
+      - MARIADB_PASSWORD=${WORDPRESS_DB_PASSWORD}
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+    volumes:
+      - db-data:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    restart: unless-stopped
+
+  phpmyadmin:
+    image: phpmyadmin:5
+    environment:
+      - PMA_HOST=db
+      - UPLOAD_LIMIT=100M
+    ports:
+      - "8081:80"
+    depends_on:
+      - db
+
+volumes:
+  wp-data:
+  db-data:

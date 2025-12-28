@@ -1,0 +1,46 @@
+name: Deploy to Staging (Ansible)
+
+on:
+  push:
+    branches:
+      - staging
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: staging
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Ansible deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible-core==2.17.5 ansible-lint cloudflare requests
+
+      - name: Decrypt vault file
+        if: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
+        run: |
+          printf "%s" "$ANSIBLE_VAULT_PASSWORD" > vault.pass
+        env:
+          ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
+
+      - name: Run playbook (staging)
+        working-directory: ansible
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: 'false'
+        run: |
+          ansible-playbook -i inventory/hosts.yml site.yml -l staging \
+            --vault-password-file ../vault.pass || true
+
+      - name: Healthcheck
+        run: |
+          curl -fsS https://stage.pausatf.org || exit 1

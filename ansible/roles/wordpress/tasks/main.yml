@@ -1,76 +1,17 @@
 ---
-- name: Install Nginx
-  apt:
-    name: nginx
-    state: present
+# WordPress application management only (no webserver here)
+# - uses WP-CLI to manage core, plugins, and themes
+# - honors per-install settings in group_vars
 
-- name: Install PHP and required extensions
-  apt:
-    name:
-      - php8.3-fpm
-      - php8.3-mysql
-      - php8.3-curl
-      - php8.3-gd
-      - php8.3-mbstring
-      - php8.3-xml
-      - php8.3-xmlrpc
-      - php8.3-zip
-      - php8.3-intl
-      - php8.3-soap
-    state: present
-
-- name: Install MySQL client
-  apt:
-    name: mysql-client
-    state: present
-
-- name: Create WordPress directory
-  file:
-    path: /var/www/html
-    state: directory
-    owner: www-data
-    group: www-data
+- name: Ensure WP-CLI is installed
+  get_url:
+    url: https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+    dest: /usr/local/bin/wp
     mode: '0755'
+  when: wpcli_enabled | default(true)
 
-- name: Configure PHP-FPM pool
-  template:
-    src: www.conf.j2
-    dest: /etc/php/8.3/fpm/pool.d/www.conf
-    owner: root
-    group: root
-    mode: '0644'
-  notify: restart php-fpm
-
-- name: Configure Nginx for WordPress
-  template:
-    src: wordpress.conf.j2
-    dest: /etc/nginx/sites-available/wordpress
-    owner: root
-    group: root
-    mode: '0644'
-  notify: restart nginx
-
-- name: Enable WordPress site
-  file:
-    src: /etc/nginx/sites-available/wordpress
-    dest: /etc/nginx/sites-enabled/wordpress
-    state: link
-  notify: restart nginx
-
-- name: Remove default Nginx site
-  file:
-    path: /etc/nginx/sites-enabled/default
-    state: absent
-  notify: restart nginx
-
-- name: Start and enable Nginx
-  systemd:
-    name: nginx
-    state: started
-    enabled: yes
-
-- name: Start and enable PHP-FPM
-  systemd:
-    name: php8.3-fpm
-    state: started
-    enabled: yes
+- name: Iterate configured WordPress installs
+  include_tasks: manage-install.yml
+  loop: "{{ wordpress_installs | default([]) }}"
+  loop_control:
+    loop_var: wp_site
