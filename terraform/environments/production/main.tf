@@ -68,50 +68,56 @@ resource "digitalocean_droplet" "production" {
 
   ssh_keys = var.ssh_key_fingerprints
 
-  user_data = templatefile("${path.module}/../../modules/droplet/cloud-init.yml", {
+  user_data = templatefile("${path.module}/../../modules/droplet/cloud-init-apache.yml", {
     environment = "production"
-    hostname    = "pausatf-prod"
+    hostname    = "ftp"
   })
 }
 
 # Production Database
-resource "digitalocean_database_cluster" "production" {
-  name       = "pausatf-production-db"
-  engine     = "mysql"
-  version    = "8"
-  size       = var.database_size
-  region     = var.region
-  node_count = 1
-
-  tags = [
-    "pausatf",
-    "production",
-    "database"
-  ]
-
-  maintenance_window {
-    day  = "sunday"
-    hour = "04:00:00"
-  }
-}
-
-resource "digitalocean_database_firewall" "production" {
-  cluster_id = digitalocean_database_cluster.production.id
-
-  rule {
-    type  = "droplet"
-    value = digitalocean_droplet.production.id
-  }
-}
+# Note: Production currently uses an external or shared database
+# Uncomment below if dedicated production database is needed
+#
+# resource "digitalocean_database_cluster" "production" {
+#   name       = "pausatf-production-db"
+#   engine     = "mysql"
+#   version    = "8"
+#   size       = var.database_size
+#   region     = var.region
+#   node_count = 1
+#
+#   tags = [
+#     "pausatf",
+#     "production",
+#     "database"
+#   ]
+#
+#   maintenance_window {
+#     day  = "sunday"
+#     hour = "04:00:00"
+#   }
+# }
+#
+# resource "digitalocean_database_firewall" "production" {
+#   cluster_id = digitalocean_database_cluster.production.id
+#
+#   rule {
+#     type  = "droplet"
+#     value = digitalocean_droplet.production.id
+#   }
+# }
 
 # VPC for Production
-resource "digitalocean_vpc" "production" {
-  name     = "pausatf-production-vpc"
-  region   = var.region
-  ip_range = "10.10.0.0/16"
-
-  description = "Production VPC for PAUSATF infrastructure"
-}
+# Note: Currently using default VPC
+# Uncomment below if custom VPC is needed
+#
+# resource "digitalocean_vpc" "production" {
+#   name     = "pausatf-production-vpc"
+#   region   = var.region
+#   ip_range = "10.10.0.0/16"
+#
+#   description = "Production VPC for PAUSATF infrastructure"
+# }
 
 # Firewall for Production
 resource "digitalocean_firewall" "production" {
