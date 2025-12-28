@@ -24,162 +24,75 @@ provider "github" {
   token = var.github_token
 }
 
-# Infrastructure Documentation Repository
-module "pausatf_infrastructure_docs" {
+# PAUSATF Infrastructure Monorepo
+# Consolidated repository containing infrastructure, configuration, scripts, docs, and content
+module "pausatf_monorepo" {
   source = "../../modules/github/repository"
 
-  name        = "pausatf-infrastructure-docs"
-  description = "Infrastructure documentation, runbooks, and operational guides for PAUSATF.org"
+  name        = "pausatf"
+  description = "PAUSATF Infrastructure Monorepo - Consolidated infrastructure, configuration, scripts, documentation, and content"
   visibility  = "public"
 
-  has_issues   = true
-  has_wiki     = false
-  has_projects = false
+  # Features
+  has_issues      = true
+  has_wiki        = true
+  has_projects    = true
+  has_discussions = false
 
+  # Merge settings
+  allow_merge_commit     = true
+  allow_squash_merge     = true
+  allow_rebase_merge     = true
+  allow_auto_merge       = false
   delete_branch_on_merge = true
-  vulnerability_alerts   = true
 
-  topics = [
-    "documentation",
-    "infrastructure",
-    "runbooks",
-    "operations",
-    "wordpress",
-    "digitalocean",
-    "cloudflare"
-  ]
+  # Security
+  vulnerability_alerts = true
+  enable_dependabot    = true
 
   # Branch Protection
-  enable_branch_protection = true
-  require_signed_commits   = true
-  enforce_admins           = false
+  enable_branch_protection        = true
+  protected_branch                = "main"
+  require_signed_commits          = true
+  require_linear_history          = false
+  allows_force_pushes             = false
+  allows_deletions                = false
+  require_conversation_resolution = true
+  enforce_admins                  = false
 
-  # Dependabot
-  enable_dependabot = true
-}
-
-# Terraform Infrastructure Repository
-module "pausatf_terraform" {
-  source = "../../modules/github/repository"
-
-  name        = "pausatf-terraform"
-  description = "Terraform infrastructure as code for PAUSATF.org - DigitalOcean and Cloudflare resources"
-  visibility  = "public"
-
-  has_issues   = true
-  has_wiki     = false
-  has_projects = false
-
-  delete_branch_on_merge = true
-  vulnerability_alerts   = true
-
-  topics = [
-    "terraform",
-    "infrastructure-as-code",
-    "digitalocean",
-    "cloudflare",
-    "wordpress",
-    "iac"
-  ]
-
-  # Branch Protection
-  enable_branch_protection = true
-  require_signed_commits   = true
-  enforce_admins           = false
-
+  # Required CI checks
   required_status_checks = {
     strict = true
     contexts = [
       "terraform-validate",
       "terraform-fmt",
-      "tfsec",
-      "tflint"
-    ]
-  }
-
-  # Dependabot
-  enable_dependabot = true
-}
-
-# Ansible Configuration Repository
-module "pausatf_ansible" {
-  source = "../../modules/github/repository"
-
-  name        = "pausatf-ansible"
-  description = "Ansible configuration management for PAUSATF.org WordPress infrastructure"
-  visibility  = "public"
-
-  has_issues   = true
-  has_wiki     = false
-  has_projects = false
-
-  delete_branch_on_merge = true
-  vulnerability_alerts   = true
-
-  topics = [
-    "ansible",
-    "configuration-management",
-    "wordpress",
-    "apache",
-    "mysql",
-    "php",
-    "devops"
-  ]
-
-  # Branch Protection
-  enable_branch_protection = true
-  require_signed_commits   = true
-  enforce_admins           = false
-
-  required_status_checks = {
-    strict = true
-    contexts = [
       "ansible-lint",
-      "yamllint"
-    ]
-  }
-
-  # Dependabot
-  enable_dependabot = true
-}
-
-# Scripts Repository
-module "pausatf_scripts" {
-  source = "../../modules/github/repository"
-
-  name        = "pausatf-scripts"
-  description = "Automation scripts for PAUSATF.org operations, backups, monitoring, and maintenance"
-  visibility  = "public"
-
-  has_issues   = true
-  has_wiki     = false
-  has_projects = false
-
-  delete_branch_on_merge = true
-  vulnerability_alerts   = true
-
-  topics = [
-    "automation",
-    "scripts",
-    "bash",
-    "operations",
-    "monitoring",
-    "backup",
-    "maintenance"
-  ]
-
-  # Branch Protection
-  enable_branch_protection = true
-  require_signed_commits   = true
-  enforce_admins           = false
-
-  required_status_checks = {
-    strict = true
-    contexts = [
       "shellcheck"
     ]
   }
 
-  # Dependabot
-  enable_dependabot = true
+  # Required reviews
+  required_pull_request_reviews = {
+    dismiss_stale_reviews           = true
+    require_code_owner_reviews      = false
+    required_approving_review_count = 1
+    require_last_push_approval      = false
+  }
+
+  # Repository topics
+  topics = [
+    "infrastructure-as-code",
+    "terraform",
+    "ansible",
+    "wordpress",
+    "digitalocean",
+    "cloudflare",
+    "monorepo",
+    "devops",
+    "automation",
+    "configuration-management",
+    "scripts",
+    "documentation",
+    "runbooks"
+  ]
 }

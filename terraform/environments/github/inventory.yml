@@ -1,0 +1,45 @@
+# GitHub Repository Inventory
+# Captured: 2025-12-28T06:03:00Z
+# Organization: pausatf
+# DO NOT EDIT MANUALLY - regenerate with capture-inventory.sh
+
+repository:
+  name: pausatf
+  description: PAUSATF Infrastructure Monorepo - Consolidated infrastructure, configuration, scripts, documentation, and content
+  visibility: PUBLIC
+  is_private: false
+  url: https://github.com/pausatf/pausatf
+  homepage:
+  created_at: 2025-12-22T07:05:31Z
+  updated_at: 2025-12-28T05:30:12Z
+  pushed_at: 2025-12-28T05:30:09Z
+  default_branch: main
+  # Repository size and activity
+  size_kb: 149965
+  stars: 0
+  forks: 0
+  open_issues: 0
+  open_pull_requests: 0
+  # Features
+  features:
+    issues_enabled: true
+    wiki_enabled: true
+    projects_enabled: true
+    discussions_enabled: false
+  # Merge settings
+  merge_settings:
+    allow_merge_commit: true
+    allow_squash_merge: true
+    allow_rebase_merge: true
+    delete_branch_on_merge: false
+  # License
+  license: none
+# Repository topics
+topics: []
+# Collaborators and permissions
+collaborators: [{"login": "thomasvincent", "permissions": {"admin": true, "maintain": true, "push": true, "triage": true, "pull": true}}]
+# Recent commits (last 10)
+recent_commits: [{"sha": "16e4b11", "message": "Fix nested docs/docs directory structure", "author": "Thomas Vincent", "date": "2025-12-28T05:30:04Z"}, {"sha": "00d6756", "message": "Add WordPress users and site configuration to inventory capture", "author": "Thomas Vincent", "date": "2025-12-28T05:27:34Z"}, {"sha": "995c90f", "message": "Update documentation with current production state", "author": "Thomas Vincent", "date": "2025-12-28T02:28:01Z"}, {"sha": "9f4b8f6", "message": "Add production migration and restore playbooks", "author": "Thomas Vincent", "date": "2025-12-28T02:18:33Z"}, {"sha": "5497ae2", "message": "Add theme configuration capture to inventory", "author": "Thomas Vincent", "date": "2025-12-28T02:16:28Z"}, {"sha": "10bea67", "message": "Capture prod WordPress inventory and configure deploy user", "author": "Thomas Vincent", "date": "2025-12-28T02:14:38Z"}, {"sha": "ff7bc20", "message": "chore(backups,capture): add nightly legacy rsync to repo; nightly DO snapshots; on-demand prod plugin/theme capture via GH Actions", "author": "Thomas Vincent", "date": "2025-12-28T02:02:22Z"}, {"sha": "74cc0af", "message": "feat(ols,terraform,ansible): adopt OpenLiteSpeed for non-prod; move DNS to Terraform; add dev/staging envs; refactor WP role; add capture playbooks and local OLS stack", "author": "Thomas Vincent", "date": "2025-12-28T01:57:21Z"}, {"sha": "015bcbf", "message": "fix: correct broken markdown links in documentation (#1)", "author": "Thomas Vincent", "date": "2025-12-23T04:57:07Z"}, {"sha": "ebfbf8d", "message": "docs: add comprehensive monorepo improvement recommendations", "author": "Thomas Vincent", "date": "2025-12-22T22:35:37Z"}]
+# Branch protection
+branch_protection:
+  enabled: false
