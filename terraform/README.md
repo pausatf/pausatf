@@ -1,354 +1,281 @@
 # PAUSATF Terraform Infrastructure
 
-**Infrastructure as Code for pausatf.org using Terraform**
+Complete infrastructure as code for PAUSATF (Pan African Ultimate Sports & Training Foundation).
 
 [![Terraform](https://img.shields.io/badge/Terraform-1.6+-623CE4?logo=terraform)](https://www.terraform.io/)
 [![DigitalOcean](https://img.shields.io/badge/DigitalOcean-Provider-0080FF?logo=digitalocean)](https://www.digitalocean.com/)
 [![Cloudflare](https://img.shields.io/badge/Cloudflare-Provider-F38020?logo=cloudflare)](https://www.cloudflare.com/)
 
----
+## 🏗️ Architecture Overview
 
-## Overview
-
-This repository contains Terraform configurations for managing PAUSATF.org infrastructure:
-
-- **DigitalOcean Droplets** - Production and staging web servers
-- **DigitalOcean Databases** - MySQL clusters for WordPress
-- **DigitalOcean Networking** - VPC, firewalls, load balancers
-- **Cloudflare** - DNS, CDN, security, and SSL configuration
-- **GitHub Repositories** - Repository settings, branch protection, Dependabot
-- **Monitoring** - Uptime monitoring and alerting
-
----
-
-## Repository Structure
+This Terraform configuration manages **39 cloud resources** across:
+- **DigitalOcean** - Compute, databases, networking (8 resources)
+- **Cloudflare** - DNS and CDN (30 resources)
+- **GitHub** - Repository and CI/CD (1 resource)
 
 ```
-pausatf-terraform/
-├── environments/
-│   ├── production/          # Production environment
-│   │   ├── main.tf
-│   │   ├── variables.tf
-│   │   ├── terraform.tfvars.example
-│   │   └── backend.tf
-│   ├── staging/             # Staging environment
-│   │   ├── main.tf
-│   │   ├── variables.tf
-│   │   ├── terraform.tfvars.example
-│   │   └── backend.tf
-│   ├── github/              # GitHub repository management
-│   │   ├── main.tf
-│   │   ├── variables.tf
-│   │   ├── terraform.tfvars.example
-│   │   └── README.md
-│   └── shared/              # Shared resources (DNS, etc.)
-│       ├── main.tf
-│       └── variables.tf
-├── modules/
-│   ├── droplet/             # DigitalOcean droplet module
-│   ├── database/            # DigitalOcean database module
-│   ├── networking/          # VPC, firewall, load balancer
-│   ├── cloudflare/          # Cloudflare DNS and security
-│   └── monitoring/          # Monitoring and alerts
-├── .github/
-│   └── workflows/
-│       ├── terraform-plan.yml    # PR validation
-│       ├── terraform-apply.yml   # Deploy on merge
-│       └── security-scan.yml     # tfsec, checkov scans
-├── .gitignore               # Terraform-specific ignores
-├── .pre-commit-config.yaml  # Pre-commit hooks
-├── .tflint.hcl             # TFLint configuration
-├── README.md               # This file
-└── CONTRIBUTING.md         # Contribution guidelines
+terraform/
+├── environments/           # Environment-specific configurations
+│   ├── production/        # Production environment (4 resources)
+│   ├── staging/           # Staging environment (4 resources)
+│   ├── cloudflare/        # DNS management (30 resources)
+│   ├── github/            # Repository configuration (1 resource)
+│   └── dev/               # Development environment
+├── modules/               # Reusable Terraform modules
+│   ├── cloudflare/        # Cloudflare zone and DNS modules
+│   ├── digitalocean/      # DigitalOcean droplet and database modules
+│   ├── github/            # GitHub repository module
+│   └── droplet/           # Cloud-init templates (Apache, OpenLiteSpeed)
+├── import-all-resources.sh        # Master import script
+├── INFRASTRUCTURE_INVENTORY.md    # Current state documentation
+├── TERRAFORM_MIGRATION_COMPLETE.md # Migration guide
+└── README.md                      # This file
 ```
 
----
+## 📊 Resources Managed
 
-## Prerequisites
+| Environment | Resources | Description |
+|-------------|-----------|-------------|
+| **Production** | 4 | Droplet (Apache + PHP 7.4), firewall, SSH key, project |
+| **Staging** | 4 | Droplet (OpenLiteSpeed + PHP 8.4 + caching), MySQL 8, firewalls |
+| **Cloudflare** | 30 | Zone + 29 DNS records (A, CNAME, MX, TXT, CAA) |
+| **GitHub** | 1 | Repository with branch protection and topics |
+| **Total** | **39** | All cloud resources managed as code |
 
-### Required Tools
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Terraform >= 1.6.0
+- DigitalOcean account and API token
+- Cloudflare account and API token
+- GitHub personal access token
+- DigitalOcean Spaces for state storage
+
+### 1. Set Environment Variables
 
 ```bash
-# Terraform
-brew install terraform
-
-# TFLint (Terraform linter)
-brew install tflint
-
-# tfsec (Security scanner)
-brew install tfsec
-
-# Pre-commit
-brew install pre-commit
-```
-
-### Required Credentials
-
-Set these environment variables:
-
-```bash
-# DigitalOcean
-export DIGITALOCEAN_TOKEN="your-do-token"
-
 # Cloudflare
-export CLOUDFLARE_API_TOKEN="your-cf-token"
-export CLOUDFLARE_ZONE_ID="your-zone-id"
+export TF_VAR_cloudflare_api_token="your-cloudflare-api-token"
+
+# GitHub
+export TF_VAR_github_token="your-github-personal-access-token"
+
+# DigitalOcean Spaces (for Terraform backend)
+export AWS_ACCESS_KEY_ID="your-do-spaces-key"
+export AWS_SECRET_ACCESS_KEY="your-do-spaces-secret"
+
+# Production SSH Key
+export TF_VAR_ssh_public_key="$(cat ~/.ssh/id_ed25519.pub)"
 ```
 
-**IMPORTANT:** Never commit tokens to the repository!
+### 2. Import Existing Resources
 
----
-
-## Getting Started
-
-### 1. Clone Repository
+If starting from existing infrastructure:
 
 ```bash
-git clone https://github.com/pausatf/pausatf-terraform.git
-cd pausatf-terraform
+cd terraform
+./import-all-resources.sh
 ```
 
-### 2. Install Pre-commit Hooks
+This will import all 39 resources into Terraform state.
+
+### 3. Verify Configuration
 
 ```bash
-pre-commit install
+# Check each environment
+cd environments/production && terraform plan
+cd environments/staging && terraform plan
+cd environments/cloudflare && terraform plan
+cd environments/github && terraform plan
 ```
 
-### 3. Initialize Terraform
+### 4. Apply Configuration
 
 ```bash
-cd environments/production
-cp terraform.tfvars.example terraform.tfvars
-# Edit terraform.tfvars with your values
+# Apply GitHub configuration (branch protection, topics)
+cd environments/github
 terraform init
-```
-
-### 4. Plan Changes
-
-```bash
-terraform plan
-```
-
-### 5. Apply Changes
-
-```bash
 terraform apply
+
+# Production/staging/cloudflare (if changes needed)
+cd environments/production && terraform apply
 ```
 
----
+## 📁 Environments
 
-## Best Practices
+### Production (`environments/production/`)
 
-### State Management
+**Infrastructure:**
+- **Droplet:** pausatf-prod (64.225.40.54)
+  - Size: s-4vcpu-8gb (4 vCPUs, 8GB RAM)
+  - Image: Custom snapshot (2023-05-16)
+  - Cloud-init: Apache 2.4 + PHP 7.4
+- **Firewall:** HTTP, HTTPS, SSH (restricted)
+- **SSH Key:** m3 laptop (46721354)
+- **Project:** PAUSATF
 
-- **Remote State:** Stored in DigitalOcean Spaces (S3-compatible)
-- **State Locking:** Enabled via DynamoDB-compatible backend
-- **Encryption:** State files encrypted at rest
+**DNS:** pausatf.org, www, ftp, mail, monitor (all → 64.225.40.54)
 
-### Workflow
+### Staging (`environments/staging/`)
 
-1. **Create Feature Branch**
-   ```bash
-   git checkout -b feature/add-staging-db
-   ```
+**Infrastructure:**
+- **Droplet:** pausatf-stage (64.227.85.73)
+  - Size: s-2vcpu-4gb (2 vCPUs, 4GB RAM)
+  - Cloud-init: OpenLiteSpeed + PHP 8.4 + memcached + Redis
+- **Database:** MySQL 8 (db-s-1vcpu-1gb, 1 node)
+- **Firewall:** HTTP, HTTPS, SSH, OpenLiteSpeed WebAdmin (7080)
 
-2. **Make Changes**
-   - Edit `.tf` files
-   - Run `terraform fmt`
-   - Run `terraform validate`
+**Features:**
+- Object caching (memcached + Redis, socket-based)
+- LSCache plugin ready
+- WebAdmin on port 7080
 
-3. **Test Locally**
-   ```bash
-   terraform plan
-   ```
+**DNS:** stage.pausatf.org, staging.pausatf.org
 
-4. **Create Pull Request**
-   - GitHub Actions will run:
-     - `terraform fmt -check`
-     - `terraform validate`
-     - `tfsec` security scan
-     - `checkov` compliance scan
-     - `terraform plan`
+### Cloudflare (`environments/cloudflare/`)
 
-5. **Review & Approve**
-   - Requires 1 approval
-   - All checks must pass
+**Manages 30 resources:**
+- **Zone:** pausatf.org
+- **7 A records:** root, www (proxied), ftp, mail, monitor, stage, staging
+- **8 CNAME records:** prod, SendGrid email/DKIM
+- **5 MX records:** Google Workspace
+- **4 TXT records:** SPF, DMARC, DKIM, Google verification
+- **5 CAA records:** Let's Encrypt, DigiCert, iodef
 
-6. **Merge to Main**
-   - Automatically runs `terraform apply` for production
-   - Manual approval required
+### GitHub (`environments/github/`)
 
-### Security
+**Repository:** pausatf (monorepo)
 
-- ✅ **No Hardcoded Secrets** - Use variables and environment vars
-- ✅ **Pre-commit Hooks** - Prevent committing secrets
-- ✅ **tfsec Scanning** - Security misconfiguration detection
-- ✅ **Checkov Scanning** - Policy as code compliance
-- ✅ **Least Privilege** - Minimal IAM permissions
-- ✅ **Encryption** - All data encrypted at rest and in transit
+**Features:**
+- Branch protection on main (signed commits, required reviews)
+- Required CI checks: terraform-validate, terraform-fmt, ansible-lint, shellcheck
+- 13 topics: infrastructure-as-code, terraform, ansible, wordpress, etc.
 
-### Code Quality
+## 🔧 Common Operations
 
-- ✅ **Formatting:** `terraform fmt` enforced
-- ✅ **Validation:** `terraform validate` required
-- ✅ **Linting:** TFLint checks for best practices
-- ✅ **Documentation:** All modules documented
-- ✅ **Versioning:** Provider versions pinned
-
----
-
-## Environments
-
-### Production
-
-- **Droplet:** pausatf-prod (4 vCPU, 8GB RAM)
-- **Database:** pausatf-production-db (MySQL 8.0)
-- **Domain:** www.pausatf.org
-- **Cloudflare:** Full protection enabled
-
-### Staging
-
-- **Droplet:** pausatf-stage (2 vCPU, 4GB RAM)
-- **Database:** pausatf-stage-db (MySQL 8.0)
-- **Domain:** staging.pausatf.org
-- **Cloudflare:** Testing configuration
-
----
-
-## Common Tasks
-
-### Add New Droplet
+### Update Droplet IP
 
 ```bash
+# Production
 cd environments/production
-# Edit main.tf to add droplet module
+terraform apply -var="production_ip=NEW_IP"
+
+# Update Cloudflare DNS
+cd ../cloudflare
+terraform apply -var="production_ip=NEW_IP"
+```
+
+### Add DNS Record
+
+```bash
+cd environments/cloudflare
+# Edit main.tf to add cloudflare_record resource
 terraform plan
 terraform apply
 ```
 
-### Update DNS Record
+### Recreate Droplet with Cloud-Init
 
 ```bash
-cd environments/shared
-# Edit cloudflare module configuration
-terraform plan
+cd environments/production  # or staging
+terraform taint digitalocean_droplet.production
 terraform apply
 ```
 
-### Destroy Staging Environment
+## 📚 Documentation
 
-```bash
-cd environments/staging
-terraform destroy
+- **[INFRASTRUCTURE_INVENTORY.md](INFRASTRUCTURE_INVENTORY.md)** - Current state analysis
+- **[TERRAFORM_MIGRATION_COMPLETE.md](TERRAFORM_MIGRATION_COMPLETE.md)** - Migration guide
+- **[modules/droplet/README.md](modules/droplet/README.md)** - Cloud-init templates
+- **[environments/cloudflare/README.md](environments/cloudflare/README.md)** - DNS management
+
+## 🔐 State Management
+
+All Terraform state is stored in DigitalOcean Spaces (S3-compatible):
+
+```
+Bucket: pausatf-terraform-state
+Region: sfo2 (us-west-1)
+Endpoint: sfo2.digitaloceanspaces.com
+
+States:
+  - production/terraform.tfstate
+  - staging/terraform.tfstate
+  - cloudflare/terraform.tfstate
+  - github/terraform.tfstate
 ```
 
-### View Current State
+**Features:** Encryption at rest, versioning enabled, state locking
+
+## 🛠️ Troubleshooting
+
+### State Lock
 
 ```bash
+terraform force-unlock LOCK_ID
+```
+
+### Import Drift
+
+```bash
+terraform refresh
 terraform show
+# Update Terraform config to match reality
+```
+
+### Backend Access
+
+```bash
+# Verify credentials
+echo $AWS_ACCESS_KEY_ID
+terraform init -reconfigure
+```
+
+## 🔒 Security Best Practices
+
+✅ Never commit secrets - use environment variables
+✅ Use state locking - prevent concurrent modifications
+✅ Review plans - always `terraform plan` before `apply`
+✅ Limit SSH access - IP whitelisting in production
+✅ Enable branch protection - require reviews
+✅ Rotate API tokens - regularly update credentials
+✅ Use signed commits - verify authorship
+✅ Backup state - DigitalOcean Spaces versioning enabled
+
+## 📈 Monitoring
+
+```bash
+# List all resources
 terraform state list
+
+# Show specific resource
+terraform state show RESOURCE_NAME
+
+# Check for drift
+terraform plan
 ```
+
+## 🤝 Contributing
+
+1. Create feature branch from `main`
+2. Make infrastructure changes
+3. Run `terraform plan`
+4. Commit with descriptive message
+5. Create pull request
+6. Get 1 approval + pass CI checks
+7. Merge to main
+8. Run `terraform apply`
+
+## 📞 Support
+
+- Check documentation in `terraform/` directory
+- Review `INFRASTRUCTURE_INVENTORY.md`
+- Create GitHub issue in pausatf/pausatf
 
 ---
 
-## CI/CD Pipeline
-
-### Pull Request Workflow
-
-```yaml
-On PR → Run:
-  1. terraform fmt -check
-  2. terraform validate
-  3. tfsec scan
-  4. checkov scan
-  5. terraform plan
-  6. Comment plan output on PR
-```
-
-### Main Branch Workflow
-
-```yaml
-On Merge → Run:
-  1. terraform plan
-  2. Wait for manual approval
-  3. terraform apply
-  4. Post results to Slack
-```
-
----
-
-## Troubleshooting
-
-### State Lock Issues
-
-```bash
-# View lock info
-terraform force-unlock <lock-id>
-
-# Only use if you're sure no other process is running!
-```
-
-### Import Existing Resources
-
-```bash
-# Import existing droplet
-terraform import module.web_server.digitalocean_droplet.main <droplet-id>
-```
-
-### Drift Detection
-
-```bash
-# Check for configuration drift
-terraform plan -refresh-only
-```
-
----
-
-## Security
-
-### Secrets Management
-
-- **DO NOT** commit `.tfvars` files
-- **DO NOT** commit state files
-- **USE** environment variables for tokens
-- **USE** encrypted Terraform Cloud/Spaces for state
-
-### Pre-commit Hooks
-
-Automatically prevent commits with:
-- Hardcoded secrets (gitleaks, detect-secrets)
-- Unformatted code (terraform fmt)
-- Invalid syntax (terraform validate)
-- Security issues (tfsec)
-
----
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-**Key Requirements:**
-- All changes via Pull Request
-- 1 approval required
-- All CI checks must pass
-- Follow HCL style guide
-- Document all modules
-
----
-
-## Support
-
-- **Documentation:** https://github.com/pausatf/pausatf-infrastructure-docs
-- **Issues:** https://github.com/pausatf/pausatf-terraform/issues
-- **DigitalOcean:** https://docs.digitalocean.com/
-- **Terraform:** https://www.terraform.io/docs
-
----
-
-## License
-
-Private repository - Internal use only
-
-**Maintained by:** Thomas Vincent
-**Organization:** Pacific Association of USA Track and Field (PAUSATF)
-**Last Updated:** 2025-12-21
+**Maintained by:** PAUSATF Infrastructure Team
+**Last Updated:** 2025-12-27
+**Terraform Version:** >= 1.6.0
+**Total Resources:** 39
