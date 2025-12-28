@@ -1,293 +1,545 @@
-# PAUSATF WordPress Server Ansible Playbook
+# PAUSATF Ansible Configuration Management
 
-Complete Ansible playbook for managing the PAUSATF WordPress server infrastructure.
+Comprehensive Ansible playbooks and roles for managing PAUSATF WordPress infrastructure across production, staging, and development environments.
+
+## Table of Contents
+
+- [Infrastructure Overview](#infrastructure-overview)
+- [Environment Inventory](#environment-inventory)
+- [Quick Start](#quick-start)
+- [Playbooks](#playbooks)
+- [Roles](#roles)
+- [Operations](#operations)
+- [Security](#security)
+- [Troubleshooting](#troubleshooting)
 
 ## Infrastructure Overview
 
-| Component | Details |
-|-----------|---------|
-| **Hosting** | DigitalOcean |
-| **Region** | San Francisco 2 (sfo2) |
-| **Droplet** | pausatforg20230516-primary |
-| **Size** | s-4vcpu-8gb (4 vCPU, 8GB RAM, 160GB disk) |
-| **IP** | 64.225.40.54 |
-| **CDN/DNS** | Cloudflare (Free plan) |
-| **OS** | Ubuntu 20.04.6 LTS (Focal Fossa) |
+| Component | Production | Staging | Development |
+|-----------|------------|---------|-------------|
+| **Provider** | DigitalOcean | DigitalOcean | Local Docker |
+| **Hostname** | ftp.pausatf.org | stage.pausatf.org | dev.pausatf.org |
+| **IP Address** | 64.225.40.54 | 64.227.85.73 | localhost |
+| **Droplet ID** | 355909945 | 538411208 | N/A |
+| **Size** | 8GB / 4 vCPU | 4GB / 2 vCPU | N/A |
+| **Web Server** | Apache 2.4 | OpenLiteSpeed 1.8 | OpenLiteSpeed |
+| **PHP** | 7.4 | 8.4 | 8.4 |
+| **WordPress** | 6.9 | 6.9 | 6.9 |
+| **Document Root** | /var/www/html | /var/www/html | /var/www/html |
+| **Legacy Path** | /var/www/legacy | N/A | N/A |
+| **SSH User** | deploy | root | N/A |
 
-## Software Stack
+## Environment Inventory
 
-| Component | Version |
-|-----------|---------|
-| Apache | 2.4.63 |
-| PHP (active) | 7.2 |
-| PHP (available) | 7.4, 8.1, 8.4 |
-| MySQL | 5.7.42 |
-| WordPress (main) | 6.8.3 |
+### Production Environment
+```yaml
+pausatf-prod:
+  ansible_host: ftp.pausatf.org
+  ansible_user: deploy                    # Non-root deploy user
+  ansible_ssh_private_key_file: ~/.ssh/pausatf-prod
+  ansible_python_interpreter: /usr/bin/python3
+  wordpress_path: /var/www/html
+  legacy_path: /var/www/legacy/public_html
+  web_server: apache
+  php_version: "7.4"
+```
 
-## WordPress Sites
+**Production Access:**
+- SSH: `ssh -i ~/.ssh/pausatf-prod deploy@ftp.pausatf.org`
+- Deploy user is member of `www-data` and `sudo` groups
+- WordPress operations require `sg www-data -c "wp ..."` wrapper
+- Read-only operations for inventory capture
 
-| Site | Domain | Path | Status |
-|------|--------|------|--------|
-| Main | www.pausatf.org | /var/www/html | Production |
-| Transit | - | /var/www/transit/html | Legacy (WP 5.0.3) |
+### Staging Environment
+```yaml
+pausatf-stage:
+  ansible_host: stage.pausatf.org
+  ansible_user: root
+  ansible_python_interpreter: /usr/bin/python3
+  wordpress_path: /var/www/html
+  web_server: openlitespeed
+  php_version: "8.4"
+```
 
-## Cloudflare Configuration
-
-| Setting | Value |
-|---------|-------|
-| Zone | pausatf.org |
-| SSL Mode | Full |
-| Min TLS | 1.2 |
-| Always HTTPS | Enabled |
-| Security Level | Medium |
-| Cache Level | Aggressive |
-
-### DNS Records (Proxied)
-- `pausatf.org` → 64.225.40.54 (proxied)
-- `www.pausatf.org` → 64.225.40.54 (proxied)
-- `ftp.pausatf.org` → 64.225.40.54 (direct)
-- `mail.pausatf.org` → 64.225.40.54 (direct)
-
-### Email (Google Workspace)
-- MX records pointing to Google (aspmx.l.google.com)
-- SendGrid for transactional email
+### Development Environment
+```yaml
+pausatf-dev:
+  ansible_host: dev.pausatf.org
+  ansible_user: root
+  ansible_python_interpreter: /usr/bin/python3
+  wordpress_path: /var/www/html
+  web_server: openlitespeed
+  php_version: "8.4"
+```
 
 ## Quick Start
+
+### Prerequisites
 
 ```bash
 # Install Ansible
 pip install ansible
 
-# Test connectivity
-ansible all -i inventory -m ping
+# Or via Homebrew (macOS)
+brew install ansible
+```
 
-# Dry run (check mode)
-ansible-playbook -i inventory site.yml --check --diff
+### Test Connectivity
 
-# Full deployment
-ansible-playbook -i inventory site.yml
+```bash
+# Test all environments
+ansible all -i inventory/hosts.yml -m ping
 
-# Deploy specific components
-ansible-playbook -i inventory site.yml --tags apache
-ansible-playbook -i inventory site.yml --tags php
-ansible-playbook -i inventory site.yml --tags mysql
-ansible-playbook -i inventory site.yml --tags wordpress
-ansible-playbook -i inventory site.yml --tags cloudflare
-ansible-playbook -i inventory site.yml --tags fail2ban
+# Test specific environment
+ansible production -i inventory/hosts.yml -m ping
+```
+
+### Run Playbooks
+
+```bash
+# Capture production WordPress inventory (read-only)
+ansible-playbook -i inventory/hosts.yml \
+  playbooks/capture-wp-inventory.yml -l production
+
+# Create production migration backup
+ansible-playbook -i inventory/hosts.yml \
+  playbooks/migrate-prod.yml -l production
+
+# Restore to new droplet
+ansible-playbook -i inventory/hosts.yml \
+  playbooks/restore-prod.yml -l production
+```
+
+## Playbooks
+
+### Core Playbooks
+
+| Playbook | Purpose | Target | Safe for Prod |
+|----------|---------|--------|---------------|
+| **site.yml** | Full infrastructure deployment | All | ⚠️ Review first |
+| **wordpress.yml** | WordPress-specific configuration | All | ⚠️ Review first |
+| **security.yml** | Security hardening tasks | All | ⚠️ Review first |
+
+### Production Operations Playbooks
+
+| Playbook | Purpose | Read-Only | Description |
+|----------|---------|-----------|-------------|
+| **capture-wp-inventory.yml** | Capture WordPress state | ✅ Yes | Captures plugins, themes, theme_mods from production |
+| **migrate-prod.yml** | Create migration backup | ✅ Yes | Full production backup for migration |
+| **restore-prod.yml** | Restore from backup | ❌ No | Restore backup to new droplet |
+
+#### capture-wp-inventory.yml
+
+**Purpose:** Capture current WordPress configuration from production
+
+**What it captures:**
+- All installed plugins (name, status, version, auto_update)
+- All installed themes (name, status, version, auto_update)
+- Active template and stylesheet
+- Theme customizations (theme_mods for parent and child themes)
+- Menu locations, custom CSS, sidebars, widgets
+
+**Output:** `ansible/group_vars/production/wordpress.yml`
+
+**Usage:**
+```bash
+ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook \
+  -i inventory/hosts.yml \
+  playbooks/capture-wp-inventory.yml \
+  -l production
+```
+
+**Current Inventory (as of 2025-12-28):**
+- 24 plugins (accordions, jetpack, cloudflare, updraftplus, etc.)
+- 3 themes (TheSource parent v4.8.13, TheSource-child active, twentytwentyfour)
+- Theme configuration: menus, custom CSS, sidebars, widgets
+
+#### migrate-prod.yml
+
+**Purpose:** Create comprehensive backup for migration to new droplet
+
+**What it captures:**
+- ✅ Cron jobs (root, www-data, deploy users)
+- ✅ Custom scripts (monitor_and_purge.sh, httpd-check.sh)
+- ✅ Apache configuration (sites, modules, configs)
+- ✅ WordPress database (compressed SQL export)
+- ✅ WordPress directory (excludes cache)
+- ✅ Legacy directory (with all hidden files)
+- ✅ System info (packages, PHP/WP-CLI versions)
+- ✅ Migration manifest with restoration steps
+
+**Output:** `backups/migration-YYYYMMDD-HHMMSS/`
+
+**Usage:**
+```bash
+ansible-playbook -i inventory/hosts.yml \
+  playbooks/migrate-prod.yml \
+  -l production
+```
+
+**Archive Contents:**
+```
+backups/migration-YYYYMMDD-HHMMSS/
+├── MANIFEST.txt                      # Migration instructions
+├── README.txt                        # Quick start guide
+├── crontab-root.txt                  # Root crontab
+├── crontab-www-data.txt             # www-data crontab
+├── crontab-deploy.txt               # deploy crontab
+├── cron.d.tar.gz                    # System cron.d directory
+├── monitor_and_purge.sh             # Cloudflare purge script
+├── httpd-check.sh                   # Apache health check
+├── apache-sites-available.tar.gz    # Apache site configs
+├── apache-sites-enabled.tar.gz      # Enabled sites
+├── apache-conf-enabled.tar.gz       # Apache conf
+├── apache-modules.txt               # Enabled modules list
+├── wordpress.tar.gz                 # Full WordPress directory
+├── wordpress-db.sql.gz              # Database export
+├── legacy.tar.gz                    # Legacy directory
+├── installed-packages.txt           # dpkg -l output
+├── php-version.txt                  # PHP info
+├── php-modules.txt                  # PHP modules
+├── wp-cli-version.txt               # WP-CLI version
+└── system-info.txt                  # OS and kernel info
+```
+
+#### restore-prod.yml
+
+**Purpose:** Restore production backup to new droplet
+
+**Prerequisites:**
+- New Ubuntu 20.04+ droplet provisioned
+- Update inventory with new droplet IP
+- SSH access configured
+
+**What it does:**
+- ✅ Installs LAMP stack (Apache, MySQL, PHP)
+- ✅ Restores WordPress files and sets permissions
+- ✅ Creates database and imports data
+- ✅ Restores legacy directory
+- ✅ Restores Apache configuration
+- ✅ Restores custom scripts
+- ✅ Creates deploy user with proper groups
+- ⚠️ Provides instructions for manual crontab restoration
+
+**Usage:**
+```bash
+ansible-playbook -i inventory/hosts.yml \
+  playbooks/restore-prod.yml \
+  -l production
+```
+
+**Interactive prompts:**
+1. Path to migration backup directory
+2. Confirmation (must type 'yes')
+
+## Roles
+
+### Available Roles
+
+| Role | Purpose | Production Status |
+|------|---------|-------------------|
+| **common** | Base system packages and configuration | ✅ Active |
+| **apache** | Apache web server (production) | ✅ Active |
+| **openlitespeed** | OpenLiteSpeed web server (staging/dev) | ✅ Active |
+| **lsphp** | LiteSpeed PHP configuration | ✅ Active |
+| **mysql** | MySQL database server | ✅ Active |
+| **wordpress** | WordPress core installation | ✅ Active |
+| **cloudflare** | Cloudflare DNS/CDN management | ✅ Active |
+| **fail2ban** | Intrusion prevention | ✅ Active |
+| **monitoring** | System monitoring | 🚧 Development |
+
+## Operations
+
+### WordPress Inventory Management
+
+**Capture current state:**
+```bash
+ansible-playbook -i inventory/hosts.yml \
+  playbooks/capture-wp-inventory.yml \
+  -l production
+```
+
+**Review captured inventory:**
+```bash
+cat ansible/group_vars/production/wordpress.yml
+```
+
+**Commit changes:**
+```bash
+git add ansible/group_vars/production/wordpress.yml
+git commit -m "Update WordPress inventory"
+git push
+```
+
+### Production Migration
+
+**Step 1: Create migration backup**
+```bash
+ansible-playbook -i inventory/hosts.yml \
+  playbooks/migrate-prod.yml \
+  -l production
+
+# Review the backup
+ls -lh backups/migration-*/
+cat backups/migration-*/MANIFEST.txt
+```
+
+**Step 2: Provision new droplet**
+```bash
+# Via doctl
+doctl compute droplet create pausatf-prod-new \
+  --image ubuntu-22-04-x64 \
+  --size s-4vcpu-8gb \
+  --region sfo3 \
+  --ssh-keys YOUR_SSH_KEY_ID
+
+# Via Terraform (recommended)
+cd terraform/environments/production
+terraform plan
+terraform apply
+```
+
+**Step 3: Update inventory**
+```yaml
+# ansible/inventory/hosts.yml
+pausatf-prod:
+  ansible_host: NEW_DROPLET_IP  # Update this
+  ansible_user: root            # Initial setup as root
+  # ... rest of config
+```
+
+**Step 4: Restore to new droplet**
+```bash
+ansible-playbook -i inventory/hosts.yml \
+  playbooks/restore-prod.yml \
+  -l production
+
+# When prompted:
+# - Enter path: backups/migration-YYYYMMDD-HHMMSS
+# - Confirm: yes
+```
+
+**Step 5: Post-restoration**
+```bash
+# SSH to new droplet
+ssh root@NEW_DROPLET_IP
+
+# Restore crontabs (manual step)
+crontab /tmp/pausatf-restore/crontab-root.txt
+crontab -u www-data /tmp/pausatf-restore/crontab-www-data.txt
+
+# Test WordPress
+curl -I http://NEW_DROPLET_IP/
+
+# Update DNS when ready
+```
+
+### WordPress Operations (Read-Only)
+
+**List plugins:**
+```bash
+ssh -i ~/.ssh/pausatf-prod deploy@ftp.pausatf.org \
+  'sg www-data -c "wp plugin list --path=/var/www/html"'
+```
+
+**List themes:**
+```bash
+ssh -i ~/.ssh/pausatf-prod deploy@ftp.pausatf.org \
+  'sg www-data -c "wp theme list --path=/var/www/html"'
+```
+
+**Check WordPress version:**
+```bash
+ssh -i ~/.ssh/pausatf-prod deploy@ftp.pausatf.org \
+  'sg www-data -c "wp core version --path=/var/www/html"'
+```
+
+**Get site info:**
+```bash
+ssh -i ~/.ssh/pausatf-prod deploy@ftp.pausatf.org \
+  'sg www-data -c "wp option get home --path=/var/www/html"'
+```
+
+## Security
+
+### SSH Access
+
+**Production access via deploy user:**
+- SSH key: `~/.ssh/pausatf-prod`
+- User: `deploy` (member of www-data, sudo)
+- Key stored in GitHub secret: `PROD_SSH_PRIVATE_KEY`
+
+**Key generation (reference):**
+```bash
+# Already created - do not regenerate
+ssh-keygen -t ed25519 -C "pausatf-prod-20251228" \
+  -f ~/.ssh/pausatf-prod -N ""
+```
+
+**Add key to server:**
+```bash
+ssh-copy-id -i ~/.ssh/pausatf-prod.pub deploy@ftp.pausatf.org
+```
+
+### Ansible Vault
+
+**Encrypt secrets:**
+```bash
+ansible-vault encrypt group_vars/vault.yml
+```
+
+**Edit encrypted file:**
+```bash
+ansible-vault edit group_vars/vault.yml
+```
+
+**Run playbook with vault:**
+```bash
+ansible-playbook -i inventory/hosts.yml site.yml --ask-vault-pass
+```
+
+### Production Safety
+
+**Read-only operations:**
+- ✅ `capture-wp-inventory.yml` - Safe, no changes
+- ✅ `migrate-prod.yml` - Safe, creates backup only
+
+**Write operations:**
+- ⚠️ `restore-prod.yml` - Destructive, requires confirmation
+- ⚠️ `site.yml` - Full deployment, review before running
+
+**Best practices:**
+1. Always use `--check --diff` for dry runs
+2. Test playbooks on staging first
+3. Create backups before making changes
+4. Use tags to limit scope: `--tags wordpress`
+5. Limit to specific hosts: `-l production`
+
+## Automated Backups
+
+### Nightly Inventory Capture
+
+**GitHub Action:** `.github/workflows/capture-prod-inventory.yml`
+
+Runs nightly to capture WordPress plugins/themes/config and commit to repo.
+
+### Nightly Legacy Backup
+
+**GitHub Action:** `.github/workflows/backup-legacy.yml`
+
+Rsyncs `/var/www/legacy` to `backups/legacy/` in this repo nightly.
+
+### DigitalOcean Snapshots
+
+**GitHub Action:** `.github/workflows/do-nightly-snapshot.yml`
+
+Creates nightly droplet snapshots with timestamp.
+
+**Required GitHub Secrets:**
+- `PROD_SSH_PRIVATE_KEY` - Deploy user SSH key
+- `DO_TOKEN` - DigitalOcean API token
+- `DO_PROD_DROPLET_ID` - Production droplet ID (355909945)
+
+## Troubleshooting
+
+### Common Issues
+
+**Permission denied for deploy user:**
+```bash
+# Verify deploy user in www-data group
+ssh root@ftp.pausatf.org 'id deploy'
+
+# If not, add to group
+ssh root@ftp.pausatf.org 'usermod -a -G www-data deploy'
+```
+
+**WP-CLI fails with permission error:**
+```bash
+# Always use sg wrapper for deploy user
+sg www-data -c "wp plugin list --path=/var/www/html"
+```
+
+**Ansible Python version error (prod):**
+```bash
+# Production uses Python 3.8, Ansible requires 3.9+
+# Solution: Use raw module in playbooks (already configured)
+```
+
+**Database connection error:**
+```bash
+# Check MySQL is running
+ssh root@ftp.pausatf.org 'systemctl status mysql'
+
+# Check wp-config.php credentials
+ssh deploy@ftp.pausatf.org 'grep DB_ /var/www/html/wp-config.php'
+```
+
+### Debug Mode
+
+**Enable verbose output:**
+```bash
+ansible-playbook -vvv -i inventory/hosts.yml playbooks/capture-wp-inventory.yml
+```
+
+**Check mode (dry run):**
+```bash
+ansible-playbook --check --diff -i inventory/hosts.yml site.yml
 ```
 
 ## Directory Structure
 
 ```
-pausatf-ansible/
-├── ansible.cfg           # Ansible configuration
-├── inventory             # Server inventory
-├── site.yml              # Main playbook
+ansible/
+├── README.md                     # This file
+├── ansible.cfg                   # Ansible configuration
+├── inventory/
+│   └── hosts.yml                # Environment inventory
 ├── group_vars/
-│   ├── all.yml          # Global variables (infrastructure, config)
-│   └── vault.yml        # Secrets (credentials, API tokens)
+│   ├── all.yml                  # Global variables
+│   ├── production/
+│   │   └── wordpress.yml        # Captured WordPress state
+│   ├── staging.yml              # Staging variables
+│   └── vault.yml                # Encrypted secrets (use ansible-vault)
+├── playbooks/
+│   ├── site.yml                 # Main deployment playbook
+│   ├── wordpress.yml            # WordPress deployment
+│   ├── capture-wp-inventory.yml # Capture WP state (read-only)
+│   ├── migrate-prod.yml         # Create migration backup
+│   └── restore-prod.yml         # Restore from backup
 └── roles/
-    ├── common/          # Base system packages
-    ├── apache/          # Apache web server
-    ├── php/             # PHP configuration
-    ├── mysql/           # MySQL database
-    ├── wordpress/       # WordPress installation
-    ├── cloudflare/      # Cloudflare CDN/DNS management
-    ├── fail2ban/        # Intrusion prevention
-    ├── newrelic/        # APM monitoring
-    └── monitoring/      # Monit + backups
+    ├── common/                  # Base system configuration
+    ├── apache/                  # Apache web server
+    ├── openlitespeed/          # OpenLiteSpeed web server
+    ├── lsphp/                  # LiteSpeed PHP
+    ├── mysql/                  # MySQL database
+    ├── wordpress/              # WordPress application
+    ├── cloudflare/             # Cloudflare integration
+    └── fail2ban/               # Security
 ```
 
-## Credentials & Secrets
+## Resources
 
-All credentials are stored in `group_vars/vault.yml`:
+### Documentation
+- [Ansible Documentation](https://docs.ansible.com/)
+- [WordPress CLI](https://wp-cli.org/)
+- [DigitalOcean API](https://docs.digitalocean.com/reference/api/)
+- [Cloudflare API](https://developers.cloudflare.com/api/)
 
-| Secret | Description |
-|--------|-------------|
-| `vault_mysql_root_password` | MySQL root password |
-| `vault_wp_main_db_password` | WordPress DB password |
-| `vault_digitalocean_api_token` | DigitalOcean API token |
-| `vault_cloudflare_api_token` | Cloudflare API token |
-| `vault_cloudflare_zone_id` | Cloudflare zone ID |
-| `vault_wp_main_*` | WordPress auth keys/salts |
-
-### Encrypting the Vault
-
-```bash
-# Encrypt
-ansible-vault encrypt group_vars/vault.yml
-
-# Edit encrypted file
-ansible-vault edit group_vars/vault.yml
-
-# Run playbook with vault
-ansible-playbook -i inventory site.yml --ask-vault-pass
-```
-
-## Available Tags
-
-| Tag | Description |
-|-----|-------------|
-| `common` | Base packages and system config |
-| `apache` | Apache web server |
-| `php` | PHP installation and config |
-| `mysql` | MySQL database |
-| `wordpress` | WordPress deployment |
-| `cloudflare` | Cloudflare CDN/DNS settings |
-| `fail2ban` | Intrusion prevention |
-| `newrelic` | New Relic APM |
-| `monitoring` | Monit and backup scripts |
-| `healthcheck` | Health check endpoint only |
-| `security` | All security-related tasks |
-| `web` | Apache + PHP |
-| `verify` | Verify services are running |
-
-## Maintenance Tasks
-
-### WordPress CLI (WP-CLI)
-```bash
-# Check WordPress version
-sudo -u www-data wp --path=/var/www/html core version
-
-# List plugins with update status
-sudo -u www-data wp --path=/var/www/html plugin list
-
-# List themes
-sudo -u www-data wp --path=/var/www/html theme list
-
-# Check for available updates
-sudo -u www-data wp --path=/var/www/html plugin list --update=available
-sudo -u www-data wp --path=/var/www/html theme list --update=available
-
-# Manual update all plugins
-sudo -u www-data wp --path=/var/www/html plugin update --all
-
-# Manual update all themes
-sudo -u www-data wp --path=/var/www/html theme update --all
-```
-
-### WordPress Auto-Updates
-Automatic security updates are scheduled weekly via cron:
-```bash
-# Manual run of auto-update script
-/usr/local/bin/wp-update-pausatf-main.sh
-
-# View update log
-cat /var/log/wordpress-updates.log
-
-# Check scheduled cron jobs
-crontab -l | grep wp-update
-```
-
-**Excluded from auto-updates** (premium/custom):
-- Plugins: `tablepress-premium`, `wp-file-manager-pro`
-- Themes: `TheSource-child`, custom OceanWP children
-
-### Backup
-```bash
-# Manual backup
-/usr/local/bin/backup-wordpress.sh
-
-# View logs
-cat /var/log/wordpress-backup.log
-```
-
-### Fail2ban
-```bash
-sudo fail2ban-client status
-sudo fail2ban-client status wordpress
-```
-
-### Cloudflare Cache Purge
-```bash
-# Via Ansible
-ansible-playbook -i inventory site.yml --tags cloudflare-purge -e "cloudflare_purge_cache=true"
-
-# Via API
-curl -X POST "https://api.cloudflare.com/client/v4/zones/ZONE_ID/purge_cache" \
-  -H "Authorization: Bearer API_TOKEN" \
-  -H "Content-Type: application/json" \
-  --data '{"purge_everything":true}'
-```
-
-### Cloudflare IP Updates
-Cloudflare IP ranges are updated automatically via weekly cron job:
-```bash
-# Manual update
-/usr/local/bin/update-cloudflare-ips.sh
-
-# View update log
-cat /var/log/cloudflare-ip-update.log
-
-# Verify current IPs
-cat /etc/apache2/conf-available/cloudflare-ips.conf
-```
-
-### Health Check Endpoint
-The health check endpoint monitors PHP, MySQL, WordPress, disk space, and system load:
-```bash
-# Local check
-curl http://localhost/health-check.php
-
-# With token (from external monitoring)
-curl "https://www.pausatf.org/health-check.php?token=YOUR_TOKEN"
-
-# Response (200 = healthy, 503 = unhealthy)
-{
-  "status": "healthy",
-  "timestamp": "2025-12-06T12:00:00-08:00",
-  "checks": {
-    "php": {"status": "healthy", "version": "7.4.33"},
-    "mysql": {"status": "healthy", "connection": "ok"},
-    "wordpress": {"status": "healthy", "version": "6.8.3"},
-    "disk": {"status": "healthy", "used_percent": 45.2},
-    "load": {"status": "healthy", "1min": 0.5}
-  }
-}
-```
-
-Configure uptime monitoring services (UptimeRobot, Pingdom, etc.) to poll this endpoint.
-
-## Known Issues & Recommendations
-
-### Current Issues
-1. **PHP 7.2** is outdated - consider upgrading to 7.4 or 8.x
-2. **UFW firewall** is currently disabled
-3. **Transit site** runs very old WordPress 5.0.3
-4. **Legacy content** in /var/www/legacy needs review
-
-### Security Recommendations
-1. Enable UFW firewall
-2. Upgrade PHP to 7.4 or 8.x
-3. Update WordPress on transit site
-4. Review `.php.suspicious` files
-5. Consider upgrading Cloudflare SSL to Full (Strict)
-6. Enable Cloudflare WAF (requires paid plan)
-
-## DigitalOcean Management
-
-### Via doctl CLI
-```bash
-# Get droplet info
-doctl compute droplet get 355909945
-
-# Create snapshot
-doctl compute droplet-action snapshot 355909945 --snapshot-name "pre-upgrade-$(date +%Y%m%d)"
-
-# List backups
-doctl compute droplet backups 355909945
-```
-
-### Via API
-```bash
-# Get droplet
-curl -X GET "https://api.digitalocean.com/v2/droplets/355909945" \
-  -H "Authorization: Bearer $DO_TOKEN"
-```
+### Internal Docs
+- [Production Operations Guide](../docs/runbooks/production-operations.md)
+- [Deployment Runbook](../docs/runbooks/deployment.md)
+- [Disaster Recovery](../docs/runbooks/disaster-recovery.md)
+- [Migration Guide](../docs/MIGRATION.md)
 
 ## Support
 
-For issues with this playbook, review the audit data or contact the infrastructure team.
+For issues with Ansible playbooks:
+- Open an issue in the monorepo
+- Review the [troubleshooting guide](#troubleshooting)
+- Check recent commits to `ansible/group_vars/production/wordpress.yml`
 
 ---
-Generated from server audit on 2025-12-06
+
+**Last Updated:** December 28, 2025
+**Maintained by:** Thomas Vincent
+**Production Status:** Active (Ubuntu 20.04, Apache 2.4, PHP 7.4, WordPress 6.9)
