@@ -68,6 +68,26 @@
       register: admin_email
       changed_when: false
 
+    - name: Get permalink structure
+      raw: "sg www-data -c '{{ wp_bin }} option get permalink_structure --path={{ wp_path }} 2>/dev/null | head -1'"
+      register: permalink_structure
+      changed_when: false
+
+    - name: Get site language
+      raw: "sg www-data -c '{{ wp_bin }} option get WPLANG --path={{ wp_path }} 2>/dev/null | head -1'"
+      register: site_language
+      changed_when: false
+
+    - name: Get WordPress menus
+      raw: "sg www-data -c '{{ wp_bin }} menu list --format=json --path={{ wp_path }} 2>/dev/null | head -1'"
+      register: menus_json
+      changed_when: false
+
+    - name: Get rewrite rules count
+      raw: "sg www-data -c '{{ wp_bin }} rewrite list --format=count --path={{ wp_path }} 2>/dev/null | head -1'"
+      register: rewrite_count
+      changed_when: false
+
     - name: Parse plugins JSON
       set_fact:
         plugins_list: "{{ (plugins_json.stdout | trim | from_json) }}"
@@ -93,6 +113,11 @@
     - name: Parse users JSON
       set_fact:
         users_list: "{{ (users_json.stdout | trim | from_json) }}"
+      delegate_to: localhost
+
+    - name: Parse menus JSON
+      set_fact:
+        menus_list: "{{ (menus_json.stdout | trim | from_json) if menus_json.stdout | trim else [] }}"
       delegate_to: localhost
 
     - name: Ensure local output directory exists
@@ -142,6 +167,19 @@
           wp_site_url: {{ site_url.stdout | trim | to_json }}
           wp_site_name: {{ site_name.stdout | trim | to_json }}
           wp_admin_email: {{ admin_email.stdout | trim | to_json }}
+          wp_permalink_structure: {{ permalink_structure.stdout | trim | to_json }}
+          wp_site_language: {{ site_language.stdout | trim | to_json }}
+          wp_rewrite_rules_count: {{ rewrite_count.stdout | trim }}
+
+          # WordPress menus
+          wp_menus:
+          {% for m in menus_list %}
+            - term_id: {{ m.term_id }}
+              name: {{ m.name | to_json }}
+              slug: {{ m.slug | to_json }}
+              locations: {{ m.locations | to_json }}
+              count: {{ m.count }}
+          {% endfor %}
 
           # WordPress users and permissions
           wp_users:
