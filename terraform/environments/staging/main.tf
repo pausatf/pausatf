@@ -51,9 +51,9 @@ resource "digitalocean_droplet" "staging" {
 
   ssh_keys = var.ssh_key_fingerprints
 
-  user_data = templatefile("${path.module}/../../modules/droplet/cloud-init.yml", {
+  user_data = templatefile("${path.module}/../../modules/droplet/cloud-init-openlitespeed.yml", {
     environment = "staging"
-    hostname    = "pausatf-stage"
+    hostname    = "stage"
   })
 }
 
@@ -88,13 +88,16 @@ resource "digitalocean_database_firewall" "staging" {
 }
 
 # VPC for Staging
-resource "digitalocean_vpc" "staging" {
-  name     = "pausatf-staging-vpc"
-  region   = var.region
-  ip_range = "10.20.0.0/16"
-
-  description = "Staging VPC for PAUSATF infrastructure"
-}
+# Note: Currently using default VPC
+# Uncomment below if custom VPC is needed
+#
+# resource "digitalocean_vpc" "staging" {
+#   name     = "pausatf-staging-vpc"
+#   region   = var.region
+#   ip_range = "10.20.0.0/16"
+#
+#   description = "Staging VPC for PAUSATF infrastructure"
+# }
 
 # Firewall for Staging
 resource "digitalocean_firewall" "staging" {
@@ -106,34 +109,41 @@ resource "digitalocean_firewall" "staging" {
   inbound_rule {
     protocol         = "tcp"
     port_range       = "80"
-    source_addresses = ["*******/0", "::/0"]
+    source_addresses = ["0.0.0.0/0", "::/0"]
   }
 
   # HTTPS
   inbound_rule {
     protocol         = "tcp"
     port_range       = "443"
-    source_addresses = ["*******/0", "::/0"]
+    source_addresses = ["0.0.0.0/0", "::/0"]
   }
 
   # SSH (more permissive for staging)
   inbound_rule {
     protocol         = "tcp"
     port_range       = "22"
-    source_addresses = ["*******/0", "::/0"]
+    source_addresses = ["0.0.0.0/0", "::/0"]
+  }
+
+  # OpenLiteSpeed WebAdmin
+  inbound_rule {
+    protocol         = "tcp"
+    port_range       = "7080"
+    source_addresses = ["0.0.0.0/0", "::/0"]
   }
 
   # Allow all outbound
   outbound_rule {
     protocol              = "tcp"
     port_range            = "1-65535"
-    destination_addresses = ["*******/0", "::/0"]
+    destination_addresses = ["0.0.0.0/0", "::/0"]
   }
 
   outbound_rule {
     protocol              = "udp"
     port_range            = "1-65535"
-    destination_addresses = ["*******/0", "::/0"]
+    destination_addresses = ["0.0.0.0/0", "::/0"]
   }
 
   tags = ["staging"]
