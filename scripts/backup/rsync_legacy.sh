@@ -5,7 +5,7 @@ set -euo pipefail
 # Requires SSH key (provided by CI) with access to root@ftp.pausatf.org.
 
 REMOTE_HOST="${REMOTE_HOST:-ftp.pausatf.org}"
-REMOTE_USER="${REMOTE_USER:-root}"
+REMOTE_USER="${REMOTE_USER:-deploy}"
 REMOTE_PATH="${REMOTE_PATH:-/var/www/legacy}"
 LOCAL_DIR="${LOCAL_DIR:-backups/legacy}"
 
