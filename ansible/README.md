@@ -138,6 +138,8 @@ ansible-playbook -i inventory/hosts.yml \
 - Active template and stylesheet
 - Theme customizations (theme_mods for parent and child themes)
 - Menu locations, custom CSS, sidebars, widgets
+- WordPress users (username, email, roles, registration date)
+- Site configuration (URL, site name, admin email)
 
 **Output:** `ansible/group_vars/production/wordpress.yml`
 
@@ -153,6 +155,8 @@ ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook \
 - 24 plugins (accordions, jetpack, cloudflare, updraftplus, etc.)
 - 3 themes (TheSource parent v4.8.13, TheSource-child active, twentytwentyfour)
 - Theme configuration: menus, custom CSS, sidebars, widgets
+- 27 WordPress users (11 administrators, 16 editors)
+- Site: https://www.pausatf.org (admin: thomasvincent@gmail.com)
 
 #### migrate-prod.yml
 
