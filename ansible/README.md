@@ -137,9 +137,11 @@ ansible-playbook -i inventory/hosts.yml \
 - All installed themes (name, status, version, auto_update)
 - Active template and stylesheet
 - Theme customizations (theme_mods for parent and child themes)
+- Navigation menus (term_id, name, slug, locations, item count)
 - Menu locations, custom CSS, sidebars, widgets
 - WordPress users (username, email, roles, registration date)
-- Site configuration (URL, site name, admin email)
+- Site configuration (URL, site name, admin email, permalink structure, language)
+- URL rewriting configuration (rewrite rules count)
 
 **Output:** `ansible/group_vars/production/wordpress.yml`
 
@@ -154,9 +156,12 @@ ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook \
 **Current Inventory (as of 2025-12-28):**
 - 24 plugins (accordions, jetpack, cloudflare, updraftplus, etc.)
 - 3 themes (TheSource parent v4.8.13, TheSource-child active, twentytwentyfour)
+- 3 navigation menus (Top_Menu with 47 items active, Bottom_Menu, Officials)
 - Theme configuration: menus, custom CSS, sidebars, widgets
 - 27 WordPress users (11 administrators, 16 editors)
 - Site: https://www.pausatf.org (admin: thomasvincent@gmail.com)
+- Permalink structure: /%postname%/ (pretty permalinks)
+- 123 rewrite rules configured
 
 #### migrate-prod.yml
 
