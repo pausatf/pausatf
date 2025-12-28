@@ -139,7 +139,8 @@ ansible-playbook -i inventory/hosts.yml \
 - Theme customizations (theme_mods for parent and child themes)
 - Navigation menus (term_id, name, slug, locations, item count)
 - Menu locations, custom CSS, sidebars, widgets
-- WordPress users (username, email, roles, registration date)
+- WordPress users (username, email, roles, registration date, last login)
+- User activity tracking (last login timestamps via Wordfence Login Security)
 - Site configuration (URL, site name, admin email, permalink structure, language)
 - URL rewriting configuration (rewrite rules count)
 
@@ -159,6 +160,9 @@ ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook \
 - 3 navigation menus (Top_Menu with 47 items active, Bottom_Menu, Officials)
 - Theme configuration: menus, custom CSS, sidebars, widgets
 - 27 WordPress users (11 administrators, 16 editors)
+  - 6 users never logged in
+  - 6 users inactive (last login >1 year ago)
+  - 15 users active (logged in within last year)
 - Site: https://www.pausatf.org (admin: thomasvincent@gmail.com)
 - Permalink structure: /%postname%/ (pretty permalinks)
 - 123 rewrite rules configured

@@ -53,6 +53,27 @@
       register: users_json
       changed_when: false
 
+    - name: Get last login data for all users
+      raw: |
+        sg www-data -c '
+        echo "["
+        first=1
+        for uid in $({{ wp_bin }} user list --field=ID --path={{ wp_path }} 2>/dev/null); do
+          [ $first -eq 1 ] && first=0 || echo ","
+          last_login=$({{ wp_bin }} user meta get $uid wfls-last-login --path={{ wp_path }} 2>/dev/null || echo "")
+          if [ -n "$last_login" ] && [ "$last_login" != "0" ]; then
+            last_login_date=$(date -d @$last_login "+%Y-%m-%d %H:%M:%S" 2>/dev/null || echo "never")
+          else
+            last_login_date="never"
+          fi
+          echo -n "{\"user_id\":$uid,\"last_login\":\"$last_login_date\"}"
+        done
+        echo ""
+        echo "]"
+        ' | grep -v "PHP Notice" | tr -d '\n' | sed 's/\]\[/,/g'
+      register: last_logins_json
+      changed_when: false
+
     - name: Get site URL
       raw: "sg www-data -c '{{ wp_bin }} option get siteurl --path={{ wp_path }} 2>/dev/null | head -1'"
       register: site_url
@@ -113,6 +134,11 @@
     - name: Parse users JSON
       set_fact:
         users_list: "{{ (users_json.stdout | trim | from_json) }}"
+      delegate_to: localhost
+
+    - name: Parse last logins JSON
+      set_fact:
+        last_logins_list: "{{ (last_logins_json.stdout | trim | from_json) if last_logins_json.stdout | trim else [] }}"
       delegate_to: localhost
 
     - name: Parse menus JSON
@@ -189,4 +215,5 @@
               email: {{ u.user_email | to_json }}
               roles: {{ u.roles | to_json }}
               registered: {{ u.user_registered | to_json }}
+              last_login: {{ (last_logins_list | selectattr('user_id', 'equalto', u.ID) | map(attribute='last_login') | first | default('never')) | to_json }}
           {% endfor %}
