@@ -1,0 +1,42 @@
+name: Nightly Legacy Backup
+
+on:
+  schedule:
+    - cron: '0 9 * * *'  # 1 AM Pacific approx
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup SSH key
+        env:
+          SSH_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf "%s" "$SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ftp.pausatf.org >> ~/.ssh/known_hosts 2>/dev/null || true
+
+      - name: Rsync legacy from prod
+        run: bash scripts/backup/rsync_legacy.sh
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          if [ -n "$(git status --porcelain)" ]; then
+            git add backups/legacy
+            git commit -m "chore(backup): nightly legacy snapshot"
+            git push
+          else
+            echo "No changes"
+          fi

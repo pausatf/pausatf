@@ -1,0 +1,57 @@
+name: Capture Prod WP Inventory
+
+on:
+  workflow_dispatch:
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Ansible
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible-core==2.17.5
+
+      - name: Setup SSH key
+        env:
+          SSH_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf "%s" "$SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ftp.pausatf.org >> ~/.ssh/known_hosts 2>/dev/null || true
+
+      - name: Run capture playbook (prod)
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: 'false'
+        run: |
+          ansible-playbook -i ansible/inventory/hosts.yml ansible/playbooks/capture-wp-inventory.yml -l production
+
+      - name: Commit and push inventory
+        run: |
+          if [ -f ansible/group_vars/production/wordpress.yml ]; then
+            git config user.name "github-actions"
+            git config user.email "github-actions@github.com"
+            git add ansible/group_vars/production/wordpress.yml
+            if [ -n "$(git status --porcelain)" ]; then
+              git commit -m "chore(inventory): update prod plugins/themes via capture"
+              git push
+            else
+              echo "No changes"
+            fi
+          else
+            echo "wordpress.yml not generated" >&2
+            exit 1
+          fi
