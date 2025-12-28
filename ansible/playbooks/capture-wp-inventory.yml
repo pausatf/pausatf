@@ -26,6 +26,28 @@
       register: themes_json
       changed_when: false
 
+    - name: Get active template (parent theme)
+      raw: "sg www-data -c '{{ wp_bin }} option get template --path={{ wp_path }} 2>/dev/null | head -1'"
+      register: active_template
+      changed_when: false
+
+    - name: Get active stylesheet (child theme)
+      raw: "sg www-data -c '{{ wp_bin }} option get stylesheet --path={{ wp_path }} 2>/dev/null | head -1'"
+      register: active_stylesheet
+      changed_when: false
+
+    - name: Get child theme customizations
+      raw: "sg www-data -c '{{ wp_bin }} option get theme_mods_{{ active_stylesheet.stdout | trim }} --format=json --path={{ wp_path }} 2>/dev/null | head -1'"
+      register: child_theme_mods
+      changed_when: false
+      ignore_errors: true
+
+    - name: Get parent theme customizations
+      raw: "sg www-data -c '{{ wp_bin }} option get theme_mods_{{ active_template.stdout | trim }} --format=json --path={{ wp_path }} 2>/dev/null | head -1'"
+      register: parent_theme_mods
+      changed_when: false
+      ignore_errors: true
+
     - name: Parse plugins JSON
       set_fact:
         plugins_list: "{{ (plugins_json.stdout | trim | from_json) }}"
@@ -35,6 +57,18 @@
       set_fact:
         themes_list: "{{ (themes_json.stdout | trim | from_json) }}"
       delegate_to: localhost
+
+    - name: Parse child theme mods
+      set_fact:
+        child_mods: "{{ (child_theme_mods.stdout | trim | from_json) if child_theme_mods.stdout | trim else {} }}"
+      delegate_to: localhost
+      when: child_theme_mods is not skipped
+
+    - name: Parse parent theme mods
+      set_fact:
+        parent_mods: "{{ (parent_theme_mods.stdout | trim | from_json) if parent_theme_mods.stdout | trim else {} }}"
+      delegate_to: localhost
+      when: parent_theme_mods is not skipped
 
     - name: Ensure local output directory exists
       delegate_to: localhost
@@ -66,3 +100,15 @@
               version: {{ t.version | to_json }}
               auto_update: {{ t.auto_update | to_json }}
           {% endfor %}
+
+          # Active theme configuration
+          wp_active_template: {{ active_template.stdout | trim | to_json }}
+          wp_active_stylesheet: {{ active_stylesheet.stdout | trim | to_json }}
+
+          # Theme customizations (theme_mods)
+          {% if child_mods is defined and child_mods %}
+          wp_child_theme_mods: {{ child_mods | to_nice_yaml(indent=2) | indent(2) }}
+          {% endif %}
+          {% if parent_mods is defined and parent_mods %}
+          wp_parent_theme_mods: {{ parent_mods | to_nice_yaml(indent=2) | indent(2) }}
+          {% endif %}
