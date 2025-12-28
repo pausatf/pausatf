@@ -179,8 +179,9 @@ ssh deploy@ftp.pausatf.org 'tail -20 /var/www/html/wp-content/debug.log'
 
 1. **WordPress Inventory Capture** (2:00 AM PT)
    - Workflow: `.github/workflows/capture-prod-inventory.yml`
-   - Captures: plugins, themes, theme_mods
+   - Captures: plugins, themes, theme_mods, users, site config
    - Output: Commits to `ansible/group_vars/production/wordpress.yml`
+   - Includes: 27 users (11 admins, 16 editors)
 
 2. **Legacy Directory Backup** (3:00 AM PT)
    - Workflow: `.github/workflows/backup-legacy.yml`

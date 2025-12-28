@@ -48,6 +48,26 @@
       changed_when: false
       ignore_errors: true
 
+    - name: Get WordPress users list
+      raw: "sg www-data -c '{{ wp_bin }} user list --format=json --fields=ID,user_login,user_email,roles,user_registered --path={{ wp_path }} 2>/dev/null | head -1'"
+      register: users_json
+      changed_when: false
+
+    - name: Get site URL
+      raw: "sg www-data -c '{{ wp_bin }} option get siteurl --path={{ wp_path }} 2>/dev/null | head -1'"
+      register: site_url
+      changed_when: false
+
+    - name: Get site name
+      raw: "sg www-data -c '{{ wp_bin }} option get blogname --path={{ wp_path }} 2>/dev/null | head -1'"
+      register: site_name
+      changed_when: false
+
+    - name: Get admin email
+      raw: "sg www-data -c '{{ wp_bin }} option get admin_email --path={{ wp_path }} 2>/dev/null | head -1'"
+      register: admin_email
+      changed_when: false
+
     - name: Parse plugins JSON
       set_fact:
         plugins_list: "{{ (plugins_json.stdout | trim | from_json) }}"
@@ -69,6 +89,11 @@
         parent_mods: "{{ (parent_theme_mods.stdout | trim | from_json) if parent_theme_mods.stdout | trim else {} }}"
       delegate_to: localhost
       when: parent_theme_mods is not skipped
+
+    - name: Parse users JSON
+      set_fact:
+        users_list: "{{ (users_json.stdout | trim | from_json) }}"
+      delegate_to: localhost
 
     - name: Ensure local output directory exists
       delegate_to: localhost
@@ -112,3 +137,18 @@
           {% if parent_mods is defined and parent_mods %}
           wp_parent_theme_mods: {{ parent_mods | to_nice_yaml(indent=2) | indent(2) }}
           {% endif %}
+
+          # Site configuration
+          wp_site_url: {{ site_url.stdout | trim | to_json }}
+          wp_site_name: {{ site_name.stdout | trim | to_json }}
+          wp_admin_email: {{ admin_email.stdout | trim | to_json }}
+
+          # WordPress users and permissions
+          wp_users:
+          {% for u in users_list %}
+            - id: {{ u.ID }}
+              username: {{ u.user_login | to_json }}
+              email: {{ u.user_email | to_json }}
+              roles: {{ u.roles | to_json }}
+              registered: {{ u.user_registered | to_json }}
+          {% endfor %}
