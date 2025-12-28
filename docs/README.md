@@ -48,13 +48,13 @@
 
 | Guide | Description | Last Updated |
 |-------|-------------|--------------|
-| [01 - Cache Implementation](docs/guides/01-cache-implementation-guide.md) | Complete cache fix implementation and technical details | Dec 20, 2025 |
-| [05 - Server Migration](docs/guides/05-server-migration-guide.md) | Complete 10-phase DigitalOcean migration process | Dec 20, 2025 |
-| [06 - Cloudflare Configuration](docs/guides/06-cloudflare-configuration-guide.md) | DNS, SSL, caching, firewall, API automation | Dec 20, 2025 |
-| [09 - Google Workspace Email](docs/guides/09-google-workspace-email-security.md) | SPF, DKIM, DMARC email security setup | Dec 20, 2025 |
-| [10 - Operational Procedures](docs/guides/10-operational-procedures.md) | Day-to-day operations, updates, backups, emergencies | Dec 21, 2025 |
-| [11 - Database Maintenance](docs/guides/11-database-maintenance.md) | Database procedures, primary keys, troubleshooting | Dec 21, 2025 |
-| [13 - DigitalOcean Optimization](docs/guides/13-digitalocean-optimization-guide.md) | Infrastructure improvements, security, monitoring, DR | Dec 21, 2025 |
+| [01 - Cache Implementation](guides/01-cache-implementation-guide.md) | Complete cache fix implementation and technical details | Dec 20, 2025 |
+| [05 - Server Migration](guides/05-server-migration-guide.md) | Complete 10-phase DigitalOcean migration process | Dec 20, 2025 |
+| [06 - Cloudflare Configuration](guides/06-cloudflare-configuration-guide.md) | DNS, SSL, caching, firewall, API automation | Dec 20, 2025 |
+| [09 - Google Workspace Email](guides/09-google-workspace-email-security.md) | SPF, DKIM, DMARC email security setup | Dec 20, 2025 |
+| [10 - Operational Procedures](guides/10-operational-procedures.md) | Day-to-day operations, updates, backups, emergencies | Dec 21, 2025 |
+| [11 - Database Maintenance](guides/11-database-maintenance.md) | Database procedures, primary keys, troubleshooting | Dec 21, 2025 |
+| [13 - DigitalOcean Optimization](guides/13-digitalocean-optimization-guide.md) | Infrastructure improvements, security, monitoring, DR | Dec 21, 2025 |
 
 ### 📊 Reports & Audits
 
@@ -62,15 +62,15 @@
 
 | Report | Description | Date |
 |--------|-------------|------|
-| [02 - Cache Audit](docs/reports/02-cache-audit-report.md) | Pre-fix audit of cache configurations | Dec 20, 2025 |
-| [03 - Cache Verification](docs/reports/03-cache-verification-report.md) | Production deployment verification | Dec 20, 2025 |
-| [04 - Security Audit](docs/reports/04-security-audit-report.md) | WordPress theme security assessment (9 findings) | Dec 20, 2025 |
-| [07 - Performance Optimization](docs/reports/07-performance-optimization-complete.md) | **Complete WordPress optimization (93% faster)** | Dec 20, 2025 |
-| [12 - Server Rightsizing](docs/reports/12-server-rightsizing-analysis.md) | Resource optimization and cost analysis | Dec 21, 2025 |
-| [14 - WordPress Security Audit](docs/reports/14-wordpress-security-audit-2025.md) | **WordPress security audit and remediation** | Dec 21, 2025 |
-| [15 - Theme Repository Workflows](docs/reports/15-theme-repository-github-workflows.md) | **GitHub workflows for WordPress theme repos** | Dec 21, 2025 |
-| [Phase 1 Implementation](docs/reports/PHASE1-IMPLEMENTATION-REPORT.md) | Phase 1 security improvements summary | Dec 21, 2025 |
-| [IaC Updates](docs/reports/INFRASTRUCTURE-AS-CODE-UPDATES.md) | Terraform/Ansible configurations | Dec 21, 2025 |
+| [02 - Cache Audit](reports/02-cache-audit-report.md) | Pre-fix audit of cache configurations | Dec 20, 2025 |
+| [03 - Cache Verification](reports/03-cache-verification-report.md) | Production deployment verification | Dec 20, 2025 |
+| [04 - Security Audit](reports/04-security-audit-report.md) | WordPress theme security assessment (9 findings) | Dec 20, 2025 |
+| [07 - Performance Optimization](reports/07-performance-optimization-complete.md) | **Complete WordPress optimization (93% faster)** | Dec 20, 2025 |
+| [12 - Server Rightsizing](reports/12-server-rightsizing-analysis.md) | Resource optimization and cost analysis | Dec 21, 2025 |
+| [14 - WordPress Security Audit](reports/14-wordpress-security-audit-2025.md) | **WordPress security audit and remediation** | Dec 21, 2025 |
+| [15 - Theme Repository Workflows](reports/15-theme-repository-github-workflows.md) | **GitHub workflows for WordPress theme repos** | Dec 21, 2025 |
+| [Phase 1 Implementation](reports/PHASE1-IMPLEMENTATION-REPORT.md) | Phase 1 security improvements summary | Dec 21, 2025 |
+| [IaC Updates](reports/INFRASTRUCTURE-AS-CODE-UPDATES.md) | Terraform/Ansible configurations | Dec 21, 2025 |
 
 ### 🗺️ Planning & Roadmaps
 
@@ -78,7 +78,7 @@
 
 | Document | Description |
 |----------|-------------|
-| [08 - Upgrade Roadmap](docs/planning/08-recommended-upgrades-roadmap.md) | PHP 8.3, Ubuntu 24.04, security hardening |
+| [08 - Upgrade Roadmap](planning/08-recommended-upgrades-roadmap.md) | PHP 8.3, Ubuntu 24.04, security hardening |
 
 ### 📝 Procedures
 
@@ -86,7 +86,7 @@
 
 | Procedure | Description |
 |-----------|-------------|
-| [Theme Dropdown Fix](docs/procedures/THEME-DROPDOWN-FIX.md) | WordPress theme dropdown menu background color fix |
+| [Theme Dropdown Fix](procedures/THEME-DROPDOWN-FIX.md) | WordPress theme dropdown menu background color fix |
 
 ### 📚 Runbooks
 
@@ -94,8 +94,8 @@
 
 | Runbook | Description |
 |---------|-------------|
-| [Deployment](docs/runbooks/deployment.md) | Deployment procedures |
-| [Disaster Recovery](docs/runbooks/disaster-recovery.md) | Disaster recovery procedures |
+| [Deployment](runbooks/deployment.md) | Deployment procedures |
+| [Disaster Recovery](runbooks/disaster-recovery.md) | Disaster recovery procedures |
 
 ---
 
@@ -242,7 +242,7 @@
 - ✅ Auto-updates enabled for all plugins
 - ✅ Database integrity verified (133 tables)
 - ✅ File security audit completed
-- 📖 [Full Report](docs/reports/14-wordpress-security-audit-2025.md)
+- 📖 [Full Report](reports/14-wordpress-security-audit-2025.md)
 
 ### GitHub Workflow Enabled (Dec 21, 2025)
 - ✅ GitHub Wiki enabled for quick reference
@@ -261,7 +261,7 @@
 - ✅ Issue templates for bug reports and feature requests
 - ✅ Pull request templates with comprehensive checklists
 - ✅ CONTRIBUTING.md guides for WordPress development
-- 📖 [Theme Workflow Report](docs/reports/15-theme-repository-github-workflows.md)
+- 📖 [Theme Workflow Report](reports/15-theme-repository-github-workflows.md)
 
 ### Performance Optimization (Dec 20, 2025)
 - ✅ Response time reduced from 1,357ms to ~220ms (6x faster)
@@ -269,14 +269,14 @@
 - ✅ **Autoloaded options: 4.54 MB → 298 KB (93% reduction)**
 - ✅ **Admin performance: 1,490ms → 232ms (84% faster)**
 - ✅ All WordPress Site Health critical issues resolved
-- 📖 [Full Report](docs/reports/07-performance-optimization-complete.md)
+- 📖 [Full Report](reports/07-performance-optimization-complete.md)
 
 ### Server Right-Sizing & Backups (Dec 21, 2025)
 - ✅ Daily automated backups enabled on both servers
 - ✅ Disk cleanup: freed 54 GB total (32 GB prod, 22 GB staging)
 - ✅ Resource usage analysis: both servers over-provisioned
 - ✅ Cost optimization: $460.80/year savings potential identified
-- 📖 [Analysis Report](docs/reports/12-server-rightsizing-analysis.md)
+- 📖 [Analysis Report](reports/12-server-rightsizing-analysis.md)
 
 ### CI/CD and Automation (Dec 21, 2025)
 - ✅ GitHub Actions workflows configured
@@ -333,9 +333,9 @@ wp core check-update --path=/var/www/html/ --allow-root
 - 🐛 [Report an Issue](https://github.com/pausatf/pausatf-infrastructure-docs/issues/new?template=bug_report.yml)
 
 **Common Issues:**
-- Cache not working → See [Cache Guide](docs/guides/01-cache-implementation-guide.md)
-- SSH connection issues → See [Server Migration Guide](docs/guides/05-server-migration-guide.md#troubleshooting)
-- WordPress issues → See [Operational Procedures](docs/guides/10-operational-procedures.md)
+- Cache not working → See [Cache Guide](guides/01-cache-implementation-guide.md)
+- SSH connection issues → See [Server Migration Guide](guides/05-server-migration-guide.md#troubleshooting)
+- WordPress issues → See [Operational Procedures](guides/10-operational-procedures.md)
 
 ---
 
