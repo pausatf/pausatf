@@ -176,76 +176,31 @@
 
 <!-- Start Socialicon Rollovers -->
 
-
-
-<script language="Javascript">
-
-
-
-if (document.images)
-
-{
-
-image1 = new Image
-
-image2 = new Image
-
-image3 = new Image
-
-image4 = new Image
-
-image5 = new Image
-
-image6 = new Image
-
-image7 = new Image
-
-image8 = new Image
-
-
-
-image1.src = 'https://pausatf.org/wp-content/uploads/2014/06/FB.png'
-
-image2.src = 'https://pausatf.org/wp-content/uploads/2014/06/FBH.png'
-
-image3.src = 'https://pausatf.org/wp-content/uploads/2014/06/TW.png'
-
-image4.src = 'https://pausatf.org/wp-content/uploads/2014/06/TWH.png'
-
-image5.src = 'http://www.pausatf.org/wp-content/uploads/2021/05/InstagramLogoBlue32.png'
-
-image6.src = 'http://www.pausatf.org/wp-content/uploads/2021/05/InstagramLogoGray32.png'
-
-image7.src = 'https://pausatf.org/wp-content/uploads/2014/06/YT.png'
-
-image8.src = 'https://pausatf.org/wp-content/uploads/2014/06/YTH.png'
-
-
-
+<style>
+/* Modern CSS-based hover effects for social icons */
+.social-icon-link img {
+	transition: opacity 0.2s ease-in-out;
 }
-
-
-
-</script>
+.social-icon-link:hover img {
+	opacity: 0.7;
+}
+</style>
 
 <!-- Instagram -->
-<div style="float:right; margin: 12px 10px 0 0;"><a href="https://www.instagram.com/usatfpacificassoc/" onMouseOver="document.mouseover3.src=image5.src" onMouseOut="document.mouseover3.src=image6.src" target="_blank">
-<img src="http://www.pausatf.org/wp-content/uploads/2021/05/InstagramLogoGray32.png" border=0 name="mouseover3"></a></div>
-
+<div style="float:right; margin: 12px 10px 0 0;"><a href="https://www.instagram.com/usatfpacificassoc/" class="social-icon-link" target="_blank" rel="noopener noreferrer">
+<img src="https://pausatf.org/wp-content/uploads/2021/05/InstagramLogoGray32.png" alt="Instagram" style="border:0;"></a></div>
 
 <!-- You Tube -->
-<div style="float:right; margin: 12px 10px 0 0;"><a href="https://www.youtube.com/channel/UC4UDU5_ALy26O1vU6rAOjjA" onMouseOver="document.mouseover4.src=image8.src" onMouseOut="document.mouseover4.src=image7.src" target="_blank">
-<img src="https://pausatf.org/wp-content/uploads/2014/06/YT.png" border=0 name="mouseover4"></a></div>
-
+<div style="float:right; margin: 12px 10px 0 0;"><a href="https://www.youtube.com/channel/UC4UDU5_ALy26O1vU6rAOjjA" class="social-icon-link" target="_blank" rel="noopener noreferrer">
+<img src="https://pausatf.org/wp-content/uploads/2014/06/YT.png" alt="YouTube" style="border:0;"></a></div>
 
 <!-- Twitter -->
-<div style="float:right; margin: 12px 10px 0 0;"><a href="https://twitter.com/UsatfPacific" onMouseOver="document.mouseover2.src=image4.src" onMouseOut="document.mouseover2.src=image3.src" target="_blank">
-<img src="https://pausatf.org/wp-content/uploads/2014/06/TW.png" border=0 name="mouseover2"></a></div>
-
+<div style="float:right; margin: 12px 10px 0 0;"><a href="https://twitter.com/UsatfPacific" class="social-icon-link" target="_blank" rel="noopener noreferrer">
+<img src="https://pausatf.org/wp-content/uploads/2014/06/TW.png" alt="Twitter" style="border:0;"></a></div>
 
 <!-- Facebook -->
-<div style="float:right; margin: 12px 10px 0 0;"><a href="https://www.facebook.com/pausatf" onMouseOver="document.mouseover1.src=image2.src" onMouseOut="document.mouseover1.src=image1.src" target="_blank">
-<img src="https://pausatf.org/wp-content/uploads/2014/06/FB.png" border=0 name="mouseover1"></a></div>
+<div style="float:right; margin: 12px 10px 0 0;"><a href="https://www.facebook.com/pausatf" class="social-icon-link" target="_blank" rel="noopener noreferrer">
+<img src="https://pausatf.org/wp-content/uploads/2014/06/FB.png" alt="Facebook" style="border:0;"></a></div>
 
 
 				</div> <!-- end #cat-nav-content -->
