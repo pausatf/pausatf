@@ -1,0 +1,378 @@
+#cloud-config
+# OpenLiteSpeed + WordPress Cloud-init Configuration for PAUSATF Staging/Development
+#
+# This template configures OpenLiteSpeed web server with:
+# - OpenLiteSpeed 1.8+
+# - LSPHP 8.4 (latest)
+# - Memcached (socket-based, 256MB)
+# - Redis (socket-based, 256MB)
+# - MySQL client
+# - WordPress optimizations
+# - LSCache plugin ready
+# - SSL/TLS support (Let's Encrypt ready)
+#
+# Variables:
+#   ${hostname} - Server hostname
+#   ${environment} - Environment name (staging or development)
+
+# System configuration
+hostname: ${hostname}
+fqdn: ${hostname}.pausatf.org
+manage_etc_hosts: true
+preserve_hostname: false
+timezone: America/Los_Angeles
+locale: en_US.UTF-8
+
+# Package management
+package_update: true
+package_upgrade: true
+package_reboot_if_required: true
+
+# Base packages
+packages:
+  # Base system
+  - curl
+  - wget
+  - git
+  - vim
+  - htop
+  - unzip
+
+  # MySQL client
+  - mysql-client
+
+  # Caching
+  - memcached
+  - redis-server
+
+  # Security
+  - fail2ban
+  - ufw
+
+  # WordPress tools
+  - rsync
+
+# System configuration files
+write_files:
+  # Environment marker
+  - path: /etc/environment
+    content: |
+      ENVIRONMENT=${environment}
+      HOSTNAME=${hostname}
+      WEB_SERVER=openlitespeed
+      PHP_VERSION=8.4
+    append: true
+
+  # OpenLiteSpeed installation script
+  - path: /tmp/install-openlitespeed.sh
+    permissions: '0755'
+    content: |
+      #!/bin/bash
+      set -euo pipefail
+
+      echo "Installing OpenLiteSpeed..."
+
+      # Add OpenLiteSpeed repository
+      wget -O - https://repo.litespeed.sh | bash
+
+      # Install OpenLiteSpeed and LSPHP 8.4
+      apt-get update
+      apt-get install -y openlitespeed lsphp84 lsphp84-common lsphp84-mysql lsphp84-curl lsphp84-imagick lsphp84-imap lsphp84-intl lsphp84-redis lsphp84-memcached lsphp84-opcache lsphp84-pgsql lsphp84-sqlite3
+
+      # Set PHP 8.4 as default
+      ln -sf /usr/local/lsws/lsphp84/bin/lsphp /usr/local/lsws/fcgi-bin/lsphp
+
+      # Set admin password (change this!)
+      /usr/local/lsws/admin/misc/admpass.sh <<EOF
+      admin
+      pausatf-temp-$(date +%s)
+      pausatf-temp-$(date +%s)
+      EOF
+
+      # Configure virtual host for WordPress
+      cat > /usr/local/lsws/conf/vhosts/pausatf/vhconf.conf <<'VHOST'
+      docRoot                   /var/www/html
+      vhDomain                  ${hostname}.pausatf.org
+      vhAliases                 www.${hostname}.pausatf.org
+      enableGzip                1
+      enableIpGeo               1
+
+      errorlog /usr/local/lsws/logs/pausatf-error.log {
+        useServer               0
+        logLevel                ERROR
+        rollingSize             10M
+      }
+
+      accesslog /usr/local/lsws/logs/pausatf-access.log {
+        useServer               0
+        logFormat               "%h %l %u %t "%r" %>s %b "%{Referer}i" "%{User-agent}i""
+        logHeaders              5
+        rollingSize             10M
+        keepDays                7
+      }
+
+      index  {
+        useServer               0
+        indexFiles              index.php, index.html
+      }
+
+      scripthandler  {
+        add                     lsapi:lsphp84 php
+      }
+
+      phpIniOverride  {
+        php_admin_value max_execution_time 300
+        php_admin_value memory_limit 256M
+        php_admin_value post_max_size 128M
+        php_admin_value upload_max_filesize 128M
+      }
+
+      rewrite  {
+        enable                  1
+        autoLoadHtaccess        1
+      }
+      VHOST
+
+      # Create WordPress directory
+      mkdir -p /var/www/html
+      chown -R nobody:nogroup /var/www/html
+      chmod -R 755 /var/www/html
+
+      # Start OpenLiteSpeed
+      systemctl enable lsws
+      systemctl start lsws
+
+      echo "OpenLiteSpeed installation completed!"
+
+  # PHP 8.4 optimization for WordPress
+  - path: /usr/local/lsws/lsphp84/etc/php/8.4/litespeed/conf.d/99-wordpress-optimization.ini
+    content: |
+      ; WordPress optimizations
+      max_execution_time = 300
+      max_input_time = 300
+      memory_limit = 256M
+      post_max_size = 128M
+      upload_max_filesize = 128M
+      max_input_vars = 3000
+
+      ; PHP security
+      expose_php = Off
+      display_errors = Off
+      log_errors = On
+      error_log = /var/log/lsphp_errors.log
+
+      ; Session security
+      session.cookie_httponly = 1
+      session.cookie_secure = 1
+      session.use_only_cookies = 1
+
+      ; OPcache optimization
+      opcache.enable = 1
+      opcache.memory_consumption = 256
+      opcache.interned_strings_buffer = 16
+      opcache.max_accelerated_files = 10000
+      opcache.revalidate_freq = 2
+      opcache.fast_shutdown = 1
+    permissions: '0644'
+
+  # Fail2ban configuration
+  - path: /etc/fail2ban/jail.d/wordpress.local
+    content: |
+      [wordpress]
+      enabled = true
+      filter = wordpress
+      logpath = /usr/local/lsws/logs/pausatf-access.log
+      maxretry = 3
+      bantime = 3600
+      findtime = 600
+    permissions: '0644'
+
+  - path: /etc/fail2ban/filter.d/wordpress.conf
+    content: |
+      [Definition]
+      failregex = ^<HOST> .* "POST .*wp-login.php
+                  ^<HOST> .* "POST .*xmlrpc.php
+      ignoreregex =
+    permissions: '0644'
+
+  # Memcached configuration (socket-based for performance)
+  - path: /etc/memcached.conf
+    content: |
+      # Memcached configuration for OpenLiteSpeed WordPress
+      # Run as nobody user (OpenLiteSpeed default)
+      -u nobody
+
+      # Memory allocation (256MB)
+      -m 256
+
+      # Use UNIX socket instead of TCP for better performance
+      -s /var/www/memcached.sock
+      -a 0770
+
+      # Connection limit
+      -c 1024
+
+      # Disable TCP
+      # -p 11211
+
+      # Verbose logging
+      -v
+
+      # Max item size (default 1MB, increase for WordPress)
+      -I 4M
+    permissions: '0644'
+
+  # Redis configuration (socket-based for performance)
+  - path: /etc/redis/redis.conf
+    content: |
+      # Redis configuration for OpenLiteSpeed WordPress
+
+      # Run as nobody user for OpenLiteSpeed compatibility
+      # Note: This will be set via systemd override
+
+      # Disable TCP port (use socket only for security/performance)
+      port 0
+
+      # Unix socket configuration
+      unixsocket /var/run/redis/redis-server.sock
+      unixsocketperm 770
+
+      # Memory limit (256MB)
+      maxmemory 256mb
+      maxmemory-policy allkeys-lru
+
+      # Persistence (disable for cache-only use)
+      save ""
+      appendonly no
+
+      # Performance tuning
+      tcp-backlog 511
+      timeout 0
+      tcp-keepalive 300
+
+      # Logging
+      loglevel notice
+      logfile /var/log/redis/redis-server.log
+
+      # Snapshotting disabled for cache
+      # Database will not persist to disk
+
+      # AOF disabled for cache
+      # Use Redis as pure cache, not persistent storage
+    permissions: '0644'
+
+  # Redis systemd override to run as nobody user
+  - path: /etc/systemd/system/redis-server.service.d/override.conf
+    content: |
+      [Service]
+      User=nobody
+      Group=nogroup
+    permissions: '0644'
+
+# System setup commands
+runcmd:
+  # Update package lists
+  - apt-get update
+
+  # Install OpenLiteSpeed
+  - bash /tmp/install-openlitespeed.sh
+
+  # Configure firewall
+  - ufw default deny incoming
+  - ufw default allow outgoing
+  - ufw allow OpenSSH
+  - ufw allow 80/tcp
+  - ufw allow 443/tcp
+  - ufw allow 7080/tcp comment 'OpenLiteSpeed Admin'
+  - echo "y" | ufw enable
+
+  # Configure fail2ban
+  - systemctl enable fail2ban
+  - systemctl start fail2ban
+
+  # Enable unattended security updates
+  - echo 'APT::Periodic::Update-Package-Lists "1";' > /etc/apt/apt.conf.d/20auto-upgrades
+  - echo 'APT::Periodic::Unattended-Upgrade "1";' >> /etc/apt/apt.conf.d/20auto-upgrades
+
+  # Create deploy user
+  - useradd -m -s /bin/bash -G sudo deploy
+  - usermod -a -G nogroup deploy
+  - mkdir -p /home/deploy/.ssh
+  - chmod 700 /home/deploy/.ssh
+  - chown -R deploy:deploy /home/deploy/.ssh
+
+  # Configure Memcached
+  - mkdir -p /var/www
+  - chown nobody:nogroup /var/www
+  - chmod 755 /var/www
+  - systemctl enable memcached
+  - systemctl restart memcached
+  - sleep 2
+  - chmod 770 /var/www/memcached.sock
+  - chown nobody:nogroup /var/www/memcached.sock
+
+  # Configure Redis
+  - mkdir -p /var/run/redis
+  - mkdir -p /var/log/redis
+  - chown nobody:nogroup /var/run/redis
+  - chown nobody:nogroup /var/log/redis
+  - chmod 755 /var/run/redis
+  - mkdir -p /etc/systemd/system/redis-server.service.d
+  - systemctl daemon-reload
+  - systemctl enable redis-server
+  - systemctl restart redis-server
+  - sleep 2
+  - chmod 770 /var/run/redis/redis-server.sock
+  - chown nobody:nogroup /var/run/redis/redis-server.sock
+
+  # Log completion
+  - echo "OpenLiteSpeed + WordPress cloud-init completed at $(date)" > /var/log/cloud-init-openlitespeed.log
+  - echo "PHP Version:" >> /var/log/cloud-init-openlitespeed.log
+  - /usr/local/lsws/lsphp84/bin/php -v >> /var/log/cloud-init-openlitespeed.log
+  - echo "OpenLiteSpeed Version:" >> /var/log/cloud-init-openlitespeed.log
+  - /usr/local/lsws/bin/openlitespeed -v >> /var/log/cloud-init-openlitespeed.log
+  - echo "Memcached Status:" >> /var/log/cloud-init-openlitespeed.log
+  - systemctl status memcached --no-pager >> /var/log/cloud-init-openlitespeed.log 2>&1
+  - echo "Redis Status:" >> /var/log/cloud-init-openlitespeed.log
+  - systemctl status redis-server --no-pager >> /var/log/cloud-init-openlitespeed.log 2>&1
+  - echo "Memcached Socket:" >> /var/log/cloud-init-openlitespeed.log
+  - ls -la /var/www/memcached.sock >> /var/log/cloud-init-openlitespeed.log 2>&1
+  - echo "Redis Socket:" >> /var/log/cloud-init-openlitespeed.log
+  - ls -la /var/run/redis/redis-server.sock >> /var/log/cloud-init-openlitespeed.log 2>&1
+
+# SSH security
+ssh_pwauth: false
+disable_root: false
+
+# Final message
+final_message: |
+  ========================================
+  PAUSATF ${environment} Server Ready!
+  ========================================
+  Environment: ${environment}
+  Hostname: ${hostname}
+  Web Server: OpenLiteSpeed 1.8+
+  PHP Version: 8.4
+  Caching: Memcached + Redis (socket-based)
+
+  OpenLiteSpeed Admin:
+  - URL: https://${hostname}.pausatf.org:7080
+  - User: admin
+  - Password: Check /usr/local/lsws/adminpasswd
+
+  Object Cache Configuration (LSCache Plugin):
+  - Memcached Socket: /var/www/memcached.sock
+  - Redis Socket: /var/run/redis/redis-server.sock
+  - Port: 0 (socket-based, no TCP)
+
+  Next Steps:
+  1. Change admin password via WebAdmin
+  2. Configure DNS A record
+  3. Set up SSL certificate
+  4. Deploy WordPress application
+  5. Configure database connection
+  6. Install LSCache plugin
+  7. Configure object cache (memcached or redis)
+
+  Uptime: $UPTIME
+  ========================================

@@ -1,0 +1,240 @@
+#cloud-config
+# Apache + WordPress Cloud-init Configuration for PAUSATF Production
+#
+# This template configures a production-ready Apache web server with:
+# - Apache 2.4
+# - PHP 7.4 (for WordPress compatibility)
+# - MySQL client
+# - WordPress optimizations
+# - SSL/TLS support (Let's Encrypt ready)
+#
+# Variables:
+#   ${hostname} - Server hostname
+#   ${environment} - Environment name (should be "production")
+
+# System configuration
+hostname: ${hostname}
+fqdn: ${hostname}.pausatf.org
+manage_etc_hosts: true
+preserve_hostname: false
+timezone: America/Los_Angeles
+locale: en_US.UTF-8
+
+# Package management
+package_update: true
+package_upgrade: true
+package_reboot_if_required: true
+
+# APT repositories
+apt:
+  sources:
+    ondrej-php:
+      source: "ppa:ondrej/php"
+
+# Production Apache + PHP packages
+packages:
+  # Base system
+  - curl
+  - wget
+  - git
+  - vim
+  - htop
+  - unzip
+
+  # Apache
+  - apache2
+  - apache2-utils
+
+  # PHP 7.4 for WordPress
+  - php7.4
+  - php7.4-fpm
+  - php7.4-mysql
+  - php7.4-curl
+  - php7.4-gd
+  - php7.4-mbstring
+  - php7.4-xml
+  - php7.4-xmlrpc
+  - php7.4-soap
+  - php7.4-intl
+  - php7.4-zip
+  - php7.4-bcmath
+  - php7.4-imagick
+  - libapache2-mod-php7.4
+
+  # MySQL client
+  - mysql-client
+
+  # SSL/TLS
+  - certbot
+  - python3-certbot-apache
+
+  # Security
+  - fail2ban
+  - ufw
+
+  # WordPress tools
+  - rsync
+
+# System configuration files
+write_files:
+  # Environment marker
+  - path: /etc/environment
+    content: |
+      ENVIRONMENT=${environment}
+      HOSTNAME=${hostname}
+      WEB_SERVER=apache
+      PHP_VERSION=7.4
+    append: true
+
+  # Apache security configuration
+  - path: /etc/apache2/conf-available/security-hardening.conf
+    content: |
+      # Hide Apache version
+      ServerTokens Prod
+      ServerSignature Off
+      TraceEnable Off
+
+      # Prevent clickjacking
+      Header always set X-Frame-Options "SAMEORIGIN"
+      Header always set X-Content-Type-Options "nosniff"
+      Header always set X-XSS-Protection "1; mode=block"
+      Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+      # Enable HSTS (uncomment after SSL is configured)
+      # Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    permissions: '0644'
+
+  # PHP 7.4 optimization for WordPress
+  - path: /etc/php/7.4/apache2/conf.d/99-wordpress-optimization.ini
+    content: |
+      ; WordPress optimizations
+      max_execution_time = 300
+      max_input_time = 300
+      memory_limit = 256M
+      post_max_size = 128M
+      upload_max_filesize = 128M
+      max_input_vars = 3000
+
+      ; PHP security
+      expose_php = Off
+      display_errors = Off
+      log_errors = On
+      error_log = /var/log/php_errors.log
+
+      ; Session security
+      session.cookie_httponly = 1
+      session.cookie_secure = 1
+      session.use_only_cookies = 1
+
+      ; Disable dangerous functions
+      disable_functions = exec,passthru,shell_exec,system,proc_open,popen,curl_exec,curl_multi_exec,parse_ini_file,show_source
+    permissions: '0644'
+
+  # Fail2ban WordPress jail
+  - path: /etc/fail2ban/jail.d/wordpress.local
+    content: |
+      [wordpress]
+      enabled = true
+      filter = wordpress
+      logpath = /var/log/apache2/access.log
+      maxretry = 3
+      bantime = 3600
+      findtime = 600
+    permissions: '0644'
+
+  - path: /etc/fail2ban/filter.d/wordpress.conf
+    content: |
+      [Definition]
+      failregex = ^<HOST> .* "POST .*wp-login.php
+                  ^<HOST> .* "POST .*xmlrpc.php
+      ignoreregex =
+    permissions: '0644'
+
+  # UFW configuration
+  - path: /etc/ufw/applications.d/apache-full
+    content: |
+      [Apache Full]
+      title=Web Server (HTTP,HTTPS)
+      description=Apache v2 Full
+      ports=80,443/tcp
+    permissions: '0644'
+
+# System setup commands
+runcmd:
+  # Update package lists
+  - apt-get update
+
+  # Enable Apache modules
+  - a2enmod rewrite
+  - a2enmod ssl
+  - a2enmod headers
+  - a2enmod deflate
+  - a2enmod expires
+  - a2enmod proxy_fcgi
+  - a2enmod setenvif
+
+  # Enable security configuration
+  - a2enconf security-hardening
+
+  # Disable default site
+  - a2dissite 000-default
+
+  # Create WordPress directory structure
+  - mkdir -p /var/www/html
+  - chown -R www-data:www-data /var/www/html
+  - chmod -R 755 /var/www/html
+
+  # Configure firewall
+  - ufw default deny incoming
+  - ufw default allow outgoing
+  - ufw allow OpenSSH
+  - ufw allow 'Apache Full'
+  - echo "y" | ufw enable
+
+  # Configure fail2ban
+  - systemctl enable fail2ban
+  - systemctl start fail2ban
+
+  # Enable unattended security updates
+  - echo 'APT::Periodic::Update-Package-Lists "1";' > /etc/apt/apt.conf.d/20auto-upgrades
+  - echo 'APT::Periodic::Unattended-Upgrade "1";' >> /etc/apt/apt.conf.d/20auto-upgrades
+
+  # Restart Apache with new configuration
+  - systemctl enable apache2
+  - systemctl restart apache2
+
+  # Create deploy user
+  - useradd -m -s /bin/bash -G www-data,sudo deploy
+  - mkdir -p /home/deploy/.ssh
+  - chmod 700 /home/deploy/.ssh
+  - chown -R deploy:deploy /home/deploy/.ssh
+
+  # Log completion
+  - echo "Apache + WordPress cloud-init completed at $(date)" > /var/log/cloud-init-apache.log
+  - echo "PHP Version:" >> /var/log/cloud-init-apache.log
+  - php -v >> /var/log/cloud-init-apache.log
+  - echo "Apache Version:" >> /var/log/cloud-init-apache.log
+  - apache2 -v >> /var/log/cloud-init-apache.log
+
+# SSH security
+ssh_pwauth: false
+disable_root: false
+
+# Final message
+final_message: |
+  ========================================
+  PAUSATF Production Server Ready!
+  ========================================
+  Environment: ${environment}
+  Hostname: ${hostname}
+  Web Server: Apache 2.4
+  PHP Version: 7.4
+
+  Next Steps:
+  1. Configure DNS A record
+  2. Set up SSL with: certbot --apache
+  3. Deploy WordPress application
+  4. Configure database connection
+
+  Uptime: $UPTIME
+  ========================================
