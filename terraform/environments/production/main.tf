@@ -31,6 +31,26 @@ provider "cloudflare" {
   api_token = var.cloudflare_api_token
 }
 
+# DigitalOcean Project
+# Import existing project: terraform import digitalocean_project.pausatf 8ddce7ba-f064-4611-8460-0771dd817342
+resource "digitalocean_project" "pausatf" {
+  name        = "PAUSATF"
+  description = "PAUSATF - Pan African Ultimate Sports & Training Foundation"
+  purpose     = "Website or blog"
+  environment = "Production"
+
+  resources = [
+    digitalocean_droplet.production.urn,
+  ]
+}
+
+# SSH Key
+# Import existing key: terraform import digitalocean_ssh_key.m3_laptop 46721354
+resource "digitalocean_ssh_key" "m3_laptop" {
+  name       = "m3 laptop"
+  public_key = var.ssh_public_key
+}
+
 # (Optional) Add Cloudflare DNS records for production via modules/cloudflare/dns
 # Example (disabled by default):
 # module "cloudflare_dns_prod" {
@@ -66,7 +86,7 @@ resource "digitalocean_droplet" "production" {
   ipv6       = false
   backups    = true
 
-  ssh_keys = var.ssh_key_fingerprints
+  ssh_keys = [digitalocean_ssh_key.m3_laptop.id]
 
   user_data = templatefile("${path.module}/../../modules/droplet/cloud-init-apache.yml", {
     environment = "production"

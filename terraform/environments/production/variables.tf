@@ -40,8 +40,14 @@ variable "database_size" {
   default     = "db-s-2vcpu-4gb"
 }
 
+variable "ssh_public_key" {
+  description = "SSH public key content"
+  type        = string
+  sensitive   = true
+}
+
 variable "ssh_key_fingerprints" {
-  description = "List of SSH key fingerprints"
+  description = "List of SSH key fingerprints (deprecated - use ssh_key resource)"
   type        = list(string)
   default     = []
 }
