@@ -1,0 +1,284 @@
+---
+- name: Migrate PAUSATF production to new droplet
+  hosts: production
+  gather_facts: no
+  become: true
+
+  vars:
+    backup_timestamp: "{{ lookup('pipe', 'date +%Y%m%d-%H%M%S') }}"
+    backup_root: "/tmp/pausatf-migration-{{ backup_timestamp }}"
+    local_backup_dir: "{{ playbook_dir }}/../../backups/migration-{{ backup_timestamp }}"
+    wp_path: "{{ wordpress_path | default('/var/www/html') }}"
+    legacy_path: "{{ legacy_path | default('/var/www/legacy') }}"
+
+  tasks:
+    # ========================================
+    # Phase 1: Pre-flight checks
+    # ========================================
+    - name: Create remote backup directory
+      file:
+        path: "{{ backup_root }}"
+        state: directory
+        mode: '0700'
+
+    - name: Create local backup directory
+      delegate_to: localhost
+      file:
+        path: "{{ local_backup_dir }}"
+        state: directory
+        mode: '0755'
+
+    # ========================================
+    # Phase 2: Capture cron jobs
+    # ========================================
+    - name: Capture root crontab
+      shell: crontab -l > {{ backup_root }}/crontab-root.txt 2>&1 || echo "No root crontab"
+      args:
+        creates: "{{ backup_root }}/crontab-root.txt"
+      ignore_errors: true
+
+    - name: Capture www-data crontab
+      shell: crontab -u www-data -l > {{ backup_root }}/crontab-www-data.txt 2>&1 || echo "No www-data crontab"
+      args:
+        creates: "{{ backup_root }}/crontab-www-data.txt"
+      ignore_errors: true
+
+    - name: Capture deploy crontab
+      shell: crontab -u deploy -l > {{ backup_root }}/crontab-deploy.txt 2>&1 || echo "No deploy crontab"
+      args:
+        creates: "{{ backup_root }}/crontab-deploy.txt"
+      ignore_errors: true
+
+    - name: Capture system-wide cron.d
+      shell: tar czf {{ backup_root }}/cron.d.tar.gz /etc/cron.d/ 2>/dev/null || true
+
+    # ========================================
+    # Phase 3: Capture custom scripts
+    # ========================================
+    - name: Capture custom scripts from /usr/local/bin
+      shell: |
+        if [ -f /usr/local/bin/monitor_and_purge.sh ]; then
+          cp /usr/local/bin/monitor_and_purge.sh {{ backup_root }}/
+        fi
+        if [ -f /etc/cron.d/httpd-check.sh ]; then
+          cp /etc/cron.d/httpd-check.sh {{ backup_root }}/
+        fi
+      args:
+        warn: false
+
+    # ========================================
+    # Phase 4: Capture Apache configuration
+    # ========================================
+    - name: Archive Apache sites-available
+      archive:
+        path: /etc/apache2/sites-available/
+        dest: "{{ backup_root }}/apache-sites-available.tar.gz"
+
+    - name: Archive Apache sites-enabled
+      archive:
+        path: /etc/apache2/sites-enabled/
+        dest: "{{ backup_root }}/apache-sites-enabled.tar.gz"
+
+    - name: Archive Apache conf-enabled
+      archive:
+        path: /etc/apache2/conf-enabled/
+        dest: "{{ backup_root }}/apache-conf-enabled.tar.gz"
+
+    - name: Capture Apache modules list
+      shell: apache2ctl -M > {{ backup_root }}/apache-modules.txt 2>&1
+
+    - name: Archive Apache custom config (if exists)
+      archive:
+        path: /etc/apache2/conf-available/
+        dest: "{{ backup_root }}/apache-conf-available.tar.gz"
+      ignore_errors: true
+
+    # ========================================
+    # Phase 5: Database export
+    # ========================================
+    - name: Get WordPress database credentials
+      shell: |
+        grep DB_NAME {{ wp_path }}/wp-config.php | cut -d "'" -f 4
+      register: wp_db_name
+      changed_when: false
+
+    - name: Get WordPress database user
+      shell: |
+        grep DB_USER {{ wp_path }}/wp-config.php | cut -d "'" -f 4
+      register: wp_db_user
+      changed_when: false
+
+    - name: Get WordPress database password
+      shell: |
+        grep DB_PASSWORD {{ wp_path }}/wp-config.php | cut -d "'" -f 4
+      register: wp_db_pass
+      changed_when: false
+      no_log: true
+
+    - name: Get WordPress database host
+      shell: |
+        grep DB_HOST {{ wp_path }}/wp-config.php | cut -d "'" -f 4
+      register: wp_db_host
+      changed_when: false
+
+    - name: Export WordPress database
+      mysql_db:
+        name: "{{ wp_db_name.stdout }}"
+        state: dump
+        target: "{{ backup_root }}/wordpress-db.sql"
+        login_user: "{{ wp_db_user.stdout }}"
+        login_password: "{{ wp_db_pass.stdout }}"
+        login_host: "{{ wp_db_host.stdout }}"
+      no_log: true
+
+    - name: Compress database dump
+      archive:
+        path: "{{ backup_root }}/wordpress-db.sql"
+        dest: "{{ backup_root }}/wordpress-db.sql.gz"
+        format: gz
+        remove: true
+
+    # ========================================
+    # Phase 6: WordPress directory archive
+    # ========================================
+    - name: Archive WordPress directory (excluding cache)
+      shell: |
+        tar czf {{ backup_root }}/wordpress.tar.gz \
+          --exclude='{{ wp_path }}/wp-content/cache' \
+          --exclude='{{ wp_path }}/wp-content/uploads/cache' \
+          -C $(dirname {{ wp_path }}) $(basename {{ wp_path }})
+      args:
+        warn: false
+
+    # ========================================
+    # Phase 7: Legacy directory archive
+    # ========================================
+    - name: Archive legacy directory (including hidden files)
+      shell: |
+        tar czf {{ backup_root }}/legacy.tar.gz \
+          -C $(dirname {{ legacy_path }}) $(basename {{ legacy_path }})
+      args:
+        warn: false
+
+    # ========================================
+    # Phase 8: System information capture
+    # ========================================
+    - name: Capture installed packages
+      shell: dpkg -l > {{ backup_root }}/installed-packages.txt
+
+    - name: Capture PHP version and modules
+      shell: |
+        php -v > {{ backup_root }}/php-version.txt
+        php -m > {{ backup_root }}/php-modules.txt
+
+    - name: Capture WordPress CLI version
+      shell: wp --version > {{ backup_root }}/wp-cli-version.txt 2>&1 || echo "WP-CLI not found"
+      ignore_errors: true
+
+    - name: Capture system info
+      shell: |
+        uname -a > {{ backup_root }}/system-info.txt
+        cat /etc/os-release >> {{ backup_root }}/system-info.txt
+
+    # ========================================
+    # Phase 9: Create migration manifest
+    # ========================================
+    - name: Create migration manifest
+      copy:
+        dest: "{{ backup_root }}/MANIFEST.txt"
+        content: |
+          PAUSATF Production Migration Archive
+          =====================================
+          Generated: {{ backup_timestamp }}
+          Source Host: {{ ansible_host }}
+
+          Contents:
+          ---------
+          1. Cron Jobs:
+             - crontab-root.txt
+             - crontab-www-data.txt
+             - crontab-deploy.txt
+             - cron.d.tar.gz
+
+          2. Custom Scripts:
+             - monitor_and_purge.sh
+             - httpd-check.sh
+
+          3. Apache Configuration:
+             - apache-sites-available.tar.gz
+             - apache-sites-enabled.tar.gz
+             - apache-conf-enabled.tar.gz
+             - apache-conf-available.tar.gz
+             - apache-modules.txt
+
+          4. WordPress:
+             - wordpress.tar.gz (full WordPress directory)
+             - wordpress-db.sql.gz (database export)
+
+          5. Legacy Site:
+             - legacy.tar.gz (full legacy directory with hidden files)
+
+          6. System Information:
+             - installed-packages.txt
+             - php-version.txt
+             - php-modules.txt
+             - wp-cli-version.txt
+             - system-info.txt
+
+          Migration Steps:
+          ----------------
+          1. Provision new droplet (Ubuntu 22.04 LTS recommended)
+          2. Install LAMP stack (Apache, MySQL, PHP 8.x)
+          3. Restore database: gunzip -c wordpress-db.sql.gz | mysql -u USER -p DATABASE
+          4. Extract WordPress: tar xzf wordpress.tar.gz -C /var/www/
+          5. Extract legacy: tar xzf legacy.tar.gz -C /var/www/
+          6. Restore Apache configs and enable sites
+          7. Restore cron jobs
+          8. Copy custom scripts to /usr/local/bin and /etc/cron.d/
+          9. Set correct permissions (www-data:www-data)
+          10. Update DNS to point to new droplet
+          11. Test thoroughly before decommissioning old droplet
+
+    # ========================================
+    # Phase 10: Download to local
+    # ========================================
+    - name: Download migration archive to local machine
+      synchronize:
+        mode: pull
+        src: "{{ backup_root }}/"
+        dest: "{{ local_backup_dir }}/"
+
+    - name: Create local README
+      delegate_to: localhost
+      copy:
+        dest: "{{ local_backup_dir }}/README.txt"
+        content: |
+          PAUSATF Production Migration {{ backup_timestamp }}
+          =================================================
+
+          This directory contains a complete backup of the PAUSATF production
+          server for migration to a new droplet.
+
+          See MANIFEST.txt for detailed contents and migration steps.
+
+          Quick Start:
+          1. Provision new droplet
+          2. Run the restoration playbook: ansible-playbook restore-prod.yml
+
+          Or manually follow the steps in MANIFEST.txt
+
+    - name: Display summary
+      debug:
+        msg: |
+          Migration backup complete!
+
+          Local backup location: {{ local_backup_dir }}
+          Remote backup location: {{ backup_root }}
+
+          Next steps:
+          1. Review the contents in {{ local_backup_dir }}
+          2. Provision a new droplet
+          3. Run the restoration playbook (when ready)
+
+          Note: The remote backup will be automatically cleaned up after
+          successful download. Manual cleanup: rm -rf {{ backup_root }}
