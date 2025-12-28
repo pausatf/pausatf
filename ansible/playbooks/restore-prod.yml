@@ -1,0 +1,227 @@
+---
+- name: Restore PAUSATF production from migration backup
+  hosts: production
+  gather_facts: yes
+  become: true
+
+  vars_prompt:
+    - name: migration_backup_dir
+      prompt: "Path to migration backup directory (e.g., backups/migration-20251228-021500)"
+      private: no
+
+    - name: confirm_restore
+      prompt: "This will overwrite existing data on the target. Type 'yes' to confirm"
+      private: no
+
+  vars:
+    wp_path: /var/www/html
+    legacy_path: /var/www/legacy
+    temp_restore_dir: /tmp/pausatf-restore
+
+  pre_tasks:
+    - name: Validate confirmation
+      fail:
+        msg: "Restoration cancelled - you must type 'yes' to confirm"
+      when: confirm_restore != 'yes'
+
+    - name: Check migration backup directory exists locally
+      delegate_to: localhost
+      stat:
+        path: "{{ migration_backup_dir }}"
+      register: backup_dir_check
+      failed_when: not backup_dir_check.stat.exists
+
+  tasks:
+    # ========================================
+    # Phase 1: Prepare target system
+    # ========================================
+    - name: Install required packages
+      apt:
+        name:
+          - apache2
+          - mysql-server
+          - php
+          - php-mysql
+          - php-cli
+          - php-curl
+          - php-gd
+          - php-mbstring
+          - php-xml
+          - php-xmlrpc
+          - php-zip
+          - python3-pymysql
+        state: present
+        update_cache: yes
+
+    - name: Create temporary restore directory
+      file:
+        path: "{{ temp_restore_dir }}"
+        state: directory
+        mode: '0700'
+
+    # ========================================
+    # Phase 2: Upload migration archives
+    # ========================================
+    - name: Upload migration archives to target
+      synchronize:
+        src: "{{ migration_backup_dir }}/"
+        dest: "{{ temp_restore_dir }}/"
+
+    # ========================================
+    # Phase 3: Restore WordPress
+    # ========================================
+    - name: Extract WordPress archive
+      unarchive:
+        src: "{{ temp_restore_dir }}/wordpress.tar.gz"
+        dest: /var/www/
+        remote_src: yes
+
+    - name: Set WordPress ownership
+      file:
+        path: "{{ wp_path }}"
+        owner: www-data
+        group: www-data
+        recurse: yes
+
+    - name: Set WordPress directory permissions
+      shell: |
+        find {{ wp_path }} -type d -exec chmod 755 {} \;
+        find {{ wp_path }} -type f -exec chmod 644 {} \;
+
+    # ========================================
+    # Phase 4: Restore database
+    # ========================================
+    - name: Extract database dump
+      shell: gunzip -f {{ temp_restore_dir }}/wordpress-db.sql.gz
+      args:
+        creates: "{{ temp_restore_dir }}/wordpress-db.sql"
+
+    - name: Get database credentials from wp-config
+      shell: grep {{ item.key }} {{ wp_path }}/wp-config.php | cut -d "'" -f 4
+      register: db_creds
+      loop:
+        - { key: 'DB_NAME', var: 'db_name' }
+        - { key: 'DB_USER', var: 'db_user' }
+        - { key: 'DB_PASSWORD', var: 'db_pass' }
+        - { key: 'DB_HOST', var: 'db_host' }
+      changed_when: false
+      no_log: true
+
+    - name: Create WordPress database
+      mysql_db:
+        name: "{{ db_creds.results[0].stdout }}"
+        state: present
+        login_user: root
+
+    - name: Create WordPress database user
+      mysql_user:
+        name: "{{ db_creds.results[1].stdout }}"
+        password: "{{ db_creds.results[2].stdout }}"
+        priv: "{{ db_creds.results[0].stdout }}.*:ALL"
+        state: present
+        login_user: root
+      no_log: true
+
+    - name: Import WordPress database
+      mysql_db:
+        name: "{{ db_creds.results[0].stdout }}"
+        state: import
+        target: "{{ temp_restore_dir }}/wordpress-db.sql"
+        login_user: root
+
+    # ========================================
+    # Phase 5: Restore legacy directory
+    # ========================================
+    - name: Extract legacy archive
+      unarchive:
+        src: "{{ temp_restore_dir }}/legacy.tar.gz"
+        dest: /var/www/
+        remote_src: yes
+
+    - name: Set legacy directory ownership
+      file:
+        path: "{{ legacy_path }}"
+        owner: www-data
+        group: www-data
+        recurse: yes
+
+    # ========================================
+    # Phase 6: Restore Apache configuration
+    # ========================================
+    - name: Extract Apache sites-available
+      unarchive:
+        src: "{{ temp_restore_dir }}/apache-sites-available.tar.gz"
+        dest: /etc/apache2/
+        remote_src: yes
+
+    - name: Enable Apache rewrite module
+      apache2_module:
+        name: rewrite
+        state: present
+
+    - name: Enable default site
+      command: a2ensite 000-default
+      notify: restart apache2
+
+    # ========================================
+    # Phase 7: Restore cron jobs
+    # ========================================
+    - name: Restore custom scripts
+      copy:
+        src: "{{ temp_restore_dir }}/{{ item.src }}"
+        dest: "{{ item.dest }}"
+        mode: '0755'
+        remote_src: yes
+      loop:
+        - { src: 'monitor_and_purge.sh', dest: '/usr/local/bin/monitor_and_purge.sh' }
+        - { src: 'httpd-check.sh', dest: '/etc/cron.d/httpd-check.sh' }
+      ignore_errors: true
+
+    - name: Display crontab restore instructions
+      debug:
+        msg: |
+          Manual step required: Restore crontabs
+
+          Root crontab:
+          crontab {{ temp_restore_dir }}/crontab-root.txt
+
+          www-data crontab:
+          crontab -u www-data {{ temp_restore_dir }}/crontab-www-data.txt
+
+          Review the crontab files before applying to ensure they're appropriate
+          for the new environment.
+
+    # ========================================
+    # Phase 8: Final steps
+    # ========================================
+    - name: Create deploy user (if doesn't exist)
+      user:
+        name: deploy
+        groups: www-data,sudo
+        shell: /bin/bash
+        state: present
+
+    - name: Display completion message
+      debug:
+        msg: |
+          ======================================
+          Restoration Complete!
+          ======================================
+
+          Post-restoration checklist:
+          1. Review and apply crontabs (see instructions above)
+          2. Update DNS records to point to this server
+          3. Install SSL certificates (Let's Encrypt recommended)
+          4. Test WordPress site functionality
+          5. Test legacy site access
+          6. Verify all plugins and themes are working
+          7. Check Apache error logs: tail -f /var/log/apache2/error.log
+
+          Migration backup location: {{ temp_restore_dir }}
+          (Safe to delete after verification)
+
+  handlers:
+    - name: restart apache2
+      service:
+        name: apache2
+        state: restarted
