@@ -1,3 +1,9 @@
+# GitHub Environment
+
+This environment is reserved for GitHub-related resources.
+
+Note: DNS for stage/dev is managed in each environment using the Cloudflare DNS module (`modules/cloudflare/dns`).
+
 # GitHub Repository Management
 
 This Terraform configuration manages PAUSATF GitHub repositories and their settings.

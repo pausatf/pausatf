@@ -31,6 +31,23 @@ provider "cloudflare" {
   api_token = var.cloudflare_api_token
 }
 
+# (Optional) Add Cloudflare DNS records for production via modules/cloudflare/dns
+# Example (disabled by default):
+# module "cloudflare_dns_prod" {
+#   source  = "../../modules/cloudflare/dns"
+#   zone_id = var.cloudflare_zone_id
+#   dns_records = [
+#     {
+#       name    = "prod"
+#       type    = "A"
+#       value   = digitalocean_droplet.production.ipv4_address
+#       ttl     = 1
+#       proxied = true
+#       comment = "Production web droplet"
+#     }
+#   ]
+# }
+
 # Production Droplet
 resource "digitalocean_droplet" "production" {
   name   = "pausatf-prod"

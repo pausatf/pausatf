@@ -1,0 +1,5 @@
+---
+- name: restart ols
+  service:
+    name: lshttpd
+    state: restarted

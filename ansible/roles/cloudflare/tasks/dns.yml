@@ -1,0 +1,47 @@
+---
+# Cloudflare DNS management
+# Uses Cloudflare v4 API via uri module
+
+- name: Merge base and environment DNS records
+  set_fact:
+    cf_records: "{{ (cloudflare_dns_records | default([])) + (cloudflare_dns_records_extra | default([])) }}"
+
+- name: Ensure DNS records exist and are up to date
+  vars:
+    rec_name: "{{ item.name }}"
+    rec_type: "{{ item.type | default('A') }}"
+  block:
+    - name: Look up existing record
+      uri:
+        url: "https://api.cloudflare.com/client/v4/zones/{{ cloudflare_zone_id }}/dns_records?type={{ rec_type }}&name={{ rec_name }}.{{ cloudflare_zone }}"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ cloudflare_api_token }}"
+          Content-Type: "application/json"
+      register: cf_lookup
+
+    - name: Create or update record
+      uri:
+        url: "https://api.cloudflare.com/client/v4/zones/{{ cloudflare_zone_id }}/dns_records{{ (cf_lookup.json.result | length) > 0 | ternary('/' + cf_lookup.json.result[0].id, '') }}"
+        method: "{{ (cf_lookup.json.result | length) > 0 | ternary('PUT', 'POST') }}"
+        headers:
+          Authorization: "Bearer {{ cloudflare_api_token }}"
+          Content-Type: "application/json"
+        body_format: json
+        body:
+          type: "{{ rec_type }}"
+          name: "{{ rec_name }}"
+          content: "{{ item.content }}"
+          ttl: "{{ item.ttl | default(1) }}"
+          proxied: "{{ item.proxied | default(true) }}"
+      register: cf_upsert
+
+    - name: Report DNS change
+      debug:
+        msg: "DNS {{ rec_type }} {{ rec_name }} -> {{ item.content }} (proxied={{ item.proxied | default(true) }})"
+      when: cf_upsert.json.success | default(false)
+  loop: "{{ cf_records }}"
+  loop_control:
+    label: "{{ item.type | default('A') }} {{ item.name }}"
+  when: cf_records | length > 0
+  tags: [cloudflare, cloudflare-dns]

@@ -1,0 +1,67 @@
+---
+# Install LiteSpeed PHP (lsphp) and common extensions
+
+- name: Add LiteSpeed repository key
+  apt_key:
+    url: https://repo.litespeed.sh/ls.key
+    state: present
+
+- name: Add LiteSpeed repo list
+  apt_repository:
+    repo: "deb http://rpms.litespeedtech.com/debian/ stable main"
+    state: present
+    filename: litespeed
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+
+- name: Compute lsphp package suffix
+  set_fact:
+    lsphp_suffix: "{{ (php_version | regex_replace('\n','') | regex_replace('\r','') | trim) | regex_replace('\.', '') }}"
+
+- name: Install lsphp packages
+  apt:
+    name:
+      - "lsphp{{ lsphp_suffix }}"
+      - "lsphp{{ lsphp_suffix }}-common"
+      - "lsphp{{ lsphp_suffix }}-mysql"
+      - "lsphp{{ lsphp_suffix }}-curl"
+      - "lsphp{{ lsphp_suffix }}-gd"
+      - "lsphp{{ lsphp_suffix }}-imagick"
+      - "lsphp{{ lsphp_suffix }}-mbstring"
+      - "lsphp{{ lsphp_suffix }}-intl"
+      - "lsphp{{ lsphp_suffix }}-zip"
+      - "lsphp{{ lsphp_suffix }}-soap"
+      - "lsphp{{ lsphp_suffix }}-bcmath"
+      - "lsphp{{ lsphp_suffix }}-opcache"
+      - "lsphp{{ lsphp_suffix }}-redis"
+      - "lsphp{{ lsphp_suffix }}-memcached"
+    state: present
+
+- name: Create PHP config directory
+  file:
+    path: "/usr/local/lsws/lsphp{{ lsphp_suffix }}/etc/php/{{ php_version }}/mods-available"
+    state: directory
+    mode: '0755'
+
+- name: Deploy CLI PHP settings (opcache/uploads)
+  copy:
+    dest: "/usr/local/lsws/lsphp{{ lsphp_suffix }}/etc/php/{{ php_version }}/conf.d/99-ansible.ini"
+    content: |
+      opcache.memory_consumption=192
+      opcache.interned_strings_buffer=16
+      opcache.max_accelerated_files=20000
+      opcache.revalidate_freq=2
+      opcache.enable_cli=1
+      upload_max_filesize=100M
+      post_max_size=100M
+      max_execution_time=300
+      max_input_time=300
+      memory_limit=256M
+    mode: '0644'
+
+- name: Ensure lshttpd picks up new PHP version (graceful)
+  service:
+    name: lshttpd
+    state: restarted

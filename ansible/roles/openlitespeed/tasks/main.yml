@@ -1,0 +1,78 @@
+---
+# Install and configure OpenLiteSpeed for WordPress
+
+- name: Add LiteSpeed repository
+  apt_key:
+    url: https://repo.litespeed.sh/ls.key
+    state: present
+
+- name: Add LiteSpeed repo list
+  apt_repository:
+    repo: "deb http://rpms.litespeedtech.com/debian/ stable main"
+    state: present
+    filename: litespeed
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+
+- name: Install OpenLiteSpeed
+  apt:
+    name: openlitespeed
+    state: present
+
+- name: Ensure lsws service enabled and started
+  systemd:
+    name: lshttpd
+    state: started
+    enabled: yes
+
+- name: Set OLS admin password (idempotent)
+  command: "/usr/local/lsws/admin/misc/admpass.sh << EOF\nadmin\n{{ vault_ols_admin_password | default('changeMe!') }}\n{{ vault_ols_admin_password | default('changeMe!') }}\nEOF"
+  args:
+    creates: /usr/local/lsws/admin/conf/htpasswd
+  no_log: true
+
+- name: Create vhost directory
+  file:
+    path: /usr/local/lsws/conf/vhosts/wordpress
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Deploy OLS main config
+  template:
+    src: httpd_config.conf.j2
+    dest: /usr/local/lsws/conf/httpd_config.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart ols
+
+- name: Deploy OLS vhost config
+  template:
+    src: vhconf.conf.j2
+    dest: /usr/local/lsws/conf/vhosts/wordpress/vhconf.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart ols
+
+- name: Ensure document root exists
+  file:
+    path: "{{ wordpress_installs[0].path | default('/var/www/html') }}"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+
+- name: Open firewall for HTTP/HTTPS (if UFW enabled)
+  ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  with_items:
+    - '80'
+    - '443'
+  when: ufw_enabled | default(false)

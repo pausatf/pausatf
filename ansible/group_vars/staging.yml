@@ -1,0 +1,24 @@
+---
+# Staging environment overrides
+web_server: openlitespeed
+php_version: "8.4"
+mysql_version: "8.0"
+
+# WordPress core on staging follows latest minor
+wordpress_installs:
+  - name: "pausatf-main"
+    domain: "stage.pausatf.org"
+    path: "/var/www/html"
+    db_name: "wordpress"
+    db_user: "wordpress"
+    db_password: "{{ vault_wp_stage_db_password }}"
+    db_host: "localhost"
+    table_prefix: "wp_"
+    wp_version: "latest"
+    active_theme: "TheSource-child"
+    cron_enabled: true
+    debug_mode: false
+    disallow_file_edit: true
+    disallow_file_mods: false
+    auto_update_core: "minor"
+    fs_method: "direct"

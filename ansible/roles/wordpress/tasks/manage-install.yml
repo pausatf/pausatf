@@ -1,0 +1,56 @@
+---
+# Per-site management via WP-CLI
+# expects loop var wp_site
+
+- name: Ensure WordPress path exists
+  file:
+    path: "{{ wp_site.path }}"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+
+- name: Check if WordPress is already installed
+  command: "{{ wpcli_path | default('/usr/local/bin/wp') }} core is-installed --path={{ wp_site.path }} --allow-root"
+  register: wp_installed
+  changed_when: false
+  failed_when: false
+
+- name: Download WordPress core (if not installed)
+  command: "{{ wpcli_path | default('/usr/local/bin/wp') }} core download --path={{ wp_site.path }} --version={{ wp_site.wp_version | default('latest') }} --skip-content --allow-root"
+  when: wp_installed.rc != 0
+
+- name: Verify WordPress checksums
+  command: "{{ wpcli_path | default('/usr/local/bin/wp') }} core verify-checksums --path={{ wp_site.path }} --allow-root"
+  register: wp_checksums
+  changed_when: false
+  failed_when: false
+
+- name: Update core to requested version (if installed)
+  command: "{{ wpcli_path | default('/usr/local/bin/wp') }} core update {{ (wp_site.wp_version is defined and wp_site.wp_version != 'latest') | ternary('--version=' + wp_site.wp_version, '') }} --path={{ wp_site.path }} --allow-root"
+  when: wp_installed.rc == 0
+
+- name: Update database (safe to run if already current)
+  command: "{{ wpcli_path | default('/usr/local/bin/wp') }} core update-db --path={{ wp_site.path }} --allow-root"
+  when: wp_installed.rc == 0
+
+- name: Configure basic salts and disallow file edit (if using wp-config template)
+  template:
+    src: wp-config.php.j2
+    dest: "{{ wp_site.path }}/wp-config.php"
+    owner: www-data
+    group: www-data
+    mode: '0640'
+  when: wp_site.manage_wp_config | default(false)
+
+- name: Update all plugins except excluded
+  command: "{{ wpcli_path | default('/usr/local/bin/wp') }} plugin update --all --path={{ wp_site.path }} --allow-root --quiet"
+  when: wpcli_update_plugins | default(true)
+
+- name: Update all themes except excluded
+  command: "{{ wpcli_path | default('/usr/local/bin/wp') }} theme update --all --path={{ wp_site.path }} --allow-root --quiet"
+  when: wpcli_update_themes | default(true)
+
+- name: Ensure LiteSpeed Cache plugin present and active (stage/dev)
+  command: "{{ wpcli_path | default('/usr/local/bin/wp') }} plugin install litespeed-cache --activate --path={{ wp_site.path }} --allow-root"
+  when: web_server | default('apache') == 'openlitespeed'
