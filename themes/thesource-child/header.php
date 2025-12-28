@@ -212,9 +212,9 @@ image3.src = 'https://pausatf.org/wp-content/uploads/2014/06/TW.png'
 
 image4.src = 'https://pausatf.org/wp-content/uploads/2014/06/TWH.png'
 
-image5.src = 'http://www.pausatf.org/wp-content/uploads/2021/05/InstagramLogoBlue32.png'
+image5.src = 'https://pausatf.org/wp-content/uploads/2021/05/InstagramLogoBlue32.png'
 
-image6.src = 'http://www.pausatf.org/wp-content/uploads/2021/05/InstagramLogoGray32.png'
+image6.src = 'https://pausatf.org/wp-content/uploads/2021/05/InstagramLogoGray32.png'
 
 image7.src = 'https://pausatf.org/wp-content/uploads/2014/06/YT.png'
 
@@ -230,7 +230,7 @@ image8.src = 'https://pausatf.org/wp-content/uploads/2014/06/YTH.png'
 
 <!-- Instagram -->
 <div style="float:right; margin: 12px 10px 0 0;"><a href="https://www.instagram.com/usatfpacificassoc/" onMouseOver="document.mouseover3.src=image5.src" onMouseOut="document.mouseover3.src=image6.src" target="_blank">
-<img src="http://www.pausatf.org/wp-content/uploads/2021/05/InstagramLogoGray32.png" border=0 name="mouseover3"></a></div>
+<img src="https://pausatf.org/wp-content/uploads/2021/05/InstagramLogoGray32.png" border=0 name="mouseover3"></a></div>
 
 
 <!-- You Tube -->
