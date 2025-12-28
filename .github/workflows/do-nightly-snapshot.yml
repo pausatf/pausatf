@@ -1,0 +1,27 @@
+name: Nightly DO Snapshot (prod)
+
+on:
+  schedule:
+    - cron: '0 10 * * *'  # 2 AM Pacific approx
+  workflow_dispatch:
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DO_TOKEN }}
+
+      - name: Snapshot prod droplet
+        env:
+          DROPLET_ID: ${{ secrets.DO_PROD_DROPLET_ID }}
+        run: |
+          if [ -z "$DROPLET_ID" ]; then
+            echo "DO_PROD_DROPLET_ID secret is required" >&2
+            exit 1
+          fi
+          TS=$(date -u +%Y%m%d-%H%M%S)
+          doctl compute droplet snapshot "$DROPLET_ID" --snapshot-name "prod-nightly-$TS"
