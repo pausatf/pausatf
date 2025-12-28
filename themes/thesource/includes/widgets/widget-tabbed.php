@@ -38,7 +38,12 @@
 		<div class="widget popular">
 			<ul>
 				<?php global $wpdb;
-				$result = $wpdb->get_results("SELECT comment_count,ID,post_title FROM $wpdb->posts ORDER BY comment_count DESC LIMIT 0 , $postsNumPopular");
+				$result = $wpdb->get_results(
+					$wpdb->prepare(
+						"SELECT comment_count, ID, post_title FROM {$wpdb->posts} WHERE post_status = 'publish' AND post_type = 'post' ORDER BY comment_count DESC LIMIT %d",
+						$postsNumPopular
+					)
+				);
 				foreach ($result as $post) {
 					//setup_postdata($post);
 					$postid = (int) $post->ID;
