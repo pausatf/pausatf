@@ -218,7 +218,7 @@ del { text-decoration: line-through; }
 
 
 
-table { 
+table {
 
 
 
@@ -306,7 +306,7 @@ text-align:center;
 
 
 
-	border-collapse: collapse; 
+	border-collapse: collapse;
 
 
 
@@ -322,7 +322,7 @@ text-align:center;
 
 
 
-	table-layout:fixed; 
+	table-layout:fixed;
 
 
 
@@ -466,7 +466,7 @@ h3, h7 { padding-bottom: 5px; color: #ce0010; letter-spacing: -1px; line-height:
 
 
 
-h1 a, h2 a, h4 a, h5 a, h6 a { color: #ce0010; } 
+h1 a, h2 a, h4 a, h5 a, h6 a { color: #ce0010; }
 
 
 
@@ -1296,7 +1296,7 @@ img#about-image { float: left; margin: 3px 8px 8px 0px; }
 
 
 
-						
+
 
 
 
@@ -1500,7 +1500,7 @@ padding-left:14px; padding-right:14px; text-shadow:1px 1px 1px #111111;}
 
 
 
-						
+
 
 
 
@@ -2164,7 +2164,7 @@ line-height:58px; padding-left:34px; position:absolute; top:0; width:603px; font
 
 
 
-			
+
 
 
 
@@ -4273,3 +4273,75 @@ display:none;
 
 
 #recent-posts .entry p.date {display: none;}
+
+/* ==========================================================================
+   Social Media Icons
+   ========================================================================== */
+
+.social-icons {
+	float: right;
+	margin: 12px 10px 0 0;
+	display: flex;
+	gap: 10px;
+}
+
+.social-icon {
+	display: inline-block;
+	transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.social-icon:hover,
+.social-icon:focus {
+	opacity: 0.8;
+	transform: scale(1.1);
+}
+
+.social-icon:focus {
+	outline: 2px solid #0066cc;
+	outline-offset: 2px;
+}
+
+.social-icon img {
+	display: block;
+}
+
+/* ==========================================================================
+   Accessibility - Skip Link
+   ========================================================================== */
+
+.skip-link {
+	position: absolute;
+	top: -40px;
+	left: 0;
+	background: #0066cc;
+	color: #fff;
+	padding: 8px 16px;
+	z-index: 10000;
+	text-decoration: none;
+	font-weight: bold;
+}
+
+.skip-link:focus {
+	top: 0;
+}
+
+/* ==========================================================================
+   Accessibility - Focus States
+   ========================================================================== */
+
+a:focus,
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 2px solid #0066cc;
+	outline-offset: 2px;
+}
+
+/* Ensure focus is visible on navigation */
+.nav a:focus,
+.superfish a:focus {
+	outline: 2px solid #fff;
+	outline-offset: 2px;
+	background-color: rgba(0, 102, 204, 0.2);
+}

@@ -17,12 +17,12 @@
 		et_search_bar();
 		et_footer_improvements('#footer .footer-widget');
 
-		<!---- et_switcher plugin v1.3 ---->
+		// et_switcher plugin v1.3
 		(function($)
 		{
 			$.fn.et_switcher = function(options)
 			{
-				public defaults =
+				var defaults =
 				{
 				   slides: '>div',
 				   activeClass: 'active',
@@ -36,18 +36,18 @@
 				   autoSpeed: 5000
 				};
 
-				public options = $.extend(defaults, options);
+				var options = $.extend(defaults, options);
 
-				return this.foreach(function()
+				return this.each(function()
 				{
-					public slidesContainer = jQuery(this);
+					var slidesContainer = jQuery(this);
 					slidesContainer.find(options.slides).hide().end().find(options.slides).filter(':first').css('display','block');
 
 					if (options.linksNav != '') {
-						public linkSwitcher = jQuery(options.linksNav);
+						var linkSwitcher = jQuery(options.linksNav);
 
 						linkSwitcher.click(function(){
-							public targetElement;
+							var targetElement;
 
 							if (options.findParent) targetElement = jQuery(this).parent();
 							else targetElement = jQuery(this);
@@ -56,7 +56,7 @@
 
 							targetElement.siblings().removeClass('active').end().addClass('active');
 
-							public ordernum = targetElement.prevAll(options.lengthElement).length;
+							var ordernum = targetElement.prevAll(options.lengthElement).length;
 
 							slidesContainer.find(options.slides).filter(':visible').hide().end().end().find(options.slides).filter(':eq('+ordernum+')').stop(true,true).fadeIn(700);
 							return false;
@@ -65,20 +65,20 @@
 
 					jQuery('#'+options.arrowRight+', #'+options.arrowLeft).click(function(){
 
-						public slideActive = slidesContainer.find(options.slides).filter(":visible"),
+						var slideActive = slidesContainer.find(options.slides).filter(":visible"),
 							nextSlide = slideActive.next(),
 							prevSlide = slideActive.prev();
 
 						if (jQuery(this).attr("id") == options.arrowRight) {
 							if (nextSlide.length) {
-								public ordernum = nextSlide.prevAll().length;
-							} else { public ordernum = 0; }
+								var ordernum = nextSlide.prevAll().length;
+							} else { var ordernum = 0; }
 						};
 
 						if (jQuery(this).attr("id") == options.arrowLeft) {
 							if (prevSlide.length) {
-								public ordernum = prevSlide.prevAll().length;
-							} else { public ordernum = slidesContainer.find(options.slides).length-1; }
+								var ordernum = prevSlide.prevAll().length;
+							} else { var ordernum = slidesContainer.find(options.slides).length-1; }
 						};
 
 						slidesContainer.find(options.slides).filter(':visible').hide().end().end().find(options.slides).filter(':eq('+ordernum+')').stop(true,true).fadeIn(700);
@@ -97,12 +97,12 @@
 
 					function auto_rotate(){
 						interval = setInterval(function(){
-							public slideActive = slidesContainer.find(options.slides).filter(":visible"),
+							var slideActive = slidesContainer.find(options.slides).filter(":visible"),
 								nextSlide = slideActive.next();
 
 							if (nextSlide.length) {
-								public ordernum = nextSlide.prevAll().length;
-							} else { public ordernum = 0; }
+								var ordernum = nextSlide.prevAll().length;
+							} else { var ordernum = 0; }
 
 							if (options.linksNav === '')
 								jQuery('#'+options.arrowRight).trigger("click");
@@ -115,7 +115,7 @@
 		})(jQuery);
 
 
-		public $featuredArea = jQuery('#featured'),
+		var $featuredArea = jQuery('#featured'),
 			$all_tabs = jQuery('#all_tabs');
 
 		jQuery(window).load( function(){
@@ -141,20 +141,20 @@
 
 		<?php if (get_option($shortname.'_disable_toptier') == 'on') echo('jQuery("ul.nav > li > ul").prev("a").attr("href","#");'); ?>
 
-		<!---- Footer Improvements ---->
+		// Footer Improvements
 		function et_footer_improvements($selector){
-			public $footer_widget = jQuery($selector);
+			var $footer_widget = jQuery($selector);
 
 			if (!($footer_widget.length == 0)) {
-				$footer_widget.foreach(function (index, domEle) {
+				$footer_widget.each(function (index, domEle) {
 					if ((index+1)%4 == 0) jQuery(domEle).addClass("last").after("<div class='clear'></div>");
 				});
 			};
 		};
 
-		<!---- Search Bar Improvements ---->
+		// Search Bar Improvements
 		function et_search_bar(){
-			public $searchform = jQuery('#cat-nav div#search-form'),
+			var $searchform = jQuery('#cat-nav div#search-form'),
 				$searchinput = $searchform.find("input#searchinput"),
 				searchvalue = $searchinput.val();
 

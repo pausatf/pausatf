@@ -3,13 +3,13 @@
 			</div> <!-- end #main-content -->
 		</div> <!-- end #main-content-wrap -->
 	</div> 	<!-- end .container -->
-</div> <!-- end #content -->
+</main> <!-- end #content -->
 
 <div id="content-bottom">
 	<div class="container<?php if ($fullWidthPage) echo(' nobg'); ?>"></div>
 </div>
 
-<div id="footer">
+<footer id="footer" role="contentinfo">
 	<div class="container clearfix">
 
 		<?php if ( !function_exists('dynamic_sidebar') || !dynamic_sidebar('Footer') ) : ?>
@@ -17,7 +17,7 @@
 		<div class="clear"></div>
 
 	</div> <!--end .container -->
-</div> <!-- end #footer -->
+</footer> <!-- end #footer -->
 
 <div id="footer-bottom">
 	<div class="container clearfix">

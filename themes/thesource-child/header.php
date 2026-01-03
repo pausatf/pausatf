@@ -6,13 +6,13 @@
 
       if ($colorScheme <> $default_colorscheme) $colorSchemePath = strtolower($colorScheme) . '/'; ?>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
+<html <?php language_attributes(); ?>>
 
-<html xmlns="https://www.w3.org/1999/xhtml" <?php language_attributes(); ?>>
+<head>
 
-<head profile="https://gmpg.org/xfn/11">
-
-<meta http-equiv="Content-Type" content="<?php bloginfo('html_type'); ?>; charset=<?php bloginfo('charset'); ?>" />
+<meta charset="<?php bloginfo('charset'); ?>" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <title><?php elegant_titles(); ?></title>
 
@@ -30,27 +30,6 @@
 
 
 
-<!--[if lt IE 7]>
-
-	<link rel="stylesheet" type="text/css" href="<?php echo get_template_directory_uri(); ?>/css/ie6style.css" />
-
-	<script type="text/javascript" src="<?php echo get_template_directory_uri(); ?>/js/DD_belatedPNG_0.0.8a-min.js"></script>
-
-	<script type="text/javascript">DD_belatedPNG.fix('img#logo, #cat-nav-left, #cat-nav-right, #search-form, #cat-nav-content, div.top-overlay, .slide .description, div.overlay, a#prevlink, a#nextlink, .slide a.readmore, .slide a.readmore span, .recent-cat .entry .title, #recent-posts .entry p.date, .footer-widget ul li, #tabbed-area ul#tab_controls li span');</script>
-
-<![endif]-->
-
-<!--[if IE 7]>
-
-	<link rel="stylesheet" type="text/css" href="<?php echo get_template_directory_uri(); ?>/css/ie7style.css" />
-
-<![endif]-->
-
-<!--[if IE 8]>
-
-	<link rel="stylesheet" type="text/css" href="<?php echo get_template_directory_uri(); ?>/css/ie8style.css" />
-
-<![endif]-->
 
 
 
@@ -72,7 +51,9 @@
 
 <body<?php if (is_home()) echo(' id="home"'); ?> <?php body_class(); ?>>
 
-	<div id="header-top" class="clearfix">
+<a href="#content" class="skip-link"><?php esc_html_e( 'Skip to content', 'TheSource' ); ?></a>
+
+	<header id="header-top" class="clearfix" role="banner">
 
 		<div class="container clearfix">
 
@@ -100,7 +81,7 @@
 
 			<!-- Start Page-menu -->
 
-			<div id="page-menu">
+			<nav id="page-menu" role="navigation" aria-label="<?php esc_attr_e( 'Primary navigation', 'TheSource' ); ?>">
 
 				<div id="p-menu-left"> </div>
 
@@ -126,13 +107,13 @@
 
 				<div id="p-menu-right"> </div>
 
-			</div>	<!-- end #page-menu -->
+			</nav>	<!-- end #page-menu -->
 
 			<!-- End Page-menu -->
 
 
 
-			<div id="cat-nav" class="clearfix">
+			<nav id="cat-nav" class="clearfix" role="navigation" aria-label="<?php esc_attr_e( 'Category navigation', 'TheSource' ); ?>">
 
 				<div id="cat-nav-left"> </div>
 
@@ -174,89 +155,32 @@
 
 
 
-<!-- Start Socialicon Rollovers -->
-
-
-
-<script language="Javascript">
-
-
-
-if (document.images)
-
-{
-
-image1 = new Image
-
-image2 = new Image
-
-image3 = new Image
-
-image4 = new Image
-
-image5 = new Image
-
-image6 = new Image
-
-image7 = new Image
-
-image8 = new Image
-
-
-
-image1.src = 'https://pausatf.org/wp-content/uploads/2014/06/FB.png'
-
-image2.src = 'https://pausatf.org/wp-content/uploads/2014/06/FBH.png'
-
-image3.src = 'https://pausatf.org/wp-content/uploads/2014/06/TW.png'
-
-image4.src = 'https://pausatf.org/wp-content/uploads/2014/06/TWH.png'
-
-image5.src = 'http://www.pausatf.org/wp-content/uploads/2021/05/InstagramLogoBlue32.png'
-
-image6.src = 'http://www.pausatf.org/wp-content/uploads/2021/05/InstagramLogoGray32.png'
-
-image7.src = 'https://pausatf.org/wp-content/uploads/2014/06/YT.png'
-
-image8.src = 'https://pausatf.org/wp-content/uploads/2014/06/YTH.png'
-
-
-
-}
-
-
-
-</script>
-
-<!-- Instagram -->
-<div style="float:right; margin: 12px 10px 0 0;"><a href="https://www.instagram.com/usatfpacificassoc/" onMouseOver="document.mouseover3.src=image5.src" onMouseOut="document.mouseover3.src=image6.src" target="_blank">
-<img src="http://www.pausatf.org/wp-content/uploads/2021/05/InstagramLogoGray32.png" border=0 name="mouseover3"></a></div>
-
-
-<!-- You Tube -->
-<div style="float:right; margin: 12px 10px 0 0;"><a href="https://www.youtube.com/channel/UC4UDU5_ALy26O1vU6rAOjjA" onMouseOver="document.mouseover4.src=image8.src" onMouseOut="document.mouseover4.src=image7.src" target="_blank">
-<img src="https://pausatf.org/wp-content/uploads/2014/06/YT.png" border=0 name="mouseover4"></a></div>
-
-
-<!-- Twitter -->
-<div style="float:right; margin: 12px 10px 0 0;"><a href="https://twitter.com/UsatfPacific" onMouseOver="document.mouseover2.src=image4.src" onMouseOut="document.mouseover2.src=image3.src" target="_blank">
-<img src="https://pausatf.org/wp-content/uploads/2014/06/TW.png" border=0 name="mouseover2"></a></div>
-
-
-<!-- Facebook -->
-<div style="float:right; margin: 12px 10px 0 0;"><a href="https://www.facebook.com/pausatf" onMouseOver="document.mouseover1.src=image2.src" onMouseOut="document.mouseover1.src=image1.src" target="_blank">
-<img src="https://pausatf.org/wp-content/uploads/2014/06/FB.png" border=0 name="mouseover1"></a></div>
+<!-- Social Media Icons -->
+<nav class="social-icons" aria-label="Social media links">
+	<a href="https://www.instagram.com/usatfpacificassoc/" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Instagram" class="social-icon social-icon--instagram">
+		<img src="https://pausatf.org/wp-content/uploads/2021/05/InstagramLogoGray32.png" alt="Instagram" width="32" height="32" />
+	</a>
+	<a href="https://www.youtube.com/channel/UC4UDU5_ALy26O1vU6rAOjjA" target="_blank" rel="noopener noreferrer" aria-label="Subscribe on YouTube" class="social-icon social-icon--youtube">
+		<img src="https://pausatf.org/wp-content/uploads/2014/06/YT.png" alt="YouTube" width="32" height="32" />
+	</a>
+	<a href="https://twitter.com/UsatfPacific" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Twitter" class="social-icon social-icon--twitter">
+		<img src="https://pausatf.org/wp-content/uploads/2014/06/TW.png" alt="Twitter" width="32" height="32" />
+	</a>
+	<a href="https://www.facebook.com/pausatf" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Facebook" class="social-icon social-icon--facebook">
+		<img src="https://pausatf.org/wp-content/uploads/2014/06/FB.png" alt="Facebook" width="32" height="32" />
+	</a>
+</nav>
 
 
 				</div> <!-- end #cat-nav-content -->
 
 				<div id="cat-nav-right"> </div>
 
-			</div>	<!-- end #cat-nav -->
+			</nav>	<!-- end #cat-nav -->
 
 		</div> 	<!-- end .container -->
 
-	</div> 	<!-- end #header-top -->
+	</header> 	<!-- end #header-top -->
 
 
 
@@ -268,7 +192,7 @@ image8.src = 'https://pausatf.org/wp-content/uploads/2014/06/YTH.png'
 
 
 
-	<div id="content">
+	<main id="content" role="main">
 
 		<?php if (!is_home()) { ?>
 
