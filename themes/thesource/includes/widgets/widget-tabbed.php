@@ -8,7 +8,11 @@
 
   /* Displays the Widget in the front-end */
     function widget($args, $instance){
-		extract($args);
+		// Extract removed for security - access $args array directly
+	$before_widget = isset( $args['before_widget'] ) ? $args['before_widget'] : '';
+	$after_widget = isset( $args['after_widget'] ) ? $args['after_widget'] : '';
+	$before_title = isset( $args['before_title'] ) ? $args['before_title'] : '';
+	$after_title = isset( $args['after_title'] ) ? $args['after_title'] : '';
 
 		$postsNumRecent = empty($instance['postsNumRecent']) ? '' : (int) $instance['postsNumRecent'];
 		$postsNumPopular = empty($instance['postsNumPopular']) ? '' : (int) $instance['postsNumPopular'];
