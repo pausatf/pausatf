@@ -17,7 +17,12 @@
 	<h4 class="widgettitle"><span><?php echo esc_html($title); ?></span></h4>
 	<ul>
 		<?php global $wpdb;
-		$result = $wpdb->get_results("SELECT comment_count,ID,post_title FROM $wpdb->posts ORDER BY comment_count DESC LIMIT 0 , $postsNum");
+		$result = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT comment_count, ID, post_title FROM {$wpdb->posts} WHERE post_status = 'publish' AND post_type = 'post' ORDER BY comment_count DESC LIMIT %d",
+				$postsNum
+			)
+		);
 		foreach ($result as $post) {
 			//setup_postdata($post);
 			$postid = (int) $post->ID;
