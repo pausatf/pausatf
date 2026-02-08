@@ -31,7 +31,12 @@ variable "droplet_size" {
 variable "droplet_image" {
   description = "Droplet image/snapshot"
   type        = string
-  default     = "ubuntu-20-04-x64"
+  default     = "ubuntu-24-04-x64"
+}
+
+variable "ssh_allowed_ips" {
+  description = "IPs allowed to SSH (CIDR notation)"
+  type        = list(string)
 }
 
 variable "database_size" {

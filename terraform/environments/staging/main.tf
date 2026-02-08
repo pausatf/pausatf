@@ -119,11 +119,11 @@ resource "digitalocean_firewall" "staging" {
     source_addresses = ["0.0.0.0/0", "::/0"]
   }
 
-  # SSH (more permissive for staging)
+  # SSH (restricted)
   inbound_rule {
     protocol         = "tcp"
     port_range       = "22"
-    source_addresses = ["0.0.0.0/0", "::/0"]
+    source_addresses = var.ssh_allowed_ips
   }
 
   # OpenLiteSpeed WebAdmin
