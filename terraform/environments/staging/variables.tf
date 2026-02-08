@@ -46,6 +46,12 @@ variable "ssh_key_fingerprints" {
   default     = []
 }
 
+variable "ssh_allowed_ips" {
+  description = "IPs allowed to SSH (CIDR notation)"
+  type        = list(string)
+  default     = []
+}
+
 variable "environment" {
   description = "Environment name"
   type        = string
