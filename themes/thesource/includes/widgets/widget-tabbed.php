@@ -8,7 +8,11 @@
 
   /* Displays the Widget in the front-end */
     function widget($args, $instance){
-		extract($args);
+		// Extract removed for security - access $args array directly
+	$before_widget = isset( $args['before_widget'] ) ? $args['before_widget'] : '';
+	$after_widget = isset( $args['after_widget'] ) ? $args['after_widget'] : '';
+	$before_title = isset( $args['before_title'] ) ? $args['before_title'] : '';
+	$after_title = isset( $args['after_title'] ) ? $args['after_title'] : '';
 
 		$postsNumRecent = empty($instance['postsNumRecent']) ? '' : (int) $instance['postsNumRecent'];
 		$postsNumPopular = empty($instance['postsNumPopular']) ? '' : (int) $instance['postsNumPopular'];
@@ -38,7 +42,12 @@
 		<div class="widget popular">
 			<ul>
 				<?php global $wpdb;
-				$result = $wpdb->get_results("SELECT comment_count,ID,post_title FROM $wpdb->posts ORDER BY comment_count DESC LIMIT 0 , $postsNumPopular");
+				$result = $wpdb->get_results(
+					$wpdb->prepare(
+						"SELECT comment_count, ID, post_title FROM {$wpdb->posts} WHERE post_status = 'publish' AND post_type = 'post' ORDER BY comment_count DESC LIMIT %d",
+						$postsNumPopular
+					)
+				);
 				foreach ($result as $post) {
 					//setup_postdata($post);
 					$postid = (int) $post->ID;
