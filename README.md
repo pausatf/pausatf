@@ -38,6 +38,85 @@ Central repository for all PAUSATF infrastructure, configuration, automation scr
    - [Legacy Content](./content/README.md)
    - [WordPress Themes](./themes/README.md)
 
+### Common operations
+
+```bash
+# Deploy to production (or push to main)
+gh workflow run deploy-prod.yml
+
+# Deploy to dev (or push to dev branch)
+gh workflow run deploy-dev.yml
+
+# Capture current prod plugin/theme inventory
+gh workflow run capture-prod-inventory.yml
+
+# Run Ansible against production manually
+cd ansible
+ansible-playbook -i inventory/hosts.yml site.yml -l production \
+  --vault-password-file ../vault.pass
+
+# Plan Terraform changes for production
+cd terraform/environments/production
+terraform init && terraform plan
+
+# Plan Cloudflare DNS changes
+cd terraform/environments/cloudflare
+terraform init && terraform plan
+```
+
+For full operational procedures see [RUNBOOK.md](RUNBOOK.md).
+
+## Architecture Overview
+
+### Server environments
+
+| Environment | Host | Web server | PHP | Ansible user |
+|-------------|------|------------|-----|--------------|
+| Production | `ftp.pausatf.org` (REDACTED_PROD_NEW_IP) | Apache 2 + MPM Prefork | 7.4 | `github-deploy` |
+| Staging | `stage.pausatf.org` | OpenLiteSpeed | 8.3 | `root` |
+| Dev | `dev.pausatf.org` | OpenLiteSpeed | 8.4 | `root` |
+
+All servers: Ubuntu 20.04 LTS, DigitalOcean `sfo2`, MySQL 5.7 (prod local) / MySQL 8 (staging/dev managed cluster).
+
+### Key tech stack
+
+- **Hosting**: DigitalOcean droplets + managed DB clusters (staging/dev)
+- **CDN/DNS**: Cloudflare (free plan, full SSL, aggressive caching)
+- **CMS**: WordPress 6.8.3, active theme `TheSource-child`
+- **Config management**: Ansible with ansible-vault for secrets
+- **IaC**: Terraform ~1.6–1.10, state in DO Spaces (`pausatf-terraform-state`)
+- **Monitoring**: New Relic APM + infrastructure agent, Monit, sysstat
+- **Security**: Fail2ban (SSH, Apache, WordPress jails), Cloudflare proxy
+
+## GitHub Actions Workflows
+
+| Workflow file | Trigger | Purpose |
+|---------------|---------|---------|
+| `deploy-prod.yml` | Push to `main`, manual dispatch | Runs `site.yml` against production; healthchecks `https://www.pausatf.org` |
+| `deploy-staging.yml` | Push to `staging` branch | Runs `site.yml` against staging; healthchecks `https://stage.pausatf.org` |
+| `deploy-dev.yml` | Push to `dev` branch, manual dispatch | Runs `site.yml` against dev |
+| `do-nightly-snapshot.yml` | Daily 02:00 Pacific, manual dispatch | Creates timestamped DigitalOcean snapshot of prod droplet |
+| `backup-legacy.yml` | Daily 01:00 Pacific, manual dispatch | Rsyncs `/var/www/legacy` from prod; commits changes to repo |
+| `capture-prod-inventory.yml` | Manual dispatch | Runs `capture-wp-inventory.yml`; commits `group_vars/production/wordpress.yml` |
+| `infra-staging.yml` | Manual dispatch | Terraform plan + apply for staging environment |
+| `ansible-lint.yml` | PR/push touching `ansible/`, manual | ansible-lint, yamllint, syntax check |
+| `terraform-validate.yml` | PR/push touching `terraform/`, manual | fmt check, validate (prod/staging/github), tfsec, tflint |
+| `shellcheck.yml` | PR/push touching `scripts/`, manual | ShellCheck + bash syntax check |
+| `markdown-lint.yml` | PR/push touching `*.md`, manual | markdownlint + link check |
+
+## Secrets Required
+
+| Secret | Used by | Description |
+|--------|---------|-------------|
+| `PROD_SSH_PRIVATE_KEY` | deploy-prod, backup-legacy, capture-prod-inventory, do-nightly-snapshot | ED25519 private key authorized on `ftp.pausatf.org` as `github-deploy` |
+| `DEV_SSH_PRIVATE_KEY` | deploy-dev | Private key for dev host |
+| `ANSIBLE_VAULT_PASSWORD` | deploy-prod, deploy-staging, deploy-dev, capture-prod-inventory | Ansible vault decryption password |
+| `DO_TOKEN` | infra-staging, do-nightly-snapshot | DigitalOcean API token |
+| `DO_PROD_DROPLET_ID` | do-nightly-snapshot | Numeric droplet ID for snapshot target |
+| `SPACES_ACCESS_KEY_ID` | infra-staging | DO Spaces key for Terraform state backend |
+| `SPACES_SECRET_ACCESS_KEY` | infra-staging | DO Spaces secret for Terraform state backend |
+| `CLOUDFLARE_API_TOKEN` | infra-staging | Cloudflare API token for Terraform |
+
 ## Development Workflow
 
 ### Branching Strategy
