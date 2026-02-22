@@ -11,7 +11,7 @@
   loop_control:
     label: "{{ item.username }} (ID {{ item.id }})"
   register: wp_user_delete
-  changed_when: "'Deleted user' in wp_user_delete.stdout or wp_user_delete.rc == 0"
+  changed_when: "'Deleted user' in wp_user_delete.stdout"
   failed_when: false
 
 - name: Get current WordPress administrator list
