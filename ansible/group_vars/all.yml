@@ -243,33 +243,6 @@ wordpress_installs:
     logged_in_salt: "{{ vault_wp_main_logged_in_salt }}"
     nonce_salt: "{{ vault_wp_main_nonce_salt }}"
 
-  # Transit site — upgraded from EOL 5.0.3 (see issue #48)
-  - name: "pausatf-transit"
-    domain: "transit.pausatf.org"
-    path: "/var/www/transit/html"
-    db_name: "wordpress_transit"
-    db_user: "wordpress_transit"
-    db_password: "{{ vault_wp_transit_db_password }}"
-    db_host: "localhost"
-    table_prefix: "wp_"
-    wp_version: "latest"
-    ssl_enabled: false
-    active_theme: "TheSource-child"
-    cron_enabled: false
-    debug_mode: false
-    disallow_file_edit: true
-    disallow_file_mods: true
-    auto_update_core: "minor"
-    # Auth keys and salts
-    auth_key: "{{ vault_wp_transit_auth_key }}"
-    secure_auth_key: "{{ vault_wp_transit_secure_auth_key }}"
-    logged_in_key: "{{ vault_wp_transit_logged_in_key }}"
-    nonce_key: "{{ vault_wp_transit_nonce_key }}"
-    auth_salt: "{{ vault_wp_transit_auth_salt }}"
-    secure_auth_salt: "{{ vault_wp_transit_secure_auth_salt }}"
-    logged_in_salt: "{{ vault_wp_transit_logged_in_salt }}"
-    nonce_salt: "{{ vault_wp_transit_nonce_salt }}"
-
 # =============================================================================
 # WORDPRESS THEMES (Main Site)
 # =============================================================================
@@ -556,9 +529,6 @@ backup_items:
   - name: "wordpress-main"
     path: "/var/www/html"
     db_name: "wordpress"
-  - name: "wordpress-transit"
-    path: "/var/www/transit/html"
-    db_name: "wordpress_transit"
 
 # =============================================================================
 # EMAIL (Google Workspace)

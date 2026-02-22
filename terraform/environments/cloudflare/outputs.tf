@@ -34,5 +34,5 @@ output "staging_records" {
 
 output "dns_record_count" {
   description = "Total number of DNS records managed by Terraform"
-  value       = 29
+  value       = 30
 }
