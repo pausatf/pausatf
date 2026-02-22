@@ -1,0 +1,9 @@
+# Fail2ban filter for WordPress authentication failures
+# Managed by Ansible
+# Requires wp-fail2ban MU plugin (writes to /var/log/auth.log via syslog)
+
+[Definition]
+failregex = ^%(__prefix_line)sAuthentication failure for .* from <HOST>$
+            ^%(__prefix_line)sXML-RPC authentication failure from <HOST>$
+            ^%(__prefix_line)sBlocked authentication attempt for .* from <HOST>$
+ignoreregex =

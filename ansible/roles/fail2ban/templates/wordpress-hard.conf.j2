@@ -1,9 +1,0 @@
-# Fail2ban filter for WordPress (hard)
-# Managed by Ansible
-
-[INCLUDES]
-before = common.conf
-
-[Definition]
-failregex = ^%(__prefix_line)sUser enumeration attempt from <HOST>$
-ignoreregex =
