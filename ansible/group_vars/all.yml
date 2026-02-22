@@ -224,7 +224,7 @@ wordpress_installs:
     wp_memory_limit: "256M"
     wp_max_memory_limit: "512M"
     ssl_enabled: true
-    ssl_certificate: "/etc/ssl/certs/6025998eb5098-key.pem"
+    ssl_certificate: "/etc/ssl/private/6025999182103-cert.crt"
     ssl_certificate_key: "/etc/ssl/private/6025998eb5098-key.key"
     active_theme: "TheSource-child"
     cron_enabled: true
@@ -492,7 +492,7 @@ legacy_sites:
 ssl_enabled: true
 ssl_protocol: "all -SSLv3 -TLSv1 -TLSv1.1"
 ssl_cipher_suite: "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384"
-ssl_certificate: "/etc/ssl/certs/6025998eb5098-key.pem"
+ssl_certificate: "/etc/ssl/private/6025999182103-cert.crt"
 ssl_certificate_key: "/etc/ssl/private/6025998eb5098-key.key"
 
 # =============================================================================
