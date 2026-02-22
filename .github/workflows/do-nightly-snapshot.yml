@@ -26,5 +26,5 @@ jobs:
             echo "DO_PROD_DROPLET_ID secret is required" >&2
             exit 1
           fi
-          TS=$(date -u +%Y%m%d-%H%M%S)
-          doctl compute droplet snapshot "$DROPLET_ID" --snapshot-name "prod-nightly-$TS"
+          # --snapshot-name removed: flag unsupported in doctl v1.140+
+          doctl compute droplet-action snapshot "$DROPLET_ID"
