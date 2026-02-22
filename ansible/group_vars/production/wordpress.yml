@@ -539,3 +539,12 @@ wp_users:
     roles: "administrator"
     registered: "2014-10-13 02:31:16"
     last_login: "2025-04-07 18:23:50"
+
+# Accounts to remove (breach-created or unauthorized)
+# mark_murray (ID 46) was created 2026-02-14 after the Jan-2026 breach.
+# Email domain cawrecycles.org is unrelated to PAUSATF.
+# No legitimate admin could confirm this account — treat as attacker persistence.
+wp_users_remove:
+  - id: 46
+    username: "mark_murray"
+    reason: "Created 2026-02-14 after Jan-2026 breach; unrecognized email domain cawrecycles.org"

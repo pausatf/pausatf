@@ -23,6 +23,10 @@ php_memory_limit: "256M"
 # Nginx configuration
 nginx_client_max_body_size: "100M"
 
+# WordPress user management
+# List of user IDs or logins to remove (e.g. breach-created accounts)
+wp_users_remove: []
+
 # Security: These should be overridden in group_vars with vault-encrypted values
 wordpress_db_password: "CHANGEME"
 wordpress_auth_key: "CHANGEME"

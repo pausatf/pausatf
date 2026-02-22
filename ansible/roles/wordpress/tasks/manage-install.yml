@@ -65,3 +65,7 @@
 - name: Ensure LiteSpeed Cache plugin present and active (stage/dev)
   command: "{{ wpcli_path | default('/usr/local/bin/wp') }} plugin install litespeed-cache --activate --path={{ wp_site.path }} --allow-root"
   when: web_server | default('apache') == 'openlitespeed'
+
+- name: Enforce WordPress user security (remove unauthorized accounts, audit admins)
+  include_tasks: user-security.yml
+  when: wp_installed.rc == 0
