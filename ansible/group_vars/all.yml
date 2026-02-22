@@ -233,6 +233,7 @@ wordpress_installs:
     disallow_file_mods: false
     auto_update_core: "minor"
     fs_method: "direct"
+    manage_wp_config: true
     # Auth keys and salts
     auth_key: "{{ vault_wp_main_auth_key }}"
     secure_auth_key: "{{ vault_wp_main_secure_auth_key }}"

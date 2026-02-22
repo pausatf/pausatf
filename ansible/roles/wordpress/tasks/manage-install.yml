@@ -69,6 +69,46 @@
   command: "{{ wpcli_path | default('/usr/local/bin/wp') }} plugin install litespeed-cache --activate --path={{ wp_site.path }} --allow-root"
   when: web_server | default('apache') == 'openlitespeed'
 
+- name: Set WordPress file permissions
+  command: >
+    find {{ wp_site.path }} -type f -exec chmod 644 {} +
+  changed_when: false
+
+- name: Set WordPress directory permissions
+  command: >
+    find {{ wp_site.path }} -type d -exec chmod 755 {} +
+  changed_when: false
+
+- name: Ensure uploads directory exists
+  file:
+    path: "{{ wp_site.path }}/wp-content/uploads"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+
+- name: Block PHP execution in uploads directory
+  copy:
+    dest: "{{ wp_site.path }}/wp-content/uploads/.htaccess"
+    owner: www-data
+    group: www-data
+    mode: '0644'
+    content: |
+      # Block PHP execution in uploads — managed by Ansible
+      <FilesMatch "\.php$">
+          Require all denied
+      </FilesMatch>
+
+- name: Deploy TheSource child theme
+  copy:
+    src: TheSource-child/
+    dest: "{{ wp_site.path }}/wp-content/themes/TheSource-child/"
+    owner: www-data
+    group: www-data
+    mode: '0644'
+    directory_mode: '0755'
+  when: wp_site.active_theme | default('') == 'TheSource-child'
+
 - name: Enforce WordPress user security (remove unauthorized accounts, audit admins)
   include_tasks: user-security.yml
   when: wp_installed.rc == 0
