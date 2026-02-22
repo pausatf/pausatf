@@ -1,4 +1,3 @@
----
 # Install LiteSpeed PHP (lsphp) and common extensions
 
 - name: Add LiteSpeed repository key
@@ -18,7 +17,7 @@
 
 - name: Compute lsphp package suffix
   set_fact:
-    lsphp_suffix: "{{ (php_version | regex_replace('\n','') | regex_replace('\r','') | trim) | regex_replace('\.', '') }}"
+    lsphp_suffix: "{{ php_version | trim | replace('.', '') }}"
 
 - name: Install lsphp packages
   apt:
