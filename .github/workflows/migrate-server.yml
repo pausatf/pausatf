@@ -1,0 +1,417 @@
+name: Migrate Server
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to migrate'
+        required: true
+        type: choice
+        options:
+          - dev
+          - staging
+          - production
+      new_server_ip:
+        description: 'IP address of the new DigitalOcean droplet'
+        required: true
+        type: string
+      dry_run:
+        description: 'Plan only — configure new server but skip data migration and DNS cutover'
+        required: false
+        type: boolean
+        default: false
+      skip_data_migration:
+        description: 'Skip database dump and file sync (use when new server already has data)'
+        required: false
+        type: boolean
+        default: false
+      confirm_production:
+        description: 'Type MIGRATE PRODUCTION to confirm production migration (ignored for dev/staging)'
+        required: false
+        type: string
+        default: ''
+
+concurrency:
+  group: migrate-${{ github.event.inputs.environment }}
+  cancel-in-progress: false
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment == 'production' && 'production' || inputs.environment == 'staging' && 'staging' || 'development' }}
+    permissions:
+      contents: read
+    outputs:
+      old_server_ip: ${{ steps.get-old-ip.outputs.old_server_ip }}
+      old_droplet_id: ${{ steps.get-old-ip.outputs.old_droplet_id }}
+
+    steps:
+      - name: Validate new_server_ip
+        run: |
+          if ! echo "${{ inputs.new_server_ip }}" | grep -Eq '^([0-9]{1,3}\.){3}[0-9]{1,3}$'; then
+            echo "ERROR: new_server_ip '${{ inputs.new_server_ip }}' is not a valid IPv4 address" >&2
+            exit 1
+          fi
+          echo "new_server_ip is valid: ${{ inputs.new_server_ip }}"
+
+      - name: Confirm production migration
+        if: inputs.environment == 'production'
+        run: |
+          if [ "${{ inputs.confirm_production }}" != "MIGRATE PRODUCTION" ]; then
+            echo "ERROR: must set confirm_production to 'MIGRATE PRODUCTION' for production migrations" >&2
+            exit 1
+          fi
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@5727c67aa3c2c34ae9462d5a0ecfea8a1b31e5ce  # v2
+        with:
+          token: ${{ secrets.DO_TOKEN }}
+
+      - name: Setup SSH key
+        env:
+          SSH_KEY: ${{ inputs.environment == 'production' && secrets.PROD_SSH_PRIVATE_KEY || secrets.DEV_SSH_PRIVATE_KEY }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf "%s" "$SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+      - name: Look up old server and snapshot
+        id: get-old-ip
+        run: |
+          set -euo pipefail
+          ENVIRONMENT="${{ inputs.environment }}"
+
+          # Look up droplet by expected name pattern, not by DNS resolution.
+          # Naming convention: pausatf-prod, pausatf-stage, pausatf-dev
+          case "$ENVIRONMENT" in
+            production) DROPLET_NAME="pausatf-prod" ;;
+            staging)    DROPLET_NAME="pausatf-stage" ;;
+            dev)        DROPLET_NAME="pausatf-dev" ;;
+          esac
+
+          # Get droplet ID and current IP by name
+          DROPLET_INFO=$(doctl compute droplet list \
+            --format Name,ID,PublicIPv4 --no-header | grep "^$DROPLET_NAME " || true)
+
+          if [[ -z "$DROPLET_INFO" ]]; then
+            # Fallback: try tag-based lookup
+            DROPLET_INFO=$(doctl compute droplet list \
+              --tag-name "env:$ENVIRONMENT" \
+              --format Name,ID,PublicIPv4 --no-header | head -1 || true)
+          fi
+
+          if [[ -z "$DROPLET_INFO" ]]; then
+            echo "ERROR: Could not find droplet for environment $ENVIRONMENT" >&2
+            echo "Tried name '$DROPLET_NAME' and tag 'env:$ENVIRONMENT'" >&2
+            echo "Available droplets:" >&2
+            doctl compute droplet list --format Name,ID,PublicIPv4 --no-header >&2
+            exit 1
+          fi
+
+          OLD_DROPLET_ID=$(echo "$DROPLET_INFO" | awk '{print $2}')
+          OLD_SERVER_IP=$(echo "$DROPLET_INFO" | awk '{print $3}')
+
+          echo "Found droplet: $DROPLET_NAME (ID: $OLD_DROPLET_ID, IP: $OLD_SERVER_IP)"
+          echo "old_server_ip=$OLD_SERVER_IP" >> "$GITHUB_OUTPUT"
+          echo "old_droplet_id=$OLD_DROPLET_ID" >> "$GITHUB_OUTPUT"
+
+          TS=$(date -u +%Y%m%d%H%M%S)
+          echo "Taking snapshot of droplet $OLD_DROPLET_ID (pre-migration-${{ inputs.environment }}-$TS)..."
+          doctl compute droplet-action snapshot "$OLD_DROPLET_ID" \
+            --snapshot-name "pre-migration-${{ inputs.environment }}-$TS" \
+            --wait
+          echo "Snapshot complete"
+
+      - name: Verify new server is reachable via SSH
+        env:
+          ANSIBLE_USER: ${{ inputs.environment == 'production' && 'github-deploy' || 'root' }}
+        run: |
+          ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no \
+            -i ~/.ssh/id_ed25519 \
+            "$ANSIBLE_USER@${{ inputs.new_server_ip }}" "echo OK"
+
+  configure-new-server:
+    runs-on: ubuntu-latest
+    needs: preflight
+    environment: ${{ inputs.environment == 'production' && 'production' || inputs.environment == 'staging' && 'staging' || 'development' }}
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4
+
+      - name: Setup Python
+        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b  # v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Ansible deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible-core==2.17.5 cloudflare requests
+
+      - name: Setup SSH key
+        env:
+          SSH_KEY: ${{ inputs.environment == 'production' && secrets.PROD_SSH_PRIVATE_KEY || secrets.DEV_SSH_PRIVATE_KEY }}
+          OLD_HOST: ${{ inputs.environment == 'production' && 'ftp.pausatf.org' || inputs.environment == 'staging' && 'stage.pausatf.org' || 'dev.pausatf.org' }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf "%s" "$SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "$OLD_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+          ssh-keyscan -H "${{ inputs.new_server_ip }}" >> ~/.ssh/known_hosts 2>/dev/null || true
+
+      - name: Decrypt vault file
+        if: ${{ secrets.ANSIBLE_VAULT_PASSWORD != '' }}
+        env:
+          ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
+        run: printf "%s" "$ANSIBLE_VAULT_PASSWORD" > vault.pass
+
+      - name: Run playbook against new server
+        working-directory: ansible
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: 'false'
+          ANSIBLE_USER: ${{ inputs.environment == 'production' && 'github-deploy' || 'root' }}
+          ENV_GROUP: ${{ inputs.environment == 'production' && 'production' || inputs.environment == 'staging' && 'staging' || 'development' }}
+        run: |
+          ansible-playbook -i inventory/hosts.yml site.yml \
+            -l "$ENV_GROUP" \
+            -e "ansible_host=${{ inputs.new_server_ip }}" \
+            -e "ansible_user=$ANSIBLE_USER" \
+            ${{ secrets.ANSIBLE_VAULT_PASSWORD != '' && '--vault-password-file ../vault.pass' || '' }}
+
+      - name: Report
+        run: echo "New server configured at ${{ inputs.new_server_ip }}"
+
+  migrate-data:
+    runs-on: ubuntu-latest
+    needs: configure-new-server
+    if: inputs.dry_run == false && inputs.skip_data_migration == false
+    environment: ${{ inputs.environment == 'production' && 'production' || inputs.environment == 'staging' && 'staging' || 'development' }}
+    permissions:
+      contents: read
+
+    steps:
+      - name: Setup SSH key
+        env:
+          SSH_KEY: ${{ inputs.environment == 'production' && secrets.PROD_SSH_PRIVATE_KEY || secrets.DEV_SSH_PRIVATE_KEY }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf "%s" "$SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+      - name: Add old server to known_hosts
+        env:
+          OLD_HOST: ${{ inputs.environment == 'production' && 'ftp.pausatf.org' || inputs.environment == 'staging' && 'stage.pausatf.org' || 'dev.pausatf.org' }}
+        run: |
+          ssh-keyscan -H "$OLD_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+          ssh-keyscan -H "${{ inputs.new_server_ip }}" >> ~/.ssh/known_hosts 2>/dev/null || true
+
+      - name: Migrate WordPress database
+        env:
+          OLD_HOST: ${{ inputs.environment == 'production' && 'ftp.pausatf.org' || inputs.environment == 'staging' && 'stage.pausatf.org' || 'dev.pausatf.org' }}
+          ANSIBLE_USER: ${{ inputs.environment == 'production' && 'github-deploy' || 'root' }}
+        run: |
+          set -euo pipefail
+          WP_PATH="/var/www/html"
+
+          echo "Migrating database from $OLD_HOST to ${{ inputs.new_server_ip }}"
+
+          # WP-CLI reads credentials from wp-config.php and scopes to the WordPress DB only,
+          # avoiding the risk of dumping all MySQL databases including system tables.
+          if [[ "${{ inputs.environment }}" == "production" ]]; then
+            ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no "$ANSIBLE_USER@$OLD_HOST" \
+              "sudo -u www-data wp db export - --path=$WP_PATH" \
+              | ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no "$ANSIBLE_USER@${{ inputs.new_server_ip }}" \
+              "sudo -u www-data wp db import - --path=$WP_PATH"
+          else
+            ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no "$ANSIBLE_USER@$OLD_HOST" \
+              "wp db export - --path=$WP_PATH --allow-root" \
+              | ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no "$ANSIBLE_USER@${{ inputs.new_server_ip }}" \
+              "wp db import - --path=$WP_PATH --allow-root"
+          fi
+
+          echo "Database migration complete"
+
+      - name: Sync wp-content/uploads
+        env:
+          OLD_HOST: ${{ inputs.environment == 'production' && 'ftp.pausatf.org' || inputs.environment == 'staging' && 'stage.pausatf.org' || 'dev.pausatf.org' }}
+          ANSIBLE_USER: ${{ inputs.environment == 'production' && 'github-deploy' || 'root' }}
+        run: |
+          rsync -az --delete \
+            -e "ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no" \
+            "$ANSIBLE_USER@$OLD_HOST:/var/www/html/wp-content/uploads/" \
+            "$ANSIBLE_USER@${{ inputs.new_server_ip }}:/var/www/html/wp-content/uploads/"
+
+      - name: Report
+        run: echo "Data migration complete"
+
+  smoke-test:
+    runs-on: ubuntu-latest
+    needs: configure-new-server
+    if: needs.configure-new-server.result == 'success'
+
+    steps:
+      - name: Smoke test via new IP with Host header
+        env:
+          HOST_HEADER: ${{ inputs.environment == 'production' && 'www.pausatf.org' || inputs.environment == 'staging' && 'stage.pausatf.org' || 'dev.pausatf.org' }}
+        run: |
+          curl -fsS --max-time 30 \
+            -H "Host: $HOST_HEADER" \
+            "http://${{ inputs.new_server_ip }}/" \
+            -o /dev/null
+
+      - name: Check WordPress is responding
+        env:
+          HOST_HEADER: ${{ inputs.environment == 'production' && 'www.pausatf.org' || inputs.environment == 'staging' && 'stage.pausatf.org' || 'dev.pausatf.org' }}
+        run: |
+          STATUS=$(curl -so /dev/null -w "%{http_code}" --max-time 30 \
+            -H "Host: $HOST_HEADER" \
+            "http://${{ inputs.new_server_ip }}/")
+          if [[ "$STATUS" != "200" && "$STATUS" != "301" && "$STATUS" != "302" ]]; then
+            echo "Unexpected HTTP status: $STATUS" >&2
+            exit 1
+          fi
+          echo "HTTP $STATUS — OK"
+
+  dns-cutover:
+    runs-on: ubuntu-latest
+    needs: smoke-test
+    if: inputs.dry_run == false && needs.smoke-test.result == 'success'
+    environment: ${{ inputs.environment == 'production' && 'production' || inputs.environment == 'staging' && 'staging' || 'development' }}
+    permissions:
+      contents: read
+
+    steps:
+      - name: Setup Python
+        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b  # v5
+        with:
+          python-version: '3.12'
+
+      - name: Install cloudflare SDK
+        run: pip install cloudflare
+
+      - name: Update Cloudflare DNS records
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          NEW_IP: ${{ inputs.new_server_ip }}
+          ENVIRONMENT: ${{ inputs.environment }}
+        run: |
+          python3 - << 'PYEOF'
+          import os, sys
+          import cloudflare
+
+          token = os.environ["CLOUDFLARE_API_TOKEN"]
+          new_ip = os.environ["NEW_IP"]
+          zone_name = "pausatf.org"
+          environment = os.environ["ENVIRONMENT"]
+
+          cf = cloudflare.Cloudflare(api_token=token)
+
+          zones = cf.zones.list(name=zone_name)
+          zone_id = zones.result[0].id
+
+          # Determine which A records to update based on environment
+          if environment == "production":
+              record_names = ["pausatf.org", "www.pausatf.org"]
+          elif environment == "staging":
+              record_names = ["stage.pausatf.org"]
+          else:
+              record_names = ["dev.pausatf.org"]
+
+          for record_name in record_names:
+              records = cf.dns.records.list(zone_id=zone_id, type="A", name=record_name)
+              if not records.result:
+                  print(f"WARNING: No A record found for {record_name}", file=sys.stderr)
+                  continue
+              record_id = records.result[0].id
+              old_ip = records.result[0].content
+
+              cf.dns.records.patch(dns_record_id=record_id, zone_id=zone_id, content=new_ip)
+              print(f"Updated {record_name}: {old_ip} -> {new_ip}")
+
+          PYEOF
+
+  verify:
+    runs-on: ubuntu-latest
+    needs: dns-cutover
+    if: inputs.dry_run == false && needs.dns-cutover.result == 'success'
+
+    steps:
+      - name: Wait for DNS propagation
+        run: sleep 30
+
+      - name: Final healthcheck via hostname
+        env:
+          HEALTHCHECK_URL: ${{ inputs.environment == 'production' && 'https://www.pausatf.org' || inputs.environment == 'staging' && 'https://stage.pausatf.org' || 'https://dev.pausatf.org' }}
+        run: curl -fsS "$HEALTHCHECK_URL" || exit 1
+
+      - name: Report
+        run: echo "Migration complete"
+
+  rollback-on-failure:
+    runs-on: ubuntu-latest
+    needs:
+      - preflight
+      - dns-cutover
+      - verify
+    if: failure() && inputs.dry_run == false
+    environment: ${{ inputs.environment == 'production' && 'production' || inputs.environment == 'staging' && 'staging' || 'development' }}
+    permissions:
+      contents: read
+
+    steps:
+      - name: Setup Python
+        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b  # v5
+        with:
+          python-version: '3.12'
+
+      - name: Install cloudflare SDK
+        run: pip install cloudflare
+
+      - name: Revert Cloudflare DNS records to old server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          OLD_IP: ${{ needs.preflight.outputs.old_server_ip }}
+          ENVIRONMENT: ${{ inputs.environment }}
+        run: |
+          if [ -z "$OLD_IP" ]; then
+            echo "ERROR: old_server_ip not available from preflight — cannot auto-rollback" >&2
+            exit 1
+          fi
+
+          python3 - << 'PYEOF'
+          import os, sys
+          import cloudflare
+
+          token = os.environ["CLOUDFLARE_API_TOKEN"]
+          old_ip = os.environ["OLD_IP"]
+          zone_name = "pausatf.org"
+          environment = os.environ["ENVIRONMENT"]
+
+          cf = cloudflare.Cloudflare(api_token=token)
+
+          zones = cf.zones.list(name=zone_name)
+          zone_id = zones.result[0].id
+
+          if environment == "production":
+              record_names = ["pausatf.org", "www.pausatf.org"]
+          elif environment == "staging":
+              record_names = ["stage.pausatf.org"]
+          else:
+              record_names = ["dev.pausatf.org"]
+
+          for record_name in record_names:
+              records = cf.dns.records.list(zone_id=zone_id, type="A", name=record_name)
+              if not records.result:
+                  print(f"WARNING: No A record found for {record_name}", file=sys.stderr)
+                  continue
+              record_id = records.result[0].id
+              current_ip = records.result[0].content
+
+              cf.dns.records.patch(dns_record_id=record_id, zone_id=zone_id, content=old_ip)
+              print(f"ROLLBACK: {record_name}: {current_ip} -> {old_ip}")
+
+          PYEOF
+          echo "ROLLBACK COMPLETE: DNS reverted to $OLD_IP"
