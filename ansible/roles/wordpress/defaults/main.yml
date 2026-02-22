@@ -27,13 +27,13 @@ nginx_client_max_body_size: "100M"
 # List of user IDs or logins to remove (e.g. breach-created accounts)
 wp_users_remove: []
 
-# Security: These should be overridden in group_vars with vault-encrypted values
-wordpress_db_password: "CHANGEME"
-wordpress_auth_key: "CHANGEME"
-wordpress_secure_auth_key: "CHANGEME"
-wordpress_logged_in_key: "CHANGEME"
-wordpress_nonce_key: "CHANGEME"
-wordpress_auth_salt: "CHANGEME"
-wordpress_secure_auth_salt: "CHANGEME"
-wordpress_logged_in_salt: "CHANGEME"
-wordpress_nonce_salt: "CHANGEME"
+# Security: Must be provided via Ansible vault — empty defaults cause fast-fail assertion.
+wordpress_db_password: ""        # Must be provided via vault (vault_wp_main_db_password)
+wordpress_auth_key: ""           # Must be provided via vault
+wordpress_secure_auth_key: ""    # Must be provided via vault
+wordpress_logged_in_key: ""      # Must be provided via vault
+wordpress_nonce_key: ""          # Must be provided via vault
+wordpress_auth_salt: ""          # Must be provided via vault
+wordpress_secure_auth_salt: ""   # Must be provided via vault
+wordpress_logged_in_salt: ""     # Must be provided via vault
+wordpress_nonce_salt: ""         # Must be provided via vault
