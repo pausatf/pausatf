@@ -17,3 +17,4 @@ rules:
     max-spaces-inside: 1
     level: warning
 # yamllint configuration for pausatf ansible playbooks
+# v2: trigger after args[module] warn_list update
