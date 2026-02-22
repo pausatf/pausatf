@@ -260,7 +260,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ## Changelog
 
-See [CHANGELOG.md](CHANGELOG.md) for version history.
+See CHANGELOG.md for version history.
 
 **Latest Changes:**
 - v0.2: Custom modifications for PAUSATF
