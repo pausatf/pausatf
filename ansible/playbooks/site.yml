@@ -21,16 +21,16 @@
   become: yes
 
   roles:
-    - role: apache
-      when: web_server | default('apache') == 'apache'
-
-    - role: openlitespeed
-      when: web_server | default('apache') == 'openlitespeed'
-
     - role: php
       when: web_server | default('apache') == 'apache'
 
+    - role: apache
+      when: web_server | default('apache') == 'apache'
+
     - role: lsphp
+      when: web_server | default('apache') == 'openlitespeed'
+
+    - role: openlitespeed
       when: web_server | default('apache') == 'openlitespeed'
 
     - role: mysql
@@ -39,7 +39,7 @@
     - role: fail2ban
 
     - role: wordpress
-      when: wordpress_enabled | default(false)
+      when: wordpress_enabled | default(true)
 
     - role: cloudflare
       when: cloudflare_enabled | default(false)
