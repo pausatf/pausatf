@@ -57,10 +57,12 @@
 - name: Update all plugins except excluded
   command: "{{ wpcli_path | default('/usr/local/bin/wp') }} plugin update --all --path={{ wp_site.path }} --allow-root --quiet"
   when: wpcli_update_plugins | default(true)
+  ignore_errors: yes
 
 - name: Update all themes except excluded
   command: "{{ wpcli_path | default('/usr/local/bin/wp') }} theme update --all --path={{ wp_site.path }} --allow-root --quiet"
   when: wpcli_update_themes | default(true)
+  ignore_errors: yes
 
 - name: Ensure LiteSpeed Cache plugin present and active (stage/dev)
   command: "{{ wpcli_path | default('/usr/local/bin/wp') }} plugin install litespeed-cache --activate --path={{ wp_site.path }} --allow-root"
