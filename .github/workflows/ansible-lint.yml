@@ -55,7 +55,8 @@ jobs:
         run: pip install yamllint
 
       - name: Run yamllint
-        run: yamllint -d '{extends: default, rules: {line-length: {max: 120}}}' .
+        run: |
+          yamllint -d '{extends: default, rules: {line-length: {max: 120}}}' .
         working-directory: ansible
 
   syntax-check:
