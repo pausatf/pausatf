@@ -24,17 +24,14 @@ $allowed_ips = [
 {% endfor %}
 ];
 
-// Check if request is from Cloudflare (real IP in header)
 $client_ip = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['REMOTE_ADDR'] ?? '';
 
-// Allow if IP is in allowed list or if coming through Cloudflare
-$is_cloudflare = isset($_SERVER['HTTP_CF_RAY']);
-$is_allowed = in_array($client_ip, $allowed_ips) || $is_cloudflare;
+$is_allowed = in_array($client_ip, $allowed_ips);
 
-// Also allow with secret token
-$token = $_GET['token'] ?? $_SERVER['HTTP_X_HEALTH_TOKEN'] ?? '';
+// Optional token-based auth for external monitoring
+$token = $_GET['token'] ?? ($_SERVER['HTTP_X_HEALTH_TOKEN'] ?? '');
 $valid_token = '{{ healthcheck_token | default("") }}';
-if (!empty($valid_token) && $token === $valid_token) {
+if ($valid_token !== '' && hash_equals($valid_token, $token)) {
     $is_allowed = true;
 }
 

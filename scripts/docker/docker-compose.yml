@@ -41,7 +41,7 @@ services:
 
   # Prometheus monitoring
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:v2.51.0  # pin: update deliberately, check release notes
     container_name: prometheus
     volumes:
       - ./monitoring/prometheus:/etc/prometheus:ro
@@ -56,7 +56,7 @@ services:
 
   # Grafana for visualization
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:11.0.0  # pin: update deliberately, check release notes
     container_name: grafana
     environment:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
@@ -74,7 +74,7 @@ services:
 
   # Node exporter for system metrics
   node-exporter:
-    image: prom/node-exporter:latest
+    image: prom/node-exporter:v1.8.0  # pin: update deliberately, check release notes
     container_name: node-exporter
     command:
       - '--path.procfs=/host/proc'

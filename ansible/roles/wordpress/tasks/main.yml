@@ -3,6 +3,20 @@
 # - uses WP-CLI to manage core, plugins, and themes
 # - honors per-install settings in group_vars
 
+- name: Assert WordPress secrets are configured
+  assert:
+    that:
+      - wordpress_db_password | length > 0
+      - wordpress_auth_key | length > 0
+      - wordpress_secure_auth_key | length > 0
+      - wordpress_logged_in_key | length > 0
+      - wordpress_nonce_key | length > 0
+      - wordpress_auth_salt | length > 0
+      - wordpress_secure_auth_salt | length > 0
+      - wordpress_logged_in_salt | length > 0
+      - wordpress_nonce_salt | length > 0
+    fail_msg: "WordPress secrets must be set via Ansible vault — check vault_wp_main_* variables"
+
 - name: Ensure WP-CLI is installed
   get_url:
     url: https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
