@@ -286,10 +286,10 @@ resource "cloudflare_record" "google_site_verification" {
 resource "cloudflare_record" "dmarc" {
   zone_id = cloudflare_zone.pausatf.id
   name    = "_dmarc"
-  content = "v=DMARC1; p=none;"
+  content = "v=DMARC1; p=quarantine; rua=mailto:admin@pausatf.org; pct=100;"
   type    = "TXT"
   ttl     = 1
-  comment = "DMARC policy (monitoring mode)"
+  comment = "DMARC policy (quarantine enforcement, aggregate reports to admin@pausatf.org)"
 }
 
 resource "cloudflare_record" "dkim_cloudflare" {

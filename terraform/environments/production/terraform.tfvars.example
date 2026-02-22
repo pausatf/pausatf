@@ -17,9 +17,8 @@ database_size = "db-s-2vcpu-4gb"
 ssh_public_key = "ssh-ed25519 AAAA... your-public-key-here"
 
 ssh_allowed_ips = [
-  # Restrict SSH access to specific IPs
-  # Example: "203.0.113.0/24"
-  "0.0.0.0/0" # WARNING: Allow from anywhere - CHANGE THIS!
+  # Replace with your IP address(es) — never use 0.0.0.0/0 in production
+  # "198.51.100.1/32"   # example: office static IP
 ]
 
 # Monitoring alerts
