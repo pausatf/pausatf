@@ -1,0 +1,14 @@
+# Serve pre-WordPress /data/ content tree at www.pausatf.org/data/.
+# This directory predates the WordPress migration. It must be served
+# directly by Apache — the WordPress rewrite rule's !-d guard only fires
+# if the path resolves to a real directory inside DocumentRoot, which it
+# does not (data/ lives in the legacy tree, not /var/www/html/).
+{% set legacy_public = legacy_sites | selectattr('name', 'equalto', 'legacy-public') | map(attribute='path') | first %}
+
+Alias /data {{ legacy_public }}/data
+
+<Directory {{ legacy_public }}/data>
+    Options FollowSymLinks
+    AllowOverride All
+    Require all granted
+</Directory>
