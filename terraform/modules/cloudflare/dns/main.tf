@@ -9,13 +9,13 @@ terraform {
   }
 }
 
-resource "cloudflare_record" "this" {
+resource "cloudflare_dns_record" "this" {
   for_each = { for record in var.dns_records : "${record.type}-${record.name}" => record }
 
   zone_id  = var.zone_id
   name     = each.value.name
   type     = each.value.type
-  value    = each.value.value
+  content  = each.value.value
   ttl      = lookup(each.value, "ttl", 1)
   proxied  = lookup(each.value, "proxied", false)
   priority = lookup(each.value, "priority", null)
