@@ -146,7 +146,7 @@ abstract class ET_Core_API_Spam_Provider extends ET_Core_API_Service  {
 		$provider = sanitize_text_field( $provider );
 		$account  = sanitize_text_field( $account );
 
-		self::$_->array_update( $options, "accounts.${provider}.{$account}", $data );
+		self::$_->array_update( $options, "accounts.{$provider}.{$account}", $data );
 
 		update_option( 'et_core_api_spam_options', $options );
 	}
