@@ -13,9 +13,7 @@ warn_list:
   - name[play]
   - name[template]
   # local_action: deprecated but functional in ansible-core <2.23.
-  - local-action
-  - deprecated[local-action]
-  - local-action[deprecated]
+  - deprecated-local-action
   # Task key order: cosmetic.
   - key-order[task]
   # Role variable naming prefix: brownfield pre-dates prefix convention.
@@ -40,3 +38,5 @@ warn_list:
   - yaml[line-length]
   - yaml[empty-lines]
   - yaml[braces]
+  # Jinja spacing: cosmetic.
+  - jinja[spacing]
