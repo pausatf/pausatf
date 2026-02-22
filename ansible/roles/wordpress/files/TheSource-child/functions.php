@@ -14,8 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Enqueue scripts and styles for the theme
  */
 function thesource_child_enqueue_scripts() {
-    // Add a version number for cache busting
-    $version = '1.1.' . time();
+    // Static version string for cache busting; increment on asset changes.
+    $version = '1.1.0';
     
     // Enqueue parent theme's style.css
     wp_enqueue_style( 'parent-style', get_template_directory_uri() . '/style.css' );
