@@ -38,10 +38,12 @@ jobs:
           ssh-keyscan -H "$DEV_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
 
       - name: Decrypt vault file
-        if: ${{ secrets.ANSIBLE_VAULT_PASSWORD != '' }}
         env:
           ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
-        run: printf "%s" "$ANSIBLE_VAULT_PASSWORD" > vault.pass
+        run: |
+          if [ -n "$ANSIBLE_VAULT_PASSWORD" ]; then
+            printf "%s" "$ANSIBLE_VAULT_PASSWORD" > vault.pass
+          fi
 
       - name: Run playbook (development)
         working-directory: ansible
