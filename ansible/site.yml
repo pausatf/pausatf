@@ -120,7 +120,6 @@
 
           Websites:
             - Main: https://www.pausatf.org (/var/www/html)
-            - Transit: /var/www/transit/html (legacy)
 
           Stack:
             - Web: {{ web_server | default('apache') }}

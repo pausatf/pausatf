@@ -104,6 +104,42 @@ resource "cloudflare_record" "staging" {
   comment = "Staging environment (alias)"
 }
 
+# Transit site redirect (decommissioned - redirects to www.pausatf.org)
+resource "cloudflare_record" "transit" {
+  zone_id = cloudflare_zone.pausatf.id
+  name    = "transit"
+  content = var.production_ip
+  type    = "A"
+  ttl     = 1
+  proxied = true
+  comment = "Transit site (decommissioned - redirects to www.pausatf.org)"
+}
+
+resource "cloudflare_ruleset" "transit_redirect" {
+  zone_id = cloudflare_zone.pausatf.id
+  name    = "Redirect transit to www"
+  kind    = "zone"
+  phase   = "http_request_dynamic_redirect"
+
+  rules = [
+    {
+      action = "redirect"
+      action_parameters = {
+        from_value = {
+          preserve_query_string = true
+          status_code           = 301
+          target_url = {
+            value = "https://www.pausatf.org"
+          }
+        }
+      }
+      description = "Redirect transit.pausatf.org to www.pausatf.org"
+      enabled     = true
+      expression  = "(http.host eq \"transit.pausatf.org\")"
+    }
+  ]
+}
+
 # CNAME Records
 resource "cloudflare_record" "prod" {
   zone_id = cloudflare_zone.pausatf.id
