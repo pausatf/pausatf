@@ -16,3 +16,4 @@ rules:
   braces:
     max-spaces-inside: 1
     level: warning
+# yamllint configuration for pausatf ansible playbooks
