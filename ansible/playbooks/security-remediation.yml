@@ -1,0 +1,147 @@
+---
+# Security Remediation Playbook
+# ==============================
+# Responds to the Jan-2026 breach and the unauthorized mark_murray admin account
+# (User ID 46, created 2026-02-14, email murray@cawrecycles.org).
+#
+# Required actions from issue #<issue>:
+#   1. Remove the mark_murray account immediately
+#   2. Rotate all WordPress auth keys/salts
+#   3. Audit admin accounts for additional persistence mechanisms
+#   4. Enable login notifications for admin accounts
+#
+# Usage:
+#   ansible-playbook playbooks/security-remediation.yml -i inventory/production
+#   ansible-playbook playbooks/security-remediation.yml -i inventory/production --check
+
+- name: WordPress security remediation
+  hosts: production
+  become: true
+  gather_facts: false
+
+  vars:
+    wp_bin: "{{ wpcli_path | default('/usr/local/bin/wp') }}"
+
+  tasks:
+    # -------------------------------------------------------------------------
+    # 1. Remove unauthorized accounts (wp_users_remove list)
+    # -------------------------------------------------------------------------
+    - name: Remove unauthorized WordPress user accounts
+      command: >
+        {{ wp_bin }} user delete {{ item.id }}
+        --reassign=1 --yes --path={{ wp_site.path }} --allow-root
+      loop: "{{ wp_users_remove | default([]) }}"
+      loop_control:
+        label: "{{ item.username }} (ID {{ item.id }}) — {{ item.reason }}"
+      register: wp_user_delete
+      changed_when: "'Deleted user' in wp_user_delete.stdout"
+      failed_when: false
+      vars:
+        wp_site: "{{ wordpress_installs | selectattr('name', 'equalto', 'pausatf-main') | first }}"
+
+    # -------------------------------------------------------------------------
+    # 2. Rotate WordPress authentication keys and salts
+    # -------------------------------------------------------------------------
+    - name: Rotate WordPress auth keys and salts
+      command: >
+        {{ wp_bin }} config shuffle-salts
+        --path={{ wp_site.path }} --allow-root
+      vars:
+        wp_site: "{{ wordpress_installs | selectattr('name', 'equalto', 'pausatf-main') | first }}"
+      register: salt_rotation
+      changed_when: true
+
+    # -------------------------------------------------------------------------
+    # 3. Audit admin accounts for additional persistence
+    # -------------------------------------------------------------------------
+    - name: List current administrator accounts
+      command: >
+        {{ wp_bin }} user list --role=administrator
+        --fields=ID,user_login,user_email,user_registered
+        --format=table --path={{ wp_site.path }} --allow-root
+      vars:
+        wp_site: "{{ wordpress_installs | selectattr('name', 'equalto', 'pausatf-main') | first }}"
+      register: admin_list
+      changed_when: false
+
+    - name: Display current administrators (review for unexpected accounts)
+      debug:
+        var: admin_list.stdout_lines
+
+    - name: Get administrator login names
+      command: >
+        {{ wp_bin }} user list --role=administrator
+        --field=user_login --path={{ wp_site.path }} --allow-root
+      vars:
+        wp_site: "{{ wordpress_installs | selectattr('name', 'equalto', 'pausatf-main') | first }}"
+      register: admin_logins
+      changed_when: false
+
+    - name: Build authorized administrator logins
+      set_fact:
+        wp_authorized_admins: >-
+          {{ wp_users | default([]) | selectattr('roles', 'search', 'administrator') | map(attribute='username') | list }}
+
+    - name: Identify unexpected administrator accounts
+      set_fact:
+        wp_unexpected_admins: >-
+          {{ admin_logins.stdout_lines | default([]) | difference(wp_authorized_admins) }}
+
+    - name: Warn about unexpected administrator accounts
+      debug:
+        msg: >
+          WARNING: Unexpected administrator account(s) found: {{ wp_unexpected_admins | join(', ') }}.
+          Investigate and add to wp_users_remove if confirmed illegitimate.
+      when: wp_unexpected_admins | length > 0
+
+    - name: Confirm no unexpected administrators remain
+      assert:
+        that: wp_unexpected_admins | length == 0
+        fail_msg: >
+          Unexpected administrator account(s) remain: {{ wp_unexpected_admins | join(', ') }}.
+          Manual review required before completing remediation.
+        success_msg: "All administrator accounts are in the authorized list."
+
+    # -------------------------------------------------------------------------
+    # 4. Enable Jetpack login notifications for admins
+    # -------------------------------------------------------------------------
+    - name: Check if Jetpack is active
+      command: >
+        {{ wp_bin }} plugin is-active jetpack
+        --path={{ wp_site.path }} --allow-root
+      vars:
+        wp_site: "{{ wordpress_installs | selectattr('name', 'equalto', 'pausatf-main') | first }}"
+      register: jetpack_active
+      changed_when: false
+      failed_when: false
+
+    - name: Enable Jetpack master user login notification
+      command: >
+        {{ wp_bin }} option update jetpack_options
+        '{"master_user_login_notification":true}' --format=json
+        --path={{ wp_site.path }} --allow-root
+      vars:
+        wp_site: "{{ wordpress_installs | selectattr('name', 'equalto', 'pausatf-main') | first }}"
+      when: jetpack_active.rc == 0
+      register: jetpack_notif
+      changed_when: jetpack_notif.rc == 0
+
+    # -------------------------------------------------------------------------
+    # 5. Summary
+    # -------------------------------------------------------------------------
+    - name: Remediation summary
+      debug:
+        msg: |
+          ============================================================
+          Security Remediation Complete
+          ============================================================
+          Accounts removed : {{ wp_users_remove | default([]) | map(attribute='username') | join(', ') or 'none' }}
+          Auth salts rotated: {{ 'yes' if (salt_rotation is defined and salt_rotation.rc is defined and salt_rotation.rc == 0) else 'FAILED' }}
+          Admin audit      : {{ 'PASS — no unexpected admins' if wp_unexpected_admins | length == 0 else 'FAIL — review required' }}
+          Login notify     : {{ 'enabled (Jetpack)' if (jetpack_active.rc == 0 and jetpack_notif is defined and jetpack_notif.rc is defined and jetpack_notif.rc == 0) else 'skipped (Jetpack not active)' }}
+          ============================================================
+          Next steps:
+            - Rotate WordPress database password (vault_wp_main_db_password)
+            - Rotate all admin user passwords manually
+            - Review server access logs for the Jan-2026 breach window
+            - Re-run capture-wp-inventory.yml to refresh group_vars
