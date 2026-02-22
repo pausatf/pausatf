@@ -31,6 +31,12 @@ jobs:
       - name: Rsync legacy from prod
         run: bash scripts/backup/rsync_legacy.sh
 
+      - name: Strip nested git repos from backup tree
+        run: |
+          # Nested .git dirs cause git-add to treat them as gitlinks (empty submodule
+          # refs), which breaks the push. Remove them before staging.
+          find backups/legacy -name ".git" -type d -exec rm -rf {} + 2>/dev/null || true
+
       - name: Commit and push if changed
         run: |
           git config user.name "github-actions"
