@@ -87,7 +87,6 @@ Production Server Layout:
 - version-info (1.3.3)
 - widget-logic (6.02)
 - widget-options (4.1.3)
-- wp-file-manager-pro (8.4.3)
 - wpforms-lite (1.9.8.7)
 - wp-mail-smtp (4.7.1)
 - wp-super-cache (3.0.3)
