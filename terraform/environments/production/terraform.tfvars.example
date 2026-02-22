@@ -7,18 +7,14 @@ do_token = "your-digitalocean-token-here"
 
 # Required - Get from Cloudflare
 cloudflare_api_token = "your-cloudflare-api-token-here"
-cloudflare_zone_id   = "your-cloudflare-zone-id-here"
 
 # Production Configuration
-region       = "sfo2"
-droplet_size = "s-4vcpu-8gb"
+region        = "sfo2"
+droplet_size  = "s-4vcpu-8gb"
 database_size = "db-s-2vcpu-4gb"
 
 # SSH Configuration
-ssh_key_fingerprints = [
-  # Add your SSH key fingerprints here
-  # Get with: doctl compute ssh-key list
-]
+ssh_public_key = "ssh-ed25519 AAAA... your-public-key-here"
 
 ssh_allowed_ips = [
   # Restrict SSH access to specific IPs
@@ -26,4 +22,7 @@ ssh_allowed_ips = [
   "0.0.0.0/0" # WARNING: Allow from anywhere - CHANGE THIS!
 ]
 
-environment = "production"
+# Monitoring alerts
+alert_email_addresses = [
+  "ops@pausatf.org",
+]

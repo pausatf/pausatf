@@ -44,3 +44,9 @@ variable "alert_email_addresses" {
   type        = list(string)
   default     = []
 }
+
+variable "database_size" {
+  description = "Database cluster size slug"
+  type        = string
+  default     = "db-s-1vcpu-1gb"
+}
