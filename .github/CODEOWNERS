@@ -1,0 +1,7 @@
+# Default owner for everything
+* @thomasvincent
+
+# Security-sensitive paths require explicit review
+terraform/ @thomasvincent
+.github/workflows/ @thomasvincent
+ansible/ @thomasvincent
