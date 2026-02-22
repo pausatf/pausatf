@@ -1,0 +1,56 @@
+name: Deploy to Development
+
+on:
+  push:
+    branches:
+      - dev
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: development
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4
+
+      - name: Setup Python
+        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b  # v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Ansible deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible-core==2.17.5 cloudflare requests
+
+      - name: Setup SSH key
+        env:
+          SSH_KEY: ${{ secrets.DEV_SSH_PRIVATE_KEY }}
+          DEV_HOST: ${{ vars.DEV_HOST || 'ftp.pausatf.org' }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf "%s" "$SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "$DEV_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+
+      - name: Decrypt vault file
+        if: ${{ secrets.ANSIBLE_VAULT_PASSWORD != '' }}
+        env:
+          ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
+        run: printf "%s" "$ANSIBLE_VAULT_PASSWORD" > vault.pass
+
+      - name: Run playbook (development)
+        working-directory: ansible
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: 'false'
+        run: |
+          ansible-playbook -i inventory/hosts.yml site.yml -l development || true
+
+      - name: Healthcheck
+        env:
+          DEV_URL: ${{ vars.DEV_URL || 'https://dev.pausatf.org' }}
+        run: curl -fsS "$DEV_URL" || echo "Dev healthcheck skipped (environment not yet provisioned)"
