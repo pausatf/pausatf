@@ -13,7 +13,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4
         with:
           fetch-depth: 0
 
@@ -22,8 +22,8 @@ jobs:
           SSH_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
         run: |
           install -m 700 -d ~/.ssh
-          printf "%s" "$SSH_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+          printf "%s" "$SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H ftp.pausatf.org >> ~/.ssh/known_hosts 2>/dev/null || true
 
       - name: Rsync legacy from prod
