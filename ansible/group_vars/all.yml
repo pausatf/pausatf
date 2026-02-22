@@ -53,7 +53,7 @@ cloudflare_always_use_https: true
 
 # Cloudflare Security Settings
 cloudflare_security_level: "medium"
-cloudflare_waf_enabled: false
+cloudflare_waf_enabled: true
 
 # Cloudflare Caching Settings
 cloudflare_cache_level: "aggressive"
@@ -488,7 +488,7 @@ fail2ban_jails:
     enabled: true
 
 # UFW Firewall
-ufw_enabled: false  # Currently disabled on server
+ufw_enabled: true
 ufw_allowed_ports:
   - "22/tcp"
   - "80/tcp"
@@ -555,7 +555,7 @@ sendgrid_subdomain: "em5172"
 # =============================================================================
 
 # FTP (vsftpd)
-vsftpd_enabled: true
+vsftpd_enabled: false
 
 # Postfix (mail)
 postfix_enabled: true
