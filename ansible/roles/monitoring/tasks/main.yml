@@ -29,3 +29,11 @@
     name: sysstat
     state: started
     enabled: yes
+
+- name: Deploy WordPress backup script
+  template:
+    src: backup-wordpress.sh.j2
+    dest: /usr/local/sbin/backup-wordpress.sh
+    owner: root
+    group: root
+    mode: '0700'
