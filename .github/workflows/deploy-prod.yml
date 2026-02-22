@@ -33,8 +33,7 @@ jobs:
           SSH_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
         run: |
           install -m 700 -d ~/.ssh
-          printf '%s
-' "$SSH_KEY" > ~/.ssh/pausatf-prod
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/pausatf-prod
           chmod 600 ~/.ssh/pausatf-prod
           ssh-keygen -l -f ~/.ssh/pausatf-prod
           ssh-keyscan -H ftp.pausatf.org >> ~/.ssh/known_hosts 2>/dev/null || true
@@ -49,7 +48,7 @@ jobs:
             chmod 600 ansible/group_vars/vault.yml
           fi
           if [ -n "$ANSIBLE_VAULT_PASSWORD" ]; then
-            printf "%s" "$ANSIBLE_VAULT_PASSWORD" > vault.pass
+            printf '%s' "$ANSIBLE_VAULT_PASSWORD" > vault.pass
           fi
 
       - name: Run playbook (production)
