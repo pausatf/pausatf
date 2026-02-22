@@ -30,7 +30,6 @@ _MYCNF=$(mktemp /root/.my-backup-XXXXXX.cnf)
 chmod 600 "$_MYCNF"
 printf '[client]\nuser=%s\npassword=%s\n' '{{ wp.db_user }}' '{{ wp.db_password }}' > "$_MYCNF"
 mysqldump --defaults-extra-file="$_MYCNF" --host='{{ wp.db_host | default("localhost") }}' {{ wp.db_name }} | gzip > "$BACKUP_DIR/{{ wp.name }}-db-$DATE.sql.gz"
-rm -f "$_MYCNF"
 
 # Files backup
 tar -czf "$BACKUP_DIR/{{ wp.name }}-files-$DATE.tar.gz" -C "$(dirname '{{ wp.path }}')" "$(basename '{{ wp.path }}')" --exclude="wp-content/cache" --exclude="wp-content/uploads/cache"
