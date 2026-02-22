@@ -35,11 +35,6 @@ output "database_uri" {
   sensitive   = true
 }
 
-output "vpc_id" {
-  description = "Staging VPC ID"
-  value       = digitalocean_vpc.staging.id
-}
-
 output "firewall_id" {
   description = "Staging firewall ID"
   value       = digitalocean_firewall.staging.id
