@@ -130,7 +130,8 @@ apache_modules:
   - mime
   - mpm_prefork
   - negotiation
-  - php7.2
+  - php7
+  - remoteip
   - reqtimeout
   - rewrite
   - setenvif
