@@ -197,8 +197,7 @@ mysql_key_buffer_size: "16M"
 mysql_max_allowed_packet: "16M"
 mysql_thread_stack: "192K"
 mysql_thread_cache_size: 8
-mysql_query_cache_limit: "1M"
-mysql_query_cache_size: "16M"
+# query_cache_limit and query_cache_size removed: not supported in MySQL 8.0
 mysql_expire_logs_days: 10
 mysql_max_binlog_size: "100M"
 
@@ -243,23 +242,23 @@ wordpress_installs:
     logged_in_salt: "{{ vault_wp_main_logged_in_salt }}"
     nonce_salt: "{{ vault_wp_main_nonce_salt }}"
 
-  # Transit site (legacy - WordPress 5.0.3)
+  # Transit site — upgraded from EOL 5.0.3 (see issue #48)
   - name: "pausatf-transit"
     domain: "transit.pausatf.org"
     path: "/var/www/transit/html"
-    db_name: "wordpress"
-    db_user: "wordpress"
+    db_name: "wordpress_transit"
+    db_user: "wordpress_transit"
     db_password: "{{ vault_wp_transit_db_password }}"
     db_host: "localhost"
     table_prefix: "wp_"
-    wp_version: "5.0.3"
+    wp_version: "latest"
     ssl_enabled: false
     active_theme: "TheSource-child"
     cron_enabled: false
     debug_mode: false
     disallow_file_edit: true
     disallow_file_mods: true
-    auto_update_core: false
+    auto_update_core: "minor"
     # Auth keys and salts
     auth_key: "{{ vault_wp_transit_auth_key }}"
     secure_auth_key: "{{ vault_wp_transit_secure_auth_key }}"
@@ -558,7 +557,7 @@ backup_items:
     db_name: "wordpress"
   - name: "wordpress-transit"
     path: "/var/www/transit/html"
-    db_name: "wordpress"
+    db_name: "wordpress_transit"
 
 # =============================================================================
 # EMAIL (Google Workspace)
