@@ -1,0 +1,6 @@
+# Fail2ban filter for OpenLiteSpeed authentication errors
+# Managed by Ansible
+
+[Definition]
+failregex = ^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} \[ERROR\] \[<HOST>:\d+\] (User name and password|Authentication failed|Unauthorized access)
+ignoreregex =
