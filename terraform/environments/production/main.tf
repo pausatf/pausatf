@@ -1,10 +1,10 @@
 terraform {
-  required_version = ">= 1.6.0"
+  required_version = ">= 1.10.0"
 
   required_providers {
     digitalocean = {
       source  = "digitalocean/digitalocean"
-      version = "~> 2.0"
+      version = "~> 2.47"
     }
     cloudflare = {
       source  = "cloudflare/cloudflare"
@@ -32,7 +32,6 @@ provider "cloudflare" {
 }
 
 # DigitalOcean Project
-# Import existing project: terraform import digitalocean_project.pausatf 8ddce7ba-f064-4611-8460-0771dd817342
 resource "digitalocean_project" "pausatf" {
   name        = "PAUSATF"
   description = "PAUSATF - Pan African Ultimate Sports & Training Foundation"
@@ -41,32 +40,34 @@ resource "digitalocean_project" "pausatf" {
 
   resources = [
     digitalocean_droplet.production.urn,
+    digitalocean_reserved_ip.production.urn,
   ]
 }
 
 # SSH Key
-# Import existing key: terraform import digitalocean_ssh_key.m3_laptop 46721354
 resource "digitalocean_ssh_key" "m3_laptop" {
   name       = "m3 laptop"
   public_key = var.ssh_public_key
 }
 
-# (Optional) Add Cloudflare DNS records for production via modules/cloudflare/dns
-# Example (disabled by default):
-# module "cloudflare_dns_prod" {
-#   source  = "../../modules/cloudflare/dns"
-#   zone_id = var.cloudflare_zone_id
-#   dns_records = [
-#     {
-#       name    = "prod"
-#       type    = "A"
-#       value   = digitalocean_droplet.production.ipv4_address
-#       ttl     = 1
-#       proxied = true
-#       comment = "Production web droplet"
-#     }
-#   ]
-# }
+# VPC for Production
+resource "digitalocean_vpc" "production" {
+  name     = "pausatf-production-vpc"
+  region   = var.region
+  ip_range = "10.10.0.0/16"
+
+  description = "Production VPC for PAUSATF infrastructure"
+}
+
+# Reserved IP — prevents address change on droplet rebuild
+resource "digitalocean_reserved_ip" "production" {
+  region = var.region
+}
+
+resource "digitalocean_reserved_ip_assignment" "production" {
+  ip_address = digitalocean_reserved_ip.production.ip_address
+  droplet_id = digitalocean_droplet.production.id
+}
 
 # Production Droplet
 resource "digitalocean_droplet" "production" {
@@ -74,6 +75,8 @@ resource "digitalocean_droplet" "production" {
   region = var.region
   size   = var.droplet_size
   image  = var.droplet_image
+
+  vpc_uuid = digitalocean_vpc.production.id
 
   tags = [
     "pausatf",
@@ -94,52 +97,47 @@ resource "digitalocean_droplet" "production" {
   })
 }
 
-# Production Database
-# Note: Production currently uses an external or shared database
-# Uncomment below if dedicated production database is needed
-#
-# resource "digitalocean_database_cluster" "production" {
-#   name       = "pausatf-production-db"
-#   engine     = "mysql"
-#   version    = "8"
-#   size       = var.database_size
-#   region     = var.region
-#   node_count = 1
-#
-#   tags = [
-#     "pausatf",
-#     "production",
-#     "database"
-#   ]
-#
-#   maintenance_window {
-#     day  = "sunday"
-#     hour = "04:00:00"
-#   }
-# }
-#
-# resource "digitalocean_database_firewall" "production" {
-#   cluster_id = digitalocean_database_cluster.production.id
-#
-#   rule {
-#     type  = "droplet"
-#     value = digitalocean_droplet.production.id
-#   }
-# }
+# Monitoring Alerts
+resource "digitalocean_monitor_alert" "cpu_high" {
+  alerts {
+    email = var.alert_email_addresses
+  }
+  window      = "5m"
+  type        = "v1/insights/droplet/cpu"
+  compare     = "GreaterThan"
+  value       = 80
+  enabled     = true
+  entities    = [digitalocean_droplet.production.id]
+  description = "Production CPU > 80% for 5 minutes"
+}
 
-# VPC for Production
-# Note: Currently using default VPC
-# Uncomment below if custom VPC is needed
-#
-# resource "digitalocean_vpc" "production" {
-#   name     = "pausatf-production-vpc"
-#   region   = var.region
-#   ip_range = "10.10.0.0/16"
-#
-#   description = "Production VPC for PAUSATF infrastructure"
-# }
+resource "digitalocean_monitor_alert" "memory_high" {
+  alerts {
+    email = var.alert_email_addresses
+  }
+  window      = "5m"
+  type        = "v1/insights/droplet/memory_utilization_percent"
+  compare     = "GreaterThan"
+  value       = 85
+  enabled     = true
+  entities    = [digitalocean_droplet.production.id]
+  description = "Production memory > 85% for 5 minutes"
+}
 
-# Firewall for Production
+resource "digitalocean_monitor_alert" "disk_high" {
+  alerts {
+    email = var.alert_email_addresses
+  }
+  window      = "5m"
+  type        = "v1/insights/droplet/disk_utilization_percent"
+  compare     = "GreaterThan"
+  value       = 75
+  enabled     = true
+  entities    = [digitalocean_droplet.production.id]
+  description = "Production disk > 75% utilization"
+}
+
+# Production Firewall
 resource "digitalocean_firewall" "production" {
   name = "pausatf-production-firewall"
 
