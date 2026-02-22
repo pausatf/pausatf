@@ -8,7 +8,7 @@
 			<?php $cat_option='thesource_home_cat_one'; ?>
 			<?php query_posts("posts_per_page=1&cat=".get_catId(get_option($cat_option)));
 				  while (have_posts()) : the_post(); ?>
-					  <?php include(TEMPLATEPATH . '/includes/recent-cat.php'); ?>
+					  <?php include(get_template_directory() . '/includes/recent-cat.php'); ?>
 			<?php endwhile; wp_reset_query(); ?>
 		</div> <!-- end .recent-cat-first -->
 
@@ -17,7 +17,7 @@
 			<?php $cat_option='thesource_home_cat_two'; ?>
 			<?php query_posts("posts_per_page=1&cat=".get_catId(get_option($cat_option)));
 				  while (have_posts()) : the_post(); ?>
-					   <?php include(TEMPLATEPATH . '/includes/recent-cat.php'); ?>
+					   <?php include(get_template_directory() . '/includes/recent-cat.php'); ?>
 			<?php endwhile; wp_reset_query(); ?>
 		</div> <!-- end .recent-cat -->
 
@@ -26,7 +26,7 @@
 			<?php $cat_option='thesource_home_cat_three'; ?>
 			<?php query_posts("posts_per_page=1&cat=".get_catId(get_option($cat_option)));
 				  while (have_posts()) : the_post(); ?>
-					   <?php include(TEMPLATEPATH . '/includes/recent-cat.php'); ?>
+					   <?php include(get_template_directory() . '/includes/recent-cat.php'); ?>
 			<?php endwhile; wp_reset_query(); ?>
 		</div> <!-- end .recent-cat -->
 
@@ -36,7 +36,7 @@
 			<?php $cat_option='thesource_home_cat_four'; ?>
 			<?php query_posts("posts_per_page=1&cat=".get_catId(get_option($cat_option)));
 				  while (have_posts()) : the_post(); ?>
-					   <?php include(TEMPLATEPATH . '/includes/recent-cat.php'); ?>
+					   <?php include(get_template_directory() . '/includes/recent-cat.php'); ?>
 			<?php endwhile; wp_reset_query(); ?>
 		</div> <!-- end .recent-cat -->
 	</div> <!-- end #from-categories -->
