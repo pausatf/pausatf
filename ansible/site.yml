@@ -99,7 +99,7 @@
         name: "{{ item }}"
         state: started
         enabled: yes
-      loop: "{{ [ 'mysql', 'fail2ban', 'cron' ] + (web_server == 'openlitespeed' | ternary(['lshttpd'], ['apache2'])) }}"
+      loop: "{{ [ 'mysql', 'fail2ban', 'cron' ] + ((web_server == 'openlitespeed') | ternary(['lshttpd'], ['apache2'])) }}"
       tags: verify
 
     - name: Display deployment summary

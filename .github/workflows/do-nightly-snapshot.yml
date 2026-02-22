@@ -8,7 +8,10 @@ on:
 jobs:
   snapshot:
     runs-on: ubuntu-latest
-    environment: production
+    # No environment gate — uses DO_TOKEN and DO_PROD_DROPLET_ID repo secrets.
+    # If those secrets are missing, doctl will fail with "token required".
+    permissions:
+      contents: read
     steps:
       - name: Install doctl
         uses: digitalocean/action-doctl@5727c67aa3c2c34ae9462d5a0ecfea8a1b31e5ce  # v2

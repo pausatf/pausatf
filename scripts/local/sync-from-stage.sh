@@ -21,7 +21,7 @@ ssh -o StrictHostKeyChecking=no "$REMOTE" \
 DOCKER_BUILDKIT=1 docker compose -f "$LOCAL_COMPOSE" up -d
 
 # Import DB
-zcat /tmp/pausatf-stage.sql.gz | docker exec -i $(docker ps -qf name=db) \
+zcat /tmp/pausatf-stage.sql.gz | docker exec -i "$(docker ps -qf name=db)" \
   mysql -u"${WORDPRESS_DB_USER:-wp}" -p"${WORDPRESS_DB_PASSWORD:-wp_password}" "${WORDPRESS_DB_NAME:-wordpress}"
 
 # Sync uploads

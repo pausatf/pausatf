@@ -370,7 +370,7 @@ and this project adheres to semantic versioning principles for infrastructure ch
 - **Plan:** Free
 - **DNS Records:**
   - pausatf.org → 64.225.40.54 (proxied)
-  - <www.pausatf.org> → 64.225.40.54 (proxied)
+  - <https://www.pausatf.org> → 64.225.40.54 (proxied)
   - prod.pausatf.org → CNAME to ftp.pausatf.org (not proxied)
   - ftp.pausatf.org → 64.225.40.54 (not proxied)
   - stage.pausatf.org → 64.227.85.73 (not proxied)

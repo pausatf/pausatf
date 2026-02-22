@@ -8,6 +8,7 @@ on:
 jobs:
   backup:
     runs-on: ubuntu-latest
+    environment: production
     permissions:
       contents: write
 
@@ -22,12 +23,19 @@ jobs:
           SSH_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
         run: |
           install -m 700 -d ~/.ssh
-          printf "%s" "$SSH_KEY" > ~/.ssh/id_ed25519
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
+          ssh-keygen -l -f ~/.ssh/id_ed25519
           ssh-keyscan -H ftp.pausatf.org >> ~/.ssh/known_hosts 2>/dev/null || true
 
       - name: Rsync legacy from prod
         run: bash scripts/backup/rsync_legacy.sh
+
+      - name: Strip nested git repos from backup tree
+        run: |
+          # Nested .git dirs cause git-add to treat them as gitlinks (empty submodule
+          # refs) which break the push. Remove them before staging.
+          find backups/legacy -name ".git" -type d -exec rm -rf {} + 2>/dev/null || true
 
       - name: Commit and push if changed
         run: |
@@ -35,8 +43,10 @@ jobs:
           git config user.email "github-actions@github.com"
           if [ -n "$(git status --porcelain)" ]; then
             git add backups/legacy
-            git commit -m "chore(backup): nightly legacy snapshot"
-            git push
+            git commit -m "chore(backup): nightly legacy snapshot $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            # Push to a dedicated branch — main is branch-protected and requires a PR.
+            # Force push so each run reflects the current prod state.
+            git push origin HEAD:refs/heads/backups/legacy-snapshots --force
           else
-            echo "No changes"
+            echo "No changes to commit"
           fi

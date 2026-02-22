@@ -166,6 +166,48 @@
     state: link
   notify: Reload Apache
 
+
+- name: Disable default-ssl virtual host (conflicts with pausatf-main-ssl)
+  file:
+    path: /etc/apache2/sites-enabled/default-ssl.conf
+    state: absent
+  notify: Reload Apache
+
+- name: Deploy phpMyAdmin localhost-only restriction
+  copy:
+    dest: /etc/apache2/conf-available/phpmyadmin-restrict.conf
+    content: |
+      # Restrict phpMyAdmin to server-local access only
+      <Location /phpmyadmin>
+          Require local
+      </Location>
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload Apache
+
+- name: Enable phpMyAdmin localhost restriction
+  file:
+    src: /etc/apache2/conf-available/phpmyadmin-restrict.conf
+    dest: /etc/apache2/conf-enabled/phpmyadmin-restrict.conf
+    state: link
+  notify: Reload Apache
+
+- name: Block HTTP access to ai1wm-backups directory
+  copy:
+    dest: /var/www/html/wp-content/ai1wm-backups/.htaccess
+    content: |
+      <IfModule mod_authz_core.c>
+          Require all denied
+      </IfModule>
+      <IfModule !mod_authz_core.c>
+          Deny from all
+      </IfModule>
+    owner: www-data
+    group: www-data
+    mode: '0644'
+  when: wordpress_installs | selectattr('path', 'equalto', '/var/www/html') | list | length > 0
+
 - name: Ensure Apache is started and enabled
   service:
     name: apache2

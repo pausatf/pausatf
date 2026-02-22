@@ -157,7 +157,7 @@ Upgrade to PHP 8.1 or 8.3 (both supported until 2026)
 
 **Timeline:** Q1 2026 (plan migration)
 
-**See:** [05-server-migration-guide.md](05-server-migration-guide.md) for detailed upgrade instructions
+**See:** [05-server-migration-guide.md](../guides/05-server-migration-guide.md) for detailed upgrade instructions
 
 ---
 
@@ -252,7 +252,7 @@ cache-control: public, max-age=2592000, immutable
 cf-cache-status: HIT
 ```
 - Cached for 30 days as configured
-- See: [01-cache-implementation-guide.md](01-cache-implementation-guide.md)
+- See: [01-cache-implementation-guide.md](../guides/01-cache-implementation-guide.md)
 
 ---
 
@@ -1009,5 +1009,5 @@ done
 **Repository:** https://github.com/pausatf/pausatf-infrastructure-docs  
 **Related Docs:**
 - [PERFORMANCE_OPTIMIZATION_REPORT.md](PERFORMANCE_OPTIMIZATION_REPORT.md)
-- [01-cache-implementation-guide.md](01-cache-implementation-guide.md)
+- [01-cache-implementation-guide.md](../guides/01-cache-implementation-guide.md)
 - [04-security-audit-report.md](04-security-audit-report.md)

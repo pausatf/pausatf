@@ -1,4 +1,3 @@
----
 # Install LiteSpeed PHP (lsphp) and common extensions
 
 - name: Add LiteSpeed repository key

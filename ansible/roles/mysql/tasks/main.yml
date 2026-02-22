@@ -41,6 +41,7 @@
     host: localhost
     login_unix_socket: "{{ mysql_socket }}"
     state: present
+  no_log: true
   ignore_errors: yes
 
 - name: Create .my.cnf for root
@@ -74,17 +75,22 @@
     collation: utf8mb4_unicode_ci
     login_unix_socket: "{{ mysql_socket }}"
   loop: "{{ wordpress_installs }}"
+  loop_control:
+    # Suppress full item dict (contains db_password) from log output
+    label: "{{ item.db_name }}"
   when: item.db_name is defined
 
 - name: Create WordPress database users
   mysql_user:
     name: "{{ item.db_user }}"
     password: "{{ item.db_password }}"
-    priv: "{{ item.db_name }}.*:ALL"
+    priv: "{{ item.db_name }}.*:SELECT,INSERT,UPDATE,DELETE,CREATE,DROP,INDEX,ALTER,CREATE TEMPORARY TABLES,LOCK TABLES"
     host: localhost
     state: present
     login_unix_socket: "{{ mysql_socket }}"
   loop: "{{ wordpress_installs }}"
+  loop_control:
+    label: "{{ item.db_name }}"
   when: item.db_user is defined
   no_log: true
 

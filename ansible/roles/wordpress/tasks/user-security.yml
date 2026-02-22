@@ -15,7 +15,8 @@
   failed_when: false
 
 - name: Get current WordPress administrator list
-  command: >
+  shell: >
+    php -d error_reporting=0
     {{ wpcli_path | default('/usr/local/bin/wp') }} user list
     --role=administrator --field=user_login --path={{ wp_site.path }} --allow-root
   register: wp_current_admins
@@ -29,8 +30,7 @@
 
 - name: Identify unauthorized administrator accounts
   set_fact:
-    wp_unauthorized_admins: >-
-      {{ wp_current_admins.stdout_lines | default([]) | difference(wp_authorized_admins) }}
+    wp_unauthorized_admins: "{{ wp_current_admins.stdout_lines | default([]) | reject('equalto', '') | list | difference(wp_authorized_admins) }}"
   when: wp_current_admins.rc == 0
 
 - name: Fail if unexpected administrator accounts exist

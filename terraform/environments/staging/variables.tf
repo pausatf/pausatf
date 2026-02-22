@@ -51,8 +51,3 @@ variable "ssh_key_fingerprints" {
   default     = []
 }
 
-variable "environment" {
-  description = "Environment name"
-  type        = string
-  default     = "staging"
-}

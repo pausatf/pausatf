@@ -24,27 +24,7 @@
       - "php{{ php_version }}-xml"
       - "php{{ php_version }}-zip"
       - "php{{ php_version }}-bcmath"
-      - "php{{ php_version }}-intl"
       - "libapache2-mod-php{{ php_version }}"
-    state: present
-  notify: Restart Apache
-
-# Also install PHP 7.2 (currently active in Apache)
-- name: Install PHP 7.2 packages (legacy compatibility)
-  apt:
-    name:
-      - php7.2
-      - php7.2-cli
-      - php7.2-common
-      - php7.2-curl
-      - php7.2-gd
-      - php7.2-json
-      - php7.2-mbstring
-      - php7.2-mysql
-      - php7.2-opcache
-      - php7.2-xml
-      - php7.2-zip
-      - libapache2-mod-php7.2
     state: present
   notify: Restart Apache
 
@@ -52,16 +32,6 @@
   template:
     src: php.ini.j2
     dest: "/etc/php/{{ php_version }}/apache2/php.ini"
-    owner: root
-    group: root
-    mode: '0644'
-    backup: yes
-  notify: Restart Apache
-
-- name: Deploy PHP 7.2 configuration
-  template:
-    src: php.ini.j2
-    dest: /etc/php/7.2/apache2/php.ini
     owner: root
     group: root
     mode: '0644'
@@ -85,30 +55,15 @@
     mode: '0644'
   notify: Restart Apache
 
-- name: Deploy OPcache configuration for PHP 7.2
-  template:
-    src: opcache.ini.j2
-    dest: /etc/php/7.2/mods-available/opcache.ini
-    owner: root
-    group: root
-    mode: '0644'
-  notify: Restart Apache
-
 - name: Check if OPcache is enabled
   stat:
-    path: "/etc/php/{{ item }}/apache2/conf.d/10-opcache.ini"
-  loop:
-    - "7.2"
-    - "{{ php_version }}"
+    path: "/etc/php/{{ php_version }}/apache2/conf.d/10-opcache.ini"
   register: opcache_enabled
   changed_when: false
 
 - name: Enable OPcache module
-  command: "phpenmod -v {{ item.item }} opcache"
-  loop: "{{ opcache_enabled.results }}"
-  loop_control:
-    label: "PHP {{ item.item }}"
-  when: not item.stat.exists
+  command: "phpenmod -v {{ php_version }} opcache"
+  when: not opcache_enabled.stat.exists
   changed_when: true
 
 - name: Set default PHP CLI version

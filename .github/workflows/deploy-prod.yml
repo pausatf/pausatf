@@ -26,29 +26,48 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install ansible-core==2.17.5 cloudflare requests
+          ansible-galaxy collection install -r ansible/requirements.yml
 
       - name: Setup SSH key
         env:
           SSH_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
         run: |
           install -m 700 -d ~/.ssh
-          printf "%s" "$SSH_KEY" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/pausatf-prod
+          chmod 600 ~/.ssh/pausatf-prod
+          ssh-keygen -l -f ~/.ssh/pausatf-prod
           ssh-keyscan -H ftp.pausatf.org >> ~/.ssh/known_hosts 2>/dev/null || true
 
       - name: Decrypt vault file
-        if: ${{ secrets.ANSIBLE_VAULT_PASSWORD != '' }}
         env:
+          ANSIBLE_VAULT_FILE: ${{ secrets.ANSIBLE_VAULT_FILE }}
           ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
-        run: printf "%s" "$ANSIBLE_VAULT_PASSWORD" > vault.pass
+        run: |
+          if [ -n "$ANSIBLE_VAULT_FILE" ]; then
+            printf '%s' "$ANSIBLE_VAULT_FILE" | base64 -d > ansible/group_vars/vault.yml
+            chmod 600 ansible/group_vars/vault.yml
+          fi
+          if [ -n "$ANSIBLE_VAULT_PASSWORD" ]; then
+            printf '%s' "$ANSIBLE_VAULT_PASSWORD" > vault.pass
+          fi
 
       - name: Run playbook (production)
         working-directory: ansible
         env:
           ANSIBLE_HOST_KEY_CHECKING: 'false'
+          ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
         run: |
-          ansible-playbook -i inventory/hosts.yml site.yml -l production \
-            ${{ secrets.ANSIBLE_VAULT_PASSWORD != '' && '--vault-password-file ../vault.pass' || '' }}
+          VAULT_ARGS=""
+          if [ -n "$ANSIBLE_VAULT_PASSWORD" ]; then
+            VAULT_ARGS="--vault-password-file ../vault.pass"
+          fi
+          # shellcheck disable=SC2086
+          ansible-playbook -i inventory/hosts.yml site.yml -l production $VAULT_ARGS
 
       - name: Healthcheck
-        run: curl -fsS https://www.pausatf.org || exit 1
+        # Verify Apache responds on the origin directly to avoid Cloudflare blocking GHA IPs
+        run: |
+          ssh -i ~/.ssh/pausatf-prod -o StrictHostKeyChecking=no \
+            -o IdentitiesOnly=yes \
+            github-deploy@ftp.pausatf.org \
+            "curl -fsS -o /dev/null -w '%{http_code}' http://localhost/ | grep -qE '^(200|301|302)'"

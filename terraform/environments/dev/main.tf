@@ -126,10 +126,6 @@ resource "digitalocean_firewall" "dev" {
 }
 
 # Cloudflare DNS for dev
-data "cloudflare_zone" "pausatf" {
-  zone_id = var.cloudflare_zone_id
-}
-
 module "cloudflare_dns_dev" {
   source  = "../../modules/cloudflare/dns"
   zone_id = var.cloudflare_zone_id

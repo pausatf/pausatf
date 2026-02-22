@@ -1,4 +1,6 @@
 terraform {
+  required_version = ">= 1.6.0"
+
   required_providers {
     github = {
       source  = "integrations/github"
@@ -57,7 +59,7 @@ resource "github_branch_protection" "main" {
   require_signed_commits = var.require_signed_commits
 
   # Require linear history
-  require_linear_history = var.require_linear_history
+  required_linear_history = var.require_linear_history
 
   # Allow force pushes
   allows_force_pushes = var.allows_force_pushes

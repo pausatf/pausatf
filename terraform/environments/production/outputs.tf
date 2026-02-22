@@ -13,28 +13,6 @@ output "droplet_urn" {
   value       = digitalocean_droplet.production.urn
 }
 
-output "database_id" {
-  description = "Production database cluster ID"
-  value       = digitalocean_database_cluster.production.id
-}
-
-output "database_host" {
-  description = "Production database host"
-  value       = digitalocean_database_cluster.production.host
-  sensitive   = true
-}
-
-output "database_port" {
-  description = "Production database port"
-  value       = digitalocean_database_cluster.production.port
-}
-
-output "database_uri" {
-  description = "Production database connection URI"
-  value       = digitalocean_database_cluster.production.uri
-  sensitive   = true
-}
-
 output "vpc_id" {
   description = "Production VPC ID"
   value       = digitalocean_vpc.production.id

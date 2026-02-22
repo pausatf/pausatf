@@ -28,18 +28,14 @@ thread_stack = {{ mysql_thread_stack }}
 thread_cache_size = {{ mysql_thread_cache_size }}
 myisam-recover-options = BACKUP
 
-# Query Cache (deprecated in MySQL 8.0, but still used in 5.7)
-query_cache_limit = {{ mysql_query_cache_limit }}
-query_cache_size = {{ mysql_query_cache_size }}
-
 # Logging
 log_error = /var/log/mysql/error.log
 slow_query_log = 1
 slow_query_log_file = /var/log/mysql/mysql-slow.log
 long_query_time = 2
 
-# Binary Logging
-expire_logs_days = {{ mysql_expire_logs_days }}
+# Binary Logging (MySQL 8.0: use binlog_expire_logs_seconds)
+binlog_expire_logs_seconds = {{ mysql_expire_logs_days | int * 86400 }}
 max_binlog_size = {{ mysql_max_binlog_size }}
 
 # InnoDB Settings
@@ -57,3 +53,4 @@ collation-server = utf8mb4_unicode_ci
 # Security
 symbolic-links = 0
 local-infile = 0
+skip-show-database

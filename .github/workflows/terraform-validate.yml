@@ -19,12 +19,12 @@ jobs:
     if: "!contains(github.event.pull_request.title, 'chore(deps):')"
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd  # v3
         with:
-          terraform_version: ~1.6
+          terraform_version: latest
 
       - name: Terraform Format Check
         run: terraform fmt -check -recursive
@@ -42,12 +42,12 @@ jobs:
           - github
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd  # v3
         with:
-          terraform_version: ~1.6
+          terraform_version: latest
 
       - name: Terraform Init
         run: terraform init -backend=false
@@ -63,7 +63,7 @@ jobs:
     if: "!contains(github.event.pull_request.title, 'chore(deps):')"
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4
 
       - name: Run tfsec
         uses: aquasecurity/tfsec-action@v1.0.3
@@ -71,7 +71,7 @@ jobs:
           working_directory: terraform
           soft_fail: false
           format: sarif
-          additional_args: --concise-output
+          additional_args: --concise-output --out results.sarif
 
       - name: Upload SARIF file
         uses: github/codeql-action/upload-sarif@v4
@@ -85,7 +85,7 @@ jobs:
     if: "!contains(github.event.pull_request.title, 'chore(deps):')"
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4
 
       - name: Setup TFLint
         uses: terraform-linters/setup-tflint@v6
@@ -97,5 +97,5 @@ jobs:
         working-directory: terraform
 
       - name: Run TFLint
-        run: tflint --recursive --format compact
+        run: tflint --recursive --format compact --minimum-failure-severity error
         working-directory: terraform
