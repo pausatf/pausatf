@@ -208,6 +208,22 @@
     mode: '0644'
   when: wordpress_installs | selectattr('path', 'equalto', '/var/www/html') | list | length > 0
 
+- name: Deploy legacy /data/ alias configuration
+  template:
+    src: legacy-data.conf.j2
+    dest: /etc/apache2/conf-available/legacy-data.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload Apache
+
+- name: Enable legacy /data/ alias
+  file:
+    src: /etc/apache2/conf-available/legacy-data.conf
+    dest: /etc/apache2/conf-enabled/legacy-data.conf
+    state: link
+  notify: Reload Apache
+
 - name: Ensure Apache is started and enabled
   service:
     name: apache2
