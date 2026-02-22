@@ -1,2 +1,38 @@
-RewriteEngine On
-RewriteRule \.php$ - [R=410,L]
+# PA/USATF Legacy Teeters Scripts
+# =================================
+# Written by Jeff Teeters, 2007-2015. PHP 5, mysql_* API (removed in PHP 7).
+# Database credentials are no longer valid. All PHP scripts return 410 Gone.
+#
+# To restore: migrate mysql_* to PDO, supply valid DB credentials, and
+# provision the pausatf_php / pausat_clubs database on the server.
+#
+# Static HTML files (clubs.html, youthindex*.html) remain accessible.
+
+Options -Indexes -ExecCGI -Includes
+DirectoryIndex disabled
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Return 410 Gone for all PHP scripts (permanently unavailable)
+    RewriteRule \.php[0-9]?$ - [R=410,L]
+
+    # Block phpinfo and other diagnostic scripts by name
+    RewriteRule ^phpinfo - [R=410,L]
+</IfModule>
+
+# Belt-and-suspenders: deny PHP execution at the file handler level too
+<FilesMatch "\.php[0-9]?$|\.phtml$">
+    Require all denied
+</FilesMatch>
+
+# Block git metadata exposure
+<FilesMatch "^\.git">
+    Require all denied
+</FilesMatch>
+
+# Prevent MIME sniffing of returned content
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Robots-Tag "noindex, nofollow"
+</IfModule>
