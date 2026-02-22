@@ -117,7 +117,8 @@ wp_active_template: "TheSource"
 wp_active_stylesheet: "TheSource-child"
 
 # Theme customizations (theme_mods)
-wp_child_theme_mods: '0': false
+wp_child_theme_mods:
+  '0': false
   background_color: ffffff
   custom_css_post_id: 46692
   et_pb_css_synced: 'yes'
@@ -234,7 +235,8 @@ wp_child_theme_mods: '0': false
       - custom_html-55
     time: 1766324361
 
-wp_parent_theme_mods: '0': false
+wp_parent_theme_mods:
+  '0': false
   custom_css_post_id: 65676
   et_pb_css_synced: 'yes'
   nav_menu_locations:
@@ -478,7 +480,7 @@ wp_users:
     email: "foxhorsepower@gmail.com"
     roles: "editor"
     registered: "2018-02-24 16:39:00"
-    last_login: "2025-02-01 00:27:42"
+    last_login: "2025-02-01 00:42:36"
   - id: 29
     username: "pamensldrchair"
     email: "andrewbyroncrawford@gmail.com"
