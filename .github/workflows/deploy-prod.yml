@@ -33,8 +33,8 @@ jobs:
           SSH_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
         run: |
           install -m 700 -d ~/.ssh
-          printf "%s" "$SSH_KEY" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
+          printf "%s" "$SSH_KEY" > ~/.ssh/pausatf-prod
+          chmod 600 ~/.ssh/pausatf-prod
           ssh-keyscan -H ftp.pausatf.org >> ~/.ssh/known_hosts 2>/dev/null || true
 
       - name: Decrypt vault file
