@@ -1,36 +1,28 @@
 {
   "ignorePatterns": [
-    {
-      "pattern": "^http://localhost"
-    },
-    {
-      "pattern": "^https://localhost"
-    },
-    {
-      "pattern": "^https://www.gnu.org/"
-    },
-    {
-      "pattern": "^https://github.com/pausatf/pausatf-(terraform|infrastructure-docs|ansible|legacy-content|scripts)"
-    },
-    {
-      "pattern": "^LICENSE$"
-    },
-    {
-      "pattern": "PERFORMANCE_OPTIMIZATION_REPORT\\.md$"
-    },
-    {
-      "pattern": "tests/README\\.md$"
-    },
-    {
-      "pattern": "themes/thesource-child/CHANGELOG\\.md$"
-    }
+    { "pattern": "^http://localhost" },
+    { "pattern": "^https://localhost" },
+    { "pattern": "^https://www.gnu.org/" },
+    { "pattern": "^https://github.com/pausatf/pausatf-(terraform|infrastructure-docs|ansible|legacy-content|scripts|theme-thesource)" },
+    { "pattern": "^LICENSE$" },
+    { "pattern": "PERFORMANCE_OPTIMIZATION_REPORT\\.md$" },
+    { "pattern": "tests/README\\.md$" },
+    { "pattern": "themes/thesource-child/CHANGELOG\\.md$" },
+    { "pattern": "^https?://(www\\.)?pausatf\\.org" },
+    { "pattern": "^https://stage\\.pausatf\\.org" },
+    { "pattern": "^https://dash\\.cloudflare\\.com" },
+    { "pattern": "^https://support\\.cloudflare\\.com" },
+    { "pattern": "^https://dev\\.mysql\\.com" },
+    { "pattern": "^https://dmarcian\\.com" },
+    { "pattern": "^https://admin\\.google\\.com" },
+    { "pattern": "^https://elegantthemes\\.com" },
+    { "pattern": "^https://www\\.isitdownrightnow\\.com" },
+    { "pattern": "^https://docs\\.digitalocean\\.com/products/droplets/how-to/migrate" },
+    { "pattern": "^https://openlitespeed\\.org/kb" }
   ],
   "timeout": "20s",
   "retryOn429": true,
   "retryCount": 3,
   "fallbackRetryDelay": "30s",
-  "aliveStatusCodes": [
-    200,
-    206
-  ]
+  "aliveStatusCodes": [200, 206]
 }
