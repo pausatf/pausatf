@@ -248,7 +248,6 @@ contact-form-7 (6.1.4)
 jetpack (15.3.1)
 tablepress-premium (3.2.6)
 updraftplus (2.25.9.0)
-wp-file-manager-pro (8.4.3)
 wpforms-lite (1.9.8.7)
 wp-mail-smtp (4.7.1)
 ```

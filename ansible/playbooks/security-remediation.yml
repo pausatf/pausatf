@@ -107,7 +107,79 @@
         success_msg: "All administrator accounts are in the authorized list."
 
     # -------------------------------------------------------------------------
-    # 4. Enable Jetpack login notifications for admins
+    # 4. Remove wp-file-manager-pro (active RCE vector — CVE-2020-25213)
+    # -------------------------------------------------------------------------
+    - name: Deactivate wp-file-manager-pro
+      command: >
+        {{ wp_bin }} plugin deactivate wp-file-manager-pro
+        --path={{ wp_site.path }} --allow-root
+      vars:
+        wp_site: "{{ wordpress_installs | selectattr('name', 'equalto', 'pausatf-main') | first }}"
+      register: fmgr_deactivate
+      changed_when: "'Plugin deactivated' in fmgr_deactivate.stdout"
+      failed_when: false
+
+    - name: Delete wp-file-manager-pro
+      command: >
+        {{ wp_bin }} plugin delete wp-file-manager-pro
+        --path={{ wp_site.path }} --allow-root
+      vars:
+        wp_site: "{{ wordpress_installs | selectattr('name', 'equalto', 'pausatf-main') | first }}"
+      register: fmgr_delete
+      changed_when: "'Deleted' in fmgr_delete.stdout"
+      failed_when: false
+
+    # -------------------------------------------------------------------------
+    # 5. Webshell scan — uploads/ and former plugin directory
+    # -------------------------------------------------------------------------
+    - name: Scan wp-content/uploads for PHP files (possible webshells)
+      find:
+        paths: "{{ wp_site.path }}/wp-content/uploads"
+        patterns:
+          - "*.php"
+          - "*.phtml"
+          - "*.php7"
+        recurse: true
+      vars:
+        wp_site: "{{ wordpress_installs | selectattr('name', 'equalto', 'pausatf-main') | first }}"
+      register: uploads_php_files
+
+    - name: Warn if PHP files found in uploads directory
+      debug:
+        msg: >
+          WARNING: {{ uploads_php_files.files | length }} PHP file(s) found in uploads/:
+          {{ uploads_php_files.files | map(attribute='path') | join(', ') }}.
+          Review each file immediately and remove any webshells.
+      when: uploads_php_files.files | length > 0
+
+    - name: Confirm no PHP files in uploads directory
+      assert:
+        that: uploads_php_files.files | length == 0
+        fail_msg: >
+          PHP file(s) found in wp-content/uploads — manual review required:
+          {{ uploads_php_files.files | map(attribute='path') | join(', ') }}
+        success_msg: "No PHP files found in wp-content/uploads."
+
+    - name: Confirm wp-file-manager-pro plugin directory is gone
+      stat:
+        path: "{{ wp_site.path }}/wp-content/plugins/wp-file-manager-pro"
+      vars:
+        wp_site: "{{ wordpress_installs | selectattr('name', 'equalto', 'pausatf-main') | first }}"
+      register: fmgr_dir
+
+    - name: Warn if wp-file-manager-pro directory still exists
+      debug:
+        msg: >
+          WARNING: wp-file-manager-pro plugin directory still exists at
+          {{ wp_site.path }}/wp-content/plugins/wp-file-manager-pro.
+          Verify the path, then remove it manually with WP-CLI:
+          wp plugin delete wp-file-manager-pro --path={{ wp_site.path }}
+      vars:
+        wp_site: "{{ wordpress_installs | selectattr('name', 'equalto', 'pausatf-main') | first }}"
+      when: fmgr_dir.stat.exists
+
+    # -------------------------------------------------------------------------
+    # 6. Enable Jetpack login notifications for admins
     # -------------------------------------------------------------------------
     - name: Check if Jetpack is active
       command: >
