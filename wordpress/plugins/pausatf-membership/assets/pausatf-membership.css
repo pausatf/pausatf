@@ -1,0 +1,117 @@
+/* PAUSATF Membership plugin — front-end styles */
+
+/* -----------------------------------------------------------------------
+   Club directory
+   ----------------------------------------------------------------------- */
+
+.pausatf-clubs {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.pausatf-clubs__item {
+    border-bottom: 1px solid #e0e0e0;
+    padding: 0.5em 0;
+}
+
+.pausatf-clubs__item:last-child {
+    border-bottom: none;
+}
+
+.pausatf-clubs__link {
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.pausatf-clubs__link:hover {
+    text-decoration: underline;
+}
+
+.pausatf-clubs--empty,
+.pausatf-clubs--login-required {
+    font-style: italic;
+    color: #666;
+}
+
+/* -----------------------------------------------------------------------
+   Member roster table
+   ----------------------------------------------------------------------- */
+
+.pausatf-members {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.pausatf-members th,
+.pausatf-members td {
+    border: 1px solid #ddd;
+    padding: 0.5em 1em;
+    text-align: left;
+}
+
+.pausatf-members thead th {
+    background: #f5f5f5;
+    font-weight: bold;
+}
+
+.pausatf-members--empty,
+.pausatf-members--login-required {
+    font-style: italic;
+    color: #666;
+}
+
+/* -----------------------------------------------------------------------
+   Score-sheet form
+   ----------------------------------------------------------------------- */
+
+.pausatf-scoresheet label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 0.25em;
+}
+
+.pausatf-scoresheet input[type="text"],
+.pausatf-scoresheet input[type="date"],
+.pausatf-scoresheet select {
+    display: block;
+    width: 100%;
+    max-width: 30em;
+    padding: 0.4em 0.6em;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+.pausatf-scoresheet button[type="submit"] {
+    padding: 0.5em 1.5em;
+    background: #0073aa;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.pausatf-scoresheet button[type="submit"]:hover {
+    background: #005177;
+}
+
+.pausatf-scoresheet__success {
+    color: #155724;
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    padding: 0.75em 1em;
+    border-radius: 3px;
+}
+
+.pausatf-scoresheet__error {
+    color: #721c24;
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    padding: 0.75em 1em;
+    border-radius: 3px;
+}
+
+.pausatf-scoresheet--login-required {
+    font-style: italic;
+    color: #666;
+}
