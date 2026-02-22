@@ -1,11 +1,10 @@
 {
   "ignorePatterns": [
-    {
-      "pattern": "^http://localhost"
-    },
-    {
-      "pattern": "^https://localhost"
-    }
+    { "pattern": "^http://localhost" },
+    { "pattern": "^https://localhost" },
+    { "pattern": "^https://www.gnu.org/" },
+    { "pattern": "^https://github.com/pausatf/pausatf-(terraform|infrastructure-docs|ansible|legacy-content|scripts)" },
+    { "pattern": "^LICENSE$" }
   ],
   "timeout": "20s",
   "retryOn429": true,
