@@ -370,12 +370,6 @@ wp_main_plugins:
     version: "4.1.3"
     auto_update: true
     description: "Extended widget control options"
-  - name: "wp-file-manager-pro"
-    slug: "wp-file-manager-pro"
-    status: "active"
-    version: "8.4.3"
-    auto_update: true
-    description: "File manager for WordPress"
   - name: "wpforms-lite"
     slug: "wpforms-lite"
     status: "active"
@@ -432,7 +426,6 @@ wpcli_update_schedule: "weekly"  # daily, weekly, monthly
 # Plugins to exclude from auto-updates (premium/custom)
 wpcli_exclude_plugins:
   - "tablepress-premium"
-  - "wp-file-manager-pro"
 
 # Themes to exclude from auto-updates (custom child themes)
 wpcli_exclude_themes:
