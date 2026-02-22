@@ -40,3 +40,5 @@ warn_list:
   - yaml[braces]
   # Jinja spacing: cosmetic.
   - jinja[spacing]
+  # args[module]: static validation can't evaluate Jinja2 templates.
+  - args[module]
