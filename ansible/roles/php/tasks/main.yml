@@ -24,7 +24,6 @@
       - "php{{ php_version }}-xml"
       - "php{{ php_version }}-zip"
       - "php{{ php_version }}-bcmath"
-      - "php{{ php_version }}-intl"
       - "libapache2-mod-php{{ php_version }}"
     state: present
   notify: Restart Apache
