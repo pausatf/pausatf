@@ -1,0 +1,16 @@
+name: Ops / Infrastructure Task
+description: Server, hosting, DNS, security, or CI/CD task
+labels: ["ops"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Task description
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Done when...
+    validations:
+      required: true
