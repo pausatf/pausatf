@@ -21,7 +21,7 @@
 #
 
 - name: Capture WordPress Configuration
-  hosts: wordpress
+  hosts: webservers
   become: yes
   vars:
     output_dir: "./wordpress-config-capture"
