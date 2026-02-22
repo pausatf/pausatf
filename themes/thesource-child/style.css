@@ -4273,3 +4273,8 @@ display:none;
 
 
 #recent-posts .entry p.date {display: none;}
+
+/* Social media icon links in header nav bar */
+.social-icon-link { display: inline-block; }
+.social-icon-link svg { width: 28px; height: 28px; fill: #888; transition: fill 0.2s; vertical-align: middle; }
+.social-icon-link:hover svg { fill: #555; }
