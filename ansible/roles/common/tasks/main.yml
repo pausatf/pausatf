@@ -52,9 +52,9 @@
 - name: Configure SSH
   include_tasks: ssh.yml
 
-- name: Set timezone to UTC
+- name: Set timezone
   timezone:
-    name: UTC
+    name: "{{ timezone }}"
 
 - name: Configure automatic security updates
   apt:
