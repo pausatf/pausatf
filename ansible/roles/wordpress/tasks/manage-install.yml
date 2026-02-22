@@ -30,6 +30,7 @@
 - name: Download WordPress core (if not installed)
   command: "{{ wpcli_path | default('/usr/local/bin/wp') }} core download --path={{ wp_site.path }} --version={{ wp_site.wp_version | default('latest') }} --skip-content --allow-root"
   when: wp_installed.rc != 0
+  failed_when: false
 
 - name: Verify WordPress checksums
   command: "{{ wpcli_path | default('/usr/local/bin/wp') }} core verify-checksums --path={{ wp_site.path }} --allow-root"
