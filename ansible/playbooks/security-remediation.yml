@@ -116,15 +116,16 @@
       failed_when: false
 
     - name: Enable Jetpack master user login notification
+      # Use option patch insert to avoid overwriting the full jetpack_options blob.
+      # wp option update would replace the entire serialized object.
       command: >
-        {{ wp_bin }} option update jetpack_options
-        '{"master_user_login_notification":true}' --format=json
+        {{ wp_bin }} option patch insert jetpack_options master_user_login_notification true
         --path={{ wp_site.path }} --allow-root
       vars:
         wp_site: "{{ wordpress_installs | selectattr('name', 'equalto', 'pausatf-main') | first }}"
       when: jetpack_active.rc == 0
       register: jetpack_notif
-      changed_when: jetpack_notif.rc == 0
+      changed_when: "'Success' in jetpack_notif.stdout"
 
     # -------------------------------------------------------------------------
     # 5. Summary
