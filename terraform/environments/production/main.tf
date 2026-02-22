@@ -41,6 +41,7 @@ resource "digitalocean_project" "pausatf" {
   resources = [
     digitalocean_droplet.production.urn,
     digitalocean_reserved_ip.production.urn,
+    module.database.urn,
   ]
 }
 
@@ -178,4 +179,30 @@ resource "digitalocean_firewall" "production" {
   }
 
   tags = ["production"]
+}
+
+# Managed Database — MySQL 8
+module "database" {
+  source = "../../modules/digitalocean/database"
+
+  name           = "pausatf-production-db"
+  engine         = "mysql"
+  engine_version = "8"
+  size           = var.database_size
+  region         = var.region
+  environment    = "production"
+
+  vpc_uuid = digitalocean_vpc.production.id
+
+  trusted_sources = [
+    {
+      type  = "droplet"
+      value = tostring(digitalocean_droplet.production.id)
+    }
+  ]
+
+  databases      = ["wordpress"]
+  database_users = ["wordpress"]
+
+  tags = ["pausatf", "production"]
 }
