@@ -34,8 +34,9 @@ Header always set X-XSS-Protection "1; mode=block"
     Require all denied
 </FilesMatch>
 
-# Block access to backup and log files
-<FilesMatch "\.(bak|backup|log|old|orig|sql|swp|tmp)$">
+# Block access to backup and archive files (including date/number-suffixed variants
+# such as wp-config.php.bak2025, wp-config.php.backup-20250501, and latest.zip)
+<FilesMatch "\.(bak[^.]*|backup[^.]*|log|old|orig|sql|swp|tmp|zip)$">
     Require all denied
 </FilesMatch>
 
