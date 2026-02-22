@@ -43,26 +43,21 @@ jobs:
           ANSIBLE_VAULT_FILE: ${{ secrets.ANSIBLE_VAULT_FILE }}
           ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
         run: |
-          if [ -n "$ANSIBLE_VAULT_FILE" ]; then
-            printf '%s' "$ANSIBLE_VAULT_FILE" | base64 -d > ansible/group_vars/vault.yml
-            chmod 600 ansible/group_vars/vault.yml
+          if [ -z "$ANSIBLE_VAULT_PASSWORD" ] || [ -z "$ANSIBLE_VAULT_FILE" ]; then
+            echo "ERROR: ANSIBLE_VAULT_PASSWORD and ANSIBLE_VAULT_FILE secrets are required" >&2
+            exit 1
           fi
-          if [ -n "$ANSIBLE_VAULT_PASSWORD" ]; then
-            printf '%s' "$ANSIBLE_VAULT_PASSWORD" > vault.pass
-          fi
+          printf '%s' "$ANSIBLE_VAULT_FILE" | base64 -d > ansible/group_vars/vault.yml
+          echo "$ANSIBLE_VAULT_PASSWORD" > vault.pass
+          chmod 600 vault.pass ansible/group_vars/vault.yml
 
       - name: Run playbook (production)
         working-directory: ansible
         env:
           ANSIBLE_HOST_KEY_CHECKING: 'false'
-          ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
         run: |
-          VAULT_ARGS=""
-          if [ -n "$ANSIBLE_VAULT_PASSWORD" ]; then
-            VAULT_ARGS="--vault-password-file ../vault.pass"
-          fi
           # shellcheck disable=SC2086
-          ansible-playbook -i inventory/hosts.yml site.yml -l production $VAULT_ARGS
+          ansible-playbook -i inventory/hosts.yml site.yml -l production --vault-password-file ../vault.pass
 
       - name: Healthcheck
         # Verify Apache responds on the origin directly to avoid Cloudflare blocking GHA IPs
