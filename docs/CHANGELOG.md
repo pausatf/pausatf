@@ -370,7 +370,7 @@ and this project adheres to semantic versioning principles for infrastructure ch
 - **Plan:** Free
 - **DNS Records:**
   - pausatf.org → REDACTED_PROD_NEW_IP (proxied)
-  - <www.pausatf.org> → REDACTED_PROD_NEW_IP (proxied)
+  - <https://www.pausatf.org> → REDACTED_PROD_NEW_IP (proxied)
   - prod.pausatf.org → CNAME to ftp.pausatf.org (not proxied)
   - ftp.pausatf.org → REDACTED_PROD_NEW_IP (not proxied)
   - stage.pausatf.org → REDACTED_STAGE_IP (not proxied)
