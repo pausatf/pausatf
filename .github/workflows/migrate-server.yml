@@ -31,6 +31,10 @@ on:
         type: string
         default: ''
 
+concurrency:
+  group: migrate-${{ github.event.inputs.environment }}
+  cancel-in-progress: false
+
 jobs:
   preflight:
     runs-on: ubuntu-latest
@@ -73,34 +77,50 @@ jobs:
 
       - name: Look up old server and snapshot
         id: get-old-ip
-        env:
-          OLD_HOST: ${{ inputs.environment == 'production' && 'ftp.pausatf.org' || inputs.environment == 'staging' && 'stage.pausatf.org' || 'dev.pausatf.org' }}
         run: |
           set -euo pipefail
-          # Resolve old host to IP
-          OLD_IP=$(dig +short "$OLD_HOST" | tail -1)
-          if [ -z "$OLD_IP" ]; then
-            echo "ERROR: could not resolve $OLD_HOST" >&2
+          ENVIRONMENT="${{ inputs.environment }}"
+
+          # Look up droplet by expected name pattern, not by DNS resolution.
+          # Naming convention: pausatf-prod, pausatf-stage, pausatf-dev
+          case "$ENVIRONMENT" in
+            production) DROPLET_NAME="pausatf-prod" ;;
+            staging)    DROPLET_NAME="pausatf-stage" ;;
+            dev)        DROPLET_NAME="pausatf-dev" ;;
+          esac
+
+          # Get droplet ID and current IP by name
+          DROPLET_INFO=$(doctl compute droplet list \
+            --format Name,ID,PublicIPv4 --no-header | grep "^$DROPLET_NAME " || true)
+
+          if [[ -z "$DROPLET_INFO" ]]; then
+            # Fallback: try tag-based lookup
+            DROPLET_INFO=$(doctl compute droplet list \
+              --tag-name "env:$ENVIRONMENT" \
+              --format Name,ID,PublicIPv4 --no-header | head -1 || true)
+          fi
+
+          if [[ -z "$DROPLET_INFO" ]]; then
+            echo "ERROR: Could not find droplet for environment $ENVIRONMENT" >&2
+            echo "Tried name '$DROPLET_NAME' and tag 'env:$ENVIRONMENT'" >&2
+            echo "Available droplets:" >&2
+            doctl compute droplet list --format Name,ID,PublicIPv4 --no-header >&2
             exit 1
           fi
-          echo "old_server_ip=$OLD_IP" >> "$GITHUB_OUTPUT"
 
-          # Find droplet by public IP
-          DROPLET_ID=$(doctl compute droplet list \
-            --format Name,ID,PublicIPv4 --no-header \
-            | awk -v ip="$OLD_IP" '$3 == ip {print $2}' | head -1)
-          if [ -z "$DROPLET_ID" ]; then
-            echo "WARNING: no droplet found with IP $OLD_IP — skipping snapshot" >&2
-            echo "old_droplet_id=" >> "$GITHUB_OUTPUT"
-          else
-            echo "old_droplet_id=$DROPLET_ID" >> "$GITHUB_OUTPUT"
-            TS=$(date -u +%Y%m%d%H%M%S)
-            echo "Taking snapshot of droplet $DROPLET_ID (pre-migration-${{ inputs.environment }}-$TS)..."
-            doctl compute droplet-action snapshot "$DROPLET_ID" \
-              --snapshot-name "pre-migration-${{ inputs.environment }}-$TS" \
-              --wait
-            echo "Snapshot complete"
-          fi
+          OLD_DROPLET_ID=$(echo "$DROPLET_INFO" | awk '{print $2}')
+          OLD_SERVER_IP=$(echo "$DROPLET_INFO" | awk '{print $3}')
+
+          echo "Found droplet: $DROPLET_NAME (ID: $OLD_DROPLET_ID, IP: $OLD_SERVER_IP)"
+          echo "old_server_ip=$OLD_SERVER_IP" >> "$GITHUB_OUTPUT"
+          echo "old_droplet_id=$OLD_DROPLET_ID" >> "$GITHUB_OUTPUT"
+
+          TS=$(date -u +%Y%m%d%H%M%S)
+          echo "Taking snapshot of droplet $OLD_DROPLET_ID (pre-migration-${{ inputs.environment }}-$TS)..."
+          doctl compute droplet-action snapshot "$OLD_DROPLET_ID" \
+            --snapshot-name "pre-migration-${{ inputs.environment }}-$TS" \
+            --wait
+          echo "Snapshot complete"
 
       - name: Verify new server is reachable via SSH
         env:
@@ -188,16 +208,31 @@ jobs:
           ssh-keyscan -H "$OLD_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
           ssh-keyscan -H "${{ inputs.new_server_ip }}" >> ~/.ssh/known_hosts 2>/dev/null || true
 
-      - name: Dump database old → new
+      - name: Migrate WordPress database
         env:
           OLD_HOST: ${{ inputs.environment == 'production' && 'ftp.pausatf.org' || inputs.environment == 'staging' && 'stage.pausatf.org' || 'dev.pausatf.org' }}
           ANSIBLE_USER: ${{ inputs.environment == 'production' && 'github-deploy' || 'root' }}
         run: |
           set -euo pipefail
-          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no "$ANSIBLE_USER@$OLD_HOST" \
-            "mysqldump --defaults-extra-file=/etc/mysql/debian.cnf --all-databases --single-transaction --quick" \
-            | ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no "$ANSIBLE_USER@${{ inputs.new_server_ip }}" \
-            "mysql -u root"
+          WP_PATH="/var/www/html"
+
+          echo "Migrating database from $OLD_HOST to ${{ inputs.new_server_ip }}"
+
+          # WP-CLI reads credentials from wp-config.php and scopes to the WordPress DB only,
+          # avoiding the risk of dumping all MySQL databases including system tables.
+          if [[ "${{ inputs.environment }}" == "production" ]]; then
+            ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no "$ANSIBLE_USER@$OLD_HOST" \
+              "sudo -u www-data wp db export - --path=$WP_PATH" \
+              | ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no "$ANSIBLE_USER@${{ inputs.new_server_ip }}" \
+              "sudo -u www-data wp db import - --path=$WP_PATH"
+          else
+            ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no "$ANSIBLE_USER@$OLD_HOST" \
+              "wp db export - --path=$WP_PATH --allow-root" \
+              | ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no "$ANSIBLE_USER@${{ inputs.new_server_ip }}" \
+              "wp db import - --path=$WP_PATH --allow-root"
+          fi
+
+          echo "Database migration complete"
 
       - name: Sync wp-content/uploads
         env:
@@ -247,55 +282,56 @@ jobs:
     environment: ${{ inputs.environment == 'production' && 'production' || inputs.environment == 'staging' && 'staging' || 'development' }}
     permissions:
       contents: read
-    env:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 
     steps:
-      - name: Update Cloudflare A record
+      - name: Setup Python
+        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b  # v5
+        with:
+          python-version: '3.12'
+
+      - name: Install cloudflare SDK
+        run: pip install cloudflare
+
+      - name: Update Cloudflare DNS records
         env:
-          RECORD_NAME: ${{ inputs.environment == 'production' && 'pausatf.org' || inputs.environment == 'staging' && 'stage.pausatf.org' || 'dev.pausatf.org' }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          NEW_IP: ${{ inputs.new_server_ip }}
+          ENVIRONMENT: ${{ inputs.environment }}
         run: |
-          set -euo pipefail
-          ZONE_ID=$(curl -sS -X GET \
-            "https://api.cloudflare.com/client/v4/zones?name=pausatf.org" \
-            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-            | python3 -c "import sys,json; print(json.load(sys.stdin)['result'][0]['id'])")
+          python3 - << 'PYEOF'
+          import os, sys
+          import cloudflare
 
-          RECORD_ID=$(curl -sS -X GET \
-            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records?type=A&name=$RECORD_NAME" \
-            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-            | python3 -c "import sys,json; print(json.load(sys.stdin)['result'][0]['id'])")
+          token = os.environ["CLOUDFLARE_API_TOKEN"]
+          new_ip = os.environ["NEW_IP"]
+          zone_name = "pausatf.org"
+          environment = os.environ["ENVIRONMENT"]
 
-          curl -sS -X PATCH \
-            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records/$RECORD_ID" \
-            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-            -H "Content-Type: application/json" \
-            --data "{\"content\": \"${{ inputs.new_server_ip }}\"}"
+          cf = cloudflare.Cloudflare(api_token=token)
 
-          echo "DNS updated: $RECORD_NAME → ${{ inputs.new_server_ip }}"
+          zones = cf.zones.list(name=zone_name)
+          zone_id = zones.result[0].id
 
-      # Production has two A records: apex and www
-      - name: Update www A record (production only)
-        if: inputs.environment == 'production'
-        run: |
-          set -euo pipefail
-          ZONE_ID=$(curl -sS -X GET \
-            "https://api.cloudflare.com/client/v4/zones?name=pausatf.org" \
-            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-            | python3 -c "import sys,json; print(json.load(sys.stdin)['result'][0]['id'])")
+          # Determine which A records to update based on environment
+          if environment == "production":
+              record_names = ["pausatf.org", "www.pausatf.org"]
+          elif environment == "staging":
+              record_names = ["stage.pausatf.org"]
+          else:
+              record_names = ["dev.pausatf.org"]
 
-          RECORD_ID=$(curl -sS -X GET \
-            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records?type=A&name=www.pausatf.org" \
-            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-            | python3 -c "import sys,json; print(json.load(sys.stdin)['result'][0]['id'])")
+          for record_name in record_names:
+              records = cf.dns.records.list(zone_id=zone_id, type="A", name=record_name)
+              if not records.result:
+                  print(f"WARNING: No A record found for {record_name}", file=sys.stderr)
+                  continue
+              record_id = records.result[0].id
+              old_ip = records.result[0].content
 
-          curl -sS -X PATCH \
-            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records/$RECORD_ID" \
-            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-            -H "Content-Type: application/json" \
-            --data "{\"content\": \"${{ inputs.new_server_ip }}\"}"
+              cf.dns.records.patch(dns_record_id=record_id, zone_id=zone_id, content=new_ip)
+              print(f"Updated {record_name}: {old_ip} -> {new_ip}")
 
-          echo "DNS updated: www.pausatf.org → ${{ inputs.new_server_ip }}"
+          PYEOF
 
   verify:
     runs-on: ubuntu-latest
@@ -324,59 +360,58 @@ jobs:
     environment: ${{ inputs.environment == 'production' && 'production' || inputs.environment == 'staging' && 'staging' || 'development' }}
     permissions:
       contents: read
-    env:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 
     steps:
-      - name: Revert Cloudflare A record to old server
+      - name: Setup Python
+        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b  # v5
+        with:
+          python-version: '3.12'
+
+      - name: Install cloudflare SDK
+        run: pip install cloudflare
+
+      - name: Revert Cloudflare DNS records to old server
         env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           OLD_IP: ${{ needs.preflight.outputs.old_server_ip }}
-          RECORD_NAME: ${{ inputs.environment == 'production' && 'pausatf.org' || inputs.environment == 'staging' && 'stage.pausatf.org' || 'dev.pausatf.org' }}
+          ENVIRONMENT: ${{ inputs.environment }}
         run: |
-          set -euo pipefail
           if [ -z "$OLD_IP" ]; then
             echo "ERROR: old_server_ip not available from preflight — cannot auto-rollback" >&2
             exit 1
           fi
 
-          ZONE_ID=$(curl -sS -X GET \
-            "https://api.cloudflare.com/client/v4/zones?name=pausatf.org" \
-            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-            | python3 -c "import sys,json; print(json.load(sys.stdin)['result'][0]['id'])")
+          python3 - << 'PYEOF'
+          import os, sys
+          import cloudflare
 
-          RECORD_ID=$(curl -sS -X GET \
-            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records?type=A&name=$RECORD_NAME" \
-            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-            | python3 -c "import sys,json; print(json.load(sys.stdin)['result'][0]['id'])")
+          token = os.environ["CLOUDFLARE_API_TOKEN"]
+          old_ip = os.environ["OLD_IP"]
+          zone_name = "pausatf.org"
+          environment = os.environ["ENVIRONMENT"]
 
-          curl -sS -X PATCH \
-            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records/$RECORD_ID" \
-            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-            -H "Content-Type: application/json" \
-            --data "{\"content\": \"$OLD_IP\"}"
+          cf = cloudflare.Cloudflare(api_token=token)
 
+          zones = cf.zones.list(name=zone_name)
+          zone_id = zones.result[0].id
+
+          if environment == "production":
+              record_names = ["pausatf.org", "www.pausatf.org"]
+          elif environment == "staging":
+              record_names = ["stage.pausatf.org"]
+          else:
+              record_names = ["dev.pausatf.org"]
+
+          for record_name in record_names:
+              records = cf.dns.records.list(zone_id=zone_id, type="A", name=record_name)
+              if not records.result:
+                  print(f"WARNING: No A record found for {record_name}", file=sys.stderr)
+                  continue
+              record_id = records.result[0].id
+              current_ip = records.result[0].content
+
+              cf.dns.records.patch(dns_record_id=record_id, zone_id=zone_id, content=old_ip)
+              print(f"ROLLBACK: {record_name}: {current_ip} -> {old_ip}")
+
+          PYEOF
           echo "ROLLBACK COMPLETE: DNS reverted to $OLD_IP"
-
-      - name: Revert www A record (production only)
-        if: inputs.environment == 'production'
-        env:
-          OLD_IP: ${{ needs.preflight.outputs.old_server_ip }}
-        run: |
-          set -euo pipefail
-          ZONE_ID=$(curl -sS -X GET \
-            "https://api.cloudflare.com/client/v4/zones?name=pausatf.org" \
-            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-            | python3 -c "import sys,json; print(json.load(sys.stdin)['result'][0]['id'])")
-
-          RECORD_ID=$(curl -sS -X GET \
-            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records?type=A&name=www.pausatf.org" \
-            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-            | python3 -c "import sys,json; print(json.load(sys.stdin)['result'][0]['id'])")
-
-          curl -sS -X PATCH \
-            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records/$RECORD_ID" \
-            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-            -H "Content-Type: application/json" \
-            --data "{\"content\": \"$OLD_IP\"}"
-
-          echo "ROLLBACK COMPLETE: www.pausatf.org reverted to $OLD_IP"
