@@ -10,12 +10,6 @@ variable "cloudflare_api_token" {
   sensitive   = true
 }
 
-variable "cloudflare_zone_id" {
-  description = "Cloudflare Zone ID for pausatf.org"
-  type        = string
-  sensitive   = true
-}
-
 variable "region" {
   description = "DigitalOcean region"
   type        = string
@@ -23,42 +17,30 @@ variable "region" {
 }
 
 variable "droplet_size" {
-  description = "Droplet size for production"
+  description = "Droplet size slug"
   type        = string
-  default     = "s-4vcpu-8gb"
+  default     = "s-1vcpu-1gb"
 }
 
 variable "droplet_image" {
-  description = "Droplet image/snapshot"
+  description = "Droplet base image"
   type        = string
-  default     = "ubuntu-24-04-x64"
-}
-
-variable "database_size" {
-  description = "Database cluster size"
-  type        = string
-  default     = "db-s-2vcpu-4gb"
+  default     = "ubuntu-22-04-x64"
 }
 
 variable "ssh_public_key" {
-  description = "SSH public key content"
+  description = "SSH public key for droplet access"
   type        = string
-  sensitive   = true
 }
 
-variable "ssh_key_fingerprints" {
-  description = "List of SSH key fingerprints (deprecated - use ssh_key resource)"
+variable "ssh_allowed_ips" {
+  description = "IP addresses allowed to SSH into the droplet"
   type        = list(string)
   default     = []
 }
 
-variable "ssh_allowed_ips" {
-  description = "IPs allowed to SSH (CIDR notation)"
+variable "alert_email_addresses" {
+  description = "Email addresses for monitoring alerts"
   type        = list(string)
-}
-
-variable "environment" {
-  description = "Environment name"
-  type        = string
-  default     = "production"
+  default     = []
 }
