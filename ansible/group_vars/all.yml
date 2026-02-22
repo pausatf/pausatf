@@ -529,6 +529,8 @@ backup_items:
   - name: "wordpress-main"
     path: "/var/www/html"
     db_name: "wordpress"
+  - name: "legacy-data"
+    path: "/var/www/legacy/public_html/data"
 
 # =============================================================================
 # EMAIL (Google Workspace)
