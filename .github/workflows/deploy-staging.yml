@@ -14,10 +14,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b  # v5
         with:
           python-version: '3.12'
 
@@ -27,19 +27,24 @@ jobs:
           pip install ansible-core==2.17.5 ansible-lint cloudflare requests
 
       - name: Decrypt vault file
-        if: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
-        run: |
-          printf "%s" "$ANSIBLE_VAULT_PASSWORD" > vault.pass
         env:
           ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
+        run: |
+          if [ -n "$ANSIBLE_VAULT_PASSWORD" ]; then
+            printf "%s" "$ANSIBLE_VAULT_PASSWORD" > vault.pass
+          fi
 
       - name: Run playbook (staging)
         working-directory: ansible
         env:
           ANSIBLE_HOST_KEY_CHECKING: 'false'
         run: |
-          ansible-playbook -i inventory/hosts.yml site.yml -l staging \
-            --vault-password-file ../vault.pass || true
+          VAULT_ARGS=""
+          if [ -f ../vault.pass ]; then
+            VAULT_ARGS="--vault-password-file ../vault.pass"
+          fi
+          # shellcheck disable=SC2086
+          ansible-playbook -i inventory/hosts.yml site.yml -l staging $VAULT_ARGS || true
 
       - name: Healthcheck
         run: |
