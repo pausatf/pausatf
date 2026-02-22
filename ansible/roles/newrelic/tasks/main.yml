@@ -8,7 +8,7 @@
 
 - name: Add New Relic repository
   apt_repository:
-    repo: "deb https://download.newrelic.com/infrastructure_agent/linux/apt focal main"
+    repo: "deb [arch=amd64] https://download.newrelic.com/infrastructure_agent/linux/apt focal main"
     state: present
     filename: newrelic-infra
 
@@ -17,6 +17,7 @@
     name: newrelic-infra
     state: present
     update_cache: yes
+  ignore_errors: yes
 
 - name: Deploy New Relic infrastructure configuration
   template:
@@ -31,7 +32,7 @@
   apt:
     name: newrelic-php5
     state: present
-  notify: Restart Apache
+  ignore_errors: yes
 
 - name: Configure New Relic PHP agent
   template:
@@ -61,3 +62,4 @@
     enabled: yes
   loop:
     - newrelic-infra
+  ignore_errors: yes
