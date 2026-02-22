@@ -186,7 +186,7 @@ sudo do-release-upgrade
 ⚠️ **Not Recommended** - Too risky for production server
 
 **Option 2: New Droplet Migration (Recommended)**
-- Follow existing migration guide: [05-server-migration-guide.md](05-server-migration-guide.md)
+- Follow existing migration guide: [05-server-migration-guide.md](../guides/05-server-migration-guide.md)
 - Create new droplet with Ubuntu 24.04 LTS
 - Migrate data and configuration
 - Test thoroughly before DNS cutover
