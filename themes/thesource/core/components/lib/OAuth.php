@@ -127,7 +127,11 @@ class ET_Core_LIB_OAuthUtil {
 			$output = array_map( array( 'ET_Core_LIB_OAuthUtil', 'urlencode_rfc3986' ), $input );
 
 		} else if ( is_scalar( $input ) ) {
-			$output = rawurlencode( utf8_encode( $input ) );
+			// PHP 8.2+: utf8_encode removed; mb_convert_encoding is the correct replacement.
+		$output = rawurlencode( function_exists( 'mb_convert_encoding' )
+			? mb_convert_encoding( (string) $input, 'UTF-8', 'ISO-8859-1' )
+			: (string) $input
+		);
 		}
 
 		return $output;
