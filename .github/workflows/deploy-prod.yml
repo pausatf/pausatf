@@ -37,18 +37,25 @@ jobs:
           ssh-keyscan -H ftp.pausatf.org >> ~/.ssh/known_hosts 2>/dev/null || true
 
       - name: Decrypt vault file
-        if: ${{ secrets.ANSIBLE_VAULT_PASSWORD != '' }}
         env:
           ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
-        run: printf "%s" "$ANSIBLE_VAULT_PASSWORD" > vault.pass
+        run: |
+          if [ -n "$ANSIBLE_VAULT_PASSWORD" ]; then
+            printf "%s" "$ANSIBLE_VAULT_PASSWORD" > vault.pass
+          fi
 
       - name: Run playbook (production)
         working-directory: ansible
         env:
           ANSIBLE_HOST_KEY_CHECKING: 'false'
+          ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
         run: |
-          ansible-playbook -i inventory/hosts.yml site.yml -l production \
-            ${{ secrets.ANSIBLE_VAULT_PASSWORD != '' && '--vault-password-file ../vault.pass' || '' }}
+          VAULT_ARGS=""
+          if [ -n "$ANSIBLE_VAULT_PASSWORD" ]; then
+            VAULT_ARGS="--vault-password-file ../vault.pass"
+          fi
+          # shellcheck disable=SC2086
+          ansible-playbook -i inventory/hosts.yml site.yml -l production $VAULT_ARGS
 
       - name: Healthcheck
         run: curl -fsS https://www.pausatf.org || exit 1
