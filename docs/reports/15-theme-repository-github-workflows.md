@@ -605,10 +605,10 @@ pausatf-theme-thesource/
 
 ## Related Documentation
 
-- [GitHub Workflow Strategy](../../governance/GITHUB-WORKFLOW-STRATEGY.md)
-- [GitHub Workflow Quickstart](../../governance/GITHUB-WORKFLOW-QUICKSTART.md)
+- [GitHub Workflow Strategy](../governance/GITHUB-WORKFLOW-STRATEGY.md)
+- [GitHub Workflow Quickstart](../governance/GITHUB-WORKFLOW-QUICKSTART.md)
 - [WordPress Security Audit](14-wordpress-security-audit-2025.md)
-- [Documentation Refactor Plan](../../governance/DOCUMENTATION-REFACTOR-PLAN.md)
+- [Documentation Refactor Plan](../governance/DOCUMENTATION-REFACTOR-PLAN.md)
 
 ---
 
