@@ -1,4 +1,4 @@
-# WordPress .htaccess for {{ item.domain }}
+# WordPress .htaccess for {{ wp_site.domain }}
 # Managed by Ansible
 
 # BEGIN WordPress
@@ -45,8 +45,9 @@ RewriteRule . /index.php [L]
 # Disable directory browsing
 Options -Indexes
 
-# Block access to backup files
-<FilesMatch "\.(bak|backup|log|old|orig|sql|swp|tmp)$">
+# Block access to backup and archive files (including date/number-suffixed variants
+# such as wp-config.php.bak2025, wp-config.php.backup-20250501, and latest.zip)
+<FilesMatch "\.(bak[^.]*|backup[^.]*|log|old|orig|sql|swp|tmp|zip)$">
     Require all denied
 </FilesMatch>
 

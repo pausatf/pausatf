@@ -10,6 +10,17 @@
     group: www-data
     mode: '0755'
 
+- name: Deploy WordPress .htaccess
+  # This task is authoritative: Ansible manages .htaccess for all WordPress sites.
+  # Manual changes will be overwritten on the next playbook run.
+  template:
+    src: htaccess.j2
+    dest: "{{ wp_site.path }}/.htaccess"
+    owner: www-data
+    group: www-data
+    mode: '0644'
+    force: true
+
 - name: Check if WordPress is already installed
   command: "{{ wpcli_path | default('/usr/local/bin/wp') }} core is-installed --path={{ wp_site.path }} --allow-root"
   register: wp_installed

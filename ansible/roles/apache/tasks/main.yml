@@ -128,6 +128,26 @@
   when: item.ssl_enabled | default(false)
   notify: Reload Apache
 
+- name: Deploy block-backups configuration
+  copy:
+    dest: /etc/apache2/conf-available/block-backups.conf
+    content: |
+      # Block access to backup and archive files at the server level.
+      # Covers date/number-suffixed variants (e.g. wp-config.php.bak2025,
+      # wp-config.php.backup-20250501) as well as plain .bak/.backup/.zip.
+      <FilesMatch "\.(bak[^.]*|backup[^.]*|log|old|orig|sql|swp|tmp|zip)$">
+          Require all denied
+      </FilesMatch>
+    mode: '0644'
+  notify: Reload Apache
+
+- name: Enable block-backups configuration
+  file:
+    src: /etc/apache2/conf-available/block-backups.conf
+    dest: /etc/apache2/conf-enabled/block-backups.conf
+    state: link
+  notify: Reload Apache
+
 - name: Deploy block-xmlrpc configuration
   copy:
     dest: /etc/apache2/conf-available/block-xmlrpc.conf
