@@ -7,11 +7,11 @@ findtime = {{ fail2ban_findtime }}
 maxretry = {{ fail2ban_maxretry }}
 ignoreip = 127.0.0.1/8 ::1
 
-# Email notifications (optional)
-# destemail = admin@pausatf.org
-# sendername = Fail2Ban
-# mta = sendmail
-# action = %(action_mwl)s
+# Email notifications
+destemail = {{ fail2ban_destemail }}
+sendername = {{ fail2ban_sendername }}
+mta = {{ fail2ban_mta }}
+action = {{ fail2ban_action }}
 
 [sshd]
 enabled = true
@@ -21,45 +21,52 @@ logpath = /var/log/auth.log
 maxretry = 3
 
 [apache-auth]
-enabled = true
+enabled = {{ 'true' if web_server | default('apache') == 'apache' else 'false' }}
 port = http,https
 filter = apache-auth
 logpath = /var/log/apache2/*error.log
 maxretry = 6
 
 [apache-badbots]
-enabled = true
+enabled = {{ 'true' if web_server | default('apache') == 'apache' else 'false' }}
 port = http,https
 filter = apache-badbots
 logpath = /var/log/apache2/*access.log
 maxretry = 2
 
 [apache-noscript]
-enabled = true
+enabled = {{ 'true' if web_server | default('apache') == 'apache' else 'false' }}
 port = http,https
 filter = apache-noscript
 logpath = /var/log/apache2/*error.log
 maxretry = 6
 
 [apache-overflows]
-enabled = true
+enabled = {{ 'true' if web_server | default('apache') == 'apache' else 'false' }}
 port = http,https
 filter = apache-overflows
 logpath = /var/log/apache2/*error.log
 maxretry = 2
 
-[wordpress]
+[openlitespeed-auth]
+enabled = {{ 'true' if web_server | default('') == 'openlitespeed' else 'false' }}
+port = http,https
+filter = openlitespeed-auth
+logpath = /usr/local/lsws/logs/error.log
+maxretry = 6
+
+[wordpress-auth]
 enabled = true
 port = http,https
-filter = wordpress
+filter = wordpress-auth
 logpath = /var/log/auth.log
 maxretry = 5
 bantime = 3600
 
-[wordpress-hard]
+[wordpress-enum]
 enabled = true
 port = http,https
-filter = wordpress-hard
+filter = wordpress-enum
 logpath = /var/log/auth.log
 maxretry = 1
 bantime = 86400

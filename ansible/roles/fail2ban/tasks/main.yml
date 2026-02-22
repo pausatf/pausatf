@@ -15,22 +15,32 @@
     mode: '0644'
   notify: Restart fail2ban
 
-- name: Deploy WordPress fail2ban filter
+- name: Deploy WordPress authentication fail2ban filter
   template:
-    src: wordpress.conf.j2
-    dest: /etc/fail2ban/filter.d/wordpress.conf
+    src: wordpress-auth.conf.j2
+    dest: /etc/fail2ban/filter.d/wordpress-auth.conf
     owner: root
     group: root
     mode: '0644'
   notify: Restart fail2ban
 
-- name: Deploy WordPress hard fail2ban filter
+- name: Deploy WordPress user enumeration fail2ban filter
   template:
-    src: wordpress-hard.conf.j2
-    dest: /etc/fail2ban/filter.d/wordpress-hard.conf
+    src: wordpress-enum.conf.j2
+    dest: /etc/fail2ban/filter.d/wordpress-enum.conf
     owner: root
     group: root
     mode: '0644'
+  notify: Restart fail2ban
+
+- name: Deploy OpenLiteSpeed fail2ban filter
+  template:
+    src: openlitespeed-auth.conf.j2
+    dest: /etc/fail2ban/filter.d/openlitespeed-auth.conf
+    owner: root
+    group: root
+    mode: '0644'
+  when: web_server | default('apache') == 'openlitespeed'
   notify: Restart fail2ban
 
 - name: Ensure fail2ban is started and enabled

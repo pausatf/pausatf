@@ -471,6 +471,10 @@ fail2ban_enabled: true
 fail2ban_bantime: 3600
 fail2ban_findtime: 600
 fail2ban_maxretry: 5
+fail2ban_destemail: "admin@pausatf.org"
+fail2ban_sendername: "Fail2Ban"
+fail2ban_mta: "sendmail"
+fail2ban_action: "%(action_mwl)s"
 fail2ban_jails:
   - name: sshd
     enabled: true
@@ -478,7 +482,9 @@ fail2ban_jails:
     enabled: true
   - name: apache-badbots
     enabled: true
-  - name: wordpress
+  - name: wordpress-auth
+    enabled: true
+  - name: wordpress-enum
     enabled: true
 
 # UFW Firewall
