@@ -56,7 +56,7 @@ jobs:
 
       - name: Run yamllint
         run: |
-          yamllint -d '{extends: default, rules: {line-length: {max: 120}}}' .
+          yamllint .
         working-directory: ansible
 
   syntax-check:
