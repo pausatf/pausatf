@@ -1,27 +1,36 @@
 ---
 # Brownfield baseline: demote cosmetic/compatibility violations to warnings.
-# Security- and correctness-critical rules remain as errors.
-# Fix incrementally via targeted refactor tasks.
+# Security- and correctness-critical rules remain errors.
 
 warn_list:
-  # FQCN: short module names still resolve correctly in this context.
+  # FQCN: short names still resolve correctly in this context.
   - fqcn[action-core]
   - fqcn[action]
-  # Truthy: 'yes'/'no' are unambiguous in Ansible's own YAML parser.
+  # Truthy: yes/no are unambiguous in Ansible's YAML parser.
   - truthy
-  # Naming: brownfield task names not capitalised.
+  # Naming: brownfield tasks not capitalised; Jinja in name allowed.
   - name[casing]
   - name[play]
+  - name[template]
   # local_action: deprecated but functional in ansible-core <2.23.
   - local-action
-  # These are intentional patterns in this codebase; fix in future sprint.
+  - deprecated[local-action]
+  - local-action[deprecated]
+  # Task key order: cosmetic.
+  - key-order[task]
+  # Role variable naming prefix: brownfield pre-dates prefix convention.
+  - var-naming[no-role-prefix]
+  - var-naming
+  # Document start "---": many files predate this convention.
+  - yaml[document-start]
+  # Intentional patterns in this codebase; fix in future sprint.
   - ignore-errors
   - no-changed-when
   - risky-file-permissions
   - risky-shell-pipe
   - command-instead-of-module
   - command-instead-of-shell
-  # YAML style: handled separately by yamllint with a project config.
+  # YAML style: handled by yamllint with project config.
   - yaml[indentation]
   - yaml[new-line-at-end-of-file]
   - yaml[trailing-spaces]
@@ -29,3 +38,5 @@ warn_list:
   - yaml[truthy]
   - yaml[octal-values]
   - yaml[line-length]
+  - yaml[empty-lines]
+  - yaml[braces]
