@@ -30,7 +30,10 @@
 - name: Identify unauthorized administrator accounts
   set_fact:
     wp_unauthorized_admins: >-
-      {{ wp_current_admins.stdout_lines | default([]) | difference(wp_authorized_admins) }}
+      {{ wp_current_admins.stdout_lines | default([])
+         | reject('match', '^(Notice|Warning|PHP |Error|\\s*$)')
+         | list
+         | difference(wp_authorized_admins) }}
   when: wp_current_admins.rc == 0
 
 - name: Fail if unexpected administrator accounts exist
