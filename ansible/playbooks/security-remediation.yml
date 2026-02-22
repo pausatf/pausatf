@@ -9,6 +9,10 @@
 #   2. Rotate all WordPress auth keys/salts
 #   3. Audit admin accounts for additional persistence mechanisms
 #   4. Enable login notifications for admin accounts
+#   5. Scan for webshells in uploads directories
+#   6. Verify WordPress core file integrity
+#   7. Audit SSH authorized_keys across all users
+#   8. Audit cron jobs for unexpected scheduled tasks
 #
 # Usage:
 #   ansible-playbook playbooks/security-remediation.yml -i inventory/production
@@ -128,7 +132,104 @@
       changed_when: "'Success' in jetpack_notif.stdout"
 
     # -------------------------------------------------------------------------
-    # 5. Summary
+    # 5. Webshell scan — PHP files in uploads directories
+    # -------------------------------------------------------------------------
+    - name: Find PHP files in uploads directories (potential webshells)
+      find:
+        paths: "{{ item.path }}/wp-content/uploads"
+        patterns: "*.php,*.phtml,*.php7,*.phar"
+        recurse: true
+      loop: "{{ wordpress_installs }}"
+      loop_control:
+        label: "{{ item.name }}"
+      register: uploads_php_scan
+      failed_when: false
+      changed_when: false
+
+    - name: Fail if PHP files found in any uploads directory
+      fail:
+        msg: >
+          WEBSHELL DETECTED in {{ item.item.name }} ({{ item.item.path }}):
+          {{ item.files | map(attribute='path') | list | join(', ') }}
+          Investigate and remove before continuing.
+      loop: "{{ uploads_php_scan.results }}"
+      loop_control:
+        label: "{{ item.item.name }}"
+      when: item.matched | default(0) | int > 0
+
+    # -------------------------------------------------------------------------
+    # 6. WordPress core integrity check
+    # -------------------------------------------------------------------------
+    - name: Verify WordPress core checksums
+      command: >
+        {{ wp_bin }} core verify-checksums
+        --path={{ item.path }} --allow-root
+      loop: "{{ wordpress_installs }}"
+      loop_control:
+        label: "{{ item.name }}"
+      register: wp_checksums
+      changed_when: false
+      failed_when: false
+
+    - name: Fail if core checksums do not match
+      fail:
+        msg: >
+          WordPress core checksum mismatch in {{ item.item.name }} ({{ item.item.path }}):
+          {{ item.stderr_lines | join(' ') }}
+          Core files may have been tampered with — investigate immediately.
+      loop: "{{ wp_checksums.results }}"
+      loop_control:
+        label: "{{ item.item.name }}"
+      when: item.rc | default(0) != 0
+
+    # -------------------------------------------------------------------------
+    # 7. SSH authorized_keys audit
+    # -------------------------------------------------------------------------
+    - name: Find all authorized_keys files
+      find:
+        paths:
+          - /root/.ssh
+          - /home
+        patterns: "authorized_keys"
+        recurse: true
+      register: auth_keys_files
+      changed_when: false
+
+    - name: Read authorized_keys contents
+      command: cat {{ item.path }}
+      loop: "{{ auth_keys_files.files }}"
+      loop_control:
+        label: "{{ item.path }}"
+      changed_when: false
+      register: auth_keys_content
+
+    - name: Display authorized_keys for manual review
+      debug:
+        msg: "{{ item.item.path }}:\n{{ item.stdout }}"
+      loop: "{{ auth_keys_content.results }}"
+      loop_control:
+        label: "{{ item.item.path }}"
+
+    # -------------------------------------------------------------------------
+    # 8. Cron job audit
+    # -------------------------------------------------------------------------
+    - name: Enumerate all user cron jobs
+      shell: |
+        set -o pipefail
+        for user in $(cut -f1 -d: /etc/passwd); do
+          crontab -u "$user" -l 2>/dev/null \
+            | grep -v '^#' | grep -v '^[[:space:]]*$' \
+            | sed "s/^/${user}: /" || true
+        done
+      changed_when: false
+      register: all_crontabs
+
+    - name: Display cron jobs for manual review
+      debug:
+        msg: "{{ all_crontabs.stdout_lines | default(['(no cron jobs found)']) }}"
+
+    # -------------------------------------------------------------------------
+    # 9. Summary
     # -------------------------------------------------------------------------
     - name: Remediation summary
       debug:
@@ -140,9 +241,14 @@
           Auth salts rotated: {{ 'yes' if (salt_rotation is defined and salt_rotation.rc is defined and salt_rotation.rc == 0) else 'FAILED' }}
           Admin audit      : {{ 'PASS — no unexpected admins' if wp_unexpected_admins | length == 0 else 'FAIL — review required' }}
           Login notify     : {{ 'enabled (Jetpack)' if (jetpack_active.rc == 0 and jetpack_notif is defined and jetpack_notif.rc is defined and jetpack_notif.rc == 0) else 'skipped (Jetpack not active)' }}
+          Webshell scan    : PASS — no PHP files in uploads
+          Core checksums   : PASS — all installs verified clean
+          SSH keys         : displayed above — review output manually
+          Cron jobs        : displayed above — review output manually
           ============================================================
           Next steps:
             - Rotate WordPress database password (vault_wp_main_db_password)
             - Rotate all admin user passwords manually
             - Review server access logs for the Jan-2026 breach window
             - Re-run capture-wp-inventory.yml to refresh group_vars
+            - Add DO_TOKEN + DO_PROD_DROPLET_ID repo secrets to restore nightly snapshots
