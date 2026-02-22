@@ -2,10 +2,10 @@
 set -euo pipefail
 
 # Sync legacy content from prod (ftp.pausatf.org) into backups/legacy/
-# Requires SSH key (provided by CI) with access to root@ftp.pausatf.org.
+# Requires SSH key (provided by CI) with access to github-deploy@ftp.pausatf.org.
 
 REMOTE_HOST="${REMOTE_HOST:-ftp.pausatf.org}"
-REMOTE_USER="${REMOTE_USER:-deploy}"
+REMOTE_USER="${REMOTE_USER:-github-deploy}"
 REMOTE_PATH="${REMOTE_PATH:-/var/www/legacy}"
 LOCAL_DIR="${LOCAL_DIR:-backups/legacy}"
 

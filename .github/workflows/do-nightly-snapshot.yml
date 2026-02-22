@@ -11,7 +11,7 @@ jobs:
     environment: production
     steps:
       - name: Install doctl
-        uses: digitalocean/action-doctl@v2
+        uses: digitalocean/action-doctl@5727c67aa3c2c34ae9462d5a0ecfea8a1b31e5ce  # v2
         with:
           token: ${{ secrets.DO_TOKEN }}
 
