@@ -21,8 +21,31 @@
   become: yes
 
   roles:
+    - role: php
+      when: web_server | default('apache') == 'apache'
+
+    - role: apache
+      when: web_server | default('apache') == 'apache'
+
+    - role: lsphp
+      when: web_server | default('apache') == 'openlitespeed'
+
+    - role: openlitespeed
+      when: web_server | default('apache') == 'openlitespeed'
+
+    - role: mysql
+      when: mysql_enabled | default(true)
+
+    - role: fail2ban
+
     - role: wordpress
-      when: wordpress_enabled | default(false)
+      when: wordpress_enabled | default(true)
+
+    - role: cloudflare
+      when: cloudflare_enabled | default(false)
+
+    - role: newrelic
+      when: newrelic_enabled | default(false)
 
 - name: Configure monitoring
   hosts: all
