@@ -65,4 +65,9 @@ jobs:
           ansible-playbook -i inventory/hosts.yml site.yml -l production $VAULT_ARGS
 
       - name: Healthcheck
-        run: curl -fsS https://www.pausatf.org || exit 1
+        # Verify Apache responds on the origin directly to avoid Cloudflare blocking GHA IPs
+        run: |
+          ssh -i ~/.ssh/pausatf-prod -o StrictHostKeyChecking=no \
+            -o IdentitiesOnly=yes \
+            github-deploy@ftp.pausatf.org \
+            "curl -fsS -o /dev/null -w '%{http_code}' http://localhost/ | grep -qE '^(200|301|302)'"
