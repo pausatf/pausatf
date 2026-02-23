@@ -190,7 +190,7 @@ php_opcache_enable: 1
 php_opcache_memory_consumption: 128
 php_opcache_interned_strings_buffer: 16
 php_opcache_max_accelerated_files: 10000
-php_opcache_revalidate_freq: 2
+php_opcache_revalidate_freq: 60
 php_opcache_save_comments: 1
 
 # =============================================================================
