@@ -12,5 +12,6 @@ jobs:
       environment: staging
       ansible_limit: staging
     secrets:
+      SSH_PRIVATE_KEY: ${{ secrets.STAGING_SSH_PRIVATE_KEY }}
       ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
       ANSIBLE_VAULT_FILE: ${{ secrets.ANSIBLE_VAULT_FILE }}
