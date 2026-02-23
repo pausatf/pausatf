@@ -97,7 +97,7 @@ Timestamp: $(date '+%Y-%m-%d %H:%M:%S')
 
     # Push to remote
     log "Pushing to remote..."
-    git push origin main || error "Failed to push to remote"
+    git push origin HEAD:legacy-content-sync || error "Failed to push to remote"
 
     log "Sync completed successfully"
 }

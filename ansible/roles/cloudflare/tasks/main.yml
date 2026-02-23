@@ -72,7 +72,6 @@
     body:
       value: "{{ cloudflare_ssl_mode }}"
   when: cloudflare_ssl_mode is defined
-  ignore_errors: yes
   tags: cloudflare
 
 - name: Ensure minimum TLS version
@@ -86,7 +85,6 @@
     body:
       value: "{{ cloudflare_min_tls_version }}"
   when: cloudflare_min_tls_version is defined
-  ignore_errors: yes
   tags: cloudflare
 
 - name: Ensure Always Use HTTPS is enabled
@@ -100,7 +98,6 @@
     body:
       value: "{{ 'on' if cloudflare_always_use_https else 'off' }}"
   when: cloudflare_always_use_https is defined
-  ignore_errors: yes
   tags: cloudflare
 
 - name: Set security level
@@ -114,7 +111,6 @@
     body:
       value: "{{ cloudflare_security_level }}"
   when: cloudflare_security_level is defined
-  ignore_errors: yes
   tags: cloudflare
 
 - name: Deploy Cloudflare IP update script

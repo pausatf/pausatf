@@ -9,6 +9,6 @@
     name: fail2ban
     state: restarted
 
-- name: reload ufw
+- name: Reload UFW
   ufw:
     state: reloaded
