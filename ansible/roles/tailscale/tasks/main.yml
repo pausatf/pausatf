@@ -1,0 +1,76 @@
+---
+# Tailscale role — SSH access over WireGuard overlay network
+#
+# After this role runs, you must manually authenticate:
+#   tailscale up --authkey <key> --hostname pausatf-prod --advertise-tags=tag:server
+#
+# The authkey is single-use. Store it in vault as vault_tailscale_authkey.
+# ACL must allow tag:server to accept SSH connections.
+
+- name: Add Tailscale GPG key
+  get_url:
+    url: https://pkgs.tailscale.com/stable/ubuntu/noble.noarmor.gpg
+    dest: /usr/share/keyrings/tailscale-archive-keyring.gpg
+    mode: '0644'
+
+- name: Add Tailscale apt repository
+  copy:
+    dest: /etc/apt/sources.list.d/tailscale.list
+    # yamllint disable rule:line-length
+    content: |
+      deb [signed-by=/usr/share/keyrings/tailscale-archive-keyring.gpg] https://pkgs.tailscale.com/stable/ubuntu noble main
+    # yamllint enable rule:line-length
+    owner: root
+    group: root
+    mode: '0644'
+  register: tailscale_repo
+
+- name: Update apt cache after adding Tailscale repo
+  apt:
+    update_cache: yes
+  when: tailscale_repo.changed
+
+- name: Install tailscale
+  apt:
+    name: tailscale
+    state: present
+
+- name: Enable and start tailscaled
+  service:
+    name: tailscaled
+    state: started
+    enabled: yes
+
+# UFW rules — allow all traffic on the Tailscale interface.
+# Tailscale assigns 100.x.x.x addresses; the tailscale0 interface
+# carries all overlay traffic including SSH.
+- name: Allow all traffic on tailscale0 interface
+  community.general.ufw:
+    rule: allow
+    direction: in
+    interface: tailscale0
+  notify: Reload UFW
+
+# Block public SSH after Tailscale is confirmed up.
+# Only run this when tailscale0 exists to avoid locking out during bootstrap.
+- name: Check if tailscale0 interface exists
+  command: ip link show tailscale0
+  register: tailscale_iface
+  changed_when: false
+  failed_when: false
+
+- name: Deny SSH from public internet (Tailscale handles SSH)
+  community.general.ufw:
+    rule: deny
+    port: "22"
+    proto: tcp
+    direction: in
+  when: tailscale_iface.rc == 0
+  notify: Reload UFW
+
+- name: Document Tailscale authentication step
+  debug:
+    msg: >
+      Tailscale is installed but not yet authenticated.
+      Run manually: tailscale up --authkey <AUTHKEY> --hostname pausatf-prod --advertise-tags=tag:server
+      Or use vault_tailscale_authkey from ansible vault for automated bootstrap.

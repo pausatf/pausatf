@@ -47,7 +47,7 @@ cloudflare_nameservers:
   - eva.ns.cloudflare.com
 
 # Cloudflare SSL/TLS Settings
-cloudflare_ssl_mode: "full"
+cloudflare_ssl_mode: "strict"
 cloudflare_min_tls_version: "1.2"
 cloudflare_always_use_https: true
 
@@ -86,10 +86,23 @@ cloudflare_dns_records:
 # SYSTEM
 # =============================================================================
 timezone: "America/Los_Angeles"
-hostname: "pausatforg20230516-primary"
+hostname: "pausatf-prod"
 os_distribution: "ubuntu"
-os_version: "20.04"
-os_codename: "focal"
+os_version: "24.04"
+os_codename: "noble"
+
+# =============================================================================
+# REDIS (local object cache on droplet)
+# =============================================================================
+redis_enabled: true
+redis_socket: "/var/run/redis/redis.sock"
+redis_maxmemory: "256mb"
+redis_maxmemory_policy: "allkeys-lru"
+
+# =============================================================================
+# CERTBOT (Let's Encrypt via Cloudflare DNS-01)
+# =============================================================================
+certbot_email: "admin@pausatf.org"
 
 # =============================================================================
 # APACHE CONFIGURATION
@@ -103,7 +116,10 @@ apache_server_admin: "webmaster@pausatf.org"
 apache_server_name: "www.pausatf.org"
 apache_conf_dir: "/etc/apache2"
 
-# MPM Prefork settings (from audit)
+# MPM — event for PHP-FPM, prefork for legacy mod_php
+apache_mpm: "event"
+
+# MPM Prefork settings (legacy, kept for reference)
 apache_mpm_prefork:
   start_servers: 5
   min_spare_servers: 5
@@ -111,7 +127,7 @@ apache_mpm_prefork:
   max_request_workers: 256
   max_connections_per_child: 0
 
-# Apache modules to enable
+# Apache modules to enable (mpm_event + proxy_fcgi managed separately by role)
 apache_modules:
   - access_compat
   - alias
@@ -125,12 +141,11 @@ apache_modules:
   - deflate
   - dir
   - env
+  - expires
   - filter
   - headers
   - mime
-  - mpm_prefork
   - negotiation
-  - php7
   - remoteip
   - reqtimeout
   - rewrite
@@ -142,13 +157,8 @@ apache_modules:
 # =============================================================================
 # PHP CONFIGURATION
 # =============================================================================
-php_version: "7.4"
-php_default_version: "7.2"
-php_available_versions:
-  - "7.2"
-  - "7.4"
-  - "8.1"
-  - "8.4"
+php_version: "8.3"
+php_fpm_socket: "/run/php/php8.3-fpm.sock"
 
 # PHP settings (for WordPress optimization)
 php_memory_limit: "256M"
@@ -186,24 +196,11 @@ php_opcache_save_comments: 1
 # =============================================================================
 # MYSQL CONFIGURATION
 # =============================================================================
-mysql_version: "5.7"
-mysql_service_name: mysql
-mysql_bind_address: "127.0.0.1"
-mysql_port: 3306
-mysql_socket: /var/run/mysqld/mysqld.sock
-mysql_datadir: /var/lib/mysql
-
-# MySQL tuning (based on audit - 8GB RAM server)
-mysql_key_buffer_size: "16M"
-mysql_max_allowed_packet: "16M"
-mysql_thread_stack: "192K"
-mysql_thread_cache_size: 8
-# query_cache_limit and query_cache_size removed: not supported in MySQL 8.0
-mysql_expire_logs_days: 10
-mysql_max_binlog_size: "100M"
-
-# MySQL credentials
-mysql_root_password: "{{ vault_mysql_root_password }}"
+# Database is DO Managed MySQL 8 — no mysql-server on the droplet.
+# Only mysql-client is installed for wp-cli and maintenance tasks.
+mysql_version: "8"
+mysql_managed: true
+mysql_port: 25060  # DO Managed MySQL default port
 
 # =============================================================================
 # WORDPRESS INSTALLATIONS
@@ -293,12 +290,6 @@ wp_main_plugins:
     version: "2.3.17"
     auto_update: true
     description: "Accordion grid for WordPress"
-  - name: "app-for-cf"
-    slug: "app-for-cf"
-    status: "active"
-    version: "1.9.6.2"
-    auto_update: true
-    description: "Cloudflare app integration"
   - name: "category-posts"
     slug: "category-posts"
     status: "active"
@@ -353,12 +344,6 @@ wp_main_plugins:
     version: "2.25.9.0"
     auto_update: true
     description: "Backup and restore plugin"
-  - name: "version-info"
-    slug: "version-info"
-    status: "active"
-    version: "1.3.2"
-    auto_update: true
-    description: "Displays version information"
   - name: "widget-logic"
     slug: "widget-logic"
     status: "active"
@@ -383,12 +368,6 @@ wp_main_plugins:
     version: "4.7.1"
     auto_update: true
     description: "SMTP email configuration"
-  - name: "google-sitemap-generator"
-    slug: "google-sitemap-generator"
-    status: "active"
-    version: "4.1.21"
-    auto_update: true
-    description: "XML sitemap generator"
   # Inactive plugins
   - name: "ocean-extra"
     slug: "ocean-extra"
@@ -458,6 +437,7 @@ legacy_sites:
 # =============================================================================
 ssl_enabled: true
 ssl_protocol: "all -SSLv3 -TLSv1 -TLSv1.1"
+# yamllint disable-line rule:line-length
 ssl_cipher_suite: "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384"
 ssl_certificate: "/etc/ssl/private/6025999182103-cert.crt"
 ssl_certificate_key: "/etc/ssl/private/6025998eb5098-key.key"

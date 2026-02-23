@@ -23,7 +23,7 @@
     CustomLog ${APACHE_LOG_DIR}/{{ item.name }}-access.log combined
 
 {% if item.ssl_enabled | default(false) %}
-    # Redirect to HTTPS
+    # Redirect all HTTP to HTTPS
     RewriteEngine On
     RewriteCond %{HTTPS} off
     RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]

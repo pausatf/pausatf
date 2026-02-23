@@ -1,0 +1,248 @@
+#cloud-config
+# Ubuntu 24.04 Cloud-init for PAUSATF
+#
+# Stack: Apache 2.4 event MPM + PHP 8.3-FPM + Redis + Managed MySQL 8
+# SSH: Tailscale only (no public port 22)
+# SSL: Certbot with Cloudflare DNS plugin
+#
+# Variables:
+#   ${hostname} - Server hostname
+#   ${environment} - Environment name
+
+hostname: ${hostname}
+fqdn: ${hostname}.pausatf.org
+manage_etc_hosts: true
+preserve_hostname: false
+timezone: America/Los_Angeles
+locale: en_US.UTF-8
+
+package_update: true
+package_upgrade: true
+package_reboot_if_required: true
+
+apt:
+  sources:
+    ondrej-php:
+      source: "ppa:ondrej/php"
+
+packages:
+  # Base system
+  - curl
+  - wget
+  - git
+  - vim
+  - htop
+  - unzip
+  - tmux
+  - ncdu
+  - net-tools
+  - dnsutils
+
+  # Apache
+  - apache2
+  - apache2-utils
+
+  # PHP 8.3-FPM (no mod_php)
+  - php8.3-fpm
+  - php8.3-mysql
+  - php8.3-redis
+  - php8.3-curl
+  - php8.3-xml
+  - php8.3-mbstring
+  - php8.3-zip
+  - php8.3-gd
+  - php8.3-intl
+  - php8.3-soap
+  - php8.3-bcmath
+  - php8.3-imagick
+  - php8.3-opcache
+  - php8.3-cli
+
+  # MySQL client only — database is DO Managed MySQL
+  - mysql-client-8.0
+
+  # Redis (local object cache)
+  - redis-server
+
+  # SSL via Cloudflare DNS challenge
+  - certbot
+  - python3-certbot-dns-cloudflare
+
+  # Security
+  - fail2ban
+  - ufw
+  - unattended-upgrades
+
+  # Build tools (for ansible/pip if needed)
+  - build-essential
+  - software-properties-common
+  - ca-certificates
+  - gnupg
+
+write_files:
+  - path: /etc/environment
+    content: |
+      ENVIRONMENT=${environment}
+      HOSTNAME=${hostname}
+      WEB_SERVER=apache
+      PHP_VERSION=8.3
+    append: true
+
+  # Apache security hardening
+  - path: /etc/apache2/conf-available/security-hardening.conf
+    content: |
+      ServerTokens Prod
+      ServerSignature Off
+      TraceEnable Off
+      Header always set X-Frame-Options "SAMEORIGIN"
+      Header always set X-Content-Type-Options "nosniff"
+      Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    permissions: '0644'
+
+  # Fail2ban WordPress jail
+  - path: /etc/fail2ban/jail.d/wordpress.local
+    content: |
+      [wordpress]
+      enabled = true
+      filter = wordpress
+      logpath = /var/log/apache2/access.log
+      maxretry = 3
+      bantime = 3600
+      findtime = 600
+    permissions: '0644'
+
+  - path: /etc/fail2ban/filter.d/wordpress.conf
+    content: |
+      [Definition]
+      failregex = ^<HOST> .* "POST .*wp-login.php
+                  ^<HOST> .* "POST .*xmlrpc.php
+      ignoreregex =
+    permissions: '0644'
+
+  # Fail2ban local config
+  - path: /etc/fail2ban/jail.local
+    content: |
+      [DEFAULT]
+      bantime = 3600
+      findtime = 600
+      maxretry = 5
+
+      [sshd]
+      enabled = true
+      port = ssh
+      logpath = %(sshd_log)s
+      backend = %(sshd_backend)s
+    permissions: '0644'
+
+  # Unattended upgrades
+  - path: /etc/apt/apt.conf.d/50unattended-upgrades
+    content: |
+      Unattended-Upgrade::Allowed-Origins {
+        "$${distro_id}:$${distro_codename}-security";
+        "$${distro_id}ESMApps:$${distro_codename}-apps-security";
+        "$${distro_id}ESM:$${distro_codename}-infra-security";
+      };
+      Unattended-Upgrade::AutoFixInterruptedDpkg "true";
+      Unattended-Upgrade::MinimalSteps "true";
+      Unattended-Upgrade::Remove-Unused-Kernel-Packages "true";
+      Unattended-Upgrade::Remove-Unused-Dependencies "true";
+      Unattended-Upgrade::Automatic-Reboot "false";
+    permissions: '0644'
+
+runcmd:
+  - apt-get update
+
+  # Apache: enable event MPM + proxy_fcgi, disable prefork + mod_php
+  - a2dismod mpm_prefork || true
+  - a2dismod php8.3 || true
+  - a2enmod mpm_event
+  - a2enmod proxy
+  - a2enmod proxy_fcgi
+  - a2enmod setenvif
+  - a2enmod rewrite
+  - a2enmod ssl
+  - a2enmod headers
+  - a2enmod deflate
+  - a2enmod expires
+  - a2enconf security-hardening
+  - a2dissite 000-default
+
+  # PHP-FPM
+  - systemctl enable php8.3-fpm
+  - systemctl start php8.3-fpm
+
+  # Redis — bind localhost, no persistence, allkeys-lru
+  - sed -i 's/^bind .*/bind 127.0.0.1/' /etc/redis/redis.conf
+  - sed -i 's/^# maxmemory .*/maxmemory 256mb/' /etc/redis/redis.conf
+  - sed -i 's/^# maxmemory-policy .*/maxmemory-policy allkeys-lru/' /etc/redis/redis.conf
+  - sed -i 's/^save /#save /' /etc/redis/redis.conf
+  - systemctl enable redis-server
+  - systemctl restart redis-server
+
+  # WordPress directory
+  - mkdir -p /var/www/html
+  - chown -R www-data:www-data /var/www/html
+  - chmod -R 755 /var/www/html
+
+  # UFW — HTTP/S + Tailscale SSH only
+  - ufw default deny incoming
+  - ufw default allow outgoing
+  - ufw allow 80/tcp
+  - ufw allow 443/tcp
+  - ufw allow in on tailscale0
+  - echo "y" | ufw enable
+
+  # Fail2ban
+  - systemctl enable fail2ban
+  - systemctl start fail2ban
+
+  # Unattended upgrades
+  - systemctl enable unattended-upgrades
+
+  # Tailscale repo + install (auth handled separately via ansible/manual)
+  - curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/noble.noarmor.gpg | tee /usr/share/keyrings/tailscale-archive-keyring.gpg >/dev/null
+  - curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/noble.tailscale-keyring.list | tee /etc/apt/sources.list.d/tailscale.list
+  - apt-get update
+  - apt-get install -y tailscale
+  - systemctl enable tailscaled
+
+  # Deploy user
+  - useradd -m -s /bin/bash -G www-data,sudo deploy
+  - mkdir -p /home/deploy/.ssh
+  - chmod 700 /home/deploy/.ssh
+  - chown -R deploy:deploy /home/deploy/.ssh
+
+  # Apache start
+  - systemctl enable apache2
+  - systemctl restart apache2
+
+  # SSH hardening
+  - sed -i 's/PermitRootLogin yes/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config
+  - systemctl restart sshd
+
+  # Log completion
+  - echo "Ubuntu 24.04 cloud-init completed at $(date)" > /var/log/cloud-init-ubuntu24.log
+  - php-fpm8.3 -v >> /var/log/cloud-init-ubuntu24.log
+  - apache2 -v >> /var/log/cloud-init-ubuntu24.log
+  - redis-server --version >> /var/log/cloud-init-ubuntu24.log
+
+ssh_pwauth: false
+disable_root: true
+
+final_message: |
+  ========================================
+  PAUSATF Server Ready (Ubuntu 24.04)
+  ========================================
+  Environment: ${environment}
+  Hostname: ${hostname}
+  Web Server: Apache 2.4 (event MPM)
+  PHP: 8.3-FPM
+  Cache: Redis 127.0.0.1 (256mb allkeys-lru)
+  Database: DO Managed MySQL 8 (external)
+  SSH: Tailscale only
+
+  Next Steps:
+  1. tailscale up --authkey <key> --hostname ${hostname}
+  2. certbot certonly --dns-cloudflare ...
+  3. Ansible provision
+  ========================================

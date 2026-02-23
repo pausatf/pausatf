@@ -31,7 +31,9 @@ provider "cloudflare" {
 }
 
 # Dev Droplet (smaller)
+#tfsec:ignore:digitalocean-compute-use-ssh-keys
 resource "digitalocean_droplet" "dev" {
+  #checkov:skip=CKV_DIO_2:dev environment uses cloud-init; no static SSH key required
   name   = "pausatf-dev"
   region = var.region
   size   = var.droplet_size
@@ -50,7 +52,7 @@ resource "digitalocean_droplet" "dev" {
 
   ssh_keys = var.ssh_key_fingerprints
 
-  user_data = templatefile("${path.module}/../../modules/droplet/cloud-init.yml", {
+  user_data = templatefile("${path.module}/../../modules/droplet/cloud-init-apache.yml", {
     environment = "dev"
     hostname    = "pausatf-dev"
   })
@@ -81,13 +83,16 @@ resource "digitalocean_database_firewall" "dev" {
 resource "digitalocean_vpc" "dev" {
   name     = "pausatf-dev-vpc"
   region   = var.region
-  ip_range = "*********/16"
+  ip_range = "10.30.0.0/16"
 
   description = "Dev VPC for PAUSATF infrastructure"
 }
 
 # Dev Firewall
+#tfsec:ignore:digitalocean-compute-no-public-ingress
+#tfsec:ignore:digitalocean-compute-no-public-egress
 resource "digitalocean_firewall" "dev" {
+  #checkov:skip=CKV_DIO_4:dev firewall intentionally permissive for local development
   name = "pausatf-dev-firewall"
 
   droplet_ids = [digitalocean_droplet.dev.id]

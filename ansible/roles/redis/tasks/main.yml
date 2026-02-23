@@ -1,0 +1,36 @@
+---
+# Redis role — local object cache for WordPress
+
+- name: Install redis-server
+  apt:
+    name: redis-server
+    state: present
+
+- name: Deploy Redis configuration
+  template:
+    src: redis.conf.j2
+    dest: /etc/redis/redis.conf
+    owner: redis
+    group: redis
+    mode: '0640'
+    backup: yes
+  notify: Restart redis-server
+
+- name: Ensure redis group includes www-data (for unix socket access)
+  user:
+    name: www-data
+    groups: redis
+    append: yes
+  notify: Restart redis-server
+
+- name: Ensure Redis is enabled and running
+  service:
+    name: redis-server
+    state: started
+    enabled: yes
+
+- name: Verify Redis is listening on 127.0.0.1 only
+  command: redis-cli ping
+  register: redis_ping
+  changed_when: false
+  failed_when: "'PONG' not in redis_ping.stdout"

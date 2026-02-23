@@ -9,7 +9,9 @@ terraform {
   }
 }
 
+#tfsec:ignore:digitalocean-compute-use-ssh-keys
 resource "digitalocean_droplet" "this" {
+  #checkov:skip=CKV_DIO_2:SSH keys injected by callers; module accepts them as optional
   name   = var.name
   region = var.region
   size   = var.size

@@ -1,5 +1,6 @@
 ---
-# Apache role - Web server configuration for PAUSATF
+# Apache role — Web server configuration for PAUSATF
+# Supports both mod_php (legacy) and PHP-FPM (Ubuntu 24.04+) via apache_mpm var
 
 - name: Install Apache packages
   apt:
@@ -14,22 +15,60 @@
     path: /etc/apache2/mods-available
     state: directory
 
-- name: Enable required Apache modules
+# MPM selection — event for FPM, prefork for mod_php
+- name: Disable mpm_prefork (when using event MPM)
+  apache2_module:
+    name: mpm_prefork
+    state: absent
+    ignore_configcheck: true
+  when: apache_mpm | default('prefork') == 'event'
+  notify: Restart Apache
+  ignore_errors: yes
+
+- name: Disable mod_php (when using FPM)
+  apache2_module:
+    name: "php{{ php_version | default('7.4') | regex_replace('\\.', '') }}"
+    state: absent
+    ignore_configcheck: true
+  when: apache_mpm | default('prefork') == 'event'
+  notify: Restart Apache
+  ignore_errors: yes
+
+- name: Enable mpm_event (when using event MPM)
+  apache2_module:
+    name: mpm_event
+    state: present
+    ignore_configcheck: true
+  when: apache_mpm | default('prefork') == 'event'
+  notify: Restart Apache
+
+- name: Enable proxy and proxy_fcgi for PHP-FPM
   apache2_module:
     name: "{{ item }}"
     state: present
-  loop: "{{ apache_modules }}"
+  loop:
+    - proxy
+    - proxy_fcgi
+  when: apache_mpm | default('prefork') == 'event'
   notify: Restart Apache
 
-- name: Disable conflicting MPM modules
+- name: Disable conflicting MPM modules (when using prefork)
   apache2_module:
     name: "{{ item }}"
     state: absent
   loop:
     - mpm_event
     - mpm_worker
+  when: apache_mpm | default('prefork') == 'prefork'
   notify: Restart Apache
   ignore_errors: yes
+
+- name: Enable required Apache modules
+  apache2_module:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ apache_modules }}"
+  notify: Restart Apache
 
 - name: Deploy Apache main configuration
   template:
@@ -57,6 +96,7 @@
     owner: root
     group: root
     mode: '0644'
+  when: apache_mpm | default('prefork') == 'prefork'
   notify: Restart Apache
 
 - name: Deploy security configuration
@@ -165,7 +205,6 @@
     dest: /etc/apache2/conf-enabled/block-xmlrpc.conf
     state: link
   notify: Reload Apache
-
 
 - name: Disable default-ssl virtual host (conflicts with pausatf-main-ssl)
   file:

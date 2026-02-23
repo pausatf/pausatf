@@ -1,16 +1,16 @@
 output "droplet_id" {
   description = "Production droplet ID"
-  value       = digitalocean_droplet.production.id
+  value       = module.wordpress.droplet_id
 }
 
 output "droplet_ip" {
   description = "Production droplet public IP"
-  value       = digitalocean_droplet.production.ipv4_address
+  value       = module.wordpress.droplet_ip
 }
 
 output "droplet_urn" {
   description = "Production droplet URN"
-  value       = digitalocean_droplet.production.urn
+  value       = module.wordpress.droplet_urn
 }
 
 output "reserved_ip" {
@@ -20,32 +20,32 @@ output "reserved_ip" {
 
 output "database_id" {
   description = "Production database cluster ID"
-  value       = module.database.id
+  value       = module.wordpress.database_id
 }
 
 output "database_host" {
   description = "Production database host"
-  value       = module.database.host
+  value       = module.wordpress.database_host
   sensitive   = true
 }
 
 output "database_port" {
   description = "Production database port"
-  value       = module.database.port
+  value       = module.wordpress.database_port
 }
 
 output "database_uri" {
   description = "Production database connection URI"
-  value       = module.database.uri
+  value       = module.wordpress.database_uri
   sensitive   = true
 }
 
 output "vpc_id" {
   description = "Production VPC ID"
-  value       = digitalocean_vpc.production.id
+  value       = module.wordpress.vpc_id
 }
 
 output "firewall_id" {
   description = "Production firewall ID"
-  value       = digitalocean_firewall.production.id
+  value       = module.wordpress.firewall_id
 }
