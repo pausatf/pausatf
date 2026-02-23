@@ -52,7 +52,7 @@ resource "digitalocean_droplet" "dev" {
 
   ssh_keys = var.ssh_key_fingerprints
 
-  user_data = templatefile("${path.module}/../../modules/droplet/cloud-init-apache.yml", {
+  user_data = templatefile("${path.module}/../../modules/droplet/cloud-init-openlitespeed.yml", {
     environment = "dev"
     hostname    = "pausatf-dev"
   })
@@ -112,7 +112,7 @@ resource "digitalocean_firewall" "dev" {
   inbound_rule {
     protocol         = "tcp"
     port_range       = "22"
-    source_addresses = ["*******/0", "::/0"]
+    source_addresses = var.ssh_allowed_ips
   }
 
   outbound_rule {

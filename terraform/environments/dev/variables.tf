@@ -45,3 +45,9 @@ variable "ssh_key_fingerprints" {
   type        = list(string)
   default     = []
 }
+
+variable "ssh_allowed_ips" {
+  description = "IP addresses allowed SSH access"
+  type        = list(string)
+  default     = []
+}

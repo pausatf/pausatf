@@ -2,6 +2,13 @@
 # MySQL role - Database configuration for PAUSATF
 # Skipped entirely when using a managed database (mysql_managed: true).
 
+- name: Assert MySQL root password is configured
+  assert:
+    that:
+      - mysql_root_password | length > 0
+    fail_msg: "mysql_root_password must be set via vault for local MySQL installations"
+  when: not (mysql_managed | default(false))
+
 - name: Local MySQL setup
   when: not (mysql_managed | default(false))
   block:

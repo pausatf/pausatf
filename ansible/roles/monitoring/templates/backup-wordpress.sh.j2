@@ -18,19 +18,20 @@ log "Starting WordPress backup..."
 # Create backup directory
 mkdir -p "$BACKUP_DIR"
 
+trap 'rm -f /root/.my-backup-*.cnf' EXIT
+
 {% for wp in wordpress_installs %}
 # Backup {{ wp.name }}
 log "Backing up {{ wp.name }}..."
 
 # Database backup — credentials via temp file to avoid MYSQL_PWD env exposure
 _MYCNF=$(mktemp /root/.my-backup-XXXXXX.cnf)
-trap 'rm -f "$_MYCNF"' EXIT
 chmod 600 "$_MYCNF"
 printf '[client]\nuser=%s\npassword=%s\n' '{{ wp.db_user }}' '{{ wp.db_password }}' > "$_MYCNF"
 mysqldump --defaults-extra-file="$_MYCNF" {{ wp.db_name }} | gzip > "$BACKUP_DIR/{{ wp.name }}-db-$DATE.sql.gz"
 
 # Files backup
-tar -czf "$BACKUP_DIR/{{ wp.name }}-files-$DATE.tar.gz" -C $(dirname {{ wp.path }}) $(basename {{ wp.path }}) --exclude="wp-content/cache" --exclude="wp-content/uploads/cache"
+tar -czf "$BACKUP_DIR/{{ wp.name }}-files-$DATE.tar.gz" -C "$(dirname '{{ wp.path }}')" "$(basename '{{ wp.path }}')" --exclude="wp-content/cache" --exclude="wp-content/uploads/cache"
 
 log "{{ wp.name }} backup complete"
 
