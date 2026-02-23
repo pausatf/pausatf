@@ -39,7 +39,7 @@
   failed_when: false
 
 - name: Update core to requested version (if installed)
-  command: "{{ wpcli_path | default('/usr/local/bin/wp') }} core update {{ (wp_site.wp_version is defined and wp_site.wp_version != 'latest') | ternary('--version=' + wp_site.wp_version, '') }} --path={{ wp_site.path }} --allow-root"
+  command: "{{ wpcli_path | default('/usr/local/bin/wp') }} core update {{ (wp_site.wp_version is defined and wp_site.wp_version != 'latest') | ternary('--version=' + wp_site.wp_version, '') }} --path={{ wp_site.path }} --allow-root"  # yamllint disable-line rule:line-length
   when: wp_installed.rc == 0
 
 - name: Update database (safe to run if already current)

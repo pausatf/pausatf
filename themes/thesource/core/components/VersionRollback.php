@@ -288,7 +288,7 @@ class ET_Core_VersionRollback {
 			if ( $major_minor . '.0' === $previous_version ) {
 				// Skip the trailing 0 in the version number and retry.
 				$previous_version = $major_minor;
-				$available        = $api->is_product_available( $this->product_name, $previous_version );	
+				$available        = $api->is_product_available( $this->product_name, $previous_version );
 			}
 
 			if ( is_wp_error( $available ) ) {

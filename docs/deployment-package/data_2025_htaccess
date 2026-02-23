@@ -10,12 +10,12 @@
         Header set Expires "0"
         Header set CF-Cache-Control "no-cache"
     </FilesMatch>
-    
+
     # Static assets - 30 days (per Jeff's recommendation)
     <FilesMatch "\.(jpg|jpeg|png|gif|ico|svg|webp)$">
         Header set Cache-Control "public, max-age=2592000, immutable"
     </FilesMatch>
-    
+
     <FilesMatch "\.(css|js)$">
         Header set Cache-Control "public, max-age=2592000, immutable"
     </FilesMatch>

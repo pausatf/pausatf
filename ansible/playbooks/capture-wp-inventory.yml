@@ -216,4 +216,3 @@
               registered: {{ u.user_registered | to_json }}
               last_login: {{ (last_logins_list | selectattr('user_id', 'equalto', u.ID) | map(attribute='last_login') | first | default('never')) | to_json }}
           {% endfor %}
-

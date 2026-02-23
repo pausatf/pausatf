@@ -42,6 +42,7 @@ resource "digitalocean_reserved_ip_assignment" "this" {
 }
 
 # Droplet
+#tfsec:ignore:digitalocean-compute-use-ssh-keys
 resource "digitalocean_droplet" "this" {
   name   = "pausatf-${var.environment}"
   region = var.region

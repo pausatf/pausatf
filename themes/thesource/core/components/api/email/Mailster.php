@@ -60,7 +60,7 @@ class ET_Core_API_Email_Mailster extends ET_Core_API_Email_Provider {
 			if ( empty( $customfields ) ) {
 				return $fields;
 			}
-			
+
 			$field_types = self::$_->array_get( $this->data_keys, 'custom_field_type' );
 			foreach ( $customfields as $field_id => $field ) {
 				$field             = $this->transform_data_to_our_format( $field, 'custom_field' );

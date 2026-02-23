@@ -1,6 +1,6 @@
 ## Core API Component Group
 This directory contains components that facilitate interacting with 3rd-party REST APIs.
- 
+
 ### What's Inside
 |File|Name|Description|
 |:--------|:----------|:----------|

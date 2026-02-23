@@ -416,10 +416,10 @@
 					replace: options.replace ? '1' : '0',
 					context: 'et_builder'
 				};
-			
+
 			/**
 			 * Max size set on server is exceeded.
-			 * 
+			 *
 			 * 0 indicating "unlimited" according to php specs
 			 * https://www.php.net/manual/en/ini.core.php#ini.post-max-size
 			 **/
@@ -434,7 +434,7 @@
 
 			$.each(requestData, function(name, value) {
 				if ('file' === name) {
-				  // Explicitly set the file name. 
+				  // Explicitly set the file name.
 				  // Otherwise it'll be set to 'Blob' in case of Blob type, but we need actual filename here.
 				  formData.append('file', value, value.name);
 				} else {
@@ -636,7 +636,7 @@
 
 				/**
 				 * Max size set on server is exceeded.
-				 * 
+				 *
 				 * 0 indicating "unlimited" according to php specs
 				 * https://www.php.net/manual/en/ini.core.php#ini.post-max-size
 				 **/

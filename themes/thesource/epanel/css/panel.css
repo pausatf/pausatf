@@ -360,7 +360,7 @@ h1#epanel-title {
 #epanel-content-wrap {
 	display: block;
 	position: relative;
-	
+
 }
 
 #epanel-content {
@@ -1432,8 +1432,8 @@ left: 0px;
     display: none;
 }
 
-.colorpalette-colorpicker .wp-picker-holder { 
-	margin-top: 50px; 
+.colorpalette-colorpicker .wp-picker-holder {
+	margin-top: 50px;
 }
 
 .navigationTabs { height: 23px; line-height: 23px; border-bottom: 1px solid #ccc; }

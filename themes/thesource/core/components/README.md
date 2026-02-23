@@ -1,6 +1,6 @@
 ## Core Components
 This directory contains all of Core's PHP Components. Components are organized into groups using a nested directory structure.
- 
+
 ### What's Inside
 |File|Name|Description|
 |:--------|:----------|:----------|

@@ -144,7 +144,7 @@ class ET_Core_API_Email_Ontraport extends ET_Core_API_Email_Provider {
 				$value = array_keys( $value );
 
 				if ( 'checkbox' === $this->data['custom_fields'][ $field_id ]['type'] ) {
-					// Determine if checkbox is a single checkbox or a list. 
+					// Determine if checkbox is a single checkbox or a list.
 					// In case of single checkbox pass `1` as a value
 					if ( ! empty( $this->data['custom_fields'][ $field_id ]['options'] ) ) {
 						$value = implode( '*/*', $value );
