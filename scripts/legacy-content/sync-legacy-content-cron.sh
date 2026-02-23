@@ -112,8 +112,9 @@ log "  Added: $files_added"
 log "  Deleted: $files_deleted"
 log "  Total: $total_changes"
 
-# Stage all changes
-git add -A
+# Stage only the legacy content directory (not arbitrary files that may have
+# landed in the repo root from other sources)
+git add content/ data/ 2>/dev/null || git add -u .
 
 # Create commit
 log "Creating commit..."
@@ -136,10 +137,11 @@ Server: $(hostname)
     exit 0
 }
 
-# Push to remote
-log "Pushing to remote repository..."
-if git push origin main; then
-    log "Successfully pushed changes to remote"
+# Push to a dedicated branch so changes are reviewed via PR rather than
+# landing directly on main. Create the branch if it doesn't exist remotely.
+log "Pushing to remote repository (branch: legacy-content-sync)..."
+if git push origin HEAD:legacy-content-sync; then
+    log "Successfully pushed changes to legacy-content-sync"
 else
     error "Failed to push to remote repository"
 fi

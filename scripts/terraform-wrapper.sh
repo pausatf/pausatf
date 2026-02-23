@@ -67,7 +67,7 @@ check_dependencies() {
 
 # Check for required environment variables
 check_env_vars() {
-    local required_vars=("DIGITALOCEAN_ACCESS_TOKEN" "CLOUDFLARE_API_TOKEN")
+    local required_vars=("DIGITALOCEAN_TOKEN" "CLOUDFLARE_API_TOKEN")
     for var in "${required_vars[@]}"; do
         if [[ -z "${!var:-}" ]]; then
             echo -e "${YELLOW}Warning: Environment variable $var is not set${NC}"

@@ -1,5 +1,5 @@
 ---
-- name: Restart php8.3-fpm
+- name: Restart php-fpm
   service:
-    name: php8.3-fpm
+    name: "php{{ php_version }}-fpm"
     state: restarted

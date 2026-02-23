@@ -1,0 +1,9 @@
+---
+apache_mpm: event
+apache_modules:
+  - rewrite
+  - headers
+  - ssl
+  - proxy
+  - proxy_fcgi
+wordpress_installs: []
