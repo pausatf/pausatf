@@ -1,14 +1,21 @@
 ---
 # New Relic role - Application monitoring for PAUSATF
 
-- name: Add New Relic repository key
-  apt_key:
+- name: Create keyrings directory
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+
+- name: Download New Relic repository key
+  get_url:
     url: https://download.newrelic.com/infrastructure_agent/gpg/newrelic-infra.gpg
-    state: present
+    dest: /etc/apt/keyrings/newrelic-infra.gpg
+    mode: '0644'
 
 - name: Add New Relic repository
   apt_repository:
-    repo: "deb [arch=amd64] https://download.newrelic.com/infrastructure_agent/linux/apt {{ ansible_distribution_release }} main"
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/newrelic-infra.gpg] https://download.newrelic.com/infrastructure_agent/linux/apt {{ ansible_distribution_release }} main"
     state: present
     filename: newrelic-infra
 

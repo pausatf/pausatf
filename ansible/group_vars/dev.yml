@@ -21,3 +21,11 @@ wordpress_installs:
     disallow_file_mods: false
     auto_update_core: "minor"
     fs_method: "direct"
+    auth_key: "{{ vault_wp_dev_auth_key | default(lookup('password', '/dev/null length=64 chars=ascii_letters,digits,punctuation')) }}"
+    secure_auth_key: "{{ vault_wp_dev_secure_auth_key | default(lookup('password', '/dev/null length=64 chars=ascii_letters,digits,punctuation')) }}"
+    logged_in_key: "{{ vault_wp_dev_logged_in_key | default(lookup('password', '/dev/null length=64 chars=ascii_letters,digits,punctuation')) }}"
+    nonce_key: "{{ vault_wp_dev_nonce_key | default(lookup('password', '/dev/null length=64 chars=ascii_letters,digits,punctuation')) }}"
+    auth_salt: "{{ vault_wp_dev_auth_salt | default(lookup('password', '/dev/null length=64 chars=ascii_letters,digits,punctuation')) }}"
+    secure_auth_salt: "{{ vault_wp_dev_secure_auth_salt | default(lookup('password', '/dev/null length=64 chars=ascii_letters,digits,punctuation')) }}"
+    logged_in_salt: "{{ vault_wp_dev_logged_in_salt | default(lookup('password', '/dev/null length=64 chars=ascii_letters,digits,punctuation')) }}"
+    nonce_salt: "{{ vault_wp_dev_nonce_salt | default(lookup('password', '/dev/null length=64 chars=ascii_letters,digits,punctuation')) }}"

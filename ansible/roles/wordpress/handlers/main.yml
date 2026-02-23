@@ -1,15 +1,16 @@
 ---
-- name: restart nginx
+- name: Restart web server
   systemd:
-    name: nginx
+    name: "{{ 'apache2' if web_server | default('apache') == 'apache' else 'lsws' }}"
     state: restarted
 
-- name: restart php-fpm
+- name: Reload web server
   systemd:
-    name: php8.3-fpm
-    state: restarted
-
-- name: reload nginx
-  systemd:
-    name: nginx
+    name: "{{ 'apache2' if web_server | default('apache') == 'apache' else 'lsws' }}"
     state: reloaded
+
+- name: Restart PHP-FPM
+  systemd:
+    name: "php{{ php_version }}-fpm"
+    state: restarted
+  when: use_php_fpm | default(false)
