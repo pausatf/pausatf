@@ -17,6 +17,19 @@
       - vault_wp_main_nonce_salt is defined and vault_wp_main_nonce_salt | length > 0
     fail_msg: "WordPress secrets must be set via Ansible vault — vault_wp_main_* variables are missing or empty"
 
+- name: Assert WordPress auth keys are wired through wordpress_installs
+  assert:
+    that:
+      - wordpress_installs[0].auth_key | default('') | length > 0
+      - wordpress_installs[0].secure_auth_key | default('') | length > 0
+      - wordpress_installs[0].logged_in_key | default('') | length > 0
+      - wordpress_installs[0].nonce_key | default('') | length > 0
+    fail_msg: "wordpress_installs[].auth keys must be wired from vault variables"
+  when:
+    - wordpress_installs is defined
+    - wordpress_installs | length > 0
+    - wordpress_installs[0].manage_wp_config | default(false)
+
 - name: Ensure WP-CLI is installed
   get_url:
     url: https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar

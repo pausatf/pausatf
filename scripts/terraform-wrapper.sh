@@ -26,13 +26,15 @@ usage() {
 Usage: $0 <environment> <action>
 
 Arguments:
-  environment    Environment to target (production, staging)
-  action         Terraform action (plan, apply, destroy, output)
+  environment    Environment to target (production, staging, dev, cloudflare, github)
+  action         Terraform action (plan, apply, destroy, output, init, validate)
 
 Examples:
   $0 production plan
   $0 staging apply
   $0 production output
+  $0 cloudflare plan
+  $0 github apply
 
 EOF
     exit 1
@@ -40,8 +42,8 @@ EOF
 
 # Validate environment
 validate_environment() {
-    if [[ ! "$ENVIRONMENT" =~ ^(production|staging)$ ]]; then
-        echo -e "${RED}Error: Invalid environment. Must be 'production' or 'staging'${NC}"
+    if [[ ! "$ENVIRONMENT" =~ ^(production|staging|dev|cloudflare|github)$ ]]; then
+        echo -e "${RED}Error: Invalid environment. Must be one of: production, staging, dev, cloudflare, github${NC}"
         usage
     fi
 }
@@ -73,6 +75,35 @@ check_env_vars() {
             echo -e "${YELLOW}Warning: Environment variable $var is not set${NC}"
         fi
     done
+}
+
+# Advisory lock — prevents concurrent local runs per environment.
+# CI relies on GitHub Actions concurrency groups instead.
+LOCK_DIR="${HOME}/.terraform-locks"
+LOCK_FILE="${LOCK_DIR}/pausatf-${ENVIRONMENT:-unknown}.lock"
+
+acquire_lock() {
+    mkdir -p "$LOCK_DIR"
+    if [ -f "$LOCK_FILE" ]; then
+        local lock_pid
+        lock_pid=$(cat "$LOCK_FILE" 2>/dev/null || echo "unknown")
+        local lock_age
+        lock_age=$(( $(date +%s) - $(stat -f %m "$LOCK_FILE" 2>/dev/null || stat -c %Y "$LOCK_FILE" 2>/dev/null || echo 0) ))
+        if [ "$lock_age" -gt 3600 ]; then
+            echo -e "${YELLOW}Warning: Stale lock found (${lock_age}s old, PID $lock_pid). Removing.${NC}"
+            rm -f "$LOCK_FILE"
+        else
+            echo -e "${RED}Error: Terraform lock held for $ENVIRONMENT (PID $lock_pid, ${lock_age}s ago)${NC}"
+            echo -e "${RED}If this is stale, remove: rm $LOCK_FILE${NC}"
+            exit 1
+        fi
+    fi
+    echo $$ > "$LOCK_FILE"
+    trap 'release_lock' EXIT
+}
+
+release_lock() {
+    rm -f "$LOCK_FILE"
 }
 
 # Run terraform command
@@ -127,6 +158,7 @@ main() {
     validate_action
     check_dependencies
     check_env_vars
+    acquire_lock
     run_terraform
 
     echo -e "${GREEN}==>${NC} Terraform $ACTION completed successfully"
