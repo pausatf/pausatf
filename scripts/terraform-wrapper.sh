@@ -117,7 +117,7 @@ run_terraform() {
 
     case "$ACTION" in
         init)
-            terraform init
+            terraform init -backend-config="$ROOT_DIR/terraform/backend.hcl"
             ;;
         validate)
             terraform validate

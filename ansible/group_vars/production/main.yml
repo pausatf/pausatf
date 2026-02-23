@@ -67,42 +67,30 @@ web_server: apache
 # =============================================================================
 # WORDPRESS — PRODUCTION INSTALL
 # =============================================================================
-# Full install definition with production DB, SSL paths, and vault-sourced
-# auth keys. Dev/staging override this block entirely in their own group_vars.
+# Production-specific overrides merged with shared defaults from all.yml.
+# Dev/staging define their own wordpress_installs in their group_vars.
 wordpress_installs:
-  - name: "pausatf-main"
-    domain: "www.pausatf.org"
-    aliases:
-      - "pausatf.org"
-    path: "/var/www/html"
-    db_name: "wordpress"
-    db_user: "wordpress"
-    db_password: "{{ vault_wp_main_db_password }}"
-    db_host: "localhost"
-    table_prefix: "wp_"
-    wp_version: "6.8.3"
-    wp_memory_limit: "256M"
-    wp_max_memory_limit: "512M"
-    ssl_enabled: true
-    ssl_certificate: "/etc/letsencrypt/live/pausatf.org/fullchain.pem"
-    ssl_certificate_key: "/etc/letsencrypt/live/pausatf.org/privkey.pem"
-    active_theme: "TheSource-child"
-    cron_enabled: true
-    debug_mode: false
-    disallow_file_edit: true
-    disallow_file_mods: false
-    auto_update_core: "minor"
-    fs_method: "direct"
-    manage_wp_config: true
-    # Auth keys and salts — sourced from vault; never hardcode
-    auth_key: "{{ vault_wp_main_auth_key }}"
-    secure_auth_key: "{{ vault_wp_main_secure_auth_key }}"
-    logged_in_key: "{{ vault_wp_main_logged_in_key }}"
-    nonce_key: "{{ vault_wp_main_nonce_key }}"
-    auth_salt: "{{ vault_wp_main_auth_salt }}"
-    secure_auth_salt: "{{ vault_wp_main_secure_auth_salt }}"
-    logged_in_salt: "{{ vault_wp_main_logged_in_salt }}"
-    nonce_salt: "{{ vault_wp_main_nonce_salt }}"
+  - "{{ wordpress_install_defaults | combine({
+      'domain': 'www.pausatf.org',
+      'aliases': ['pausatf.org'],
+      'wp_version': '6.8.3',
+      'debug_mode': false,
+      'wp_memory_limit': '256M',
+      'wp_max_memory_limit': '512M',
+      'ssl_enabled': true,
+      'ssl_certificate': '/etc/letsencrypt/live/pausatf.org/fullchain.pem',
+      'ssl_certificate_key': '/etc/letsencrypt/live/pausatf.org/privkey.pem',
+      'manage_wp_config': true,
+      'db_password': vault_wp_main_db_password,
+      'auth_key': vault_wp_main_auth_key,
+      'secure_auth_key': vault_wp_main_secure_auth_key,
+      'logged_in_key': vault_wp_main_logged_in_key,
+      'nonce_key': vault_wp_main_nonce_key,
+      'auth_salt': vault_wp_main_auth_salt,
+      'secure_auth_salt': vault_wp_main_secure_auth_salt,
+      'logged_in_salt': vault_wp_main_logged_in_salt,
+      'nonce_salt': vault_wp_main_nonce_salt,
+    }) }}"
 
 # =============================================================================
 # WORDPRESS THEMES (production site)
