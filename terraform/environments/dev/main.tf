@@ -19,6 +19,8 @@ terraform {
     key                         = "dev/terraform.tfstate"
     skip_credentials_validation = true
     skip_metadata_api_check     = true
+    skip_region_validation      = true
+    use_lockfile                = true
   }
 }
 
@@ -29,6 +31,15 @@ provider "digitalocean" {
 provider "cloudflare" {
   api_token = var.cloudflare_api_token
 }
+
+# TODO: Migrate to stacks/wordpress module for environment parity with production.
+# Migration steps:
+# 1. Add module "wordpress" block (see production/main.tf for reference)
+# 2. Run: terraform state mv digitalocean_droplet.dev module.wordpress.digitalocean_droplet.this
+# 3. Run: terraform state mv digitalocean_firewall.dev module.wordpress.digitalocean_firewall.this
+# 4. Run: terraform plan — verify no destroy/create actions
+# 5. Remove inline resource definitions
+# Tracked in: https://github.com/pausatf/pausatf/issues
 
 # Dev Droplet (smaller)
 #tfsec:ignore:digitalocean-compute-use-ssh-keys
