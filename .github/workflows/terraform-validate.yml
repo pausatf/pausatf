@@ -19,7 +19,7 @@ jobs:
     if: "!contains(github.event.pull_request.title, 'chore(deps):')"
     steps:
       - name: Checkout code
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@b9cd54a3c349d3f85571c5fb643da9750e94b949  # v3
@@ -44,7 +44,7 @@ jobs:
           - cloudflare
     steps:
       - name: Checkout code
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@b9cd54a3c349d3f85571c5fb643da9750e94b949  # v3
@@ -65,7 +65,7 @@ jobs:
     if: "!contains(github.event.pull_request.title, 'chore(deps):')"
     steps:
       - name: Checkout code
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
 
       - name: Run tfsec
         uses: aquasecurity/tfsec-action@b842aa8571b0120b60891e9fcab20ab5ed5bf26e  # v1.0.3
@@ -87,7 +87,7 @@ jobs:
     if: "!contains(github.event.pull_request.title, 'chore(deps):')"
     steps:
       - name: Checkout code
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
 
       - name: Setup TFLint
         uses: terraform-linters/setup-tflint@v6
