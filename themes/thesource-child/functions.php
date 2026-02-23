@@ -17,29 +17,29 @@ function thesource_child_enqueue_scripts() {
     // Use static version for proper browser caching
     // Increment version when making changes to CSS/JS files
     $version = '1.2.0';
-    
+
     // Enqueue parent theme's style.css
     wp_enqueue_style( 'parent-style', get_template_directory_uri() . '/style.css' );
-    
+
     // Enqueue child theme's dropdown.css
     wp_enqueue_style( 'child-dropdown', get_stylesheet_directory_uri() . '/dropdown.css', array( 'parent-style' ), $version );
-    
+
     // Enqueue red theme overrides
     wp_enqueue_style( 'red-style', get_stylesheet_directory_uri() . '/style-Red.css', array( 'child-dropdown' ), $version );
- 
+
     // Add browser-specific CSS
     $user_agent = filter_input( INPUT_SERVER, 'HTTP_USER_AGENT', FILTER_SANITIZE_STRING );
-    
+
     if ( $user_agent && false !== strpos( $user_agent, 'Chrome' ) ) {
         wp_enqueue_style( 'chrome-fixes', get_stylesheet_directory_uri() . '/chrome-fixes.css', array( 'child-dropdown' ), $version );
     }
-    
+
     // Enqueue jQuery first
     wp_enqueue_script( 'jquery' );
-    
+
     // Enqueue superfish.js
     wp_enqueue_script( 'superfish', get_template_directory_uri() . '/js/superfish.js', array( 'jquery' ), $version, true );
-    
+
     // Initialize superfish
     wp_add_inline_script(
         'superfish',
@@ -75,11 +75,11 @@ add_action( 'wp_enqueue_scripts', 'thesource_child_enqueue_scripts', 999 );
  */
 function thesource_child_browser_body_class( $classes ) {
     $user_agent = filter_input( INPUT_SERVER, 'HTTP_USER_AGENT', FILTER_SANITIZE_STRING );
-    
+
     if ( ! $user_agent ) {
         return $classes;
     }
-    
+
     if ( false !== strpos( $user_agent, 'Chrome' ) ) {
         $classes[] = 'browser-chrome';
     } elseif ( false !== strpos( $user_agent, 'Safari' ) ) {
@@ -91,7 +91,7 @@ function thesource_child_browser_body_class( $classes ) {
     } elseif ( false !== strpos( $user_agent, 'Edge' ) ) {
         $classes[] = 'browser-edge';
     }
-    
+
     return $classes;
 }
 add_filter( 'body_class', 'thesource_child_browser_body_class' );

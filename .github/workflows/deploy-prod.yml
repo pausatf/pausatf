@@ -8,61 +8,16 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
-    environment: production
-    permissions:
-      contents: read
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4
-
-      - name: Setup Python
-        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b  # v5
-        with:
-          python-version: '3.12'
-
-      - name: Install Ansible deps
-        run: |
-          python -m pip install --upgrade pip
-          pip install ansible-core==2.17.5 cloudflare requests
-          ansible-galaxy collection install -r ansible/requirements.yml
-
-      - name: Setup SSH key
-        env:
-          SSH_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
-        run: |
-          install -m 700 -d ~/.ssh
-          printf '%s\n' "$SSH_KEY" > ~/.ssh/pausatf-prod
-          chmod 600 ~/.ssh/pausatf-prod
-          ssh-keygen -l -f ~/.ssh/pausatf-prod
-          ssh-keyscan -H ftp.pausatf.org >> ~/.ssh/known_hosts 2>/dev/null || true
-
-      - name: Decrypt vault file
-        env:
-          ANSIBLE_VAULT_FILE: ${{ secrets.ANSIBLE_VAULT_FILE }}
-          ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
-        run: |
-          if [ -z "$ANSIBLE_VAULT_PASSWORD" ] || [ -z "$ANSIBLE_VAULT_FILE" ]; then
-            echo "ERROR: ANSIBLE_VAULT_PASSWORD and ANSIBLE_VAULT_FILE secrets are required" >&2
-            exit 1
-          fi
-          printf '%s' "$ANSIBLE_VAULT_FILE" | base64 -d > ansible/group_vars/vault.yml
-          echo "$ANSIBLE_VAULT_PASSWORD" > vault.pass
-          chmod 600 vault.pass ansible/group_vars/vault.yml
-
-      - name: Run playbook (production)
-        working-directory: ansible
-        env:
-          ANSIBLE_HOST_KEY_CHECKING: 'false'
-        run: |
-          # shellcheck disable=SC2086
-          ansible-playbook -i inventory/hosts.yml site.yml -l production --vault-password-file ../vault.pass
-
-      - name: Healthcheck
-        # Verify Apache responds on the origin directly to avoid Cloudflare blocking GHA IPs
-        run: |
-          ssh -i ~/.ssh/pausatf-prod -o StrictHostKeyChecking=no \
-            -o IdentitiesOnly=yes \
-            github-deploy@ftp.pausatf.org \
-            "curl -fsS -o /dev/null -w '%{http_code}' http://localhost/ | grep -qE '^(200|301|302)'"
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: production
+      ansible_limit: production
+      healthcheck_cmd: |
+        ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new \
+          -o IdentitiesOnly=yes \
+          github-deploy@ftp.pausatf.org \
+          "curl -fsS -o /dev/null -w '%{http_code}' http://localhost/ | grep -qE '^(200|301|302)'"
+    secrets:
+      SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+      ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
+      ANSIBLE_VAULT_FILE: ${{ secrets.ANSIBLE_VAULT_FILE }}

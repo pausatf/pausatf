@@ -711,4 +711,3 @@ msgstr ""
 #: ../includes/widgets/widget-tabbed.php:24
 msgid "Random"
 msgstr ""
-

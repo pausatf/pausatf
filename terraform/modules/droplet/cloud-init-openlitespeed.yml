@@ -358,7 +358,7 @@ final_message: |
   OpenLiteSpeed Admin:
   - URL: https://${hostname}.pausatf.org:7080
   - User: admin
-  - Password: Check /usr/local/lsws/adminpasswd
+  - Password: Check /usr/local/lsws/adminpasswd  # pragma: allowlist secret
 
   Object Cache Configuration (LSCache Plugin):
   - Memcached Socket: /var/www/memcached.sock

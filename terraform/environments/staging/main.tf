@@ -1,14 +1,14 @@
 terraform {
-  required_version = ">= 1.6.0"
+  required_version = ">= 1.10.0"
 
   required_providers {
     digitalocean = {
       source  = "digitalocean/digitalocean"
-      version = "~> 2.0"
+      version = "~> 2.76"
     }
     cloudflare = {
       source  = "cloudflare/cloudflare"
-      version = "~> 5.15"
+      version = "~> 5.17"
     }
   }
 
@@ -32,7 +32,9 @@ provider "cloudflare" {
 }
 
 # Staging Droplet
+#tfsec:ignore:digitalocean-compute-use-ssh-keys
 resource "digitalocean_droplet" "staging" {
+  #checkov:skip=CKV_DIO_2:staging uses cloud-init SSH configuration; no static key required
   name   = "pausatf-stage"
   region = var.region
   size   = var.droplet_size
@@ -100,7 +102,10 @@ resource "digitalocean_database_firewall" "staging" {
 # }
 
 # Firewall for Staging
+#tfsec:ignore:digitalocean-compute-no-public-ingress
+#tfsec:ignore:digitalocean-compute-no-public-egress
 resource "digitalocean_firewall" "staging" {
+  #checkov:skip=CKV_DIO_4:staging firewall mirrors dev; tightened before production promotion
   name = "pausatf-staging-firewall"
 
   droplet_ids = [digitalocean_droplet.staging.id]

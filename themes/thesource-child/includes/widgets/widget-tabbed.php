@@ -128,4 +128,3 @@ function TabbedWidgetInit() {
 }
 
 add_action('widgets_init', 'TabbedWidgetInit');
-

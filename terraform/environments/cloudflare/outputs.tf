@@ -16,23 +16,18 @@ output "name_servers" {
 output "production_records" {
   description = "Production DNS records"
   value = {
-    root    = cloudflare_record.root.hostname
-    www     = cloudflare_record.www.hostname
-    ftp     = cloudflare_record.ftp.hostname
-    mail    = cloudflare_record.mail.hostname
-    monitor = cloudflare_record.monitor.hostname
+    root    = cloudflare_dns_record.root.name
+    www     = cloudflare_dns_record.www.name
+    ftp     = cloudflare_dns_record.ftp.name
+    mail    = cloudflare_dns_record.mail.name
+    monitor = cloudflare_dns_record.monitor.name
   }
 }
 
 output "staging_records" {
   description = "Staging DNS records"
   value = {
-    stage   = cloudflare_record.stage.hostname
-    staging = cloudflare_record.staging.hostname
+    stage   = cloudflare_dns_record.stage.name
+    staging = cloudflare_dns_record.staging.name
   }
-}
-
-output "dns_record_count" {
-  description = "Total number of DNS records managed by Terraform"
-  value       = 30
 }

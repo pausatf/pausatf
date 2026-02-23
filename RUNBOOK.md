@@ -330,10 +330,10 @@ terraform apply
 
 | Environment | Terraform | digitalocean | cloudflare | github |
 |-------------|-----------|--------------|------------|--------|
-| production | >= 1.10.0 | ~> 2.47 | ~> 5.15 | — |
+| production | >= 1.10.0 | ~> 2.76 | ~> 5.17 | — |
 | staging | >= 1.6.0 | ~> 2.0 | ~> 5.15 | — |
 | dev | >= 1.6.0 | ~> 2.0 | ~> 5.15 | — |
-| cloudflare | >= 1.6.0 | — | ~> 5.0 | — |
+| cloudflare | >= 1.10.0 | — | ~> 5.17 | — |
 | github | >= 1.0 | — | — | ~> 6.0 |
 
 ---
@@ -519,3 +519,221 @@ sudo -u www-data wp user list --role=administrator --path=/var/www/html
 - **Jan 2026 breach** — Unauthorized WP admin `mark_murray` (ID 46, created
   2026-02-14) was created. Remediated via `security-remediation.yml`. Auth
   keys/salts rotated. See issue history for full timeline.
+
+---
+
+## Ubuntu 24.04 Rebuild (feat/ubuntu24-rebuild)
+
+Full rebuild to Ubuntu 24.04: Apache event MPM + PHP 8.3-FPM + Redis object
+cache + Managed MySQL 8 + Certbot DNS-01 via Cloudflare + SSH via Tailscale
+only + Cloudflare Full (Strict) SSL.
+
+### Prerequisites
+
+- Terraform >= 1.10.0
+- Ansible >= 2.15
+- `DO_TOKEN`, `SPACES_ACCESS_KEY_ID` / `SPACES_SECRET_ACCESS_KEY` configured
+- `CLOUDFLARE_API_TOKEN` configured
+- Ansible vault password (macOS Keychain: `security find-generic-password -s "pausatf-ansible-vault" -a "ansible" -w`)
+- Tailscale authkey generated; `vault_tailscale_authkey` added to vault
+- `vault_cloudflare_api_token` populated in vault (shared with Terraform and certbot)
+
+### Staging Rehearsal
+
+#### Provision staging droplet
+
+```bash
+cd terraform/environments/staging
+terraform init
+terraform plan -var 'droplet_image=ubuntu-24-04-x64'
+terraform apply
+```
+
+#### Configure staging via Ansible
+
+```bash
+cd ansible
+ansible-playbook -i inventory site.yml --limit stage --check --diff
+ansible-playbook -i inventory site.yml --limit stage
+```
+
+#### Staging verification gates
+
+All gates must pass before production cutover.
+
+```bash
+# Apache event MPM
+ssh stage 'apachectl -V | grep MPM'
+# Expected: Server MPM: event
+
+# PHP-FPM config test
+ssh stage 'php-fpm8.3 -t'
+
+# PHP-FPM socket
+ssh stage 'ls -la /run/php/php8.3-fpm.sock'
+
+# Redis
+ssh stage 'redis-cli ping'
+# Expected: PONG
+
+ssh stage 'redis-cli CONFIG GET maxmemory-policy'
+# Expected: allkeys-lru
+
+# Certbot dry-run
+ssh stage 'certbot renew --dry-run'
+
+# WordPress
+ssh stage 'wp --allow-root core is-installed --path=/var/www/html && wp --allow-root db check --path=/var/www/html'
+
+# No external Redis
+ssh stage 'ss -tlnp | grep 6379'
+# Expected: 127.0.0.1:6379 only
+
+# UFW
+ssh stage 'ufw status verbose'
+# Expected: 80,443 ALLOW, tailscale0 ALLOW, 22 DENY
+
+# Tailscale
+ssh stage 'tailscale status'
+```
+
+### Production Cutover
+
+#### Pre-cutover backup
+
+```bash
+doctl compute droplet-action snapshot <DROPLET_ID> --snapshot-name "pre-ubuntu24-rebuild-$(date +%Y%m%d)"
+doctl databases backups list <DB_CLUSTER_ID>
+```
+
+#### Create new production droplet
+
+The reserved IP stays; a new droplet is created and the IP is reassigned.
+
+```bash
+cd terraform/environments/production
+terraform init -upgrade
+terraform plan -out=tfplan
+# Expect: 1 droplet to add, 1 reserved_ip_assignment to update
+# moved blocks should show zero resource recreation for VPC, DB, firewall, alerts
+terraform apply tfplan
+```
+
+If `moved` blocks produce unexpected destroy/create, abort and investigate.
+
+#### Bootstrap Tailscale
+
+```bash
+ssh root@<NEW_DROPLET_IP>
+tailscale up --authkey <AUTHKEY> --hostname pausatf-prod --advertise-tags=tag:server
+tailscale status
+```
+
+#### Ansible full provision
+
+```bash
+cd ansible
+ansible-playbook -i inventory site.yml --limit production
+```
+
+#### Certbot certificates
+
+Runs as part of the certbot role. Verify:
+
+```bash
+ssh pausatf-prod 'certbot certificates'
+```
+
+#### Cloudflare environment
+
+The Cloudflare env reads the production reserved IP from remote state:
+
+```bash
+cd terraform/environments/cloudflare
+terraform init -upgrade
+terraform plan -out=tfplan
+# Review: zone settings update to strict, cache/WAF rulesets created
+terraform apply tfplan
+```
+
+#### Production verification
+
+```bash
+# Apache
+ssh pausatf-prod 'apachectl -V | grep MPM'
+
+# PHP-FPM
+ssh pausatf-prod 'php-fpm8.3 -t'
+
+# Redis
+ssh pausatf-prod 'redis-cli ping'
+
+# WordPress
+ssh pausatf-prod 'wp --allow-root core is-installed --path=/var/www/html && wp --allow-root db check --path=/var/www/html'
+
+# Certbot renewal
+ssh pausatf-prod 'certbot renew --dry-run'
+
+# Listening services
+ssh pausatf-prod 'ss -tlnp | grep -E "80|443|6379"'
+
+# UFW
+ssh pausatf-prod 'ufw status verbose'
+
+# Tailscale
+ssh pausatf-prod 'tailscale status'
+
+# Cloudflare cache — static HIT
+curl -sI https://www.pausatf.org/wp-content/themes/thesource/style.css | grep -i cf-cache-status
+# Expected: HIT (after cache warm)
+
+# Cloudflare cache — admin BYPASS
+curl -sI https://www.pausatf.org/wp-admin/ | grep -i cf-cache-status
+# Expected: BYPASS or DYNAMIC
+
+# External port scan
+nmap -Pn -p 22,80,443 www.pausatf.org
+# Expected: 22=filtered, 80=open, 443=open
+```
+
+#### Decommission old droplet
+
+Only after all verification passes and site stable for >= 24 hours:
+
+```bash
+doctl compute droplet-action power-off <OLD_DROPLET_ID>
+# After 7 days with no issues:
+doctl compute droplet delete <OLD_DROPLET_ID>
+```
+
+### Rollback
+
+#### Rollback droplet creation
+
+```bash
+doctl compute reserved-ip-action assign <RESERVED_IP> <OLD_DROPLET_ID>
+terraform destroy -target=module.wordpress.digitalocean_droplet.this
+```
+
+#### Rollback Ansible
+
+```bash
+git checkout main -- ansible/
+ansible-playbook -i inventory site.yml --limit production
+```
+
+#### Rollback Cloudflare
+
+```bash
+git checkout main -- terraform/environments/cloudflare/
+cd terraform/environments/cloudflare && terraform apply
+```
+
+#### Full rollback
+
+1. Restore DO snapshot from pre-cutover backup
+2. Reassign reserved IP to restored droplet
+3. Revert Cloudflare Terraform to `main` and apply
+4. Verify site operational
+
+The reserved IP does not change during cutover — zero DNS propagation delay.

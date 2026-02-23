@@ -27,9 +27,9 @@
 
 ## EXECUTIVE SUMMARY
 
-**Problem:** Static HTML race results in `/data/2025/` showing stale content to users for YEARS  
-**Root Cause:** Missing Cache-Control headers + Cloudflare caching HTML files indefinitely  
-**Impact:** Users see old race results until manual hard refresh  
+**Problem:** Static HTML race results in `/data/2025/` showing stale content to users for YEARS
+**Root Cause:** Missing Cache-Control headers + Cloudflare caching HTML files indefinitely
+**Impact:** Users see old race results until manual hard refresh
 **Solution:** Multi-layered cache control + automated purge system
 
 ---
@@ -78,13 +78,13 @@
         # Tell Cloudflare to bypass cache for these files
         Header set CF-Cache-Control "no-cache"
     </FilesMatch>
-    
+
     # Static assets - Reasonable TTL (30 days, recommended by operations team)
     # IMPORTANT: Use versioned filenames when updating (e.g., logo-v2.png)
     <FilesMatch "\.(jpg|jpeg|png|gif|ico|svg|webp)$">
         Header set Cache-Control "public, max-age=2592000, immutable"
     </FilesMatch>
-    
+
     <FilesMatch "\.(css|js)$">
         Header set Cache-Control "public, max-age=2592000, immutable"
     </FilesMatch>
@@ -271,10 +271,10 @@ do
     # Convert file path to URL
     RELATIVE_PATH="${FILEPATH#$WATCH_DIR}"
     FULL_URL="${BASE_URL}${RELATIVE_PATH}"
-    
+
     echo "[$(date)] File changed: $FILEPATH"
     echo "[$(date)] Purging cache for: $FULL_URL"
-    
+
     # Purge Cloudflare cache for specific file
     "$PURGE_SCRIPT" "$FULL_URL"
 done
@@ -404,7 +404,7 @@ tail -f /var/log/cloudflare-monitor.log
 
 **Message:**
 ```
-If you viewed race results on pausatf.org before December 20, 2025, 
+If you viewed race results on pausatf.org before December 20, 2025,
 you may need to perform a HARD REFRESH one time to see updated results.
 
 After this one-time refresh, results will update automatically going forward.
@@ -556,7 +556,7 @@ journalctl -u cloudflare-file-monitor -f
 
 ## SUMMARY
 
-**Status:** 
+**Status:**
 - ✅ Staging server configured and tested
 - ⏳ Production server awaiting deployment
 - ⏳ Cloudflare Page Rules need manual configuration (API token lacks permission)
@@ -568,7 +568,7 @@ journalctl -u cloudflare-file-monitor -f
 4. Purge full cache
 5. Notify users
 
-**Estimated Impact:** 
+**Estimated Impact:**
 - Immediate: Users will see fresh results after one hard refresh
 - Long-term: Automated cache invalidation ensures results always fresh
 - Performance: 30-day static asset cache maintains site speed

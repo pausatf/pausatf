@@ -170,7 +170,7 @@ function et_core_esc_attr( $attr_key, $attr_value ) {
 	 *
 	 * @since 3.27.1?
 	 *
-	 * @param array  $allowed_attrs_default Key/value paired array, the key used as the attribute identifier, 
+	 * @param array  $allowed_attrs_default Key/value paired array, the key used as the attribute identifier,
 	 *                                      the value used as the callback to escape the value.
 	 * @param string $attr_key              Element attribute key.
 	 * @param (string|array) $attr_value    Element attribute value.

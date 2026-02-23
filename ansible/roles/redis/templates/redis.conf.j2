@@ -1,0 +1,35 @@
+# Redis configuration for PAUSATF WordPress object cache
+# Managed by Ansible — do not edit manually
+
+# Network — localhost only, no external access
+bind 127.0.0.1
+port 6379
+protected-mode yes
+
+# Unix socket for PHP-FPM (lower latency than TCP)
+unixsocket /var/run/redis/redis.sock
+unixsocketperm 770
+
+# Memory — volatile cache, no persistence
+maxmemory {{ redis_maxmemory | default('256mb') }}
+maxmemory-policy {{ redis_maxmemory_policy | default('allkeys-lru') }}
+
+# Disable all persistence — this is a cache, not a datastore
+save ""
+appendonly no
+
+# Logging
+loglevel notice
+logfile /var/log/redis/redis-server.log
+
+# Connections
+timeout 300
+tcp-keepalive 300
+databases 16
+
+# Security — disable dangerous commands.
+# Note: wp redis flush uses FLUSHALL; use redis-cli DEL or KEYS+DEL instead.
+rename-command FLUSHDB ""
+rename-command FLUSHALL ""
+rename-command DEBUG ""
+rename-command CONFIG ""

@@ -73,7 +73,7 @@
       register: default_site
       failed_when: default_site.stat.exists
 
-    - name: Test Nginx is responding
+    - name: Test Nginx is responding  # checkov:skip=CKV2_ANSIBLE_1:localhost HTTP in molecule verify
       uri:
         url: http://localhost
         status_code: [200, 301, 302, 404]

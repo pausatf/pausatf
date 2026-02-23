@@ -253,6 +253,6 @@ The cache fix has been successfully deployed to production. All tests pass:
 
 ---
 
-**Verification Performed By:** Thomas Vincent  
-**Date:** 2025-12-20  
+**Verification Performed By:** Thomas Vincent
+**Date:** 2025-12-20
 **Server:** prod.pausatf.org (REDACTED_PROD_NEW_IP)
