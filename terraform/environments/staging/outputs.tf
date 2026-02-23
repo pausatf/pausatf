@@ -1,6 +1,6 @@
 output "staging_ipv4" {
   description = "IPv4 of staging droplet"
-  value       = digitalocean_droplet.staging.ipv4_address
+  value       = module.wordpress.droplet_ip
 }
 
 output "stage_dns_records" {
@@ -10,32 +10,32 @@ output "stage_dns_records" {
 
 output "droplet_id" {
   description = "Staging droplet ID"
-  value       = digitalocean_droplet.staging.id
+  value       = module.wordpress.droplet_id
 }
 
 output "droplet_ip" {
   description = "Staging droplet public IP"
-  value       = digitalocean_droplet.staging.ipv4_address
+  value       = module.wordpress.droplet_ip
 }
 
 output "database_id" {
   description = "Staging database cluster ID"
-  value       = digitalocean_database_cluster.staging.id
+  value       = module.wordpress.database_id
 }
 
 output "database_host" {
   description = "Staging database host"
-  value       = digitalocean_database_cluster.staging.host
+  value       = module.wordpress.database_host
   sensitive   = true
 }
 
 output "database_uri" {
   description = "Staging database connection URI"
-  value       = digitalocean_database_cluster.staging.uri
+  value       = module.wordpress.database_uri
   sensitive   = true
 }
 
 output "firewall_id" {
   description = "Staging firewall ID"
-  value       = digitalocean_firewall.staging.id
+  value       = module.wordpress.firewall_id
 }

@@ -56,7 +56,7 @@
     dest: "{{ wordpress_installs[0].path | default('/var/www/html') }}/.well-known/health-check.php"
     owner: www-data
     group: www-data
-    mode: '0644'
+    mode: '0640'
   when:
     - healthcheck_enabled | default(false)
     - wordpress_installs is defined

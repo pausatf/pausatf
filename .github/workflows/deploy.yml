@@ -87,3 +87,8 @@ jobs:
             -o IdentitiesOnly=yes \
             "$HC_HOST" \
             "curl -fsS -o /dev/null -w '%{http_code}' http://localhost/ | grep -qE '^(200|301|302)'"
+
+      - name: Cleanup secrets
+        if: always()
+        run: |
+          rm -f vault.pass ansible/group_vars/vault.yml ~/.ssh/deploy_key

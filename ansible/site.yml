@@ -2,8 +2,8 @@
 # Main playbook that orchestrates all roles
 - name: Configure all servers
   hosts: all
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
 
   pre_tasks:
     - name: Update apt cache
@@ -19,8 +19,8 @@
 
 - name: Configure web servers
   hosts: webservers
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
 
   tasks:
     - name: Deploy web stack
@@ -101,7 +101,6 @@
           service:
             name: "{{ 'apache2' if web_server | default('apache') == 'apache' else 'lsws' }}"
             state: started
-          ignore_errors: yes
 
         - name: Fail the play after rescue
           fail:
@@ -109,8 +108,8 @@
 
 - name: Configure monitoring
   hosts: all
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
 
   roles:
     - monitoring

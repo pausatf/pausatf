@@ -12,6 +12,9 @@ on:
       - 'terraform/**.tf'
       - '.github/workflows/terraform-validate.yml'
 
+permissions:
+  contents: read
+
 jobs:
   terraform-fmt:
     name: Terraform Format Check
@@ -24,7 +27,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@b9cd54a3c349d3f85571c5fb643da9750e94b949  # v3
         with:
-          terraform_version: latest
+          terraform_version: '1.10.3'
 
       - name: Terraform Format Check
         run: terraform fmt -check -recursive
@@ -49,7 +52,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@b9cd54a3c349d3f85571c5fb643da9750e94b949  # v3
         with:
-          terraform_version: latest
+          terraform_version: '1.10.3'
 
       - name: Terraform Init
         run: terraform init -backend=false
@@ -62,6 +65,9 @@ jobs:
   tfsec:
     name: TFSec Security Scan
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
     if: "!contains(github.event.pull_request.title, 'chore(deps):')"
     steps:
       - name: Checkout code
@@ -79,7 +85,7 @@ jobs:
         uses: github/codeql-action/upload-sarif@4f3212b61783c3c68e8309a0f18842c009e7c1c0  # v4
         if: always()
         with:
-          sarif_file: results.sarif
+          sarif_file: terraform/results.sarif
 
   tflint:
     name: TFLint

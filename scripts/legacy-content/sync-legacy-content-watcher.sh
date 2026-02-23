@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ##############################################################################
 # Legacy Content Git Sync Watcher
 #
@@ -102,29 +102,21 @@ Timestamp: $(date '+%Y-%m-%d %H:%M:%S')
     log "Sync completed successfully"
 }
 
-# Debounce mechanism
-last_change_time=0
-
 while true; do
-    # Wait for file system events
-    inotifywait -r -e modify,create,delete,move \
+    # Wait for initial filesystem event
+    inotifywait -r -q -e modify,create,delete,move \
         --exclude "$EXCLUDE_PATTERNS" \
         "$LEGACY_DIR" 2>/dev/null
 
-    # Record time of change
-    current_time=$(date +%s)
-    last_change_time=$current_time
-
     log "Detected changes, waiting for quiet period (${DEBOUNCE_SECONDS}s)..."
 
-    # Wait for debounce period
-    sleep "$DEBOUNCE_SECONDS"
+    # Drain events during debounce window using --timeout
+    while inotifywait -r -q -t "$DEBOUNCE_SECONDS" -e modify,create,delete,move \
+        --exclude "$EXCLUDE_PATTERNS" \
+        "$LEGACY_DIR" 2>/dev/null; do
+        log "More changes during debounce, resetting timer..."
+    done
 
-    # Check if more changes occurred during wait
-    if [ "$last_change_time" -eq "$current_time" ]; then
-        # No more changes, safe to sync
-        sync_to_git
-    else
-        log "More changes detected during debounce, extending wait..."
-    fi
+    log "Quiet period elapsed, syncing changes..."
+    sync_to_git
 done
