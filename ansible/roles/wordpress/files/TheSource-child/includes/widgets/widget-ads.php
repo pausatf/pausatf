@@ -66,4 +66,3 @@ function AdvWidgetInit() {
 }
 
 add_action('widgets_init', 'AdvWidgetInit');
-

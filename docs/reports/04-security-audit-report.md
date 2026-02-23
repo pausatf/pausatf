@@ -359,6 +359,6 @@ The child theme (TheSource-child) is **well-written and secure**, using modern W
 
 ---
 
-**Audit Performed By:** Thomas Vincent  
-**Date:** 2025-12-20  
+**Audit Performed By:** Thomas Vincent
+**Date:** 2025-12-20
 **Next Review:** 2026-06-20 (6 months)

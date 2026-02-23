@@ -66,4 +66,3 @@ function AdsenseWidgetInit() {
 }
 
 add_action('widgets_init', 'AdsenseWidgetInit');
-

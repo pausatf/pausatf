@@ -1,7 +1,7 @@
 # Database Password Rotation Procedure
 
-**Applies to**: WordPress production database on `ftp.pausatf.org`  
-**Frequency**: Immediately after any suspected credential exposure; otherwise annually  
+**Applies to**: WordPress production database on `ftp.pausatf.org`
+**Frequency**: Immediately after any suspected credential exposure; otherwise annually
 **Prerequisite**: Root SSH access to production server
 
 ---

@@ -179,4 +179,3 @@ function et_theme_maybe_load_core() {
 	et_core_setup( get_template_directory_uri() );
 }
 add_action( 'after_setup_theme', 'et_theme_maybe_load_core' );
-

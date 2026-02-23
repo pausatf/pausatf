@@ -137,4 +137,3 @@ NEXT STEPS AFTER DEPLOYMENT:
 2. Notify users to hard refresh ONE TIME
 3. Monitor /var/log/cloudflare-purge.log for issues
 4. Consider enabling file monitoring (see full docs)
-

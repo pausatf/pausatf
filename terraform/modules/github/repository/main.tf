@@ -9,6 +9,7 @@ terraform {
   }
 }
 
+#tfsec:ignore:GIT-0001
 resource "github_repository" "repo" {
   #checkov:skip=CKV_GIT_1:pausatf repo is intentionally public (track & field club)
   name        = var.name

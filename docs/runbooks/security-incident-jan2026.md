@@ -1,8 +1,8 @@
 # Security Incident Response — January 2026 Breach
 
-**Date discovered**: 2026-02-21  
-**Incident window**: Jan 20–21 2026 (estimated)  
-**Severity**: Critical — active server compromise with persistence  
+**Date discovered**: 2026-02-21
+**Incident window**: Jan 20–21 2026 (estimated)
+**Severity**: Critical — active server compromise with persistence
 **Status**: Remediated
 
 ---

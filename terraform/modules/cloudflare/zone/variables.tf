@@ -8,11 +8,6 @@ variable "zone_name" {
   type        = string
 }
 
-variable "plan" {
-  description = "Cloudflare plan (free, pro, business, enterprise)"
-  type        = string
-  default     = "free"
-}
 
 variable "type" {
   description = "Zone type (full, partial)"
