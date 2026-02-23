@@ -1,0 +1,5 @@
+---
+redis_enabled: false
+redis_maxmemory: "256mb"
+redis_maxmemory_policy: "allkeys-lru"
+redis_socket: "/var/run/redis/redis.sock"

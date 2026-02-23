@@ -1,0 +1,8 @@
+---
+cloudflare_enabled: false
+cloudflare_zone_id: ""
+cloudflare_api_token: ""
+cloudflare_zone: ""
+cloudflare_ssl_mode: "full"
+cloudflare_min_tls_version: "1.2"
+cloudflare_security_level: "medium"

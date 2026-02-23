@@ -29,8 +29,7 @@
     certbot certonly
     --dns-cloudflare
     --dns-cloudflare-credentials /etc/letsencrypt/cloudflare.ini
-    -d pausatf.org
-    -d www.pausatf.org
+    {{ certbot_domains | map('regex_replace', '^', '-d ') | join(' ') }}
     --non-interactive
     --agree-tos
     -m "{{ certbot_email }}"
