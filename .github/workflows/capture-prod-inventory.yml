@@ -34,8 +34,6 @@ jobs:
           ssh-keyscan -H ftp.pausatf.org >> ~/.ssh/known_hosts 2>/dev/null || true
 
       - name: Run capture playbook (prod)
-        env:
-          ANSIBLE_HOST_KEY_CHECKING: 'false'
         run: |
           ansible-playbook -i ansible/inventory/hosts.yml ansible/playbooks/capture-wp-inventory.yml -l production
 

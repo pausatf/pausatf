@@ -131,11 +131,11 @@ resource "digitalocean_firewall" "staging" {
     source_addresses = var.ssh_allowed_ips
   }
 
-  # OpenLiteSpeed WebAdmin
+  # OpenLiteSpeed WebAdmin (restricted to admin IPs)
   inbound_rule {
     protocol         = "tcp"
     port_range       = "7080"
-    source_addresses = ["0.0.0.0/0", "::/0"]
+    source_addresses = var.ssh_allowed_ips
   }
 
   # Allow all outbound

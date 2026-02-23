@@ -1,0 +1,5 @@
+---
+mysql_managed: false
+mysql_root_password: ""
+mysql_socket: /var/run/mysqld/mysqld.sock
+wordpress_installs: []

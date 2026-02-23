@@ -99,6 +99,16 @@
           Require all denied
       </FilesMatch>
 
+- name: Deploy TheSource parent theme
+  copy:
+    src: TheSource/
+    dest: "{{ wp_site.path }}/wp-content/themes/TheSource/"
+    owner: www-data
+    group: www-data
+    mode: '0644'
+    directory_mode: '0755'
+  when: wp_site.active_theme | default('') == 'TheSource-child'
+
 - name: Deploy TheSource child theme
   copy:
     src: TheSource-child/

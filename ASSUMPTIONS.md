@@ -122,10 +122,12 @@ Items marked **ACTION REQUIRED** need manual steps before or during cutover.
     in the Tailscale role. Ensure it is installed:
     `ansible-galaxy collection install community.general`
 
-26. The old `mysql` Ansible role (which installs `mysql-server`) is no longer
-    included in `site.yml`. If a future playbook run targets the old
-    production droplet, the `mysql` role must be re-added to `site.yml` or
-    run separately.
+26. The `mysql` Ansible role is present in `site.yml` but guarded by
+    `when: not (mysql_managed | default(false))`. On the Ubuntu 24.04 droplet
+    (managed DB path), `mysql_managed: true` is set in the environment group
+    vars, so the role skips local `mysql-server` installation. Set
+    `mysql_managed: false` only when targeting a droplet that needs a local
+    MySQL instance.
 
 27. The `php` role (mod_php) is replaced by `php-fpm` in `site.yml`. The old
     role files are preserved in the repo for backward compatibility.
