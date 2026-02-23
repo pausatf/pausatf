@@ -1,5 +1,6 @@
 ---
 dependencies:
   - role: mysql
+    when: not (mysql_managed | default(false))
   - role: apache
     when: web_server | default('apache') == 'apache'

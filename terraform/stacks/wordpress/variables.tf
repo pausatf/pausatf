@@ -87,3 +87,9 @@ variable "enable_monitoring" {
   type        = bool
   default     = true
 }
+
+variable "create_reserved_ip" {
+  description = "Create a reserved IP in the stack module. Set false if the environment manages its own."
+  type        = bool
+  default     = true
+}

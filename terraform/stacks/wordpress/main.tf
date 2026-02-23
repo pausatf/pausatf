@@ -29,6 +29,7 @@ resource "digitalocean_vpc" "this" {
 
 # Reserved IP — survives droplet rebuilds
 resource "digitalocean_reserved_ip" "this" {
+  count  = var.create_reserved_ip ? 1 : 0
   region = var.region
 
   lifecycle {
@@ -37,7 +38,8 @@ resource "digitalocean_reserved_ip" "this" {
 }
 
 resource "digitalocean_reserved_ip_assignment" "this" {
-  ip_address = digitalocean_reserved_ip.this.ip_address
+  count      = var.create_reserved_ip ? 1 : 0
+  ip_address = digitalocean_reserved_ip.this[0].ip_address
   droplet_id = digitalocean_droplet.this.id
 }
 

@@ -70,12 +70,18 @@ module "wordpress" {
     environment = "production"
     hostname    = "pausatf-prod"
   })
+
+  create_reserved_ip = false
 }
 
 # Alias for reserved IP (project resource reference needs direct resource)
 # The stack module creates the reserved IP; reference it for the project.
 resource "digitalocean_reserved_ip" "production" {
   region = var.region
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "digitalocean_reserved_ip_assignment" "production" {
@@ -117,4 +123,14 @@ moved {
 moved {
   from = digitalocean_monitor_alert.disk_high
   to   = module.wordpress.digitalocean_monitor_alert.disk_high
+}
+
+moved {
+  from = module.wordpress.digitalocean_reserved_ip.this[0]
+  to   = digitalocean_reserved_ip.production
+}
+
+moved {
+  from = module.wordpress.digitalocean_reserved_ip_assignment.this[0]
+  to   = digitalocean_reserved_ip_assignment.production
 }
