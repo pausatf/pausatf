@@ -1,0 +1,31 @@
+; PHP-FPM pool configuration for PAUSATF WordPress
+; Managed by Ansible — do not edit manually
+
+[www]
+user = www-data
+group = www-data
+
+listen = {{ php_fpm_socket | default('/run/php/php8.3-fpm.sock') }}
+listen.owner = www-data
+listen.group = www-data
+listen.mode = 0660
+
+pm = dynamic
+pm.max_children = {{ php_fpm_max_children | default(10) }}
+pm.start_servers = {{ php_fpm_start_servers | default(2) }}
+pm.min_spare_servers = {{ php_fpm_min_spare | default(1) }}
+pm.max_spare_servers = {{ php_fpm_max_spare | default(3) }}
+pm.max_requests = {{ php_fpm_max_requests | default(500) }}
+
+; Slow log for debugging
+slowlog = /var/log/php-fpm-slow.log
+request_slowlog_timeout = 5s
+
+; Security — limit extensions
+security.limit_extensions = .php
+
+; Environment
+env[HOSTNAME] = $HOSTNAME
+env[TMP] = /tmp
+env[TMPDIR] = /tmp
+env[TEMP] = /tmp

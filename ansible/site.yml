@@ -1,17 +1,8 @@
 ---
 # PAUSATF WordPress Server Deployment Playbook
 # ==============================================
-# Based on audit of ftp.pausatf.org (pausatforg20230516-primary)
-#
-# Server Details:
-#   - Ubuntu 20.04.6 LTS (Focal Fossa)
-#   - 4 CPU cores, 8GB RAM
-#   - DigitalOcean Droplet (sfo2)
-#   - Web Server: Apache or OpenLiteSpeed (per-environment)
-#   - PHP: per-environment (8.3/8.4 for new hosts)
-#   - MySQL: per-environment (8.0+ for new hosts)
-#   - WordPress: per-environment (latest on stage/dev)
-#   - Cloudflare CDN/DNS (Free plan, SSL Full/Strict)
+# Ubuntu 24.04 + Apache event MPM + PHP 8.3-FPM + Redis + Managed MySQL 8
+# SSH via Tailscale only. SSL via Certbot Cloudflare DNS-01.
 #
 # Usage:
 #   ansible-playbook -i inventory site.yml
@@ -29,12 +20,12 @@
     - group_vars/vault.yml
 
   pre_tasks:
-    - name: Validate target is Ubuntu
+    - name: Validate target is Ubuntu 24.04+
       assert:
         that:
           - ansible_distribution == "Ubuntu"
-          - ansible_distribution_major_version | int >= 20
-        fail_msg: "This playbook is designed for Ubuntu 20.04+"
+          - ansible_distribution_major_version | int >= 24
+        fail_msg: "This playbook targets Ubuntu 24.04+"
 
     - name: Update apt cache
       apt:
@@ -47,9 +38,11 @@
           Infrastructure Details:
           =======================
           Hosting: DigitalOcean ({{ digitalocean_region }})
-          Droplet: {{ digitalocean_droplet_name }} ({{ digitalocean_size }})
           CDN/DNS: Cloudflare ({{ cloudflare_zone }})
           SSL Mode: {{ cloudflare_ssl_mode }}
+          Apache MPM: {{ apache_mpm }}
+          PHP: {{ php_version }}-FPM
+          Database: DO Managed MySQL {{ mysql_version }}
       tags: always
 
   roles:
@@ -59,24 +52,22 @@
     - role: fail2ban
       tags: [fail2ban, security]
 
-    - role: mysql
-      tags: [mysql, database]
+    - role: tailscale
+      tags: [tailscale, security, ssh]
 
-    # Web server selection per environment
-    - role: lsphp
-      when: web_server | default('apache') == 'openlitespeed'
-      tags: [php, web, webserver]
+    # No mysql role — database is DO Managed MySQL 8
 
-    - role: openlitespeed
-      when: web_server | default('apache') == 'openlitespeed'
-      tags: [openlitespeed, web, webserver]
+    - role: redis
+      tags: [redis, cache]
+      when: redis_enabled | default(false)
 
-    - role: php
-      when: web_server | default('apache') == 'apache'
+    - role: certbot
+      tags: [certbot, ssl]
+
+    - role: php-fpm
       tags: [php, web, webserver]
 
     - role: apache
-      when: web_server | default('apache') == 'apache'
       tags: [apache, web, webserver]
 
     - role: cloudflare
@@ -99,7 +90,13 @@
         name: "{{ item }}"
         state: started
         enabled: yes
-      loop: "{{ [ 'mysql', 'fail2ban', 'cron' ] + ((web_server == 'openlitespeed') | ternary(['lshttpd'], ['apache2'])) }}"
+      loop:
+        - apache2
+        - php8.3-fpm
+        - redis-server
+        - fail2ban
+        - tailscaled
+        - cron
       tags: verify
 
     - name: Display deployment summary
@@ -109,21 +106,21 @@
           ====================
 
           Infrastructure:
-            - DigitalOcean: {{ digitalocean_droplet_name }}
-            - Region: {{ digitalocean_region_name }}
-            - Size: {{ digitalocean_size }} ({{ digitalocean_vcpus }} vCPU, {{ digitalocean_memory_mb }}MB RAM)
+            - DigitalOcean: {{ hostname }}
+            - Region: {{ digitalocean_region }}
 
           Cloudflare:
             - Zone: {{ cloudflare_zone }}
             - SSL Mode: {{ cloudflare_ssl_mode }}
-            - Plan: {{ cloudflare_plan }}
 
           Websites:
             - Main: https://www.pausatf.org (/var/www/html)
 
           Stack:
-            - Web: {{ web_server | default('apache') }}
-            - PHP: {{ php_version }}
-            - MySQL: {{ mysql_version }}
-            - WordPress: {{ wordpress_installs[0].wp_version | default('latest') }}
+            - Web: Apache 2.4 ({{ apache_mpm }} MPM)
+            - PHP: {{ php_version }}-FPM via {{ php_fpm_socket }}
+            - Cache: Redis ({{ redis_maxmemory }} {{ redis_maxmemory_policy }})
+            - Database: DO Managed MySQL {{ mysql_version }}
+            - SSH: Tailscale only
+            - SSL: Certbot (Cloudflare DNS-01)
       tags: always

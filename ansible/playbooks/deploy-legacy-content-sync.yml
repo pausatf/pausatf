@@ -61,11 +61,11 @@
         name: "{{ item.name }}"
         value: "{{ item.value }}"
       loop:
-        - { name: 'user.name', value: 'Legacy Content Sync Bot' }
-        - { name: 'user.email', value: 'noreply@pausatf.org' }
+        - {name: 'user.name', value: 'Legacy Content Sync Bot'}
+        - {name: 'user.email', value: 'noreply@pausatf.org'}
       tags: [always]
 
-    - name: Download watcher script
+    - name: Download watcher script  # checkov:skip=CKV2_ANSIBLE_2:template variable URL
       get_url:
         url: "{{ scripts_source }}/sync-legacy-content-watcher.sh"
         dest: /usr/local/bin/sync-legacy-content-watcher.sh
@@ -75,7 +75,7 @@
       when: sync_method in ['watcher', 'both']
       tags: [watcher, both]
 
-    - name: Download watcher systemd service
+    - name: Download watcher systemd service  # checkov:skip=CKV2_ANSIBLE_2:template variable URL
       get_url:
         url: "{{ scripts_source }}/sync-legacy-content-watcher.service"
         dest: /etc/systemd/system/sync-legacy-content-watcher.service
@@ -99,7 +99,7 @@
       when: sync_method in ['watcher', 'both']
       tags: [watcher, both]
 
-    - name: Download cron script
+    - name: Download cron script  # checkov:skip=CKV2_ANSIBLE_2:template variable URL
       get_url:
         url: "{{ scripts_source }}/sync-legacy-content-cron.sh"
         dest: /usr/local/bin/sync-legacy-content-cron.sh

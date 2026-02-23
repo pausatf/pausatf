@@ -1,13 +1,11 @@
-variable "do_token" {
-  description = "DigitalOcean API token"
+variable "environment" {
+  description = "Environment name (production, staging, development)"
   type        = string
-  sensitive   = true
-}
 
-variable "cloudflare_api_token" {
-  description = "Cloudflare API token"
-  type        = string
-  sensitive   = true
+  validation {
+    condition     = contains(["production", "staging", "development"], var.environment)
+    error_message = "Environment must be production, staging, or development."
+  }
 }
 
 variable "region" {
@@ -43,13 +41,14 @@ variable "droplet_image" {
   }
 }
 
-variable "ssh_public_key" {
-  description = "SSH public key for droplet access"
+variable "cloud_init_content" {
+  description = "Rendered cloud-init user data"
   type        = string
+  default     = null
 }
 
-variable "alert_email_addresses" {
-  description = "Email addresses for monitoring alerts"
+variable "ssh_key_fingerprints" {
+  description = "List of SSH key IDs/fingerprints for droplet access"
   type        = list(string)
   default     = []
 }
@@ -63,4 +62,28 @@ variable "database_size" {
     condition     = startswith(var.database_size, "db-s-")
     error_message = "Database size must start with 'db-s-'."
   }
+}
+
+variable "vpc_cidr" {
+  description = "VPC IP range in CIDR notation"
+  type        = string
+  default     = "10.10.0.0/16"
+}
+
+variable "alert_emails" {
+  description = "Email addresses for monitoring alerts"
+  type        = list(string)
+  default     = []
+}
+
+variable "enable_backups" {
+  description = "Enable automated droplet backups"
+  type        = bool
+  default     = false
+}
+
+variable "enable_monitoring" {
+  description = "Enable DigitalOcean monitoring agent"
+  type        = bool
+  default     = true
 }

@@ -10,6 +10,7 @@ terraform {
 }
 
 resource "github_repository" "repo" {
+  #checkov:skip=CKV_GIT_1:pausatf repo is intentionally public (track & field club)
   name        = var.name
   description = var.description
   visibility  = var.visibility
@@ -50,6 +51,7 @@ resource "github_repository" "repo" {
 }
 
 resource "github_branch_protection" "main" {
+  #checkov:skip=CKV_GIT_5:small team; 1 reviewer sufficient
   count = var.enable_branch_protection ? 1 : 0
 
   repository_id = github_repository.repo.node_id
