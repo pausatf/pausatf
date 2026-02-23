@@ -51,11 +51,12 @@
     interface: tailscale0
   notify: Reload UFW
 
-# Block public SSH after Tailscale is confirmed up.
-# Only run this when tailscale0 exists to avoid locking out during bootstrap.
-- name: Check if tailscale0 interface exists
-  command: ip link show tailscale0
-  register: tailscale_iface
+# Block public SSH only after Tailscale is authenticated and connected.
+# tailscale0 exists as soon as tailscaled starts, but the overlay network
+# is not usable until the node is authenticated (BackendState == Running).
+- name: Check if Tailscale is authenticated
+  command: tailscale status --json
+  register: tailscale_status
   changed_when: false
   failed_when: false
 
@@ -65,7 +66,9 @@
     port: "22"
     proto: tcp
     direction: in
-  when: tailscale_iface.rc == 0
+  when:
+    - tailscale_status.rc == 0
+    - (tailscale_status.stdout | from_json).BackendState | default('') == 'Running'
   notify: Reload UFW
 
 - name: Document Tailscale authentication step
