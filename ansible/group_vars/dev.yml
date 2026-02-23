@@ -2,7 +2,7 @@
 # Dev environment overrides
 web_server: openlitespeed
 php_version: "8.4"
-mysql_version: "8.0"
+mysql_version: "8"
 
 wordpress_installs:
   - name: "pausatf-main"

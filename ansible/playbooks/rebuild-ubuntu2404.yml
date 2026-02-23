@@ -92,7 +92,7 @@
         enabled: yes
       loop:
         - apache2
-        - php8.3-fpm
+        - "php{{ php_version }}-fpm"
         - redis-server
         - fail2ban
         - tailscaled
