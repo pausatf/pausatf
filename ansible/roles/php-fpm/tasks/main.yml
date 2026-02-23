@@ -56,7 +56,10 @@
   alternatives:
     name: php
     path: /usr/bin/php8.3
-  ignore_errors: yes
+  register: php_alternatives
+  failed_when:
+    - php_alternatives.rc != 0
+    - "'no alternatives' not in (php_alternatives.stderr | default(''))"
 
 - name: Create PHP session directory
   file:
