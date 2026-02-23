@@ -128,10 +128,10 @@ class ET_Core_LIB_OAuthUtil {
 
 		} else if ( is_scalar( $input ) ) {
 			// PHP 8.2+: utf8_encode removed; mb_convert_encoding is the correct replacement.
-		$output = rawurlencode( function_exists( 'mb_convert_encoding' )
-			? mb_convert_encoding( (string) $input, 'UTF-8', 'ISO-8859-1' )
-			: (string) $input
-		);
+			$output = rawurlencode( function_exists( 'mb_convert_encoding' )
+				? mb_convert_encoding( (string) $input, 'UTF-8', 'ISO-8859-1' )
+				: (string) $input
+			);
 		}
 
 		return $output;
