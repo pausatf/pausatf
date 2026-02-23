@@ -131,7 +131,7 @@ php_upload_max_filesize: "64M"
 php_post_max_size: "64M"
 php_date_timezone: "America/Los_Angeles"
 
-# PHP modules to ensure installed
+# PHP modules to ensure installed (used by both php and php-fpm roles)
 php_modules:
   - bcmath
   - cli
@@ -139,10 +139,11 @@ php_modules:
   - curl
   - gd
   - imagick
-  - json
+  - intl
   - mbstring
   - mysql
   - opcache
+  - redis
   - soap
   - xml
   - zip
@@ -164,6 +165,26 @@ mysql_version: "8"
 mysql_managed: true
 mysql_enabled: false
 mysql_port: 25060  # DO Managed MySQL default port
+
+# =============================================================================
+# WORDPRESS INSTALL DEFAULTS
+# =============================================================================
+# Shared defaults for all environments. Per-environment group_vars override
+# only the keys that differ (domain, db_password, auth keys, etc.).
+# Usage in env group_vars: wordpress_install_defaults | combine({...})
+wordpress_install_defaults:
+  name: "pausatf-main"
+  path: "/var/www/html"
+  db_name: "wordpress"
+  db_user: "wordpress"
+  db_host: "localhost"
+  table_prefix: "wp_"
+  active_theme: "TheSource-child"
+  cron_enabled: true
+  disallow_file_edit: true
+  disallow_file_mods: false
+  auto_update_core: "minor"
+  fs_method: "direct"
 
 # =============================================================================
 # WP-CLI CONFIGURATION
