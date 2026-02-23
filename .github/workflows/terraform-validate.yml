@@ -90,7 +90,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
 
       - name: Setup TFLint
-        uses: terraform-linters/setup-tflint@v6
+        uses: terraform-linters/setup-tflint@4cb9feea73331a35b422df102992a03a44a3bb33  # v6
         with:
           tflint_version: latest
 

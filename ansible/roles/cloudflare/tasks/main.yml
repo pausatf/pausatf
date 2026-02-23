@@ -35,6 +35,7 @@
     dest: /etc/apache2/cloudflare-ips-v4.txt
     mode: '0644'
   register: cf_ips_v4
+  when: web_server | default('apache') == 'apache'
   tags: cloudflare
 
 - name: Update Cloudflare IPv6 ranges
@@ -43,6 +44,7 @@
     dest: /etc/apache2/cloudflare-ips-v6.txt
     mode: '0644'
   register: cf_ips_v6
+  when: web_server | default('apache') == 'apache'
   tags: cloudflare
 
 - name: Verify Cloudflare zone is active

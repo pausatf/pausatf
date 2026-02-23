@@ -62,6 +62,7 @@ cloudflare_dns_records:
 # SYSTEM — PRODUCTION HOSTNAME
 # =============================================================================
 hostname: "pausatf-prod"
+web_server: apache
 
 # =============================================================================
 # WORDPRESS — PRODUCTION INSTALL

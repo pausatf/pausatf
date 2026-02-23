@@ -3,19 +3,14 @@
 # - uses WP-CLI to manage core, plugins, and themes
 # - honors per-install settings in group_vars
 
-- name: Assert WordPress vault secrets are configured
+- name: Assert WordPress credentials are configured
   assert:
     that:
-      - vault_wp_main_db_password is defined and vault_wp_main_db_password | length > 0
-      - vault_wp_main_auth_key is defined and vault_wp_main_auth_key | length > 0
-      - vault_wp_main_secure_auth_key is defined and vault_wp_main_secure_auth_key | length > 0
-      - vault_wp_main_logged_in_key is defined and vault_wp_main_logged_in_key | length > 0
-      - vault_wp_main_nonce_key is defined and vault_wp_main_nonce_key | length > 0
-      - vault_wp_main_auth_salt is defined and vault_wp_main_auth_salt | length > 0
-      - vault_wp_main_secure_auth_salt is defined and vault_wp_main_secure_auth_salt | length > 0
-      - vault_wp_main_logged_in_salt is defined and vault_wp_main_logged_in_salt | length > 0
-      - vault_wp_main_nonce_salt is defined and vault_wp_main_nonce_salt | length > 0
-    fail_msg: "WordPress secrets must be set via Ansible vault — vault_wp_main_* variables are missing or empty"
+      - wordpress_installs is defined
+      - wordpress_installs | length > 0
+      - wordpress_installs[0].db_password | default('') | length > 0
+    fail_msg: "wordpress_installs must be defined with a non-empty db_password"
+  when: wordpress_enabled | default(true)
 
 - name: Assert WordPress auth keys are wired through wordpress_installs
   assert:

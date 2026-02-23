@@ -39,17 +39,16 @@
       apt:
         name:
           - apache2
-          - mysql-server
-          - php
-          - php-mysql
-          - php-cli
-          - php-curl
-          - php-gd
-          - php-mbstring
-          - php-xml
-          - php-xmlrpc
-          - php-zip
+          - "php{{ php_version }}"
+          - "php{{ php_version }}-mysql"
+          - "php{{ php_version }}-cli"
+          - "php{{ php_version }}-curl"
+          - "php{{ php_version }}-gd"
+          - "php{{ php_version }}-mbstring"
+          - "php{{ php_version }}-xml"
+          - "php{{ php_version }}-zip"
           - python3-pymysql
+          - mysql-client
         state: present
         update_cache: yes
 

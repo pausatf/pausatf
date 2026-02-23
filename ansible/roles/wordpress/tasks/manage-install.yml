@@ -69,9 +69,18 @@
   when: wpcli_update_themes | default(true)
   ignore_errors: yes
 
-- name: Ensure LiteSpeed Cache plugin present and active (stage/dev)
-  command: "{{ wpcli_path | default('/usr/local/bin/wp') }} plugin install litespeed-cache --activate --path={{ wp_site.path }} --allow-root"
+- name: Check if LiteSpeed Cache plugin is installed
+  command: "{{ wpcli_path | default('/usr/local/bin/wp') }} plugin is-installed litespeed-cache --path={{ wp_site.path }} --allow-root"
+  register: lscache_installed
+  changed_when: false
+  failed_when: false
   when: web_server | default('apache') == 'openlitespeed'
+
+- name: Install and activate LiteSpeed Cache plugin (stage/dev)
+  command: "{{ wpcli_path | default('/usr/local/bin/wp') }} plugin install litespeed-cache --activate --path={{ wp_site.path }} --allow-root"
+  when:
+    - web_server | default('apache') == 'openlitespeed'
+    - lscache_installed.rc != 0
 
 - name: Set WordPress file and directory permissions
   file:

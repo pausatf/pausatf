@@ -31,7 +31,7 @@ variable "droplet_size" {
 variable "droplet_image" {
   description = "Droplet image/snapshot"
   type        = string
-  default     = "ubuntu-22-04-x64"
+  default     = "ubuntu-24-04-x64"
 }
 
 variable "database_size" {
