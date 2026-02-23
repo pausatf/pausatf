@@ -9,6 +9,9 @@ region        = "sfo2"
 droplet_size  = "s-1vcpu-2gb"
 database_size = "db-s-1vcpu-1gb"
 
-ssh_key_fingerprints = []
+# DO SSH key fingerprints to seed into the droplet at creation.
+# pausatf-dev-deploy key (DO ID 54308918) — used by deploy-dev workflow (DEV_SSH_PRIVATE_KEY secret).
+# Add additional keys (e.g. developer laptops) as needed.
+ssh_key_fingerprints = ["41:de:28:dd:8b:51:aa:f6:04:b3:37:18:64:be:c2:3e"]
 
 environment = "dev"
