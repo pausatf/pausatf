@@ -1,126 +1,75 @@
 ---
-# PAUSATF WordPress Server Deployment Playbook
-# ==============================================
-# Ubuntu 24.04 + Apache event MPM + PHP 8.3-FPM + Redis + Managed MySQL 8
-# SSH via Tailscale only. SSL via Certbot Cloudflare DNS-01.
-#
-# Usage:
-#   ansible-playbook -i inventory site.yml
-#   ansible-playbook -i inventory site.yml --tags "webserver"
-#   ansible-playbook -i inventory site.yml --tags "cloudflare"
-#   ansible-playbook -i inventory site.yml --check --diff
-
-- name: Deploy PAUSATF WordPress Server
-  hosts: webservers
-  become: yes
+# Main playbook that orchestrates all roles
+- name: Configure all servers
+  hosts: all
   gather_facts: yes
-
-  vars_files:
-    - group_vars/all.yml
-    - group_vars/vault.yml
+  become: yes
 
   pre_tasks:
-    - name: Validate target is Ubuntu 24.04+
-      assert:
-        that:
-          - ansible_distribution == "Ubuntu"
-          - ansible_distribution_major_version | int >= 24
-        fail_msg: "This playbook targets Ubuntu 24.04+"
-
     - name: Update apt cache
       apt:
         update_cache: yes
         cache_valid_time: 3600
-
-    - name: Display infrastructure info
-      debug:
-        msg: |
-          Infrastructure Details:
-          =======================
-          Hosting: DigitalOcean ({{ digitalocean_region }})
-          CDN/DNS: Cloudflare ({{ cloudflare_zone }})
-          SSL Mode: {{ cloudflare_ssl_mode }}
-          Apache MPM: {{ apache_mpm }}
-          PHP: {{ php_version }}-FPM
-          Database: DO Managed MySQL {{ mysql_version }}
-      tags: always
+      when: ansible_os_family == "Debian"
 
   roles:
-    - role: common
-      tags: [common, base]
-
-    - role: fail2ban
-      tags: [fail2ban, security]
-
+    - common
     - role: tailscale
-      tags: [tailscale, security, ssh]
+      when: tailscale_enabled | default(false)
 
-    # No mysql role — database is DO Managed MySQL 8
+- name: Configure web servers
+  hosts: webservers
+  gather_facts: yes
+  become: yes
 
-    - role: redis
-      tags: [redis, cache]
-      when: redis_enabled | default(false)
-
-    - role: certbot
-      tags: [certbot, ssl]
+  roles:
+    # PHP — mod_php (legacy) or PHP-FPM (new)
+    - role: php
+      when:
+        - web_server | default('apache') == 'apache'
+        - not (use_php_fpm | default(false))
 
     - role: php-fpm
-      tags: [php, web, webserver]
+      when:
+        - web_server | default('apache') == 'apache'
+        - use_php_fpm | default(false)
 
     - role: apache
-      tags: [apache, web, webserver]
+      when: web_server | default('apache') == 'apache'
 
-    - role: cloudflare
-      tags: [cloudflare, cdn, dns]
-      when: cloudflare_enabled | default(false)
+    # OpenLiteSpeed path (staging/dev)
+    - role: lsphp
+      when: web_server | default('apache') == 'openlitespeed'
+
+    - role: openlitespeed
+      when: web_server | default('apache') == 'openlitespeed'
+
+    # TLS certificates via Let's Encrypt DNS-01
+    - role: certbot
+      when: certbot_enabled | default(false)
+
+    - role: mysql
+      when: mysql_enabled | default(true)
+
+    # Redis object cache
+    - role: redis
+      when: redis_enabled | default(false)
+
+    - role: fail2ban
 
     - role: wordpress
-      tags: [wordpress, app]
+      when: wordpress_enabled | default(true)
+
+    - role: cloudflare
+      when: cloudflare_enabled | default(false)
 
     - role: newrelic
-      tags: [newrelic, monitoring]
       when: newrelic_enabled | default(false)
 
-    - role: monitoring
-      tags: [monitoring]
+- name: Configure monitoring
+  hosts: all
+  gather_facts: yes
+  become: yes
 
-  post_tasks:
-    - name: Verify core services are running
-      service:
-        name: "{{ item }}"
-        state: started
-        enabled: yes
-      loop:
-        - apache2
-        - php8.3-fpm
-        - redis-server
-        - fail2ban
-        - tailscaled
-        - cron
-      tags: verify
-
-    - name: Display deployment summary
-      debug:
-        msg: |
-          Deployment Complete!
-          ====================
-
-          Infrastructure:
-            - DigitalOcean: {{ hostname }}
-            - Region: {{ digitalocean_region }}
-
-          Cloudflare:
-            - Zone: {{ cloudflare_zone }}
-            - SSL Mode: {{ cloudflare_ssl_mode }}
-
-          Websites:
-            - Main: https://www.pausatf.org (/var/www/html)
-
-          Stack:
-            - Web: Apache 2.4 ({{ apache_mpm }} MPM)
-            - PHP: {{ php_version }}-FPM via {{ php_fpm_socket }}
-            - Cache: Redis ({{ redis_maxmemory }} {{ redis_maxmemory_policy }})
-            - Database: DO Managed MySQL {{ mysql_version }}
-            - SSH: Tailscale only
-            - SSL: Certbot (Cloudflare DNS-01)
-      tags: always
+  roles:
+    - monitoring
