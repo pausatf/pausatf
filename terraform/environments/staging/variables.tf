@@ -50,4 +50,3 @@ variable "ssh_key_fingerprints" {
   type        = list(string)
   default     = []
 }
-

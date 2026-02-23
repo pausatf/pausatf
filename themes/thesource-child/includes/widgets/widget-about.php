@@ -83,4 +83,3 @@ function AboutMeWidgetInit() {
     register_widget('AboutMeWidget');
 }
 add_action('widgets_init', 'AboutMeWidgetInit');
-

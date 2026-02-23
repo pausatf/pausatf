@@ -54,7 +54,7 @@ if ( ! function_exists( 'et_epanel_admin_js' ) ) {
 if ( ! function_exists( 'et_epanel_enable_css_lint' ) ) {
 	function et_epanel_enable_css_lint( $settings ){
 		$modes = array( 'text/css', 'css', 'text/x-scss', 'text/x-less', 'text/x-sass' );
-		
+
 		if ( in_array( $settings['codemirror']['mode'], $modes, true ) ) {
 			$settings['codemirror']['lint'] = true;
 			$settings['codemirror']['gutters'] = array( 'CodeMirror-lint-markers' );

@@ -41,7 +41,7 @@
 
 ### 2. OPENLITESPEED CACHE MODULE
 
-**Status:** ✅ ENABLED  
+**Status:** ✅ ENABLED
 **Configuration:**
 ```
 module cache {
@@ -65,7 +65,7 @@ module cache {
 
 ### 3. WORDPRESS CACHE PLUGINS
 
-**Installed:** None actively running  
+**Installed:** None actively running
 **Remnants Found:**
 - `advanced-cache.php` (dropin) - Status: OFF
 - WpFastestCache options in database (plugin removed)
@@ -77,7 +77,7 @@ module cache {
 
 ### 4. PHP OPCACHE SETTINGS
 
-**Status:** Enabled (default with PHP 8.4)  
+**Status:** Enabled (default with PHP 8.4)
 **Configuration:**
 ```ini
 [opcache]
@@ -367,5 +367,5 @@ Once headers + Page Rules are deployed, automated purge becomes optional.
 
 ---
 
-*Generated: 2025-12-20*  
+*Generated: 2025-12-20*
 *Contact: Thomas Vincent (thomasvincent@gmail.com)*

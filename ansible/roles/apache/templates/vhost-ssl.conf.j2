@@ -14,8 +14,14 @@
 
     # SSL Configuration
     SSLEngine on
+{% if apache_mpm | default('prefork') == 'event' %}
+    # Let's Encrypt certificates (certbot with Cloudflare DNS plugin)
+    SSLCertificateFile /etc/letsencrypt/live/pausatf.org/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/pausatf.org/privkey.pem
+{% else %}
     SSLCertificateFile {{ item.ssl_certificate }}
     SSLCertificateKeyFile {{ item.ssl_certificate_key }}
+{% endif %}
 
     # Modern SSL Configuration
     SSLProtocol {{ ssl_protocol | default('all -SSLv3 -TLSv1 -TLSv1.1') }}
@@ -23,8 +29,8 @@
     SSLHonorCipherOrder off
     SSLSessionTickets off
 
-    # HSTS
-    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    # HSTS — preload-ready
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
 
     <Directory {{ item.path }}>
         Options FollowSymLinks
@@ -32,26 +38,50 @@
         Require all granted
     </Directory>
 
-    # PHP settings via mod_php
+{% if apache_mpm | default('prefork') == 'event' %}
+    # PHP-FPM via unix socket (event MPM)
+    <FilesMatch "\.php$">
+        SetHandler "proxy:unix:{{ php_fpm_socket | default('/run/php/php8.3-fpm.sock') }}|fcgi://localhost"
+    </FilesMatch>
+    <Proxy "fcgi://localhost">
+    </Proxy>
+{% else %}
+    # PHP via mod_php (prefork MPM)
     <FilesMatch "\.php$">
         SSLOptions +StdEnvVars
     </FilesMatch>
+{% endif %}
 
-    # Logging
+    # Logging — include X-Forwarded-For for real client IP behind Cloudflare
     ErrorLog ${APACHE_LOG_DIR}/{{ item.name }}-ssl-error.log
-    CustomLog ${APACHE_LOG_DIR}/{{ item.name }}-ssl-access.log combined
+    LogFormat "%{X-Forwarded-For}i %h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" cloudflare_combined
+    CustomLog ${APACHE_LOG_DIR}/{{ item.name }}-ssl-access.log cloudflare_combined
 
     # Security headers
     <IfModule mod_headers.c>
         Header always set X-Content-Type-Options "nosniff"
         Header always set X-Frame-Options "SAMEORIGIN"
-        Header always set X-XSS-Protection "1; mode=block"
         Header always set Referrer-Policy "strict-origin-when-cross-origin"
     </IfModule>
 
-    # Cloudflare headers (for upload support)
-    <IfModule mod_headers.c>
-        SetEnvIf X-Forwarded-For "^.*\..*\..*\..*" CLOUDFLARE=1
-        Header set X-Upload-Allowed "1" env=CLOUDFLARE
+    # Cloudflare handles ETags at the edge
+    FileETag None
+
+    # mod_expires — browser cache hints for static assets
+    <IfModule mod_expires.c>
+        ExpiresActive On
+        ExpiresByType image/jpeg "access plus 1 month"
+        ExpiresByType image/png "access plus 1 month"
+        ExpiresByType image/gif "access plus 1 month"
+        ExpiresByType image/svg+xml "access plus 1 month"
+        ExpiresByType image/webp "access plus 1 month"
+        ExpiresByType image/x-icon "access plus 1 month"
+        ExpiresByType text/css "access plus 1 week"
+        ExpiresByType application/javascript "access plus 1 week"
+        ExpiresByType application/x-javascript "access plus 1 week"
+        ExpiresByType font/woff "access plus 1 month"
+        ExpiresByType font/woff2 "access plus 1 month"
+        ExpiresByType application/font-woff "access plus 1 month"
+        ExpiresByType application/font-woff2 "access plus 1 month"
     </IfModule>
 </VirtualHost>

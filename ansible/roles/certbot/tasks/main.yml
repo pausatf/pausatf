@@ -1,0 +1,55 @@
+---
+# Certbot role — Let's Encrypt via Cloudflare DNS-01 challenge
+
+- name: Install certbot and Cloudflare DNS plugin
+  apt:
+    name:
+      - certbot
+      - python3-certbot-dns-cloudflare
+    state: present
+
+- name: Ensure letsencrypt directory exists
+  file:
+    path: /etc/letsencrypt
+    state: directory
+    owner: root
+    group: root
+    mode: '0700'
+
+- name: Deploy Cloudflare credentials for certbot
+  template:
+    src: cloudflare.ini.j2
+    dest: /etc/letsencrypt/cloudflare.ini
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Obtain SSL certificate via DNS-01 challenge
+  command: >
+    certbot certonly
+    --dns-cloudflare
+    --dns-cloudflare-credentials /etc/letsencrypt/cloudflare.ini
+    -d pausatf.org
+    -d www.pausatf.org
+    --non-interactive
+    --agree-tos
+    -m "{{ certbot_email }}"
+    --keep-until-expiring
+  register: certbot_result
+  changed_when: "'Certificate not yet due for renewal' not in certbot_result.stdout"
+
+- name: Ensure certbot systemd timer is enabled
+  systemd:
+    name: certbot.timer
+    state: started
+    enabled: yes
+
+- name: Deploy post-renewal hook to reload Apache
+  copy:
+    dest: /etc/letsencrypt/renewal-hooks/deploy/reload-apache.sh
+    content: |
+      #!/bin/bash
+      systemctl reload apache2
+    owner: root
+    group: root
+    mode: '0755'

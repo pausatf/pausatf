@@ -78,4 +78,3 @@ function RandomWidgetInit() {
 }
 
 add_action('widgets_init', 'RandomWidgetInit');
-

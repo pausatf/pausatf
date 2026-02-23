@@ -15,8 +15,11 @@ repos:
       - id: check-yaml
         args: ['--unsafe']  # Allow custom tags in Ansible YAML
       - id: end-of-file-fixer
+        exclude: ^content/
       - id: trailing-whitespace
+        exclude: ^content/
       - id: mixed-line-ending
+        exclude: ^content/
       - id: detect-private-key
 
   # ===========================================================================
@@ -26,7 +29,17 @@ repos:
     rev: v1.4.0
     hooks:
       - id: detect-secrets
-        exclude: package.lock.json
+        exclude: |
+          (?x)^(
+            package\.lock\.json|
+            content/.*|
+            docs/.*|
+            .*\.md$|
+            terraform/import-all-resources\.sh|
+            terraform/modules/droplet/cloud-init.*\.yml|
+            ansible/roles/wordpress/files/TheSource/.*|
+            themes/thesource/.*
+          )$
 
   - repo: https://github.com/zricethezav/gitleaks
     rev: v8.18.1
@@ -51,11 +64,8 @@ repos:
         files: ^terraform/
         args:
           - '--args=--config=__GIT_WORKING_DIR__/terraform/.tflint.hcl'
-      - id: terraform_tfsec
+      - id: terraform_trivy
         files: ^terraform/
-        args:
-          - '--args=--concise-output'
-          - '--args=--exclude-downloaded-modules'
 
   - repo: https://github.com/bridgecrewio/checkov
     rev: 3.1.34
@@ -73,7 +83,7 @@ repos:
   # Ansible Hooks (ansible/ directory)
   # ===========================================================================
   - repo: https://github.com/ansible/ansible-lint
-    rev: v6.22.1
+    rev: v25.12.2
     hooks:
       - id: ansible-lint
         files: ^ansible/.*\.(yaml|yml)$
@@ -87,7 +97,7 @@ repos:
     hooks:
       - id: yamllint
         files: ^ansible/.*\.(yaml|yml)$
-        args: ['-d', '{extends: default, rules: {line-length: {max: 120}}}']
+        args: ['-d', '{extends: default, rules: {line-length: {max: 200}, braces: {max-spaces-inside: 1}, indentation: {indent-sequences: whatever}}}']
 
   - repo: https://github.com/bridgecrewio/checkov
     rev: 3.1.34

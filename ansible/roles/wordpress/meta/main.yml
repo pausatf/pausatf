@@ -1,0 +1,5 @@
+---
+dependencies:
+  - role: mysql
+  - role: apache
+    when: web_server | default('apache') == 'apache'

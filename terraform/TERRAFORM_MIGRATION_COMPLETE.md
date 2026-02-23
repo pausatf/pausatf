@@ -96,7 +96,7 @@ Already defined in `terraform/environments/github/`:
 
 ```bash
 # Terraform
-export TF_VAR_cloudflare_api_token="PnuBpx-JPMopY_KcVX1_pP8DQjJr7IOILcVlvFIZ"
+export TF_VAR_cloudflare_api_token="YOUR_CLOUDFLARE_API_TOKEN"
 export TF_VAR_github_token="YOUR_GITHUB_TOKEN"
 
 # DigitalOcean Spaces (backend)

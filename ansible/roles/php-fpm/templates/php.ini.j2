@@ -1,0 +1,32 @@
+; PAUSATF PHP 8.3-FPM configuration
+; Managed by Ansible — do not edit manually
+
+; OPcache
+opcache.enable = 1
+opcache.memory_consumption = {{ php_opcache_memory_consumption | default(128) }}
+opcache.interned_strings_buffer = {{ php_opcache_interned_strings_buffer | default(16) }}
+opcache.max_accelerated_files = {{ php_opcache_max_accelerated_files | default(10000) }}
+opcache.revalidate_freq = {{ php_opcache_revalidate_freq | default(60) }}
+opcache.save_comments = 1
+
+; Upload and memory limits
+upload_max_filesize = {{ php_upload_max_filesize | default('64M') }}
+post_max_size = {{ php_post_max_size | default('64M') }}
+memory_limit = {{ php_memory_limit | default('256M') }}
+max_execution_time = {{ php_max_execution_time | default(300) }}
+max_input_time = {{ php_max_input_time | default(300) }}
+max_input_vars = {{ php_max_input_vars | default(3000) }}
+
+; Security
+expose_php = Off
+display_errors = Off
+log_errors = On
+error_log = /var/log/php_errors.log
+
+; Session security
+session.cookie_httponly = 1
+session.cookie_secure = 1
+session.use_only_cookies = 1
+
+; Timezone
+date.timezone = {{ php_date_timezone | default('America/Los_Angeles') }}

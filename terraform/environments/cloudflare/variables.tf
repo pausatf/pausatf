@@ -7,14 +7,10 @@ variable "cloudflare_api_token" {
 variable "cloudflare_account_id" {
   description = "Cloudflare account ID"
   type        = string
-  default     = "c540729070ba913814ac4557c8974099"
+  default     = "c540729070ba913814ac4557c8974099" # pragma: allowlist secret
 }
 
-variable "production_ip" {
-  description = "Production droplet IP address (pausatf-prod)"
-  type        = string
-  default     = "64.225.40.54"
-}
+# production_ip is now sourced from terraform_remote_state.production
 
 variable "staging_ip" {
   description = "Staging droplet IP address (pausatf-stage)"

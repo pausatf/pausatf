@@ -79,4 +79,3 @@ function PopularWidgetInit() {
 }
 
 add_action('widgets_init', 'PopularWidgetInit');
-

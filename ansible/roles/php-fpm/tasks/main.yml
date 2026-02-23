@@ -1,0 +1,76 @@
+---
+# PHP 8.3-FPM role — replaces mod_php with FPM over unix socket
+
+- name: Add Ondrej PHP repository
+  apt_repository:
+    repo: "ppa:ondrej/php"
+    state: present
+    update_cache: yes
+
+- name: Install PHP 8.3-FPM and extensions
+  apt:
+    name:
+      - php8.3-fpm
+      - php8.3-mysql
+      - php8.3-redis
+      - php8.3-curl
+      - php8.3-xml
+      - php8.3-mbstring
+      - php8.3-zip
+      - php8.3-gd
+      - php8.3-intl
+      - php8.3-soap
+      - php8.3-bcmath
+      - php8.3-imagick
+      - php8.3-opcache
+      - php8.3-cli
+    state: present
+
+- name: Remove mod_php if installed
+  apt:
+    name:
+      - "libapache2-mod-php*"
+    state: absent
+  notify: Restart php8.3-fpm
+
+- name: Deploy FPM pool configuration
+  template:
+    src: www.conf.j2
+    dest: /etc/php/8.3/fpm/pool.d/www.conf
+    owner: root
+    group: root
+    mode: '0644'
+    backup: yes
+  notify: Restart php8.3-fpm
+
+- name: Deploy php.ini for FPM
+  template:
+    src: php.ini.j2
+    dest: /etc/php/8.3/fpm/conf.d/99-pausatf.ini
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart php8.3-fpm
+
+- name: Set default PHP CLI version
+  alternatives:
+    name: php
+    path: /usr/bin/php8.3
+  register: php_alternatives
+  failed_when:
+    - php_alternatives.rc != 0
+    - "'no alternatives' not in (php_alternatives.stderr | default(''))"
+
+- name: Create PHP session directory
+  file:
+    path: /var/lib/php/sessions
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0770'
+
+- name: Ensure PHP 8.3-FPM is enabled and running
+  service:
+    name: php8.3-fpm
+    state: started
+    enabled: yes

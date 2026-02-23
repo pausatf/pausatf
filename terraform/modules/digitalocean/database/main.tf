@@ -28,6 +28,10 @@ resource "digitalocean_database_cluster" "this" {
     var.tags,
     [var.environment]
   )
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "digitalocean_database_firewall" "this" {
