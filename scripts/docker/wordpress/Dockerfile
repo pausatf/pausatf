@@ -60,7 +60,7 @@ RUN chown -R www-data:www-data /var/www/html
 
 # Healthcheck
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
-    CMD php-fpm-healthcheck || exit 1
+    CMD php-fpm -t || exit 1
 
 EXPOSE 9000
 

@@ -38,9 +38,6 @@ resource "github_repository" "repo" {
   gitignore_template = var.gitignore_template
   license_template   = var.license_template
 
-  # Topics
-  topics = var.topics
-
   # Template repository
   dynamic "template" {
     for_each = var.template_repository != null ? [var.template_repository] : []

@@ -38,7 +38,7 @@ module "wordpress" {
   enable_backups           = false
   enable_monitoring        = true
   create_reserved_ip       = false
-  create_vpc               = false # staging uses default VPC
+  create_vpc = false  # staging uses default networking; no VPC isolation
   enable_monitoring_alerts = false
 
   # Staging uses open firewall (not CF-only)
@@ -60,6 +60,9 @@ module "wordpress" {
   })
 }
 
+# NOTE: stage.pausatf.org A record is also managed by the cloudflare environment.
+# If both environments are applied, the last apply wins. Consider removing this
+# module and managing all DNS centrally in the cloudflare environment.
 # Cloudflare DNS for staging
 module "cloudflare_dns_staging" {
   source  = "../../modules/cloudflare/dns"
