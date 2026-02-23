@@ -38,6 +38,30 @@
     group: root
     mode: '0700'
 
+- name: Ensure .well-known directory exists
+  file:
+    path: "{{ wordpress_installs[0].path | default('/var/www/html') }}/.well-known"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+  when:
+    - healthcheck_enabled | default(false)
+    - wordpress_installs is defined
+    - wordpress_installs | length > 0
+
+- name: Deploy health check endpoint
+  template:
+    src: health-check.php.j2
+    dest: "{{ wordpress_installs[0].path | default('/var/www/html') }}/.well-known/health-check.php"
+    owner: www-data
+    group: www-data
+    mode: '0644'
+  when:
+    - healthcheck_enabled | default(false)
+    - wordpress_installs is defined
+    - wordpress_installs | length > 0
+
 - name: Schedule nightly WordPress backup
   cron:
     name: "WordPress backup"

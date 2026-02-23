@@ -28,7 +28,12 @@
     enabled: yes
 
 - name: Set OLS admin password (idempotent)
-  command: "/usr/local/lsws/admin/misc/admpass.sh << EOF\nadmin\n{{ vault_ols_admin_password | default('changeMe!') }}\n{{ vault_ols_admin_password | default('changeMe!') }}\nEOF"
+  shell: |
+    /usr/local/lsws/admin/misc/admpass.sh << EOF
+    admin
+    {{ ols_admin_password }}
+    {{ ols_admin_password }}
+    EOF
   args:
     creates: /usr/local/lsws/admin/conf/htpasswd
   no_log: true

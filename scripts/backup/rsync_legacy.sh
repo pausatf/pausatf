@@ -16,7 +16,7 @@ mkdir -p "$LOCAL_DIR"
 # IdentitiesOnly prevents SSH from falling back to other key files
 # (runner environments may have a broken id_rsa that causes libcrypto errors)
 rsync -az --delete \
-  -e "ssh -i ${SSH_KEY} -o IdentitiesOnly=yes -o StrictHostKeyChecking=no" \
+  -e "ssh -i ${SSH_KEY} -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new" \
   "${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}/" \
   "${LOCAL_DIR}/"
 

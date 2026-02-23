@@ -81,3 +81,7 @@ jobs:
             ansible-playbook --syntax-check "$playbook"
           done
         working-directory: ansible
+
+      - name: Syntax-check site.yml
+        working-directory: ansible
+        run: ansible-playbook --syntax-check site.yml

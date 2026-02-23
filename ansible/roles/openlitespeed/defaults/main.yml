@@ -1,2 +1,3 @@
 ---
 ols_admin_port: 7080
+ols_admin_password: "{{ vault_ols_admin_password }}"
