@@ -15,14 +15,14 @@ fi
 
 # Dump remote DB via WP-CLI
 ssh -o StrictHostKeyChecking=accept-new "$REMOTE" \
-  "wp db export - | gzip -c" > /tmp/pausatf-stage.sql.gz
+  "wp db export --allow-root --path=/var/www/html - | gzip -c" > /tmp/pausatf-stage.sql.gz
 
 # Start local stack
 DOCKER_BUILDKIT=1 docker compose -f "$LOCAL_COMPOSE" up -d
 
 # Import DB
 zcat /tmp/pausatf-stage.sql.gz | docker exec -i "$(docker ps -qf name=db)" \
-  mysql -u"${WORDPRESS_DB_USER:-wp}" -p"${WORDPRESS_DB_PASSWORD:-wp_password}" "${WORDPRESS_DB_NAME:-wordpress}"
+  MYSQL_PWD="${WORDPRESS_DB_PASSWORD:-wp_password}" mysql -u"${WORDPRESS_DB_USER:-wp}" "${WORDPRESS_DB_NAME:-wordpress}"
 
 # Sync uploads
 rsync -az --delete -e "ssh -o StrictHostKeyChecking=accept-new" "$REMOTE:$SITE_PATH/wp-content/uploads/" \

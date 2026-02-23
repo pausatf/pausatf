@@ -46,7 +46,7 @@ log "{{ wp.name }} backup complete"
 {% for item in file_only_items %}
 log "Backing up {{ item.name }} (files only)..."
 tar -czf "$BACKUP_DIR/{{ item.name }}-files-$DATE.tar.gz" \
-    -C "$(dirname {{ item.path }})" "$(basename {{ item.path }})"
+    -C "$(dirname '{{ item.path }}')" "$(basename '{{ item.path }}')"
 log "{{ item.name }} backup complete"
 
 {% endfor %}
