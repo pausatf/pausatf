@@ -53,7 +53,7 @@ output "database_urn" {
 
 output "vpc_id" {
   description = "VPC ID"
-  value       = digitalocean_vpc.this.id
+  value       = var.create_vpc ? digitalocean_vpc.this[0].id : var.vpc_uuid_override
 }
 
 output "firewall_id" {

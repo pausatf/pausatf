@@ -9,14 +9,17 @@
 
 - name: Install PHP {{ php_version }} packages
   apt:
-    name:
+    name: "{{ _php_packages }}"
+    state: present
+  notify: Restart Apache
+  vars:
+    _php_base_packages:
       - "php{{ php_version }}"
       - "php{{ php_version }}-cli"
       - "php{{ php_version }}-common"
       - "php{{ php_version }}-curl"
       - "php{{ php_version }}-gd"
       - "php{{ php_version }}-imagick"
-      - "php{{ php_version }}-json"
       - "php{{ php_version }}-mbstring"
       - "php{{ php_version }}-mysql"
       - "php{{ php_version }}-opcache"
@@ -25,8 +28,8 @@
       - "php{{ php_version }}-zip"
       - "php{{ php_version }}-bcmath"
       - "libapache2-mod-php{{ php_version }}"
-    state: present
-  notify: Restart Apache
+    _php_legacy_packages: "{{ ['php' + php_version + '-json'] if php_version is version('8.0', '<') else [] }}"
+    _php_packages: "{{ _php_base_packages + _php_legacy_packages }}"
 
 - name: Deploy PHP {{ php_version }} configuration
   template:

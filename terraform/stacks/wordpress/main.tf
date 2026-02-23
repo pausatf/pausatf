@@ -19,12 +19,21 @@ terraform {
 # Cloudflare IP ranges — used to restrict HTTP/S inbound to CF edge only
 data "cloudflare_ip_ranges" "current" {}
 
-# VPC
+# VPC — optional; staging uses default networking
 resource "digitalocean_vpc" "this" {
+  count       = var.create_vpc ? 1 : 0
   name        = "pausatf-${var.environment}-vpc"
   region      = var.region
   ip_range    = var.vpc_cidr
   description = "${title(var.environment)} VPC for PAUSATF infrastructure"
+}
+
+locals {
+  vpc_id = var.create_vpc ? digitalocean_vpc.this[0].id : var.vpc_uuid_override
+  http_source_cidrs = var.firewall_http_source_cidrs != null ? var.firewall_http_source_cidrs : concat(
+    data.cloudflare_ip_ranges.current.ipv4_cidrs,
+    data.cloudflare_ip_ranges.current.ipv6_cidrs
+  )
 }
 
 # Reserved IP — survives droplet rebuilds
@@ -51,7 +60,7 @@ resource "digitalocean_droplet" "this" {
   size   = var.droplet_size
   image  = var.droplet_image
 
-  vpc_uuid = digitalocean_vpc.this.id
+  vpc_uuid = local.vpc_id
 
   tags = [
     "pausatf",
@@ -87,7 +96,7 @@ module "database" {
   region         = var.region
   environment    = var.environment
 
-  vpc_uuid = digitalocean_vpc.this.id
+  vpc_uuid = local.vpc_id
 
   trusted_sources = [
     {
@@ -96,14 +105,13 @@ module "database" {
     }
   ]
 
-  databases      = ["wordpress"]
-  database_users = ["wordpress"]
+  databases      = var.databases
+  database_users = var.database_users
 
   tags = ["pausatf", var.environment]
 }
 
-# Firewall — HTTP/S from Cloudflare only, no public SSH (Tailscale handles it)
-# Cloudflare's published IP ranges are public by definition; ingress restricted to CF only.
+# Firewall — HTTP/S source CIDRs are configurable (defaults to Cloudflare-only)
 #tfsec:ignore:digitalocean-compute-no-public-ingress
 #tfsec:ignore:digitalocean-compute-no-public-egress
 resource "digitalocean_firewall" "this" {
@@ -111,35 +119,35 @@ resource "digitalocean_firewall" "this" {
 
   droplet_ids = [digitalocean_droplet.this.id]
 
-  # HTTP from Cloudflare IPv4
   inbound_rule {
     protocol         = "tcp"
     port_range       = "80"
-    source_addresses = data.cloudflare_ip_ranges.current.ipv4_cidrs
+    source_addresses = local.http_source_cidrs
   }
 
-  # HTTP from Cloudflare IPv6
-  inbound_rule {
-    protocol         = "tcp"
-    port_range       = "80"
-    source_addresses = data.cloudflare_ip_ranges.current.ipv6_cidrs
-  }
-
-  # HTTPS from Cloudflare IPv4
   inbound_rule {
     protocol         = "tcp"
     port_range       = "443"
-    source_addresses = data.cloudflare_ip_ranges.current.ipv4_cidrs
+    source_addresses = local.http_source_cidrs
   }
 
-  # HTTPS from Cloudflare IPv6
-  inbound_rule {
-    protocol         = "tcp"
-    port_range       = "443"
-    source_addresses = data.cloudflare_ip_ranges.current.ipv6_cidrs
+  dynamic "inbound_rule" {
+    for_each = length(var.ssh_allowed_ips) > 0 ? [1] : []
+    content {
+      protocol         = "tcp"
+      port_range       = "22"
+      source_addresses = var.ssh_allowed_ips
+    }
   }
 
-  # No port 22 — SSH is via Tailscale overlay network
+  dynamic "inbound_rule" {
+    for_each = var.extra_firewall_rules
+    content {
+      protocol         = inbound_rule.value.protocol
+      port_range       = inbound_rule.value.port_range
+      source_addresses = inbound_rule.value.source_addresses
+    }
+  }
 
   # All outbound
   outbound_rule {
@@ -157,8 +165,9 @@ resource "digitalocean_firewall" "this" {
   tags = [var.environment]
 }
 
-# Monitoring Alerts
+# Monitoring Alerts — disabled for non-production by default
 resource "digitalocean_monitor_alert" "cpu_high" {
+  count = var.enable_monitoring_alerts ? 1 : 0
   alerts {
     email = var.alert_emails
   }
@@ -172,6 +181,7 @@ resource "digitalocean_monitor_alert" "cpu_high" {
 }
 
 resource "digitalocean_monitor_alert" "memory_high" {
+  count = var.enable_monitoring_alerts ? 1 : 0
   alerts {
     email = var.alert_emails
   }
@@ -185,6 +195,7 @@ resource "digitalocean_monitor_alert" "memory_high" {
 }
 
 resource "digitalocean_monitor_alert" "disk_high" {
+  count = var.enable_monitoring_alerts ? 1 : 0
   alerts {
     email = var.alert_emails
   }
@@ -195,4 +206,25 @@ resource "digitalocean_monitor_alert" "disk_high" {
   enabled     = true
   entities    = [digitalocean_droplet.this.id]
   description = "${title(var.environment)} disk > 75% utilization"
+}
+
+# State migration: resources that gained count require moved blocks
+moved {
+  from = digitalocean_vpc.this
+  to   = digitalocean_vpc.this[0]
+}
+
+moved {
+  from = digitalocean_monitor_alert.cpu_high
+  to   = digitalocean_monitor_alert.cpu_high[0]
+}
+
+moved {
+  from = digitalocean_monitor_alert.memory_high
+  to   = digitalocean_monitor_alert.memory_high[0]
+}
+
+moved {
+  from = digitalocean_monitor_alert.disk_high
+  to   = digitalocean_monitor_alert.disk_high[0]
 }
