@@ -11,7 +11,7 @@ jobs:
     uses: ./.github/workflows/deploy.yml
     with:
       environment: development
-      ansible_limit: development
+      ansible_limit: dev
     secrets:
       SSH_PRIVATE_KEY: ${{ secrets.DEV_SSH_PRIVATE_KEY }}
       ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}

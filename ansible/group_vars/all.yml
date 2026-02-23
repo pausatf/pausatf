@@ -120,7 +120,7 @@ apache_modules:
 # =============================================================================
 php_version: "8.3"
 use_php_fpm: true
-php_fpm_socket: "/run/php/php8.3-fpm.sock"
+php_fpm_socket: "/run/php/php{{ php_version }}-fpm.sock"
 
 # PHP settings (for WordPress optimization)
 php_memory_limit: "256M"
@@ -162,6 +162,7 @@ php_opcache_save_comments: 1
 # Only mysql-client is installed for wp-cli and maintenance tasks.
 mysql_version: "8"
 mysql_managed: true
+mysql_enabled: false
 mysql_port: 25060  # DO Managed MySQL default port
 
 # =============================================================================

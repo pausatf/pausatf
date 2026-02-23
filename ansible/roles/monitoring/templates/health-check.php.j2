@@ -52,10 +52,10 @@ $checks['php'] = [
 
 // Check 2: MySQL connection
 try {
-    $db_host = '{{ wp_main_db_host | default("localhost") }}';
-    $db_name = '{{ wp_main_db_name | default("wordpress") }}';
-    $db_user = '{{ wp_main_db_user | default("wordpress") }}';
-    $db_pass = '{{ vault_wp_main_db_password | default("") }}';
+    $db_host = '{{ wordpress_installs[0].db_host | default("localhost") }}';
+    $db_name = '{{ wordpress_installs[0].db_name | default("wordpress") }}';
+    $db_user = '{{ wordpress_installs[0].db_user | default("wordpress") }}';
+    $db_pass = '{{ wordpress_installs[0].db_password | default("") }}';
 
     $pdo = new PDO(
         "mysql:host=$db_host;dbname=$db_name;charset=utf8mb4",
@@ -77,7 +77,7 @@ try {
 }
 
 // Check 3: WordPress files exist
-$wp_path = '{{ wp_main_document_root | default("/var/www/html") }}';
+$wp_path = '{{ wordpress_installs[0].path | default("/var/www/html") }}';
 $wp_files = ['wp-config.php', 'wp-includes/version.php', 'index.php'];
 $wp_healthy = true;
 
