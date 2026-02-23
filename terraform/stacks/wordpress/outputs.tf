@@ -1,6 +1,6 @@
 output "reserved_ip_address" {
   description = "Reserved IP address for this environment"
-  value       = digitalocean_reserved_ip.this.ip_address
+  value       = var.create_reserved_ip ? digitalocean_reserved_ip.this[0].ip_address : null
 }
 
 output "droplet_id" {

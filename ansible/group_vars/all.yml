@@ -158,6 +158,7 @@ apache_modules:
 # PHP CONFIGURATION
 # =============================================================================
 php_version: "8.3"
+use_php_fpm: true
 php_fpm_socket: "/run/php/php8.3-fpm.sock"
 
 # PHP settings (for WordPress optimization)

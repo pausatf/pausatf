@@ -11,11 +11,11 @@ on:
         required: true
         type: string
         description: "Ansible --limit value"
-      healthcheck_cmd:
+      healthcheck_host:
         required: false
         type: string
         default: ""
-        description: "Optional healthcheck command to run after deploy"
+        description: "SSH host for post-deploy healthcheck (e.g., github-deploy@ftp.pausatf.org)"
     secrets:
       SSH_PRIVATE_KEY:
         required: false
@@ -79,5 +79,11 @@ jobs:
             --vault-password-file ../vault.pass
 
       - name: Healthcheck
-        if: ${{ inputs.healthcheck_cmd != '' }}
-        run: ${{ inputs.healthcheck_cmd }}
+        if: ${{ inputs.healthcheck_host != '' }}
+        env:
+          HC_HOST: ${{ inputs.healthcheck_host }}
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new \
+            -o IdentitiesOnly=yes \
+            "$HC_HOST" \
+            "curl -fsS -o /dev/null -w '%{http_code}' http://localhost/ | grep -qE '^(200|301|302)'"
