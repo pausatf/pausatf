@@ -28,8 +28,6 @@ tcp-keepalive 300
 databases 16
 
 # Security — disable dangerous commands.
-# Note: wp redis flush uses FLUSHALL; use redis-cli DEL or KEYS+DEL instead.
-rename-command FLUSHDB ""
-rename-command FLUSHALL ""
+# CONFIG, FLUSHALL, FLUSHDB left enabled: Redis is localhost-only with
+# protected-mode, and WP Redis Object Cache needs FLUSHALL for wp redis flush.
 rename-command DEBUG ""
-rename-command CONFIG ""

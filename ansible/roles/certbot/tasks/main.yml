@@ -24,6 +24,11 @@
     group: root
     mode: '0600'
 
+- name: Check if certificate already exists
+  stat:
+    path: "/etc/letsencrypt/live/{{ certbot_domains[0] }}/fullchain.pem"
+  register: certbot_cert_exists
+
 - name: Obtain SSL certificate via DNS-01 challenge
   command: >
     certbot certonly
@@ -36,6 +41,7 @@
     --keep-until-expiring
   register: certbot_result
   changed_when: "'Certificate not yet due for renewal' not in certbot_result.stdout"
+  when: not certbot_cert_exists.stat.exists
 
 - name: Ensure certbot systemd timer is enabled
   systemd:

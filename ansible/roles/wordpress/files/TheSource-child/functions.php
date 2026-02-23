@@ -28,7 +28,7 @@ function thesource_child_enqueue_scripts() {
     wp_enqueue_style( 'red-style', get_stylesheet_directory_uri() . '/style-Red.css', array( 'child-dropdown' ), $version );
 
     // Add browser-specific CSS
-    $user_agent = filter_input( INPUT_SERVER, 'HTTP_USER_AGENT', FILTER_SANITIZE_STRING );
+    $user_agent = filter_input( INPUT_SERVER, 'HTTP_USER_AGENT' );
 
     if ( $user_agent && false !== strpos( $user_agent, 'Chrome' ) ) {
         wp_enqueue_style( 'chrome-fixes', get_stylesheet_directory_uri() . '/chrome-fixes.css', array( 'child-dropdown' ), $version );
@@ -74,7 +74,7 @@ add_action( 'wp_enqueue_scripts', 'thesource_child_enqueue_scripts', 999 );
  * @return array Modified body classes
  */
 function thesource_child_browser_body_class( $classes ) {
-    $user_agent = filter_input( INPUT_SERVER, 'HTTP_USER_AGENT', FILTER_SANITIZE_STRING );
+    $user_agent = filter_input( INPUT_SERVER, 'HTTP_USER_AGENT' );
 
     if ( ! $user_agent ) {
         return $classes;

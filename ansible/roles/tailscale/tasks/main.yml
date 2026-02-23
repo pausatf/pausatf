@@ -60,6 +60,27 @@
   changed_when: false
   failed_when: false
 
+- name: Get Tailscale IP address
+  command: tailscale ip -4
+  register: tailscale_ip
+  changed_when: false
+  failed_when: false
+  when:
+    - tailscale_status.rc == 0
+    - (tailscale_status.stdout | from_json).BackendState | default('') == 'Running'
+
+- name: Verify SSH is reachable over Tailscale
+  wait_for:
+    host: "{{ tailscale_ip.stdout | trim }}"
+    port: 22
+    timeout: 5
+  register: tailscale_ssh_check
+  failed_when: false
+  when:
+    - tailscale_ip is defined
+    - tailscale_ip.rc == 0
+    - tailscale_ip.stdout | default('') | trim | length > 0
+
 - name: Deny SSH from public internet (Tailscale handles SSH)
   community.general.ufw:
     rule: deny
@@ -69,6 +90,8 @@
   when:
     - tailscale_status.rc == 0
     - (tailscale_status.stdout | from_json).BackendState | default('') == 'Running'
+    - tailscale_ssh_check is defined
+    - not (tailscale_ssh_check.failed | default(true))
   notify: Reload UFW
 
 - name: Document Tailscale authentication step
