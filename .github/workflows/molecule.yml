@@ -37,8 +37,13 @@ jobs:
 
       - name: Install Molecule and dependencies
         run: |
-          pip install ansible molecule molecule-plugins[docker]
+          pip install ansible-core==2.17.5 molecule molecule-plugins[docker]
+          ansible-galaxy collection install community.general community.mysql ansible.posix
 
       - name: Run Molecule
         run: molecule test
         working-directory: ansible/roles/${{ matrix.role }}
+        env:
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLOR: '1'
+          ANSIBLE_ROLES_PATH: ${{ github.workspace }}/ansible/roles
