@@ -12,10 +12,8 @@
     name: "{{ _php_packages }}"
     state: present
   vars:
-    _php_module_packages: "{{ php_modules | map('regex_replace', '^(.*)$', 'php' + php_version + '-\\1') | list }}"
-    _php_extra_packages:
-      - "php{{ php_version }}-fpm"
-      - "php{{ php_version }}-memcached"
+    _php_module_packages: "{{ php_modules | map('regex_replace', '^(.*)$', 'php' + (php_version | string) + '-\\1') | list }}"
+    _php_extra_packages: "{{ ['php' + (php_version | string) + '-fpm', 'php' + (php_version | string) + '-memcached'] }}"
     _php_packages: "{{ _php_module_packages + _php_extra_packages }}"
 
 - name: Remove mod_php if installed
