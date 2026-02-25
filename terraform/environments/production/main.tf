@@ -76,6 +76,10 @@ module "wordpress" {
 # The stack module creates the reserved IP; reference it for the project.
 resource "digitalocean_reserved_ip" "production" {
   region = var.region
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "digitalocean_reserved_ip_assignment" "production" {

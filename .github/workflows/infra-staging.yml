@@ -3,6 +3,9 @@ name: Infra Staging (Terraform)
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   plan-apply:
     runs-on: ubuntu-latest

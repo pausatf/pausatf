@@ -16,6 +16,9 @@ on:
       - '.markdownlint.json'
       - '.markdown-link-check.json'
 
+permissions:
+  contents: read
+
 jobs:
   markdown-lint:
     name: Markdown Lint
