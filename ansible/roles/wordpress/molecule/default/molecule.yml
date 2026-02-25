@@ -27,5 +27,12 @@ provisioner:
         environment: staging
         mysql_managed: true
         web_server: 'openlitespeed'
+        wpcli_update_plugins: false
+        wpcli_update_themes: false
+        wordpress_installs:
+          - path: /var/www/html
+            domain: localhost
+            db_password: molecule_test_pass  # pragma: allowlist secret
+            manage_wp_config: false
 verifier:
   name: ansible
