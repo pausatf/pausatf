@@ -1,0 +1,44 @@
+name: Molecule Tests
+
+on:
+  pull_request:
+    paths:
+      - 'ansible/roles/**'
+      - '.github/workflows/molecule.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'ansible/roles/**'
+      - '.github/workflows/molecule.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  molecule:
+    name: molecule / ${{ matrix.role }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        role:
+          - common
+          - wordpress
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4
+
+      - name: Setup Python
+        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b  # v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Molecule and dependencies
+        run: |
+          pip install ansible molecule molecule-plugins[docker]
+
+      - name: Run Molecule
+        run: molecule test
+        working-directory: ansible/roles/${{ matrix.role }}
