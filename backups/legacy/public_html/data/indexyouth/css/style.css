@@ -1,0 +1,30 @@
+h2 {
+	color: blue;
+	font-size: 1.5em !important;
+}
+#menu {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+a {
+	font-size: 15px;
+	font-family: Tahoma;
+	font-weight: bold;
+	color: blue;
+	
+}
+a:hover {
+	color: red;
+	text-decoration: none;
+}
+.heading {
+	width: 48%;
+	text-align: center;
+	line-height: 1.5em !important;
+	margin-left: 20%;
+}
+#wrapper {
+	border-bottom: 1px solid blue;
+}

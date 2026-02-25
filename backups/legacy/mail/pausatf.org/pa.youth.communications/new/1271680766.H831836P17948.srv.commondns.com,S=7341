@@ -1,0 +1,128 @@
+Return-path: <rita.joseph1@btopenworld.com>
+Envelope-to: pa.youth.communications@pausatf.org
+Delivery-date: Mon, 19 Apr 2010 13:39:26 +0100
+Received: from n27.bullet.mail.ukl.yahoo.com ([87.248.110.144])
+	by srv.commondns.com with smtp (Exim 4.69)
+	(envelope-from <rita.joseph1@btopenworld.com>)
+	id 1O3qG6-0004fP-C1
+	for pa.youth.communications@pausatf.org; Mon, 19 Apr 2010 13:39:26 +0100
+Received: from [217.146.182.177] by n27.bullet.mail.ukl.yahoo.com with NNFMP; 19 Apr 2010 12:39:26 -0000
+Received: from [87.248.111.144] by t3.bullet.ukl.yahoo.com with NNFMP; 19 Apr 2010 12:39:26 -0000
+Received: from [127.0.0.1] by omp201.mail.ukl.yahoo.com with NNFMP; 19 Apr 2010 12:37:55 -0000
+X-Yahoo-Newman-Property: ymail-5
+X-Yahoo-Newman-Id: 228542.78378.bm@omp201.mail.ukl.yahoo.com
+Received: (qmail 99993 invoked by uid 60001); 19 Apr 2010 12:37:54 -0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=btopenworld.com; s=s1024; t=1271680674; bh=0m6Gcz0eueW48hK0UpLd9ONdg3L+Mii/jVZX9tJr6Qk=; h=Message-ID:X-YMail-OSG:Received:X-Mailer:Date:From:Reply-To:Subject:To:MIME-Version:Content-Type; b=udC4wbNCEU4WQC+YALEa8Lo7SObq9xlBSMghOejsjb6bqryFGTGpN2EE25TJrWSd0fbAWxEp0pOA+BqWEqvR9IIvMhgzZitdwaNVeORQfdg5gHYubKPoLxUR2lLNmPfFpyCLEKXOKmVizc3ae4afjjVI2va+GEb5smYGzLqrRSE=
+DomainKey-Signature:a=rsa-sha1; q=dns; c=nofws;
+  s=s1024; d=btopenworld.com;
+  h=Message-ID:X-YMail-OSG:Received:X-Mailer:Date:From:Reply-To:Subject:To:MIME-Version:Content-Type;
+  b=3UcIrOmOiyqjntviykpdNdDXjS4gLvOzVSXOdBDxFJw98PUItn086QTPpdSXejmir/8BovHLsZP96dwnMkzNJywmeoFBTzkvw0u8/5pgQR+9W113u38z3xfkJNrS60d6e+JDevWysj6eR3s4XifhQ5veYiQO9/o5RTrVqjjFOhw=;
+Message-ID: <912519.99590.qm@web87104.mail.ird.yahoo.com>
+X-YMail-OSG: l.dAGlIVM1mX5rJUK.P6mOnTxrI96uKWYbzqMeTnWDGre_w
+ X.x6Jpl5B8e0dm7V6cO0qMeqvP9B.qdpDZzdXs6JhKCr.W3Xy6L1pd2tWtti
+ E51OiTr_I7o7NYJFvzQ3NiUnLkjK7TYy7xmnLm211uV57.uU2EILhTz0yAKV
+ mtbsL8ShXCZUvwBMl8.7EtqvQtSTbZwMdh15jLYGLbTEOK60OXn8G8xfpuc0
+ PUL3GV55tf.i7PtD0mr3LDI0eQBmkdBxp2.LJFi74CSbXZc1CsRuM9UV3PyR
+ M7e0XPj537cMskyyvW58juOBym0oJvYv1ZSlOVtFvvn64F1wQqaDONAa7DuR
+ jC0QGicjAmMQVlL4eeZix7E3n6L2Jg_6iLSQOjO9vqJzGFB6.0mOqry2WGEu
+ s7MWa2Aoq8sk6GYFdrXlkvpsYHAd.gBOgTyM.ZtaglsIe7L3oLQhp3O4kOtG
+ CpN2i292gu735.a6sF5fnKyYwh46cVORS7uYoJRRRQsj0ySnz22pIPbzrzuU
+ wquZX7QkquetgFjqcPu08BXwyiTMxTQoRKL2jmlqr5gv6NQMOi.2etEwRDxv
+ 14E.WSk44X_qygg_SG.vM1cNZ0cVNtKUh1t879Bx1Y2pr3PwXI6CWgCx1ptU
+ ixm.mrcMxBivhOtY3z5vlt0lFjGqF1J4QdczoDPqkO0z35uK_gX16qaHh.dF
+ x0VCGkCPKvrv7ZrITn86ygp32z0gucSH_j.AXYYsKUf9HhLPn83gRrGEi88m
+ iuc4_e9GMTQN8Y7q90GV.hFgzLEQBF_zcfRF_jQE91DwU1.Ijv_FuG6.x5IR
+ AEpZvMoWy759tEYxM.3FnYGBm15P3Bh4FBTe2LaFmiSrtBXKUV_9U76R1ckx
+ KJLQ_f00CIhnPA4QgAopuXZVy3ZKgTR5Kq843sXnrr15.ynJMvEUhq4nHUd0
+ AKtQ4xz4_6ZWN8Sl_Ve1xA0fTKZFz
+Received: from [196.201.72.132] by web87104.mail.ird.yahoo.com via HTTP; Mon, 19 Apr 2010 12:37:54 GMT
+X-Mailer: YahooMailClassic/10.1.9 YahooMailWebService/0.8.102.267879
+Date: Mon, 19 Apr 2010 12:37:54 +0000 (GMT)
+From: mrs rita joseph <rita.joseph1@btopenworld.com>
+Reply-To: rita61joseph@yahoo.co.jp
+Subject: GOD BLESS YOU AS YOU REPLY URGENTLY
+To: undisclosed recipients: ;
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="0-841510920-1271680674=:99590"
+
+--0-841510920-1271680674=:99590
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+GOD BLESS YOU AS YOU REPLY URGENTLY
+Dear Child of God,
+=A0
+Calvary Greetings in the name of the LORD Almighty and Our LORD JESUS CHRIS=
+T the giver of every good thing.
+=A0
+Good day and compliments of the seasons, i know this letter will definitely=
+ come to you as a huge surprise, but I implore you to take the time to go t=
+hrough it carefully as the decision you make will go off a long way to dete=
+rmine my future and continued existence. I am Mrs. Rita Joseph an aging wid=
+ow of 61 years old suffering from long time illness.=20
+=A0
+I have some funds I inherited from my late husband, the sum of $14,000,000.=
+00 and I needed a very honest and God fearing Christian who can withdraw th=
+is money then use the funds for Charity works. I WISH TO GIVE THIS FUNDS TO=
+ YOU FOR CHARITY WORKS. I found your email address from the internet after =
+honest prayers to the LORD to bring me a helper and i decided to contact yo=
+u if you may be willing and interested to handle these trust funds in good =
+faith before anything happens to me.
+=A0
+I am desperately in keen need of assistance and I have summoned up courage =
+to contact you for this task, you must not fail me and the millions of the =
+poor people in our todays WORLD. This is no stolen money and there are no d=
+angers involved,100% RISK FREE with full legal proof. Please if you would b=
+e able to use the funds for the Charity works please kindly let me know imm=
+ediately.=20
+=A0
+Please kindly respond quickly for further details, reply quick or you will =
+give me room to contact someone else to handle this task on my behalf.
+=A0
+Warmest Regards,
+Mrs Rita Joseph
+=A0=20
+=A0
+=A0
+--0-841510920-1271680674=:99590
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+<table cellspacing=3D"0" cellpadding=3D"0" border=3D"0" ><tr><td valign=3D"=
+top" style=3D"font: inherit;"><DIV><STRONG>GOD BLESS YOU AS YOU REPLY URGEN=
+TLY<BR>Dear Child of God,</STRONG></DIV>
+<DIV><STRONG></STRONG>&nbsp;</DIV>
+<DIV><STRONG>Calvary Greetings in the name of the LORD Almighty and Our LOR=
+D JESUS CHRIST the giver of every good thing.</STRONG></DIV>
+<DIV><STRONG></STRONG>&nbsp;</DIV>
+<DIV><STRONG>Good day and compliments of the seasons, i know this letter wi=
+ll definitely come to you as a huge surprise, but I implore you to take the=
+ time to go through it carefully as the decision you make will go off a lon=
+g way to determine my future and continued existence. I am Mrs. Rita Joseph=
+ an aging widow of 61 years old suffering from long time illness. </STRONG>=
+</DIV>
+<DIV><STRONG></STRONG>&nbsp;</DIV>
+<DIV><STRONG>I have some funds I inherited from my late husband, the sum of=
+ $14,000,000.00 and I needed a very honest and God fearing Christian who ca=
+n withdraw this money then use the funds for Charity works. I WISH TO GIVE =
+THIS FUNDS TO YOU FOR CHARITY WORKS. I found your email address from the in=
+ternet after honest prayers to the LORD to bring me a helper and i decided =
+to contact you if you may be willing and interested to handle these trust f=
+unds in good faith before anything happens to me.</STRONG></DIV>
+<DIV><STRONG></STRONG>&nbsp;</DIV>
+<DIV><STRONG>I am desperately in keen need of assistance and I have summone=
+d up courage to contact you for this task, you must not fail me and the mil=
+lions of the poor people in our todays WORLD. This is no stolen money and t=
+here are no dangers involved,100% RISK FREE with full legal proof. Please i=
+f you would be able to use the funds for the Charity works please kindly le=
+t me know immediately. </STRONG></DIV>
+<DIV><STRONG></STRONG>&nbsp;</DIV>
+<DIV><STRONG>Please kindly respond quickly for further details, reply quick=
+ or you will give me room to contact someone else to handle this task on my=
+ behalf.</STRONG></DIV>
+<DIV><STRONG></STRONG>&nbsp;</DIV>
+<DIV><STRONG>Warmest Regards,<BR>Mrs Rita Joseph</STRONG></DIV>
+<DIV><STRONG>&nbsp; <BR>&nbsp;</STRONG></DIV>
+<DIV><STRONG></STRONG>&nbsp;</DIV></td></tr></table>
+--0-841510920-1271680674=:99590--
+

@@ -1,0 +1,510 @@
+<?php
+  /* $Id: show-club.php,v 1.4 2007/02/08 16:04:49 Owner Exp $ */
+
+  /* Script for displaying PA clubs.  Written by Jeff Teeters, January 2007 */
+
+  require_once ('/home/pausat/db.php');  // connects to database
+
+  function this_script_name() {
+    $full_script_name = $_SERVER['SCRIPT_NAME'];  // e.g. /teeters/show-club.php
+    $script_name = substr(strrchr($full_script_name, "/"), 1);  // e.g. show-club.php
+    return($script_name);
+  }
+
+  function members_script_name() {
+    // Name of companion script displaying members
+    return('members.php');
+  }
+
+  function get_db_param($param) {
+    $sql = "select value from db_status where table_name = 'pa_members' and param = '$param'";
+    $result = mysql_query($sql) or fail_sql('get_db_param', $sql);
+    $row = mysql_fetch_row($result);
+    return($row[0]);  
+  }
+
+  function fail_sql($func, $sql) {
+    die("<pre>Query failed in '$func'\n$sql\n" . mysql_error(). "</pre>");
+  }
+
+class Option_information {
+  var $form_values = array();
+
+  // List form vars and valid values for each.  First value is the default.
+  var $form_vars = array(
+      'club' => array('none', 'unat', '#^[1-9]\d*$#'),  // last element is regex pattern,  e.g. a club_number for 'club' var
+      'sort' => array('club_name', 'club_no', 'roster'),
+      'sdir' => array('up', 'down')
+  );
+
+  function Option_information() {
+    $this->get_form_values();
+    if($this->form_values['club'] != 'none') {
+      $this->get_club_name();
+    }
+    // die("<pre>\n\$_SERVER is " . print_r($_SERVER, true) . "\n" . "\$_ENV is\n" . print_r($_ENV, true) . "\n</pre>");
+    // $this->make_descriptons();
+  }
+
+  function get_form_values() {
+    foreach ($this->form_vars as $form_var => $possible_values) {
+      if($form_var == 'sdir' && $this->form_values['sort'] == 'roster') {
+        $possible_values = array('down', 'up');  // make default order for roster, down
+      }
+      if(isset($_REQUEST[$form_var]) && (($val = $_REQUEST[$form_var]) != '')) {
+        $val = mysql_real_escape_string($val);  // only needed for real expressions, do for all anyway
+        if(!in_array($val, $possible_values)  // not in possible_values
+           // check for last possible_value is a regex pattern.  e.g. a club_number for 'club' var
+           && !(preg_match('/^#.+\#/', $pattern = $possible_values[count($possible_values)-1])  // last possible_values is regex pattern
+                 && preg_match($pattern, $val))) {  // matches regex pattern
+           $first_pm = preg_match('/^#.+\#/', $pattern = $possible_values[count($possible_values)-1]);
+           $second_pm = preg_match($pattern, $val);
+           $debug = "pattern=$pattern\n" .
+             "first pm=$first_pm, second_pm=$second_pm\n" .
+             '!($first_pm && $second_pm) = ' . !($first_pm && $second_pm);
+           die("<pre>Invalid value for $form_var ($val).  Must be one of: " . join(', ', $possible_values) . "\n$debug</pre>");
+        }
+      } else {
+        $val = $possible_values[0];  // default value.
+      }
+      $this->form_values[$form_var] = $val;
+    }
+  }
+
+  function &get_order_clause() {
+    $fv = &$this->form_values;
+    switch ($fv['sort']) {
+      case 'club_name':
+        $order_fields = array('club_name');
+        break;
+      case 'club_no':
+        $order_fields = array('club_no');
+        break;
+      case 'roster':
+        $order_fields = array('roster_count');
+        break;
+      default:
+        die('Invalid sort specification: ' . $fv['sort'] . '"');
+    }
+    if ($fv['sdir'] == 'down') {
+      $order_fields[0] .= ' desc';
+    }
+    $order_clause = "order by " . implode(', ', $order_fields);
+    return($order_clause);
+  }
+
+  function get_club_name() {
+    $club = $this->form_values['club'];
+    if($club == 'unat') {
+      $this->club_name = "Unattached";
+    } else {
+      $row = get_club_info($club);
+      $this->club_name = $row['club_name'];
+    }
+  }
+
+  function make_option_link($changing_var, $new_value, $fixed_title='') {
+    $this_script_name = this_script_name();
+    $current_value = $this->form_values[$changing_var];
+    $title = $fixed_title ? $fixed_title : ucfirst($new_value);
+    if($new_value == $current_value && $changing_var != 'sort') {
+      $link = "<strong>$title</strong>";
+    } else {
+      $parms = array();
+      if($new_value == $current_value && $changing_var == 'sort') {
+        // keeping same sort variable, changing sort direction
+        if($this->form_values['sdir'] == 'up') {
+          $title .= '&nbsp;&uarr;';
+          if($new_value != 'roster') {
+            $parms[] = "sdir=down";  // must be specified if not roster, default otherwise
+          }
+        } else {
+          $title .= '&nbsp;&darr;';
+          if($new_value == 'roster') {
+            $parms[] = "sdir=up";  // must be specified if roster, default otherwise
+          }
+        }
+      }
+      foreach ($this->form_values as $form_var => $val) {
+        if($form_var == 'sdir') {
+          continue;  // do nothing since sdir values set above
+        }
+        if($form_var == $changing_var) {
+          $val = $new_value;
+        }
+        if($this->form_vars[$form_var][0] != $val) {
+          // is not default, must include it
+          $parms[] = "$form_var=$val";
+        }
+      }
+      $plist = implode('&', $parms);
+      if($plist) {
+        $plist = "?$plist";  // put ? at front if present
+      }
+      $link = "<a href=\"$this_script_name$plist\">$title</a>";
+    }
+    return($link);
+  }
+}  // end of class Option_information
+
+  function make_lower_case_name($name) {
+    // Used to make club names mostly lower case
+    $keep_upper = array('AEIOU', 'AFB', 'T&F', 'EOYDC', 'WNLR', 'WWW', 'NAPA', 'PAL', 'VSC', 'TAM', 'TNT', 'L.S.I.');
+    $force_lower = array('OF', 'AND', 'AT');
+    $words = explode(' ', $name);
+    foreach ($words as $word) {
+      if(in_array(strtoupper($word), $force_lower)) {
+        $word = strtolower($word);
+      } else {
+        $length = strlen($word);
+        if($length > 2 && !in_array($word, $keep_upper)) {
+          $word = ucfirst(strtolower($word));
+        }
+      }
+      $new_words[] = $word;
+    }
+    return(implode(' ', $new_words));
+  }
+
+  function get_lower_case_club_name($club_no, $club_name) {
+    static $cache=array();
+    if(!isset($cache[$club_no])) {
+      $cache[$club_no] = make_lower_case_name($club_name);
+    }
+    return($cache[$club_no]);
+  }
+
+  function page_header($title) {
+    $html = 
+'<html>
+<head>
+  <title>' . $title . '</title>
+  <link href="http://www.pausatf.org/PAstylesheetpg2.css" type="text/css" rel="stylesheet">
+</head>
+<body style="max-width:890px;">
+  <table border="0" cellspacing="0" cellpadding="0" width="100%">
+      <tr>
+        <td valign="top" width="20%">
+          <font size="2"><a href="http://www.pausatf.org/index.html"><b>Home</b></a><br>
+             <a href="http://www.pausatf.org/data/pacontacts.html"><b>Contacts</b></a></font></td>
+        <td valign="top" style="text-align: center; width: 60%;">
+          <h2>' . $title . '</h2>
+        </td>
+        <td width="20%">&nbsp;</td>
+      </tr>
+      <tr>
+        <td colspan="3" align="center" width="100%">
+          <!-- hr width="80%" -->
+          <table><tr><td style="text-align: left;">
+          <!-- div style="text-align: left;"-->
+            <!-- Content goes here -->
+';  //      <div style="background-color: #cceeff; border: 1px solid black">
+
+  return($html);
+}
+
+  function page_footer() {
+    $html =
+//'           </div>
+'          </td></tr></table>
+          <!-- /div -->
+        </td>
+      </tr>
+  </table>
+</body>
+</html>
+';
+    return($html);
+  }
+
+  function all_clubs_intro() {
+    $members_script_name = members_script_name();
+$intro = '
+<center> ' . make_main_menu() . '</center><br />
+<table border="0" width="100%" cellspacing ="0" cellpadding="0">
+    <tr>
+	<td width="25%"><font size="4"><b><u>Focus</u></b></font></td>
+	<td width="25%"><font size="4"><b><u>Locations (Counties)</u></b></font></td>
+	<td width="25%">&nbsp;</td>
+	<td width="25%">&nbsp;</td>
+    </tr>
+    <tr>
+	<td>R = Road Racing</td>
+	<td>AL Alameda</td>
+	<td>PL Placer</td>
+	<td>SM San Mateo</td>
+    </tr>
+    <tr>
+	<td>X = Cross Country</td>
+	<td>BU Butte</td>
+	<td>SA Sacramento</td>
+	<td>SN Sonoma</td>
+    </tr>
+    <tr>
+	<td>U = Ultra Running</td>
+	<td>CC Contra Costa</td>
+	<td>SB Santa Barbara</td>
+	<td>SO Solano</td>
+    </tr>
+    <tr>
+	<td>T = Track &amp; Field</td>
+	<td>ED El Dorado</td>
+	<td>SC Santa Clara</td>
+	<td>SZ Santa Cruz</td>
+    </tr>
+    <tr>
+	<td>Y = Youth</td>
+	<td>HU Humboldt</td>
+	<td>SF San Francisco</td>
+	<td>TE Tehama</td>
+    </tr>
+    <tr>
+	<td>W = Racewalking</td>
+	<td>MA Marin</td>
+	<td>SH Shasta</td>
+	<td>TR Trinity</td>
+    </tr>
+    <tr>
+	<td>&nbsp;</td>
+	<td>ME Mendicino</td>
+	<td>SJ San Joaquin</td>
+	<td>YO Yolo</td>
+    </tr>
+    <tr>
+	<td>&nbsp;</td>
+	<td>MO Monterey</td>
+	<td>SL San Luis Obispo</td>
+	<td>&nbsp;</td>
+    </tr>
+</table>
+<CENTER>
+<hr width="80%">
+<font size = "4"><B>PACIFIC CLUB LIST:</B></font></CENTER>
+<UL>
+
+	<LI><font size="2">To add or update your club' . "'" . 's profile to this list use the <a href="http://www.pausatf.org/PHP/clubprofiles.php"> Club Profile Form</font></a> (you must
+have club #).</font></LI>
+        <LI><font size="2"><B><I>IF YOU HAVE NOT PAID ANNUAL CLUB DUES, YOU WILL NOT APPEAR HERE</I></B></font></LI> 
+	<LI><font size="2"><B><I>To get the most current paid status, use the <a href="http://www.pausatf.org/PHP/batchList.php"> paid status</a> link</I></B></font></LI>
+	<LI><font size="2">Click on the Roster link to view your roster</font></LI>
+	<LI><font size="2">If someone is missing from your roster, check the <a href="' . $members_script_name . '?club=unat">unattached</a> and <a href="' . $members_script_name . '?club=invalid">invalid</a> list or <a href="' . $members_script_name . '?cmd=search">search</a> for the member.</font></LI>
+	<LI><font size="2">To view all unattached athletes, click <a href="' . $members_script_name . '?club=unat">here</a>.</font></LI>
+</UL>
+';
+  return($intro);
+} // end all_clubs_intro
+
+  function start_all_clubs_table(&$oi) {
+    // possible values for sort (from form_vars, defined in class Option_information):
+    //      'sort' => array('club_name', 'club_no', 'roster'),
+    $sort_club_name = $oi->make_option_link('sort', 'club_name', 'Club name');
+    $sort_roster = $oi->make_option_link('sort', 'roster', 'PA Roster');
+    $sort_club_no = $oi->make_option_link('sort', 'club_no', 'Club#');
+    $output = '
+	<table border = "1" cellpadding = "1" cellspacing = "1" width = 100%>
+		<tr>
+		<td><b>' . $sort_club_name . '</b></td>
+		<td><b>' . $sort_roster . '</b></td>
+		<td><b>' . $sort_club_no . '</b></td>
+		<td><b>FOCUS</b></td>
+		<td><b>LOCATION</b></td>
+		<td><b>CONTACT</b></td>			
+		</TR>
+';
+    return($output);
+  }
+
+  function finish_all_clubs_table() {
+    $output = '
+	</table>
+';
+    return($output);
+  }
+
+  function show_list_of_all_clubs() {
+    // main routine for showing list of all clubs
+    $oi = new Option_information();
+    $this_script_name = this_script_name();
+    $members_script_name = members_script_name();
+    $fv = &$oi->form_values;
+    $order_clause = &$oi->get_order_clause();
+    $output = page_header("List of all clubs") . all_clubs_intro() . start_all_clubs_table($oi);
+    $sql = "select tblCLUBS.club_no, club_name, roster_count, focus, locations, primary_contact, primary_phone\n" .
+           "from tblCLUBS, roster_counts where tblCLUBS.club_no = roster_counts.club_no\n" .
+           "and tblCLUBS.paid = 'Y'\n" .  // take out if clubs table has all set to false, to see some clubs
+           $order_clause;
+    $result = mysql_query($sql) or fail_sql('show_all', $sql);
+    while($row = mysql_fetch_array($result)) {
+      $club_no = $row['club_no'];
+      if($club_no == 0) {
+        $club_link = 'Unattached';
+        $club_no = 'unat';
+        $contact_info = 'None';
+      } else {
+        $club_name = $row['club_name'];
+        $club_name = get_lower_case_club_name($club_no, $club_name);
+        $club_link = "<a href=\"$this_script_name?club_no=$club_no\">$club_name</a>";
+        $contact_info = make_lower_case_name($row['primary_contact']) . ' ' . $row['primary_phone'];
+      }
+      $output .= "
+<TR>
+	<TD>$club_link</TD>
+	<TD>" .	($row['roster_count'] > 0
+             ? ("<a href=\"$members_script_name?club=" . $club_no . '">' . $row['roster_count'] . "</a>")
+             : "0") . "</TD>
+	<TD>" . $row['club_no'] . "</TD>
+	<TD>" . $row['focus'] . "</TD>
+	<TD>" . $row['locations'] . "</TD>
+	<TD>" . $contact_info . "</TD>
+</TR>";
+    }
+    $output .= finish_all_clubs_table() . page_footer();
+    return $output;
+  }
+
+
+/***
+Fields in table tblCLUBS
+Field Type Collation Attributes Null Default Extra Action 
+  club_no int(11)   No 0                
+  club_name varchar(50) latin1_swedish_ci  No                 
+  short_name varchar(20) latin1_swedish_ci  No                 
+  club_logo varchar(255) latin1_swedish_ci  No                 
+  paid char(1) latin1_swedish_ci  No N                
+  update_date date   No 0000-00-00                
+  ldr enum('N', 'Y') latin1_swedish_ci  No N                
+  primary_contact varchar(50) latin1_swedish_ci  No                 
+  primary_phone varchar(50) latin1_swedish_ci  No                 
+  membership_contact varchar(50) latin1_swedish_ci  No                 
+  membership_phone varchar(75) latin1_swedish_ci  No                 
+  rw_contact varchar(50) latin1_swedish_ci  No                 
+  rw_phone varchar(50) latin1_swedish_ci  No                 
+  rw_email varchar(50) latin1_swedish_ci  No                 
+  rw_committee_rep varchar(50) latin1_swedish_ci  No                 
+  email varchar(80) latin1_swedish_ci  No                 
+  hotline varchar(50) latin1_swedish_ci  No                 
+  website varchar(100) latin1_swedish_ci  No                 
+  total_members varchar(50) latin1_swedish_ci  No                 
+  annual_dues varchar(50) latin1_swedish_ci  No                 
+  year_established mediumint(9)   No 0                
+  locations varchar(30) latin1_swedish_ci  No                 
+  sponsors varchar(255) latin1_swedish_ci  No                 
+  track_workouts varchar(255) latin1_swedish_ci  No                 
+  road_trail_workouts varchar(255) latin1_swedish_ci  No                 
+  newsletter_frequency varchar(30) latin1_swedish_ci  No                 
+  focus varchar(25) latin1_swedish_ci  No                 
+  primary_focus varchar(35) latin1_swedish_ci  No                 
+  annual_club_events varchar(255) latin1_swedish_ci  No                 
+  comments varchar(255) latin1_swedish_ci  No                 
+  clubs_updated date
+***/
+
+  function make_club_info_table(&$row) {
+    $membershipYear = get_db_param('membershipYear');
+    if(preg_match('#^(http://)?(.+)$#i', $row['website'], $matches)) {
+      $row['website'] = '<a href="http://' . $matches[2] . '">' . $matches[2] . '</a>';
+    }
+    $wanted_fields = array(
+      'primary_contact',
+      'primary_phone',
+      'membership_contact',
+      'membership_phone',
+      'email' => 'Club email',
+      'hotline',
+      'website',
+      'total_members',
+      'annual_dues',
+      'year_established',
+      'locations',
+      'sponsors',
+      'track_workouts',
+      'road_trail_workouts',
+      'newsletter_frequency',
+      'focus' => 'Competition focus',
+      'primary_focus' => 'Primary club focus',
+      'annual_club_events',
+      'paid' => $membershipYear . ' USATF fees paid?',
+      'comments');
+    $tbl = "<table>\n";
+    foreach ($wanted_fields as $each_key => $each_nice_name) {
+      $key = $each_key;
+      $nice_name = $each_nice_name;
+      if(preg_match('#^\d+$#', $key)) {
+        // key is digits, so no => pair
+        $key = $nice_name;
+        $nice_name = ucfirst(str_replace('_', ' ', $nice_name));
+      }
+      $tbl .= "<tr><td>$nice_name</td><td>" . $row[$key] . "</td></tr>\n";
+    }
+    $tbl .= "</table>\n";
+    return($tbl);
+  }
+
+  function get_club_info($club_no) {
+    $sql = "select * FROM tblCLUBS where club_no = $club_no";
+    $result = mysql_query($sql) or fail_sql('get_club_info', $sql);
+    if(!($row = mysql_fetch_array($result))) {
+      die("Could not find a club with number $club_no in the database.");
+    }
+    return($row);
+  }
+
+  function make_link($title, $link) {
+    $menu = "<a href=\"$link\">$title</a>";
+    return($menu);
+  }
+
+  function make_main_menu() {
+    $members_script_name = members_script_name();
+    $all_adult = make_link('All adult', "$members_script_name?age=adult");
+    $all_youth = make_link('All youth', "$members_script_name?age=youth");
+    $search = make_link('Search members', "$members_script_name?cmd=search");
+    $menu = "[ $all_adult | $all_youth | $search ]";
+    return($menu);
+  }
+
+
+  function show_club_info($club_no) {
+    $this_script_name = this_script_name();
+    $membershipYear = get_db_param('membershipYear');
+    $members_script_name = members_script_name();
+    $row = get_club_info($club_no);
+    $club_name = get_lower_case_club_name($club_no, $row['club_name']);
+    $club_list= "<a href=\"$this_script_name\">Club list</a>";
+    $all_adult = "<a href=\"$members_script_name?age=adult\">All adult</a>";
+    $all_youth = "<a href=\"$members_script_name?age=youth\">All youth</a>";
+    if(strtoupper($row['paid']) != 'Y') {
+      $select = "[ $club_list | $all_adult | $all_youth ]";
+      $info = "This club is not active.  Either the $membershipYear dues were not paid, or if it is<br />" .
+              "a youth club, none of the coaches have completed the background check.";
+    } else {
+      $roster = "<a href=\"$members_script_name?club=$club_no\">Roster</a>";
+      $select = "[ $roster | $club_list | $all_adult | $all_youth ]";
+      $update_date = $row['update_date'];
+      $info = "<strong>Last updated on " . $update_date . "</strong><br />\n" .
+      make_club_info_table($row);
+    }
+    $output = page_header($club_name) .
+      "\n<center>$select</center><br />\n" .
+      $info .
+      page_footer();
+    return($output);
+  }
+
+  function get_request($key) {
+    return (isset($_REQUEST[$key]) ? $_REQUEST[$key] : '');
+  }
+
+  function main() {
+    $club_no = get_request('club_no');
+    // if club_no specified show information about that club,
+    // otherwise show list of all clubs
+    $output = $club_no
+              ? show_club_info($club_no)
+              : show_list_of_all_clubs();
+    echo $output;
+  }
+
+  // start everything
+  main();
+?>

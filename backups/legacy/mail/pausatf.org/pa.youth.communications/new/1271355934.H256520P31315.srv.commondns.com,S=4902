@@ -1,0 +1,138 @@
+Return-path: <ahill@ebay.com>
+Envelope-to: pa.youth.communications@pausatf.org
+Delivery-date: Thu, 15 Apr 2010 19:25:34 +0100
+Received: from den-mipot-001.corp.ebay.com ([216.113.175.152])
+	by srv.commondns.com with esmtps (TLSv1:RC4-SHA:128)
+	(Exim 4.69)
+	(envelope-from <ahill@ebay.com>)
+	id 1O2Tkr-00088q-Lk
+	for pa.youth.communications@pausatf.org; Thu, 15 Apr 2010 19:25:34 +0100
+DomainKey-Signature: s=corp; d=ebay.com; c=nofws; q=dns;
+  h=X-EBay-Corp:X-IronPort-AV:Received:Received:From:To:Date:
+   Subject:Thread-Topic:Thread-Index:Message-ID:
+   Accept-Language:Content-Language:X-MS-Has-Attach:
+   X-MS-TNEF-Correlator:acceptlanguage:x-ems-proccessed:
+   x-ems-stamp:Content-Type:MIME-Version:X-CFilter;
+  b=Fr11D92W8881dnhHH1YNxvDLEMEH45jYkbke9FJILStap8UiDwpwMYpw
+   Ek3+DYTp4WlgCqDLjv9d2hOYa8ZYMgXrkR1OrPAMvPYlps6sQ4Z1msK0P
+   6Ue3HMqLHhKVFVP;
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=ebay.com; i=ahill@ebay.com; q=dns/txt; s=corp;
+  t=1271355937; x=1302891937;
+  h=from:sender:reply-to:subject:date:message-id:to:cc:
+   mime-version:content-transfer-encoding:content-id:
+   content-description:resent-date:resent-from:resent-sender:
+   resent-to:resent-cc:resent-message-id:in-reply-to:
+   references:list-id:list-help:list-unsubscribe:
+   list-subscribe:list-post:list-owner:list-archive;
+  z=From:=20"Hill,=20Alexander"=20<ahill@ebay.com>|Subject:
+   =20This=20is=20a=20test|Date:=20Thu,=2015=20Apr=202010=20
+   12:25:30=20-0600|Message-ID:=20<6928A6E30607D244A2BD17AD2
+   2827E6484BDD87A36@DEN-MEXMS-002.corp.ebay.com>|To:=20"pa.
+   youth.communications@pausatf.org"=0D=0A=09<pa.youth.commu
+   nications@pausatf.org>|MIME-Version:=201.0;
+  bh=v2SimQM0VyhqzMwWcutZvdHVNGFEP190/xQZX1Eo7Tk=;
+  b=igSs2na+742qTKXNhUdGEbDbORO5zV45ZbBD14sUszQbX2w81g6RqlhR
+   Zh7ftel0yE2HaEPTSa6bb2DOOAxhqs4YNCAPG4LBHHvkXr45o5/C8HSDD
+   VULOIOgby61XGzK;
+X-EBay-Corp: Yes
+X-IronPort-AV: E=Sophos;i="4.52,214,1270450800"; 
+   d="scan'208,217";a="70307700"
+Received: from den-vtenf-002.corp.ebay.com (HELO DEN-MEXHT-002.corp.ebay.com) ([10.101.112.213])
+  by den-mipot-001.corp.ebay.com with ESMTP; 15 Apr 2010 11:25:32 -0700
+Received: from DEN-MEXMS-002.corp.ebay.com ([192.101.150.21]) by
+ DEN-MEXHT-002.corp.ebay.com ([10.241.17.53]) with mapi; Thu, 15 Apr 2010
+ 12:25:32 -0600
+From: "Hill, Alexander" <ahill@ebay.com>
+To: "pa.youth.communications@pausatf.org"
+	<pa.youth.communications@pausatf.org>
+Date: Thu, 15 Apr 2010 12:25:30 -0600
+Subject: This is a test
+Thread-Topic: This is a test
+Thread-Index: AcrcyQePFNtRBfOlSVm0lAau9LA82Q==
+Message-ID: <6928A6E30607D244A2BD17AD22827E6484BDD87A36@DEN-MEXMS-002.corp.ebay.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+acceptlanguage: en-US
+x-ems-proccessed: 10SqDH0iR7ekR7SRpKqm5A==
+x-ems-stamp: aKqEi0vHKkIk8y5C9zCc2A==
+Content-Type: multipart/alternative;
+	boundary="_000_6928A6E30607D244A2BD17AD22827E6484BDD87A36DENMEXMS002co_"
+MIME-Version: 1.0
+X-CFilter: Scanned
+
+--_000_6928A6E30607D244A2BD17AD22827E6484BDD87A36DENMEXMS002co_
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+
+This is a test
+
+--_000_6928A6E30607D244A2BD17AD22827E6484BDD87A36DENMEXMS002co_
+Content-Type: text/html; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+
+<html xmlns:v=3D"urn:schemas-microsoft-com:vml" xmlns:o=3D"urn:schemas-micr=
+osoft-com:office:office" xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
+xmlns:m=3D"http://schemas.microsoft.com/office/2004/12/omml" xmlns=3D"http:=
+//www.w3.org/TR/REC-html40">
+
+<head>
+<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; charset=3Dus-ascii"=
+>
+<meta name=3DGenerator content=3D"Microsoft Word 12 (filtered medium)">
+<style>
+<!--
+ /* Font Definitions */
+ @font-face
+	{font-family:Calibri;
+	panose-1:2 15 5 2 2 2 4 3 2 4;}
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0in;
+	margin-bottom:.0001pt;
+	font-size:11.0pt;
+	font-family:"Calibri","sans-serif";}
+a:link, span.MsoHyperlink
+	{mso-style-priority:99;
+	color:blue;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{mso-style-priority:99;
+	color:purple;
+	text-decoration:underline;}
+span.EmailStyle17
+	{mso-style-type:personal-compose;
+	font-family:"Calibri","sans-serif";
+	color:windowtext;}
+.MsoChpDefault
+	{mso-style-type:export-only;}
+@page Section1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.0in 1.0in 1.0in;}
+div.Section1
+	{page:Section1;}
+-->
+</style>
+<!--[if gte mso 9]><xml>
+ <o:shapedefaults v:ext=3D"edit" spidmax=3D"1026" />
+</xml><![endif]--><!--[if gte mso 9]><xml>
+ <o:shapelayout v:ext=3D"edit">
+  <o:idmap v:ext=3D"edit" data=3D"1" />
+ </o:shapelayout></xml><![endif]-->
+</head>
+
+<body lang=3DEN-US link=3Dblue vlink=3Dpurple>
+
+<div class=3DSection1>
+
+<p class=3DMsoNormal>This is a test<o:p></o:p></p>
+
+</div>
+
+</body>
+
+</html>
+
+--_000_6928A6E30607D244A2BD17AD22827E6484BDD87A36DENMEXMS002co_--

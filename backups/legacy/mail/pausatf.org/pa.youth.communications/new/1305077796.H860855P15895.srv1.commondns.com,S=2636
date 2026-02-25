@@ -1,0 +1,45 @@
+Return-path: <sackingchuckt@yahoo.com>
+Envelope-to: pa.youth.communications@pausatf.org
+Delivery-date: Tue, 10 May 2011 21:36:36 -0400
+Received: from smtp113-mob.biz.mail.gq1.yahoo.com ([98.136.185.204])
+	by srv1.commondns.com with smtp (Exim 4.69)
+	(envelope-from <sackingchuckt@yahoo.com>)
+	id 1QJyLs-000484-Gh
+	for pa.youth.communications@pausatf.org; Tue, 10 May 2011 21:36:36 -0400
+Received: (qmail 98309 invoked from network); 11 May 2011 01:36:27 -0000
+DomainKey-Signature: a=rsa-sha1; q=dns; c=nofws;
+  s=s1024; d=yahoo.com;
+  h=DKIM-Signature:Received:X-Yahoo-SMTP:X-YMail-OSG:X-Yahoo-Newman-Property:Subject:From:Content-Type:Message-Id:Date:To:Content-Transfer-Encoding:Mime-Version:X-Mailer;
+  b=6R2TAvT24AAUZTOLgWIUtuOYIIC+3zkvMM4ubnoqaevJ+QRwRK7XwpZIaEX92+BioZHHvwapFXHWh450QY+6qD/GP3h2TMMwzfXKVO/WESgbaxivXcXaXeJOw4YN1EUOjCBRcmG4F7CfsmtRkh3o1A2w9qEiA74uSX2V880zPGE=  ;
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s1024; t=1305077785; bh=SNHRxPaXQce0NuKaX4f4WIKG2ze9PIqg2ns9TPm+if4=; h=Received:X-Yahoo-SMTP:X-YMail-OSG:X-Yahoo-Newman-Property:Subject:From:Content-Type:Message-Id:Date:To:Content-Transfer-Encoding:Mime-Version:X-Mailer; b=bqq0A2+gM4TSLlHQEeeDV4eIbb/4gfcNoepkQT73k9e5HKDhnpZU4sBTxgBx9l4kIy2UpWgC/BsDhKNBoaLPcyxvSOsNsfDwYKHCAWk6hsZEd6dU4o2vsv86oMU2M34Wn1b3Sj+18c26hsqyBwaeFxFA/w79bWhjg1C2/NkLy5M=
+Received: from [10.14.76.49] (sackingchuckt@166.205.138.199 with xymcookie)
+        by smtp113-mob.biz.mail.gq1.yahoo.com with SMTP; 10 May 2011 18:36:24 -0700 PDT
+X-Yahoo-SMTP: 8emoWJCswBB_9mBNKjjqasIxn61wO4Gbtg4-
+X-YMail-OSG: tpxqC6gVM1nEA9J0prlXLUt89MPHVruDZVFe5MRsF7Qa5s.
+ YIWTXs2LJcvM7TntolJlxhwVqaT4RzBJuZZ2v7LqpyB4WAX5Au4UTH7UKtb4
+ 3koRKzTm..W1cC_WQiO2ts7TzHdINw9G_n5cpMWUoBLr_lSMnCItsbQDofHt
+ lIps7MkaMDzD3qqeLu647A3rlFiM90981XmZ29SdjLyUaowOSM.JiYB5BeMg
+ TvFGyJS8ElHv2WsO35Nd6h.729BGre0oIGIcXUFajCX06b1tPlho1ai_2VQ8
+ gtCxcT9iEOExb6kFYruUVgWzffVtKzPl51Bj_YnMWmRKiNf1LRgp9U0edtJ7
+ fZqxKFcmV7ZGlMnSu4su1eQj1pGfy8w0NbURVUtjK
+X-Yahoo-Newman-Property: ymail-3
+Subject: Mission valley meet
+From: Charles Turner <sackingchuckt@yahoo.com>
+Content-Type: text/plain; charset=us-ascii
+Message-Id: <C99FC470-253D-4A91-A712-56F767BEC0D1@yahoo.com>
+Date: Tue, 10 May 2011 18:36:13 -0700
+To: "pa.youth.communications@pausatf.org" <pa.youth.communications@pausatf.org>
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0 (iPhone Mail 8H7)
+X-Mailer: iPhone Mail (8H7)
+
+Hi:
+
+I was checking the results for the mission valley meet this weekend and the r=
+esults link keeps saying error page not found.  I just wanted to bring it to=
+ your attention.
+
+Thanks,
+Gail
+
+Sent from my iPhone=

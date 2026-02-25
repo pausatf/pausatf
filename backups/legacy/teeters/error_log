@@ -1,0 +1,62 @@
+[07-Mar-2007 14:16:39] PHP Parse error:  syntax error, unexpected T_VARIABLE in /home/pausat/public_html/teeters/members.php on line 304
+[07-Mar-2007 14:37:10] PHP Parse error:  syntax error, unexpected T_ENCAPSED_AND_WHITESPACE, expecting T_STRING or T_VARIABLE or T_NUM_STRING in /home/pausat/public_html/teeters/members.php on line 284
+[07-Mar-2007 15:49:56] PHP Notice:  Undefined variable:  number_found in /home/pausat/public_html/teeters/members.php on line 625
+[08-Jun-2007 01:13:09] PHP Parse error:  syntax error, unexpected T_IF in /home/pausat/public_html/teeters/ScoreSheet.php on line 36
+[08-Jun-2007 01:13:46] PHP Notice:  Undefined variable:  program_name in /home/pausat/public_html/teeters/ScoreSheet.php on line 42
+[08-Jun-2007 01:19:28] PHP Notice:  Undefined variable:  program_name in /home/pausat/public_html/teeters/ScoreSheet.php on line 43
+[08-Jun-2007 01:20:33] PHP Notice:  Undefined variable:  program_name in /home/pausat/public_html/teeters/ScoreSheet.php on line 42
+[08-Jun-2007 01:22:52] PHP Notice:  Undefined variable:  row in /home/pausat/public_html/teeters/ScoreSheet.php on line 63
+[08-Jun-2007 01:27:53] PHP Parse error:  syntax error, unexpected T_ENCAPSED_AND_WHITESPACE, expecting T_STRING or T_VARIABLE or T_NUM_STRING in /home/pausat/public_html/teeters/ScoreSheet.php on line 39
+[08-Jun-2007 22:38:54] PHP Notice:  Undefined index:  Race_Date in /home/pausat/public_html/teeters/ScoreSheet.php on line 51
+[08-Jun-2007 22:38:54] PHP Notice:  Undefined index:  Race_Date in /home/pausat/public_html/teeters/ScoreSheet.php on line 51
+[08-Jun-2007 23:44:16] PHP Parse error:  syntax error, unexpected T_STRING in /home/pausat/public_html/teeters/ScoreSheet.php on line 89
+[09-Jun-2007 22:16:06] PHP Fatal error:  Call to undefined function:  get_request() in /home/pausat/public_html/teeters/ScoreSheet.php on line 134
+[10-Jun-2007 00:14:47] PHP Parse error:  syntax error, unexpected '{' in /home/pausat/public_html/teeters/ScoreSheet.php on line 176
+[10-Jun-2007 00:47:40] PHP Parse error:  syntax error, unexpected '{' in /home/pausat/public_html/teeters/ScoreSheet.php on line 256
+[10-Jun-2007 01:29:41] PHP Parse error:  syntax error, unexpected T_STRING in /home/pausat/public_html/teeters/ScoreSheet.php on line 203
+[14-Jun-2007 01:11:53] PHP Notice:  Use of undefined constant division - assumed 'division' in /home/pausat/public_html/teeters/ScoreSheet.php on line 417
+[14-Jun-2007 12:44:20] PHP Notice:  Use of undefined constant division - assumed 'division' in /home/pausat/public_html/teeters/ScoreSheet.php on line 417
+[15-Jun-2007 19:29:26] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/pausat/public_html/teeters/trimbleflash.php:4) in /home/pausat/public_html/teeters/trimbleflash.php on line 13
+[24-Jun-2007 14:20:39] PHP Parse error:  syntax error, unexpected '>' in /home/pausat/public_html/teeters/ScoreSheet.php on line 231
+[24-Jun-2007 14:21:51] PHP Parse error:  syntax error, unexpected ',' in /home/pausat/public_html/teeters/ScoreSheet.php on line 488
+[24-Jun-2007 14:23:18] PHP Parse error:  syntax error, unexpected ',' in /home/pausat/public_html/teeters/ScoreSheet.php on line 488
+[24-Jun-2007 14:23:59] PHP Warning:  Unexpected character in input:  '\' (ASCII=92) state=1 in /home/pausat/public_html/teeters/ScoreSheet.php on line 503
+[24-Jun-2007 14:23:59] PHP Parse error:  syntax error, unexpected T_STRING in /home/pausat/public_html/teeters/ScoreSheet.php on line 503
+[24-Jun-2007 14:24:56] PHP Fatal error:  Cannot redeclare fail_sql() (previously declared in /home/pausat/public_html/teeters/ScoreSheet.php:612) in /home/pausat/public_html/teeters/ScoreSheet.php on line 700
+[24-Jun-2007 15:30:43] PHP Notice:  Undefined variable:  club_no in /home/pausat/public_html/teeters/ScoreSheet.php on line 488
+[24-Jun-2007 15:33:35] PHP Notice:  Undefined index:  race_name in /home/pausat/public_html/teeters/ScoreSheet.php on line 458
+[24-Jun-2007 15:33:35] PHP Notice:  Undefined variable:  club_no in /home/pausat/public_html/teeters/ScoreSheet.php on line 463
+[24-Jun-2007 16:06:49] PHP Parse error:  syntax error, unexpected T_ECHO in /home/pausat/public_html/teeters/ScoreSheet.php on line 507
+[24-Jun-2007 16:34:19] PHP Parse error:  syntax error, unexpected T_ENCAPSED_AND_WHITESPACE, expecting T_STRING or T_VARIABLE or T_NUM_STRING in /home/pausat/public_html/teeters/ScoreSheet.php on line 520
+[24-Jun-2007 19:59:41] PHP Parse error:  syntax error, unexpected T_STRING in /home/pausat/public_html/teeters/ScoreSheet.php on line 646
+[25-Jun-2007 11:45:28] PHP Parse error:  syntax error, unexpected '<' in /home/pausat/public_html/teeters/ScoreSheet.php on line 607
+[25-Jun-2007 14:22:30] PHP Parse error:  syntax error, unexpected T_STRING in /home/pausat/public_html/teeters/ScoreSheet.php on line 617
+[25-Jun-2007 14:23:06] PHP Parse error:  syntax error, unexpected '.' in /home/pausat/public_html/teeters/ScoreSheet.php on line 626
+[25-Jun-2007 14:23:33] PHP Parse error:  syntax error, unexpected T_CONCAT_EQUAL in /home/pausat/public_html/teeters/ScoreSheet.php on line 628
+[25-Jun-2007 14:32:00] PHP Parse error:  syntax error, unexpected '.' in /home/pausat/public_html/teeters/ScoreSheet.php on line 626
+[26-Jun-2007 11:28:33] PHP Parse error:  syntax error, unexpected '.' in /home/pausat/public_html/teeters/ScoreSheet.php on line 731
+[26-Jun-2007 16:17:09] PHP Parse error:  syntax error, unexpected '.' in /home/pausat/public_html/teeters/ScoreSheet.php on line 82
+[26-Jun-2007 16:17:41] PHP Parse error:  syntax error, unexpected '.' in /home/pausat/public_html/teeters/ScoreSheet.php on line 650
+[26-Jun-2007 16:18:27] PHP Parse error:  syntax error, unexpected T_CONSTANT_ENCAPSED_STRING in /home/pausat/public_html/teeters/ScoreSheet.php on line 668
+[26-Jun-2007 16:19:21] PHP Parse error:  syntax error, unexpected '.' in /home/pausat/public_html/teeters/ScoreSheet.php on line 670
+[26-Jun-2007 16:19:47] PHP Parse error:  syntax error, unexpected T_VARIABLE in /home/pausat/public_html/teeters/ScoreSheet.php on line 684
+[26-Jun-2007 16:20:19] PHP Parse error:  syntax error, unexpected T_STRING in /home/pausat/public_html/teeters/ScoreSheet.php on line 684
+[26-Jun-2007 16:20:51] PHP Parse error:  syntax error, unexpected T_ENCAPSED_AND_WHITESPACE, expecting T_STRING or T_VARIABLE or T_NUM_STRING in /home/pausat/public_html/teeters/ScoreSheet.php on line 762
+[26-Jun-2007 14:52:45] PHP Notice:  Undefined variable:  output in /home/pausat/public_html/teeters/ScoreSheet.php on line 65
+[27-Jun-2007 09:47:42] PHP Parse error:  syntax error, unexpected T_STRING in /home/pausat/public_html/teeters/ScoreSheet.php on line 85
+[27-Jun-2007 09:48:29] PHP Parse error:  syntax error, unexpected T_STRING in /home/pausat/public_html/teeters/ScoreSheet.php on line 91
+[27-Jun-2007 10:09:16] PHP Parse error:  syntax error, unexpected T_STRING in /home/pausat/public_html/teeters/ScoreSheet.php on line 81
+[27-Jun-2007 10:12:15] PHP Parse error:  syntax error, unexpected T_STRING in /home/pausat/public_html/teeters/ScoreSheet.php on line 81
+[27-Jun-2007 12:15:58] PHP Parse error:  syntax error, unexpected T_STRING in /home/pausat/public_html/teeters/ScoreSheet.php on line 86
+[27-Jun-2007 12:26:23] PHP Parse error:  syntax error, unexpected T_STRING in /home/pausat/public_html/teeters/ScoreSheet.php on line 64
+[27-Jun-2007 12:53:03] PHP Parse error:  syntax error, unexpected T_VARIABLE in /home/pausat/public_html/teeters/ScoreSheet.php on line 698
+[27-Jun-2007 13:17:54] PHP Parse error:  syntax error, unexpected '{' in /home/pausat/public_html/teeters/ScoreSheet.php on line 43
+[27-Jun-2007 13:10:17] PHP Notice:  Undefined variable:  mail_log in /home/pausat/public_html/teeters/ScoreSheet.php on line 698
+[27-Jun-2007 21:29:11] PHP Parse error:  syntax error, unexpected ',' in /home/pausat/public_html/teeters/test-mail.php on line 6
+[27-Jun-2007 21:30:02] PHP Parse error:  syntax error, unexpected ',' in /home/pausat/public_html/teeters/test-mail.php on line 6
+[27-Jun-2007 21:30:09] PHP Parse error:  syntax error, unexpected ',' in /home/pausat/public_html/teeters/test-mail.php on line 6
+[28-Jun-2007 13:54:43] PHP Parse error:  syntax error, unexpected '/', expecting T_VARIABLE or '$' in /home/pausat/public_html/teeters/ScoreSheet.php on line 197
+[08-Sep-2007 17:20:42] PHP Parse error:  syntax error, unexpected '(' in /home/pausat/public_html/teeters/ScoreSheet.php on line 366
+[15-Sep-2007 12:44:02] PHP Notice:  Undefined variable:  comments in /home/pausat/public_html/teeters/ScoreSheet.php on line 833
+[04-Nov-2007 09:47:12] PHP Parse error:  syntax error, unexpected '}' in /home/pausat/public_html/teeters/members.php on line 664
+[02-Jan-2008 07:46:46] PHP Notice:  Undefined variable:  renewed_clause in /home/pausat/public_html/teeters/members.php on line 666

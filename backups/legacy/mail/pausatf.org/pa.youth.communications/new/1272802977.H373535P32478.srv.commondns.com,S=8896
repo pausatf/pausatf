@@ -1,0 +1,159 @@
+Return-path: <evelyn.hanson16@btinternet.com>
+Envelope-to: pa.youth.communications@pausatf.org
+Delivery-date: Sun, 02 May 2010 13:22:57 +0100
+Received: from n26.bullet.mail.ukl.yahoo.com ([87.248.110.143])
+	by srv.commondns.com with smtp (Exim 4.69)
+	(envelope-from <evelyn.hanson16@btinternet.com>)
+	id 1O8YCH-0008RZ-6L
+	for pa.youth.communications@pausatf.org; Sun, 02 May 2010 13:22:57 +0100
+Received: from [217.146.182.177] by n26.bullet.mail.ukl.yahoo.com with NNFMP; 02 May 2010 12:22:57 -0000
+Received: from [87.248.111.148] by t3.bullet.ukl.yahoo.com with NNFMP; 02 May 2010 12:22:57 -0000
+Received: from [127.0.0.1] by omp205.mail.ukl.yahoo.com with NNFMP; 02 May 2010 12:21:43 -0000
+X-Yahoo-Newman-Property: ymail-5
+X-Yahoo-Newman-Id: 255473.25507.bm@omp205.mail.ukl.yahoo.com
+Received: (qmail 2305 invoked by uid 60001); 2 May 2010 12:21:43 -0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=btinternet.com; s=s1024; t=1272802903; bh=K0a+2mHo9/DiPzCihcDO1gzd9XblnOq8MO+feY2Yo9Q=; h=Message-ID:X-YMail-OSG:Received:X-Mailer:Date:From:Reply-To:Subject:To:MIME-Version:Content-Type; b=NRsIZLYTHOpOF8qWdElT/FTQk7S634bIQ5m/l+6tu1VEwX/qCJg+uAgwronD+09Ur1QC0HmJTZ9qu+aAsmxjFuKOTzANcjYbHcJxM194ZakHj5Ks+Qhgg3+mG6v7vNaQThzXscLywUYfPRZJfklaOWRzdkA+HBS208u6vFIsd1E=
+DomainKey-Signature:a=rsa-sha1; q=dns; c=nofws;
+  s=s1024; d=btinternet.com;
+  h=Message-ID:X-YMail-OSG:Received:X-Mailer:Date:From:Reply-To:Subject:To:MIME-Version:Content-Type;
+  b=u7GcT2tVNf/hrwfqZe94MPXBIyNY1PUY4tFHSnXMyEOuw/g/GhY4diRiYLf8VSmgt2AhlPlPrA69VIcwiK41lGXRPLmOTtoY9PwEzEol3jqQ7Va0PqlLeiB4XDRY4Igdc1DqNDcI4/F4PLhyh0pD4Z9GXrUWWXBKF3KI9YTeviA=;
+Message-ID: <13853.1941.qm@web87003.mail.ird.yahoo.com>
+X-YMail-OSG: EZ04dtMVM1k8TKhUN0sa4ba1CyLm5BSYRjv17dZoZKgrKwc
+ 4MEhcmQu5e03LX5cpu2pbRPWkaVHoVP_lUv4uWeh9u.x2eaShNS2liz3pto_
+ y79p05Rv6pQ6mYLQxdMLTopj053._EaEWhr0TohjV7ov..1zR9G7OVkimf4s
+ D5ldcI1YLLPABG9RwNj34kw95u5h8XGLl9ofSVCgBD2JYIVzkNnTbOSkB5Vk
+ kDbjfTOz0.2szMDbARradq8x0El0XUg6JX50IMvnYHYY3kRTiJeWlt06cIKG
+ wR.WW7Acn8g7X2KBEoe5axEypH1TDQzKFohu1mXK0VWjDe.CekVjYu2.VIwt
+ ReBUfYgQub9Lw4hnhbMQqxiMaRtfAAlNVJItfC09HUoDCcet6lXAcHOixrvW
+ 0C8U_9ehT_YkWWCiGN6nuOM7ensLN2ZOFTxyx8LVfBrr3X8Z0IBm_V50K9uR
+ Dx69p66gS1Llb6PdTLnVuFcIHdTEvY4lQBlZAXZ4qDvEWcLOpCB8lKXLMT04
+ knLpDpfJauSH8OySFRYeIPNiYmz.R9OU53zngpELFhDO31x2npMGN5O3HaEY
+ 6Q586SX.kmLOU9VG0e1BerWYYmlUGZd4Nk.SWz1WYkEPC30o9tX_WXxYK7s_
+ ZsXCNi9YCT_QqfKMMA5J83pWqFdp5e4m8BICOOO7TXEmxqHd3aCesYzRhDbF
+ PsSJcbGWx72GBC6vWhqU4nrie1u8Ks7eWQ9iMx1aZsfjNlkNy9OE9RB_7UI0
+ aJQtWD3DB4pVPkCwqiJf2Jr.LwvbJ2k9ApAEuL81ym81CkLHnOa0Zb4vdLkF
+ fyLv6q3C6zr5l2yWsNjYfmWn5CQnY6jCCHsMGs4ehAhVN0VGOC4X8RkMf6Sq
+ x2GoW_EYYc3LBlGsc5nFAQD4pNHDDxfqFN.TCPlXcOJlypCGrP6YAg1M9DPK
+ 7BCWAGEcS3L_Ks.Jucu3aWRGwerP4kLSOa1.QOkk9PeuzRoCHfoLHSf1sMJE
+ ntZz2agRXyr8SzuqcrC06.iKrZJxNYxJmzlL5Tq26ReM_uJQtnlKLiuxbSar
+ u_5uVbJ96HbkmFbVbCekI_yzbpfGQ3bulMujeAG5kudv_weJOnUwydtaPT01
+ z8NV3FrMJapNpEiOUk7BPICCm3a1RUGwbABOFRB3kU1tY_pIUWvzmzx.aj9h
+ pNnkt8W.cQpOeXEFSzy_DOPKtReT_hMUz0fe3x2W9x3JTUzXPZ6XbASI1Fe2
+ EBUM1oTcRZgJgYnWxlIp6sV7mix2bL5nScZuOykAuCUCLlVr6T3xNsXgeosf
+ Nh_a.Si6jXqYbVGPhEMgUpJXjcyycs09Uc0kMLUovhlYOL8s_IVIXE9yQUML
+ ykOf3CGMUlqLO008sq2rDYhJ7ACBBt3Rh9oWTk1ZHxhQwO.oGBvM_.kV4xCn
+ h3h9i_aiIbgBScHaPW6YQ0uUbXzDHp3l6_eN.UANMCAs91HWhJjOH7oHsjyj
+ V8VFLMohTEA82sMpvsm_acFhYaDa96g5uEuCwKiXv9h56mLxxH1b3fzu6veG
+ 6Aj1VjFY.Lk9o5B3A_rIpg0MB0i3uFqhD.bNyAuxlXPLBdiYuCIElD929LVq
+ 6wscFa54si6c98CK.Z8hXVJzeBRII5XS2a5sIBPa1zSUVYCjOfGKBOfZuX._
+ z5PkFMNrSjOUuMJqzbcn1AHd634h6F2_XnNawF9hk6tqRkrQckzmLrD_5jHJ
+ j664ayPpDygwnudLiPnQBappT9k64nbFelZ5.zxMzWw34aXJuM8I45ESv.Gu
+ OxGXabZ6ZQRY7AHrhceoNtVtCCN8bCey2t11HwBm6iGFbDbCBMxZXTuzt6lS
+ i.4bYUdZPf6QswBZlWUzYIV9.gGz9rfDj2QJB02HmXUF2bujBGW7GhGWexcs
+ zWY_jCykQSTemQ0ItkTUOdJMpCU7KeP3y7VmFeZ_fQhSC7KkYQKXLM1WzQxf
+ lGhpy640vp3gH6Hr5f0OTXYU68lmO35wXK1QtybGuPEOEcGW1cUgoullYQqw
+ pumHBtOIASXoNmu249yH..JbUTTaFoDYsI.niiJze7xRZDBvHMHmz81sqavc
+ 4NDBpAUieHj95x6fiqhgeOtxD5IyiA8Qqrg3oZfBp_3oXNRtZjxbCZf5XnV.
+ aaiboaY7Qz2flQSGGwAUabFx6YzAwDy9C9K1ssnnX5hLUEFAQk2EtrhjB8sc
+ YKi0OW8JrHvlQPyMv4Vt4JmH4XlMm8m92ODEbJmtyXh8h51pyWIn1Swg4orw
+ TJ5odzu4FNjQtoXsfA1gAJ7_3eoAg8rK.uO.Psc2NOxUz0AW3VQ3PEt8Rvde
+ KEzgwyNZpsAo.dllogjQ0cys8Etq_wkJY87eMPWSGB4pfsSonmiAn3qwL7nD
+ nKCB21AreA15RG1phNDjGCyaHgTXA0c2r3bybhc3qy9zo0RbM5OCA5eCPhjP
+ EVJpkUN1M4fhlBpWDJHNlXkdV10pO5RovVILHhIVcjivsoffAsatWELJNfus
+ fOViXYtzso0uFktb0PDLyLyvdpoiY1u1NarjWtxTgVCmWNdHK1XpC_EFjz9o
+ GygUvQOH8MIcZaNwtJRXMqmsqRx2EgYwtTPM_m96J2IXxxNEOJxJwNcnPyT.
+ jm1ws2yDr.8z75CqHs8hSi1YSLcldLaMEwBpeGkqAC8drVWU78CPZtdDn66N
+ H75c0pPXcLy.4Ytg_nmOzJuPKzovs.5MZFm7KL7AIkGUJxzVre8EHG9bKv49
+ JD4cco6AvQzAMPTP4WD7C2a_jOFR5lltZFOZL3MITzYxX_LnfFnbKC1HUsiy
+ kE.HB9q520Qy7w4kipskC5kX6pyGrmcmlgxn.a57yf5s_lkKB_84rES5apbu
+ ZLNZUu_Owyxoil8VaFGBnxfgqI.4WQpGUCWADIipim_BnDBaBAOsbow8REFd
+ 3AIuB1YPVPWIWduH7fFD6Pd64PugbvsPsocpa7nZfmZQYR6JKqOBeDL.kzpy
+ qepBO9jT1NrKPhrFMpr.bTe0NPLYSC3yMiNRNoeWDEHOLu3qWmY32szoJu1w
+ -
+Received: from [41.202.80.220] by web87003.mail.ird.yahoo.com via HTTP; Sun, 02 May 2010 12:21:42 GMT
+X-Mailer: YahooMailClassic/10.1.11 YahooMailWebService/0.8.103.269680
+Date: Sun, 2 May 2010 12:21:42 +0000 (GMT)
+From: EVELYN HANSON <evelyn.hanson16@btinternet.com>
+Reply-To: evelynhanson_x2@yahoo.co.jp
+Subject: Dearest One,
+To: undisclosed recipients: ;
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="0-434694285-1272802902=:1941"
+
+--0-434694285-1272802902=:1941
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+Dearest One,
+
+Permit me to inform you of my desire of going into business relationship wi=
+th you. I am quite aware that my message will come to you as a surprise bec=
+ause it is indeed very strange for someone you have not met before to conta=
+ct you in this regard.
+=A0
+I am writing to seek your partnership in the investment of my inheritance f=
+und ( USD$7.5Million ) from my late father who died mysteriously on 12 july=
+ 2008
+I am Ms Evelyn Hanson=A0 From Ivory Coast, I am an orphan and I need your h=
+onest assistance to transfer my inheritance (USD$7.500, 000.00) which my la=
+te father deposited in a security company. here befor his assasination for =
+reason which I will let you know as soon as I hear your quick reply. throug=
+h this email
+=A0
+l am willing to offer you 20% of the total sum as compensation for your ass=
+istance in the transfer of this deposit to your country. Furthermore, you c=
+an indicate your option towards assisting me as l believed that this projec=
+t would be concluded within seven days you signify interest to assist me by=
+ contacting the security company.=20
+=A0
+Hoping to hearing from you soon. May God bless you as you extend your helpi=
+ng hand to the needy
+=A0
+Please I would like you to keep this proposal as a top secret and delete it=
+ if you are not interested in assist me, please contact me on my email addr=
+ess for me to send moire details to you, my email is (evelynhanson_x2@yahoo=
+.co.jp)
+=A0
+Best wishes
+=A0
+Sincerely,=20
+=A0
+Ms Evelyn Hanson. 
+--0-434694285-1272802902=:1941
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+<table cellspacing=3D"0" cellpadding=3D"0" border=3D"0" ><tr><td valign=3D"=
+top" style=3D"font: inherit;"><DIV>Dearest One,</DIV>
+<DIV><BR>Permit me to inform you of my desire of going into business relati=
+onship with you. I am quite aware that my message will come to you as a sur=
+prise because it is indeed very strange for someone you have not met before=
+ to contact you in this regard.</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>I am writing to seek your partnership in the investment of my inherita=
+nce fund ( USD$7.5Million ) from my late father who died mysteriously on 12=
+ july 2008</DIV>
+<DIV>I am Ms Evelyn Hanson&nbsp; From Ivory Coast, I am an orphan and I nee=
+d your honest assistance to transfer my inheritance (USD$7.500, 000.00) whi=
+ch my late father deposited in a security company. here befor his assasinat=
+ion for reason which I will let you know as soon as I hear your quick reply=
+. through this email</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>l am willing to offer you 20% of the total sum as compensation for you=
+r assistance in the transfer of this deposit to your country. Furthermore, =
+you can indicate your option towards assisting me as l believed that this p=
+roject would be concluded within seven days you signify interest to assist =
+me by contacting the security company. <BR>&nbsp;<BR>Hoping to hearing from=
+ you soon. May God bless you as you extend your helping hand to the needy</=
+DIV>
+<DIV>&nbsp;</DIV>
+<DIV>Please I would like you to keep this proposal as a top secret and dele=
+te it if you are not interested in assist me, please contact me on my email=
+ address for me to send moire details to you, my email is (evelynhanson_x2@=
+yahoo.co.jp)<BR>&nbsp;<BR>Best wishes</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>Sincerely, </DIV>
+<DIV>&nbsp;</DIV>
+<DIV>Ms Evelyn Hanson. </DIV></td></tr></table>
+--0-434694285-1272802902=:1941--
+

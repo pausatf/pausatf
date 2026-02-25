@@ -1,0 +1,137 @@
+Return-path: <getkelvin@att.net>
+Envelope-to: pa.youth.communications@pausatf.org
+Delivery-date: Thu, 14 Apr 2011 09:46:48 -0400
+Received: from nm7-vm0.bullet.mail.ukl.yahoo.com ([217.146.183.236])
+	by srv1.commondns.com with smtp (Exim 4.69)
+	(envelope-from <getkelvin@att.net>)
+	id 1QAMsi-000877-0E
+	for pa.youth.communications@pausatf.org; Thu, 14 Apr 2011 09:46:48 -0400
+Received: from [217.146.183.211] by nm7.bullet.mail.ukl.yahoo.com with NNFMP; 14 Apr 2011 13:46:45 -0000
+Received: from [217.146.183.41] by tm4.bullet.mail.ukl.yahoo.com with NNFMP; 14 Apr 2011 13:46:45 -0000
+Received: from [127.0.0.1] by omp1026.mail.ukl.yahoo.com with NNFMP; 14 Apr 2011 13:46:45 -0000
+X-Yahoo-Newman-Property: ymail-3
+X-Yahoo-Newman-Id: 149070.21448.bm@omp1026.mail.ukl.yahoo.com
+Received: (qmail 63452 invoked by uid 60001); 14 Apr 2011 13:46:44 -0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=att.net; s=s1024; t=1302788804; bh=BCijIBVESvhodFQFHkh0PMC5Jcg/4R0gg/T7v63ob8E=; h=Message-ID:X-YMail-OSG:Received:X-RocketYMMF:X-Mailer:Date:From:Reply-To:Subject:To:MIME-Version:Content-Type; b=r4qOnljIt5ox2mzCF6KYEqW4FSJZOaXPV0Y3hNgSyc0tVTPINtkww/xR63/L4pGY/xE7QK4p/iQU444mZzbr4qYXdf2gFZttjipOpV2LrCD3I/SsfbGyuif23mvQQ67AMVj9bz9gLywXUgdPCAbTP+Ifu0NiyK4NdKAix9E+Gg8=
+DomainKey-Signature:a=rsa-sha1; q=dns; c=nofws;
+  s=s1024; d=att.net;
+  h=Message-ID:X-YMail-OSG:Received:X-RocketYMMF:X-Mailer:Date:From:Reply-To:Subject:To:MIME-Version:Content-Type;
+  b=C3/ZfoCwmZo4Uhb6Vd4iCkwxjy+FvTWPMofEh/8ZsMIqk/R2lFwyqYQhKC3R4xgH4AKx+f3kFLtwmMaKC9iHzaINluOUU+dhyuAL2BhCKCzTmMsbBis9tHqwfKLIipu0ddDkVqoARcJUSbsWd+MUc1ND7j5Qu35NsKBiUzScolg=;
+Message-ID: <857667.63086.qm@web28214.mail.ukl.yahoo.com>
+X-YMail-OSG: Ft8S808VM1n.XI2ycP4mJ2xpv6an7p9hQiUGlVe9g3yooOg
+ ytL3WNNFBWJKP.9IaGw4DOjnOpsxYS_FXFVZYpggJ36RGG0qvE5wn5cpdLEw
+ SZvGl99tP7Z0soT71EsgvGDhA3glSbZh7XtL0VKmspF8QTDnK23iZluiNEiQ
+ T9wHDReh3QxS0SNuNsojtyHzjIVwnn_TVwRWXrBxAjHn.6JTUiJ6yYlreV0e
+ w1VJJwRZywZFm12Tz2XhN7Lp5EDCTI4KBI3eWQKq8Yp6rMSbaCVXLHZZxijx
+ YoghfC6CzIHUcrtuqvjA8s9J7H59AThrr350FuneHcLOlfwh83OSh27iHvDH
+ es0nSSKzzjnY_vDApLMMpow1EC3fCxFbYSat6H_Lw0R7EuNDL7lOWZj_xjzt
+ .433nVm_gxbPYHWwlqGZx6Dfr9_crcXSSR0sBtLS_W37iCmSZlPt_Zz.pbkG
+ BTY0lcwtwRAcxO.vHAype4RnBDhhElqnR9xla371y1uk9aKvNtEHhz5zTndm
+ 9jlACey_GyaiZvIYl5Vk.K2a12NDeq.FRTCF74mts9TmZFMZkYXzs1TWWnKJ
+ 3vYQHUyLHq8XNk_hkYmwNryIL2jHqUV75rqWWcZsyHhcAUw1bLL0_PaLzMg4
+ LoEM54mXZhD1GY1tt7baM88LL4Nknht.X0lw44aLnPBehkgTGAIKseCglnlb
+ hBxYnh6fezE_XriyMvhUkA7VpF9GGqDCyhNQJ_4Kz6g--
+Received: from [41.86.224.4] by web28214.mail.ukl.yahoo.com via HTTP; Thu, 14 Apr 2011 14:46:44 BST
+X-RocketYMMF: rishisiahmed001
+X-Mailer: YahooMailClassic/12.0.2 YahooMailWebService/0.8.109.295617
+Date: Thu, 14 Apr 2011 14:46:44 +0100 (BST)
+From: "Mr.Kelvin Nelson" <getkelvin@att.net>
+Reply-To: getkelvin@att.net
+Subject: Fr.Kelvin Nelson.(not spam)
+To: undisclosed recipients: ;
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="0-1377717295-1302788804=:63086"
+
+--0-1377717295-1302788804=:63086
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+
+Hello,
+=C2=A0
+Please take your time to read this message; although we have never met befo=
+re, this is no spam. It's a real message sent to you. I know also that you =
+will be amazed at the level of trust that I am willing to place in a person=
+ that I have never seen nor spoken with.
+=C2=A0
+My name is Fr.Kelvin Nelson, I am a catholic priest for over 55 years. I ha=
+d a heart surgery on the 26-2-2011 and the Doctors have just informed me th=
+at I cannot live longer; I had a serious bleeding after the operation. I ha=
+ve decided to release to you the total sum of $2.970.000.00 (Two million Ni=
+ne Hundred and seventy Thousand US DOLLARS) deposited with my Bank:I want y=
+ou to use these amount to make the world a better place for the poor and le=
+ss privileged, help the needy and also help your family members.
+=C2=A0
+As a Catholic priest, I have no child, no wife, and no family. I have no ot=
+her option as my days on earth are numbered, this is no joke. It's true we =
+don't receive emails like this every day,=C2=A0 but today is a different da=
+y so it's time for "REAL CHANGE" I will turn 77 years a day after tomorrow.
+=C2=A0
+I took this decision because I was raised in an Orphanage so I don't have r=
+elatives and presently, I'm hospitalized at a Benin hospital, where I am un=
+dergoing treatment. That=E2=80=99s why I have decided to contact you so tha=
+t you can make good use of the money which I willed to you. Now, the people=
+ around me are only waiting for me to die, so that they can sit on my money=
+ and use it for their selfish interest. I hate evil minded people and that=
+=E2=80=99s why I want you to now contact my Lawyer:
+=C2=A0
+Contact name:(Barrister)Laurence Alfred..
+Email address: laurence.alfred@yahoo.com
+Office address: Rue 131 Saint Rita, Cotonou Benin Republic.
+=C2=A0
+He will direct you on what to do to receive funds immediately; I have passe=
+d on my instructions to him so feel free to contact him. Please make sure y=
+ou contact my Lawyer, he is the only one that can respond to you in due tim=
+e. I wish you the very best in life. Always pray for my soul to rest in per=
+fect peace, I would be a very happy man even in death if you use these fund=
+s for Good work to help humanity. I am 77 years old now and has been good t=
+o everyone around... please assure me that you would help me carry on the g=
+ood work.
+=C2=A0
+Fr.Kelvin Nelson.
+NB: Do not fail to contact my Lawyer, because I might not be able to respon=
+d to your email in due time because of my ill health. Direct all questions =
+to the Lawyer.
+--0-1377717295-1302788804=:63086
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+<table cellspacing=3D"0" cellpadding=3D"0" border=3D"0" ><tr><td valign=3D"=
+top" style=3D"font: inherit;"><br>Hello,<br>&nbsp;<br>Please take your time=
+ to read this message; although we have never met before, this is no spam. =
+It's a real message sent to you. I know also that you will be amazed at the=
+ level of trust that I am willing to place in a person that I have never se=
+en nor spoken with.<br>&nbsp;<br>My name is Fr.Kelvin Nelson, I am a cathol=
+ic priest for over 55 years. I had a heart surgery on the 26-2-2011 and the=
+ Doctors have just informed me that I cannot live longer; I had a serious b=
+leeding after the operation. I have decided to release to you the total sum=
+ of $2.970.000.00 (Two million Nine Hundred and seventy Thousand US DOLLARS=
+) deposited with my Bank:I want you to use these amount to make the world a=
+ better place for the poor and less privileged, help the needy and also hel=
+p your family members.<br>&nbsp;<br>As a Catholic priest, I have no child, =
+no
+ wife, and no family. I have no other option as my days on earth are number=
+ed, this is no joke. It's true we don't receive emails like this every day,=
+&nbsp; but today is a different day so it's time for "REAL CHANGE" I will t=
+urn 77 years a day after tomorrow.<br>&nbsp;<br>I took this decision becaus=
+e I was raised in an Orphanage so I don't have relatives and presently, I'm=
+ hospitalized at a Benin hospital, where I am undergoing treatment. That=E2=
+=80=99s why I have decided to contact you so that you can make good use of =
+the money which I willed to you. Now, the people around me are only waiting=
+ for me to die, so that they can sit on my money and use it for their selfi=
+sh interest. I hate evil minded people and that=E2=80=99s why I want you to=
+ now contact my Lawyer:<br>&nbsp;<br>Contact name:(Barrister)Laurence Alfre=
+d..<br>Email address: laurence.alfred@yahoo.com<br>Office address: Rue 131 =
+Saint Rita, Cotonou Benin Republic.<br>&nbsp;<br>He will direct you on what=
+ to
+ do to receive funds immediately; I have passed on my instructions to him s=
+o feel free to contact him. Please make sure you contact my Lawyer, he is t=
+he only one that can respond to you in due time. I wish you the very best i=
+n life. Always pray for my soul to rest in perfect peace, I would be a very=
+ happy man even in death if you use these funds for Good work to help human=
+ity. I am 77 years old now and has been good to everyone around... please a=
+ssure me that you would help me carry on the good work.<br>&nbsp;<br>Fr.Kel=
+vin Nelson.<br>NB: Do not fail to contact my Lawyer, because I might not be=
+ able to respond to your email in due time because of my ill health. Direct=
+ all questions to the Lawyer.</td></tr></table>
+--0-1377717295-1302788804=:63086--

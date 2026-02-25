@@ -1,0 +1,11 @@
+{
+'update_all.pl': ['500', 'Mar', '20', '2004'],
+'palm_datebook.pl': ['14166', 'Oct', '22', '2004'],
+'check_translation.pl': ['3485', 'Nov', '30', '2004'],
+'upgrade_to_0.9.7.pl': ['5911', 'Aug', '13', '2002'],
+'convert_passwords.php': ['2638', 'Jun', '7', '2006'],
+'summary.txt': ['1382', 'Sep', '28', '2006'],
+'send_reminders.php': ['17613', 'Jun', '7', '2006'],
+'translation_summary.pl': ['996', 'Dec', '2', '2004'],
+'update_translation.pl': ['8620', 'Mar', '11', '2005'],
+}

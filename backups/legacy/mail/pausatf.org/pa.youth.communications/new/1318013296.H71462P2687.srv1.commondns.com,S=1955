@@ -1,0 +1,49 @@
+Return-path: <accounts@wellsfargoaccount.com>
+Envelope-to: pa.youth.communications@pausatf.org
+Delivery-date: Fri, 07 Oct 2011 14:48:16 -0400
+Received: from fed1rmfepo201.cox.net ([68.230.241.146])
+	by srv1.commondns.com with esmtp (Exim 4.69)
+	(envelope-from <accounts@wellsfargoaccount.com>)
+	id 1RCFSx-0000gn-Ag
+	for pa.youth.communications@pausatf.org; Fri, 07 Oct 2011 14:48:15 -0400
+Received: from fed1rmimpo109.cox.net ([68.230.241.158])
+          by fed1rmfepo201.cox.net
+          (InterMail vM.8.01.04.00 201-2260-137-20101110) with ESMTP
+          id <20111007184812.TLQP3776.fed1rmfepo201.cox.net@fed1rmimpo109.cox.net>;
+          Fri, 7 Oct 2011 14:48:12 -0400
+Received: from User ([68.2.97.231])
+	by fed1rmimpo109.cox.net with bizsmtp
+	id hvkx1h00b4zXk1803vkyou; Fri, 07 Oct 2011 15:45:01 -0400
+X-CT-Class: Bulk
+X-CT-Score: 5.00
+X-CT-RefID: str=0001.0A020201.4E8F4943.00A9,ss=3,sh,re=0.000,fgs=0
+X-CT-Spam: 0
+X-Authority-Analysis: v=1.1 cv=f7+iIEBXlRg8DgWVVSd61rd0G1hrWSJW6o4ACgxAEYw=
+ c=1 sm=1 a=Dyoqhi_TatcA:10 a=xVUd66Mu6e8A:10 a=PnrKG0Vj3sUA:10
+ a=Cfj4BQAnxiAA:10 a=PebPdupG4kdUEZcNZ9qFjA==:17 a=9uacuh_NAAAA:8
+ a=gUJ08q43iS39z-wmhOIA:9 a=Ft8UYL4EG9YA:10 a=PebPdupG4kdUEZcNZ9qFjA==:117
+X-CM-Score: 0.00
+Authentication-Results: cox.net; none
+From: "Account WellsFargo"<accounts@wellsfargoaccount.com>
+Subject: Your Account Has A warning Message!
+Date: Fri, 7 Oct 2011 11:48:12 -0700
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="Windows-1251"
+Content-Transfer-Encoding: 7bit
+X-Priority: 1
+X-MSMail-Priority: High
+X-Mailer: Microsoft Outlook Express 6.00.2600.0000
+X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2600.0000
+Message-Id: <20111007184812.TLQP3776.fed1rmfepo201.cox.net@fed1rmimpo109.cox.net>
+
+Your Account Has A warning Message!
+
+You need to read this message as soon as possible.
+
+This may affect your account status.
+
+Please read the message here: http://wellsfrgo-aler-message.com
+
+Thank You,
+Account Message Center

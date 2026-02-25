@@ -1,0 +1,4 @@
+# Legacy PHP 5 scripts - DB unavailable, mysql_* removed in PHP 7. Return 410 Gone.
+Options -Indexes
+RewriteEngine On
+RewriteRule \.php$ - [R=410,L]

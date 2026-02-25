@@ -1,0 +1,58 @@
+Return-path: <uylftp@westernunion.com>
+Envelope-to: pa.youth.communications@pausatf.org
+Delivery-date: Mon, 05 Sep 2011 09:54:00 -0400
+Received: from fed1rmfepo101.cox.net ([68.230.241.143])
+	by srv1.commondns.com with esmtp (Exim 4.69)
+	(envelope-from <uylftp@westernunion.com>)
+	id 1R0Zce-0007o0-5f
+	for pa.youth.communications@pausatf.org; Mon, 05 Sep 2011 09:54:00 -0400
+Received: from fed1rmimpo02.cox.net ([70.169.32.72])
+          by fed1rmfepo101.cox.net
+          (InterMail vM.8.01.04.00 201-2260-137-20101110) with ESMTP
+          id <20110905135357.QQEQ8731.fed1rmfepo101.cox.net@fed1rmimpo02.cox.net>;
+          Mon, 5 Sep 2011 09:53:57 -0400
+Received: from User ([98.189.85.18])
+	by fed1rmimpo02.cox.net with bizsmtp
+	id V1tw1h00G0Pk6vW041twPf; Mon, 05 Sep 2011 09:53:57 -0400
+X-CT-Class: Clean
+X-CT-Score: 0.00
+X-CT-RefID: str=0001.0A02020A.4E64D475.0055,ss=1,re=0.000,fgs=0
+X-CT-Spam: 0
+X-Authority-Analysis: v=1.1 cv=9dqdZ/fUQSkOhIOEI4lL3PSMOfzwZY+8GDOxtWm+MYQ=
+ c=1 sm=1 a=p_iT1Ce5MD8A:10 a=Ghvlo5z-HGEA:10 a=sSbu5ttcUucA:10
+ a=t8h3MGqUbMMA:10 a=RRF2LoEAzt+XdBwNRC+oWw==:17 a=Wsk0mO_hAAAA:8
+ a=FVtDcW9Vn8hF3x-J3rsA:9 a=iGWDSUpu49ty6gYg8hYA:7 a=ZnBHZVZb9rEA:10
+ a=RRF2LoEAzt+XdBwNRC+oWw==:117
+X-CM-Score: 0.00
+Authentication-Results: cox.net; none
+Reply-To: uylftp@westernunion.com
+From: PayPal<uylftp@westernunion.com>
+To: service@paypal.com
+Subject: Notification of limited account access
+Date: Mon, 5 Sep 2011 06:53:58 -0700
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="ks_c_5601-1987"
+Content-Transfer-Encoding: 7bit
+X-Priority: 3
+X-MSMail-Priority: Normal
+X-Mailer: Microsoft Outlook Express 6.00.2600.0000
+X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2600.0000
+Message-Id: <20110905135357.QQEQ8731.fed1rmfepo101.cox.net@fed1rmimpo02.cox.net>
+
+Dear Paypal Member,
+
+We're not able to process your account information at this time.
+
+In reviewing your account, we found out that we need more information from you before we restore your full account access.
+
+What you need to do
+
+Please visit the Resolution Center. There, you'll also be able to get more details on what additional information is required, and what you can and can't do with your PayPal account until the issue is resolved.
+
+To access Resolution Center please follow :
+http://secure-mode.beachfieldcourt.com/.online/secure/area/identification-code-account-suspended/
+
+Once you provide the information we need, we'll send you an email to let you know if we need more details.
+
+Thanks, PayPal Resolution Center

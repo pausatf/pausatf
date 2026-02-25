@@ -1,0 +1,71 @@
+Return-path: <azaeske@google.com>
+Envelope-to: pa.youth.communications@pausatf.org
+Delivery-date: Fri, 30 Apr 2010 04:04:56 +0100
+Received: from smtp-out.google.com ([216.239.44.51])
+	by srv.commondns.com with esmtps (TLSv1:AES256-SHA:256)
+	(Exim 4.69)
+	(envelope-from <azaeske@google.com>)
+	id 1O7gX8-0001XP-QY
+	for pa.youth.communications@pausatf.org; Fri, 30 Apr 2010 04:04:55 +0100
+Received: from wpaz21.hot.corp.google.com (wpaz21.hot.corp.google.com [172.24.198.85])
+	by smtp-out.google.com with ESMTP id o3U34raX018126
+	for <pa.youth.communications@pausatf.org>; Thu, 29 Apr 2010 20:04:54 -0700
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed/relaxed; d=google.com; s=beta;
+	t=1272596694; bh=yg+mxuwMzDs1Y6mICMIZCJR1E5I=;
+	h=MIME-Version:Reply-To:Date:Message-ID:Subject:From:To:
+	 Content-Type;
+	b=otP+iMxCfXk4NVpQIfFeS0KSIBZvxR+ClIQ/mBwXZjxgc7Bt5rZvd4LfNjCXodEr1
+	 77ZKgU+4PMknGbQpGHNLQ==
+DomainKey-Signature: a=rsa-sha1; s=beta; d=google.com; c=nofws; q=dns;
+	h=mime-version:reply-to:date:message-id:subject:from:to:
+	content-type:x-system-of-record;
+	b=wPhmuy+yFafJbAAx896n3VplUCM17NiJ84Ky5D82IckT/FspPVSpfgpsHTk+S1TDm
+	NK6gsqJI7tawMwQeG9Z9Q==
+Received: from gwb20 (gwb20.prod.google.com [10.200.2.20])
+	by wpaz21.hot.corp.google.com with ESMTP id o3U34ql6019559
+	for <pa.youth.communications@pausatf.org>; Thu, 29 Apr 2010 20:04:53 -0700
+Received: by gwb20 with SMTP id 20so3662gwb.22
+        for <pa.youth.communications@pausatf.org>; Thu, 29 Apr 2010 20:04:52 -0700 (PDT)
+MIME-Version: 1.0
+Received: by 10.150.13.21 with SMTP id 21mr690747ybm.101.1272596692264; Thu, 
+	29 Apr 2010 20:04:52 -0700 (PDT)
+Received: by 10.150.66.13 with HTTP; Thu, 29 Apr 2010 20:04:52 -0700 (PDT)
+Reply-To: azaeske@google.com
+Date: Thu, 29 Apr 2010 20:04:52 -0700
+Message-ID: <n2he626b4bc1004292004l111cdcf3l73ebd1b6255221aa@mail.gmail.com>
+Subject: best marks in PAUSATF
+From: Andrew Zaeske <azaeske@google.com>
+To: pa.youth.communications@pausatf.org
+Content-Type: multipart/alternative; boundary=000e0cd7613ac8e8f704856b81f2
+X-System-Of-Record: true
+
+--000e0cd7613ac8e8f704856b81f2
+Content-Type: text/plain; charset=ISO-8859-1
+
+Hi, I was looking at your "best marks" page and noticed that you're missing
+the 1500 meter run for Midget Boys (and a few other age groups). You do have
+the 1500 meter *race walk* but not the 1500 meter run.
+
+My son, Ben Zaeske, has the fastest midget boy time in the association this
+year so far in that race (Roseville). That's why I noticed. Here's the
+Roseville results:
+http://pausatf.org/data/2010/youth/RVResults.htm
+
+Andrew Zaeske
+
+--000e0cd7613ac8e8f704856b81f2
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+Hi, I was looking at your &quot;best marks&quot; page and noticed that you&=
+#39;re missing the 1500 meter run for Midget Boys (and a few other age grou=
+ps). You do have the 1500 meter <b>race walk</b>=A0but not the 1500 meter r=
+un.<div>
+<br></div><div>My son, Ben Zaeske, has the fastest midget boy time in the a=
+ssociation this year so far in that race (Roseville). That&#39;s why I noti=
+ced. Here&#39;s the Roseville results:</div><div><a href=3D"http://pausatf.=
+org/data/2010/youth/RVResults.htm">http://pausatf.org/data/2010/youth/RVRes=
+ults.htm</a></div>
+<div><br></div><div>Andrew Zaeske</div>
+
+--000e0cd7613ac8e8f704856b81f2--

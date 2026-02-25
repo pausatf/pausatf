@@ -1,0 +1,152 @@
+Return-path: <honestt@att.net>
+Envelope-to: pa.youth.communications@pausatf.org
+Delivery-date: Mon, 17 Jan 2011 05:56:27 -0500
+Received: from nm24-vm0.bullet.mail.sp2.yahoo.com ([98.139.91.226])
+	by srv1.commondns.com with smtp (Exim 4.69)
+	(envelope-from <honestt@att.net>)
+	id 1Peml9-0004O4-Hk
+	for pa.youth.communications@pausatf.org; Mon, 17 Jan 2011 05:56:27 -0500
+Received: from [98.139.91.64] by nm24.bullet.mail.sp2.yahoo.com with NNFMP; 17 Jan 2011 10:56:24 -0000
+Received: from [98.139.91.35] by tm4.bullet.mail.sp2.yahoo.com with NNFMP; 17 Jan 2011 10:56:24 -0000
+Received: from [127.0.0.1] by omp1035.mail.sp2.yahoo.com with NNFMP; 17 Jan 2011 10:56:24 -0000
+X-Yahoo-Newman-Property: ymail-3
+X-Yahoo-Newman-Id: 620338.41881.bm@omp1035.mail.sp2.yahoo.com
+Received: (qmail 99376 invoked by uid 60001); 17 Jan 2011 10:56:24 -0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=att.net; s=s1024; t=1295261784; bh=hLz5a1LdU8Uy9G5Ss76Pyj63nlKc9oRRAhrInJVYTt0=; h=Message-ID:X-YMail-OSG:Received:X-Mailer:Date:From:Reply-To:Subject:To:MIME-Version:Content-Type; b=NwVSEoySft2cTdNH+N8WOCl706w+/eI+s7x4yrWC3je7k8IUkgW1YnbHCjdTj6KlaRgIP1rRE/mXioVyYyp4jB14rWTc8oOX0sGoc6zG3wL2IwMt3xtHwYedErmYpHvqrTPvSSYKgZvK1fNU40n+H5FJbFai2MnRSQcs2EL3JFs=
+DomainKey-Signature:a=rsa-sha1; q=dns; c=nofws;
+  s=s1024; d=att.net;
+  h=Message-ID:X-YMail-OSG:Received:X-Mailer:Date:From:Reply-To:Subject:To:MIME-Version:Content-Type;
+  b=oKdhifUj1/Yo+G0D2qG8HyLUGntk5ltgXbA6d1hIuSRUVBsEFsLHmLOFAS1AMz+AxkJiHFoV+329NtJHMknEP4NXgsHU+GhzmACnI//EDBD7vTzbTEypdNmRjqHHrX3HtwrnuJ9gfF4rk/Qi4qaM3jyCbZCaJVJR5BT3JPDrz+s=;
+Message-ID: <354475.96993.qm@web83711.mail.sp1.yahoo.com>
+X-YMail-OSG: crn7HiEVM1kL6Q1w2YGojy4a6JPbOclBpEOXFHYWkiFQZ1P
+ FojWUUEzjYJz5KDXoi7p2cFWUOArEmCJ7l4dal8Mqr_oXUX05T7OTQ6Q8WpS
+ mr86cVKqIevjCFdz90qKreqSNUcnJ6aELoqPCWekyHs5AsbGuIOOZ.tW3oSL
+ sjYZf64WNO9WqGHE8wqGuiqBRjeOzvpJrxXhNitYRgaDsZ3qXh..HL1d0tiU
+ hEeJ_ab0S9z6y4jFxoxBbi3MQ3eDlkKsI5s1FYLidnronIOJoMVK92mtOANS
+ 47G6aLQu.MOpm5WvenTANluEOWSDGgPPsGs6FAu9tD7tERwn0azUYZdTHyfC
+ .jcg9aMoM.4EE_PM3LRsXgv_F572eCh9WqT4DDsNaluz7zXsar7bV5Vyv_ZZ
+ 8jpKzTGNOkxhXeBjPengtUt7K2iw43H86sInXSr4cjIBkul2UEx1mM6cdpqN
+ VL.BYYqGITKPWYNagUScWWO1QyAKk2Nd9mXabLTU6lWZTAo9JnBrtpD1iMxJ
+ ufE4Ek1V7ko8CCyhLm99IaJ4aC9F4fO6_qDc3_ZEbWh_h78ThB8RrbTUaLuh
+ 8T96QkVgHEZAy1k0tHXLXwkmMELje_VmFcvVbNSJeCAHEQXthJIEUSDI8LEk
+ AhAggzpAvv7mbnw6PkRHNNL20W5gAmWPopMOJULA3K__bNKHnW.5RCkTAwI4
+ NKw3Cn0SBYF3hKccY4t658Bpo_igFXxTCUfX6Ly4yypIZnYoLnopRr_oRqWd
+ bPwv5aXwfXdWCs.yQBS2706syPZFNDrMVisk4hIJJwmZDeXfQUQypVN9UUss
+ ekuuGqi.pbHtDpsOohpRuHzAgIsEhUBN04I97Rg9a_4htiFdzTrmByKGb74P
+ zyS8eqFzxOuv2g1tQUaJL2QcRwfMOJspcacQGXSUnf32Eca40khtOEQw-
+Received: from [41.189.50.56] by web83711.mail.sp1.yahoo.com via HTTP; Mon, 17 Jan 2011 02:56:24 PST
+X-Mailer: YahooMailClassic/11.4.20 YahooMailWebService/0.8.107.285259
+Date: Mon, 17 Jan 2011 02:56:24 -0800 (PST)
+From: Honest hon <honestt@att.net>
+Reply-To: honestworld03@yahoo.co.jp
+Subject: Hello Dear Respond,
+To: undisclosed recipients: ;
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="0-1031685768-1295261784=:96993"
+
+--0-1031685768-1295261784=:96993
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+Hello Dear Respond,
+=A0
+=A0I am sorry if this mail will come to you as an embarrassment or a surpri=
+se, I just felt like empting myself to you, after my fast and pray, I decid=
+ed to confide in you, as am faced with total frustration and hardship. My E=
+rnest prayer is that you find this mail in good health and blessings.
+=A0
+=A0I am I am Neiva kolonga only daughter of late Dr.Hassan kolonga who was =
+killied during the political crisis here in ivoiry coast, My Mum. died when=
+ I was young and my dad was assasinated by unknown gun men. We all are from=
+ Bouake in the Norther part of Ivory Coast West Africa. There has been seri=
+es of killing in my country due to the political crisses and so many family=
+s have lost their life and properties, you can read more about this in BBC =
+NEW,FRANCE24 NEWS AND CNN NEWS for more details. My late father was the for=
+mer Director of finance diamond and mining corporation. Few days before the=
+ death at the hospital my father, he confided in me and ordered me to go to=
+ his underground safe and move out immediately to=A0 another country for se=
+curity reason, with a Deposit=A0 document he made with a FINANCE SECURITY C=
+OMPANY OVERSEAS valued USD $6.5 million dollars cash(SIX MILLION,FIVE HUNDR=
+ED THOUSAND DOLLARS).
+=A0
+This money was made from the sells of Gold and Diamond by my father and he =
+have already decided to use this money for future investment in OVERSEAS. T=
+hereafter, Meanwhile, my fathers have instructed me to look for a trusted f=
+oreigner who can assist me to move=A0 the deposite from the security compan=
+y OVERSEAS and transfer to his account.
+Based on this, I solicit for your assistance to transfer this fund into you=
+r Account, but I will demand for the following requirement:
+=A0
+(1) Could you be able to introduce me to a profitable business venture that=
+ would not require much technical expertise in your country where part of t=
+his fund will be invested?
+(2) Your full name.
+(3) Your residential house address.
+(4) Your direct telephone and fax number.
+(5) Your age
+=A0
+Please, all these requirements are urgently needed as it will enable me to =
+establish a stronger business relationship with you hence I will like you t=
+o be the general overseer of the investment there after.I am trusting you a=
+nd I will please want you to handle this transaction based on the trust I h=
+ave established on you. For your assistance in this transaction, I have dec=
+ided to offer you 20% percent commission of the total amount at the end of =
+this business.
+The security of this business is very important to me and as such, I would =
+like you to keep this business very confidential. If you are willing to ass=
+ist me.
+Please kindly reply me immediately. I shall expect your urgent respond at m=
+y private email:=20
+Thanks From
+Neiva kolonga
+=A0
+--0-1031685768-1295261784=:96993
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+<table cellspacing=3D"0" cellpadding=3D"0" border=3D"0" ><tr><td valign=3D"=
+top" style=3D"font: inherit;"><DIV>Hello Dear Respond,</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>&nbsp;I am sorry if this mail will come to you as an embarrassment or =
+a surprise, I just felt like empting myself to you, after my fast and pray,=
+ I decided to confide in you, as am faced with total frustration and hardsh=
+ip. My Ernest prayer is that you find this mail in good health and blessing=
+s.<BR>&nbsp;<BR>&nbsp;I am I am Neiva kolonga only daughter of late Dr.Hass=
+an kolonga who was killied during the political crisis here in ivoiry coast=
+, My Mum. died when I was young and my dad was assasinated by unknown gun m=
+en. We all are from Bouake in the Norther part of Ivory Coast West Africa. =
+There has been series of killing in my country due to the political crisses=
+ and so many familys have lost their life and properties, you can read more=
+ about this in BBC NEW,FRANCE24 NEWS AND CNN NEWS for more details. My late=
+ father was the former Director of finance diamond and mining corporation. =
+Few days before the death at the hospital my father, he confided in
+ me and ordered me to go to his underground safe and move out immediately t=
+o&nbsp; another country for security reason, with a Deposit&nbsp; document =
+he made with a FINANCE SECURITY COMPANY OVERSEAS valued USD $6.5 million do=
+llars cash(SIX MILLION,FIVE HUNDRED THOUSAND DOLLARS).<BR>&nbsp;<BR>This mo=
+ney was made from the sells of Gold and Diamond by my father and he have al=
+ready decided to use this money for future investment in OVERSEAS. Thereaft=
+er, Meanwhile, my fathers have instructed me to look for a trusted foreigne=
+r who can assist me to move&nbsp; the deposite from the security company OV=
+ERSEAS and transfer to his account.</DIV>
+<DIV>Based on this, I solicit for your assistance to transfer this fund int=
+o your Account, but I will demand for the following requirement:<BR>&nbsp;<=
+BR>(1) Could you be able to introduce me to a profitable business venture t=
+hat would not require much technical expertise in your country where part o=
+f this fund will be invested?<BR>(2) Your full name.<BR>(3) Your residentia=
+l house address.<BR>(4) Your direct telephone and fax number.<BR>(5) Your a=
+ge<BR>&nbsp;</DIV>
+<DIV>Please, all these requirements are urgently needed as it will enable m=
+e to establish a stronger business relationship with you hence I will like =
+you to be the general overseer of the investment there after.I am trusting =
+you and I will please want you to handle this transaction based on the trus=
+t I have established on you. For your assistance in this transaction, I hav=
+e decided to offer you 20% percent commission of the total amount at the en=
+d of this business.<BR>The security of this business is very important to m=
+e and as such, I would like you to keep this business very confidential. If=
+ you are willing to assist me.</DIV>
+<DIV>Please kindly reply me immediately. I shall expect your urgent respond=
+ at my private email: </DIV>
+<DIV>Thanks From<BR>Neiva kolonga</DIV>
+<DIV>&nbsp;</DIV></td></tr></table>
+--0-1031685768-1295261784=:96993--

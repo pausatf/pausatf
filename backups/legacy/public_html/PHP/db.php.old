@@ -1,0 +1,27 @@
+<?php
+// ----------------------------------------------------------------------------*
+// Created August 2005                                                         *
+// Created by Dan Preston                                                      *
+// This script has the database access information.  It is stored outside      * 
+// public_html so it is not available to the public.                           *
+// ----------------------------------------------------------------------------*
+        define ('DB_USER', 'dbuser');
+        define ('DB_PASSWORD', '9*ku&^hH54%');
+        define ('DB_HOST', 'localhost');
+        define ('DB_NAME', 'pausatf_php');
+//  Following does work, but not in command line
+        $dbh = mysqli(DB_HOST, DB_USER, DB_PASSWORD) OR die ('Could not connect to MySQL: '. mysql_error() );
+        mysql_select_db (DB_NAME) OR die ('Could not select the database: '. mysql_error() );
+
+// $dbh = mysqli_init();
+// $worked = mysqli_real_connect ( $dbh, DB_HOST, DB_USER, DB_PASSWORD, DB_NAME );
+// if (! $worked) die ("Unable to connect to dbh"); 
+
+
+//  $mysqli = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+//  if ($mysqli->connect_errno) {
+//     echo "Failed to connect to MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error;
+//  }
+
+
+?>

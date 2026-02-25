@@ -1,0 +1,47 @@
+Return-path: <megwusinich@yahoo.com>
+Envelope-to: pa.youth.communications@pausatf.org
+Delivery-date: Tue, 13 Jul 2010 04:14:10 +0100
+Received: from web51901.mail.re2.yahoo.com ([206.190.48.64])
+	by srv.commondns.com with smtp (Exim 4.69)
+	(envelope-from <megwusinich@yahoo.com>)
+	id 1OYVwe-0007PN-KO
+	for pa.youth.communications@pausatf.org; Tue, 13 Jul 2010 04:14:09 +0100
+Received: (qmail 65982 invoked by uid 60001); 13 Jul 2010 03:14:05 -0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s1024; t=1278990845; bh=LwkAYM+vHRjbtdXAEDPdypNVFLN+O4BxqVcW1QlQX+Y=; h=Message-ID:X-YMail-OSG:Received:X-Mailer:Date:From:Subject:To:MIME-Version:Content-Type; b=BY96Xlho4msFIOnn5GdJgnINHXqAss+UAEXF4eiQbks+XHUSoPm9Krw3gP5CiD6X35t3dtYdXDe+sJkjqBc1JF2wfevrvSNbTboQYU/ey37AEbd6GT9/suxoftD0KotUr73X2iTNZiyPsFQqss5zDQp6xgtnmaqY76suprvjQEs=
+DomainKey-Signature:a=rsa-sha1; q=dns; c=nofws;
+  s=s1024; d=yahoo.com;
+  h=Message-ID:X-YMail-OSG:Received:X-Mailer:Date:From:Subject:To:MIME-Version:Content-Type;
+  b=A5akEYwALM6tkaSEEORhZSUDw5Cy1gOWlsR0Plqkj6+xt2Ce+imeWqf5bof4HRzhHRviAHemKhll8Gui8rc/L1/OXBT5M8MZ9dZxc7cT7Z8x3ArCqhqUZesb5fU28ZaddsJSIDixjYSHR9A847I2deDjq62hn+rYb2zdK0hIQ7k=;
+Message-ID: <695144.65749.qm@web51901.mail.re2.yahoo.com>
+X-YMail-OSG: ipW1nyQVM1n4DdTyHw3gH4NcG46868.3_P_VjEYGKzETxjD
+ I2TLlpWjvDQEJ.UJDiULqqUjzBmjUTjBQXxl0d3XM1MSxtJ6FkIOczWocNv3
+ 8n1zNmWz0dwT.yonMhg3H8ClESyjXOagX3oqdMg7MZvkQra7jiiGnT7xhkNx
+ 4jp7uSWBDzuyDgtNwfbMxYJV45Lm4zZESOXDseVo.3xS8oywzjxT8SZlr98j
+ kYBWBe6ZG7swJaBlOq95kMhkIr2_fPmOGM60m2cZKYEoEULpBQRiXICJRwKy
+ oIsYeURIGdFqFolPmsUvw9nNi7bo-
+Received: from [108.16.163.173] by web51901.mail.re2.yahoo.com via HTTP; Mon, 12 Jul 2010 20:14:05 PDT
+X-Mailer: YahooMailClassic/11.2.4 YahooMailWebService/0.8.104.276605
+Date: Mon, 12 Jul 2010 20:14:05 -0700 (PDT)
+From: Meg Wusinich <megwusinich@yahoo.com>
+Subject: 2010 USATF Junior Olympics
+To: pa.youth.communications@pausatf.org
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="0-361034091-1278990845=:65749"
+
+--0-361034091-1278990845=:65749
+Content-Type: text/plain; charset=us-ascii
+
+My daughter has qualified for the Junior Olympics National Championship in CA. Our whole family is not able to come out to see it, so I was wondering if it is broadcast over the internet, or with any satellite or cable companies. Thank you.
+
+Meg Wusinich
+
+
+
+      
+--0-361034091-1278990845=:65749
+Content-Type: text/html; charset=us-ascii
+
+<table cellspacing="0" cellpadding="0" border="0" ><tr><td valign="top" style="font: inherit;">My daughter has qualified for the Junior Olympics National Championship in CA. Our whole family is not able to come out to see it, so I was wondering if it is broadcast over the internet, or with any satellite or cable companies. Thank you.<br><br>Meg Wusinich<br></td></tr></table><br>
+
+      
+--0-361034091-1278990845=:65749--

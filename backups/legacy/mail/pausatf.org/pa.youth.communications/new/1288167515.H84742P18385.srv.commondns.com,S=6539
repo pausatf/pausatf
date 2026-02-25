@@ -1,0 +1,101 @@
+Return-path: <shantan1988@live.fr>
+Envelope-to: pa.youth.communications@pausatf.org
+Delivery-date: Wed, 27 Oct 2010 09:18:35 +0100
+Received: from web120517.mail.ne1.yahoo.com ([98.138.85.244])
+	by srv.commondns.com with smtp (Exim 4.69)
+	(envelope-from <shantan1988@live.fr>)
+	id 1PB1DO-0004mO-Az
+	for pa.youth.communications@pausatf.org; Wed, 27 Oct 2010 09:18:34 +0100
+Received: (qmail 22368 invoked by uid 60001); 27 Oct 2010 08:18:32 -0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s1024; t=1288167512; bh=fSAsJnBxyCd/eC/zQmzK58A0P+ip8KuVoOAhQU4A/8w=; h=Message-ID:X-YMail-OSG:Received:X-RocketYMMF:X-Mailer:Date:From:Reply-To:Subject:To:MIME-Version:Content-Type; b=OF0bQnkVr459A6K1EViGiR3TlQZWIHKgE8MF8uapo6ePcPyKmr6JTBEBA6p1E3xNIb6bkmxbrJpbgU9QNj57l/B7Qen9HE8jR1Yll25KZvRw6HIumCGCrVFbSrKzvl1PMw0As3hLkZfdAyjO4GcDbqoncF2wCPIxCtTjL7x0hJg=
+Message-ID: <805390.20834.qm@web120517.mail.ne1.yahoo.com>
+X-YMail-OSG: NUCz53IVM1nVrAFab5kPUb8R7pu3GST5zWB5vKWxto3RV_.
+ cm8iqDprBEPFL6VQAg90b4I.xE5kOm2aEWoRC08cHzPySGTPbBhk7Nm06TC7
+ v6kJXqYjc38hvLMjTFaJAOlVdOgfxlIHL.Iis1x86U79kBIfTnOy6kglGF57
+ yNV4yME_vbeDI4mlicU2enrz7lEB2mFPtbjusG.D3hMAIlIGNYByDVJdDQvz
+ SJ7MIsnJpvdMSUmmJfiiXYY36hf2KvTYF_1pwTXpJ5D7turWdiNIjgEGOgeL
+ 10j80EYOzczi1mavFX5m2I_MhebMTbYBrMhWN0y8WTvNqoCggsGhvnyWiVbR
+ P9az4f44QZxKQKycAdWSucX6GpKG5QvXh4UcT6jhGPUgddMsJUtAth7qWE5k
+ 64oFIaKans3aGqJAPlLR0turhpcult9fMuoIvwW3lMH.KpIc6ba2Ebix0sv7
+ kBAZyKJNHaT_W0YYReSTV2RHt7kX7z7xmNSJDUFSxtnBdW.njpNPDyLt2t1o
+ KgTQDUHxK7UrFURrKm7Z_X3apwaSXkJ1FQFaNpyQ.x4B6gT9l40y3lLOk9yO
+ d9PcbGNbHw_eoEKdtTqpPhtFganEoBdrG0F_UIpeynUsXqAQPtZUtLrYCtKC
+ Ll.VI4eiszK.pCfzu6n1SwL7Qx2NI9sgOwSiYzlhYBZoZWAKnPkiQrlMQxxb
+ t7E6IWur0d1cDLdJi.Gb7iQ8la3UsgsP1uZIQj0YzgPQJ7NO6GNu4qnfXyFU
+ nTmAshHkGujPGe7p8Ls_og.r.80cg3eZQqhO2Tm9QGBCqrbKNkYTH9RWdSQZ
+ OFIXWSJh5FMHgtRR2ZHEhq0f1z5Pkz3QLieXU9X99yZZ4k_FA_.P7POtN7M6
+ pj3Lh1OxLKn9Uaxy21qKkguyMwVdasYUYa4YeW7pJFyxMSKviBvso5QwzQxL
+ EbQ0STVabQIetMj9nrcLZwpBKD.PL203X3Kl3cXZ7eO5zA1tWcPOutqXXReZ
+ eiyt4Rp5ims74iYFX5TF1fmyWeJnM6AW.01tAm8GrFEwWctgqWnxC9gBXcS4
+ 7OJwenA6eKGZz0O4hDjlMxMPQmi03fr3TZBdHbPFS.YacFex7F4tBbIu7Aqc
+ h.T5VRn00pP.APczbfBp.B6SFICeo8J_aCXCg7fG231H_F3rxnYrtTT8zqlq
+ rLwi89F1rG6QQYrl6DGnRDwd5W55.jqCT9moYqZv0jtDEi6VfeX75MYPxBWM
+ HgKaK0_iZ4XHcuUxuS5QOkCyNKvg8ppw8mMGrtAKRa25hbsGT2DcMn79TG..
+ zUINXRHeTvOloB3bO82bH3ItAZNHTMbH16utM6gd2ZZxdyFiyBhzL4qaVB.h
+ So00eYKHl2pQSf_adVrRsdb0248Yqq2BTkIYDTPsBJ1Clz8sz4A9R05o0sRb
+ 38x7D8IuLR1YOHXizxv2HxU5Pvm.Z6c198n3MiCyw_nZTx6aeK5eHBfUh8Ro
+ U4_BcqaeIQ5BI4tqbNyCOYzWHlNqm_it9cM4duAbKVCjR8KesTejgeGxxGI4
+ 23sbIz7fC68r55lwhJZMaAu_aw_ELCl1tZgyaAHWM80MCg3O6GmmUwdRv9zn
+ B6ZL9w57eKF0QjxmblJ4Y9UOZL9iLtEbbroDv96LQAa4k1qKdw8crhFaguLr
+ RMtbT43uv0PgWlQcTcuTao5FgF0Vb5Ri2tEY26Arl5b_LXwx2iZt92.kOkjZ
+ 10tyUeSwOLAGid3pxKz9qFbTcj4zUtPv2GkuM3bLyaKv8in6hQwKDEud6pfL
+ 2colCV4kAtbcHa1wj5as6ReL.aePb8PTgLSdUp1j7fkXJJBRAQ6rztnqMXNL
+ B9PYhorzc1GFN5NF8eyqee7cFy1zkzab3C8FEJgXKoSqHIO_bhBbwMDOYBt0
+ nuNn67KwOB.AkcQTkBabJq8VuqPQmmBnWjpn55w3l4Hr59X4i5.8D0Ixa.xp
+ t6YJ22.MMQwwEdaQrqZjom_Cg9t0ykslspuuvgrG83Z6G94nma2IZTYbyIig
+ a.m3vzQdV5ZvCvMMs3lgt8kaQOih3JvQTirg2iKKpWQApxogNEpdh_TDn2N1
+ ykAcF1TNVisCaA73lQNLXbjJUmb63fc95E41fHqe.n0Pye8jOSJOIXusMHr2
+ 1HvSGmx8ta85hJEVbkQlAQQ7lOdS0anBGOW0bLfp7JH0nd873u8qiebI3.V6
+ FPYlub8QDdt4Et8ipHbuSO.6MOfycSCejK0ehMK2padFbZZvXkPsvmmDaANL
+ SRPP6hE2dzw1D8HSK7ORq_4ErvN0Kf51sXo94efYA_5RHFpAAH34KoUiOw.X
+ zWu3qvSSCyWK6CyeE9DQMLgddo_tWnKIql79w766_I.3QKWxTtPQko3F3Yp7
+ UiFLZ8SObqKHKgK1BG.XqoTwuVz9UeQ5LUJUiYgLFHbPw7gakJjT1rt_BvzA
+ XDoqpkORTZUyHZjEguP.l_s1460oolzBfETYZ_a60OxAECN7OE88AyWuQDKK
+ YL0xcIq.jmGvjB3L5D4oPk5tdtQY00_3VxqywodR3nwDzCeKql81MHMFSU7t
+ DU5HW6I6gypTnvy7vrLxfTgsmx0wRKLYXAhjAsMpuyJCep_Ll2wRq2x4hHGg
+ L9BmsWmkXMgbyV5RA3KG5t49jQhV42G5uerh0sJSyJdOef8evF5n1flRYCZa
+ RQMAepH0gI7vjjrw_o_N61zJXXvIfnkf_cEkAw5h86qAk_67Gg7Uqstd8GFx
+ JKb8d3mWG74KJB9ET4Pjs0u2b5tE9YCI50c10lEjCEQFeQ83Yqwz6HnBiQX.
+ WuMZjehNvxuTuNC7s5r4eLQLe8qWfSR8wDQIHe4RiUdBPDC5X_24gxODLDyI
+ CRQ0oRg--
+Received: from [41.66.8.147] by web120517.mail.ne1.yahoo.com via HTTP; Wed, 27 Oct 2010 01:18:32 PDT
+X-RocketYMMF: ejiogujude2
+X-Mailer: YahooMailClassic/11.4.7 YahooMailWebService/0.8.107.284920
+Date: Wed, 27 Oct 2010 01:18:32 -0700 (PDT)
+From: Shantan Kamara <shantan1988@live.fr>
+Reply-To: shantan1988@live.fr
+Subject: Shantan Kamara
+To: undisclosed recipients: ;
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="0-2025812124-1288167512=:20834"
+
+--0-2025812124-1288167512=:20834
+Content-Type: text/plain; charset=us-ascii
+
+
+
+From Shantan Kamara
+
+Dear Sir,
+
+l am introducing myself,l am Shantan Kamara, the only child of late Chief Pascal Kamara , I wish to request for your assistance in a financial transaction and I want to invest in Manufacturing and real estate management in your country.
+
+I am from Liberia my late father was an international businessman and a cocoa marchant my father was killed by rebels on September 19 2009 and as his only child they are also seeking to kill me too.
+
+Before the death of my Father he deposited 10.5 million USD dollars in a suspense account in a bank in Abidjan and told me to seek for a foreign partner that will provide account overseas where the funds will be transferred to for Investment.
+
+Please I am asking you to assist me so that this funds can be transferred to your account for Investment.Every documents about the funds is legal.
+
+God bless you.
+Shantan Kamara.
+
+
+      
+--0-2025812124-1288167512=:20834
+Content-Type: text/html; charset=us-ascii
+
+<table cellspacing="0" cellpadding="0" border="0" ><tr><td valign="top" style="font: inherit;"><BR><BR>From Shantan Kamara<BR><BR>Dear Sir,<BR><BR>l am introducing myself,l am Shantan Kamara, the only child of late Chief Pascal Kamara , I wish to request for your assistance in a financial transaction and I want to invest in Manufacturing and real estate management in your country.<BR><BR>I am from Liberia my late father was an international businessman and a cocoa marchant my father was killed by rebels on September 19 2009 and as his only child they are also seeking to kill me too.<BR><BR>Before the death of my Father he deposited 10.5 million USD dollars in a suspense account in a bank in Abidjan and told me to seek for a foreign partner that will provide account overseas where the funds will be transferred to for Investment.<BR><BR>Please I am asking you to assist me so that this funds can be transferred to your account for Investment.Every documents
+ about the funds is legal.<BR><BR>God bless you.<BR>Shantan Kamara.</td></tr></table><br>
+
+      
+--0-2025812124-1288167512=:20834--

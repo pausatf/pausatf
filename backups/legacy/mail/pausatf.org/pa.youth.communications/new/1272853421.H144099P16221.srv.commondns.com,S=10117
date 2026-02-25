@@ -1,0 +1,162 @@
+Return-path: <cecilia.roberts1@btinternet.com>
+Envelope-to: pa.youth.communications@pausatf.org
+Delivery-date: Mon, 03 May 2010 03:23:41 +0100
+Received: from n20.bullet.mail.ukl.yahoo.com ([87.248.110.137])
+	by srv.commondns.com with smtp (Exim 4.69)
+	(envelope-from <cecilia.roberts1@btinternet.com>)
+	id 1O8lJs-0004DT-LO
+	for pa.youth.communications@pausatf.org; Mon, 03 May 2010 03:23:40 +0100
+Received: from [217.146.182.178] by n20.bullet.mail.ukl.yahoo.com with NNFMP; 03 May 2010 02:23:39 -0000
+Received: from [87.248.110.111] by t4.bullet.ukl.yahoo.com with NNFMP; 03 May 2010 02:23:33 -0000
+Received: from [127.0.0.1] by omp216.mail.ukl.yahoo.com with NNFMP; 03 May 2010 02:22:05 -0000
+X-Yahoo-Newman-Property: ymail-3
+X-Yahoo-Newman-Id: 144932.26962.bm@omp216.mail.ukl.yahoo.com
+Received: (qmail 9837 invoked by uid 60001); 3 May 2010 02:22:04 -0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=btinternet.com; s=s1024; t=1272853324; bh=NlkDhlp/ynYvBSLCxOczAf03oColf+o0sBrTZ/31j/Y=; h=Message-ID:X-YMail-OSG:Received:X-Mailer:Date:From:Reply-To:Subject:To:MIME-Version:Content-Type; b=hvk/whlrclBBEy2A2QBa7qzmZLu/MyzYoU7Zbp4VmwP26KhDyYa7Fy6awrr4kkdBqQd2qoI1NeMH0Ilqt/Icap318WXIDPhoivjM6vJln4fZgvLeB5guz3StSphShWRpncuC7WQiIbG8UVH7QYjjMI3ba98Pw8NnbpsCH8NxolQ=
+DomainKey-Signature:a=rsa-sha1; q=dns; c=nofws;
+  s=s1024; d=btinternet.com;
+  h=Message-ID:X-YMail-OSG:Received:X-Mailer:Date:From:Reply-To:Subject:To:MIME-Version:Content-Type;
+  b=G4uy32kP7SY8VdxGzSL9UStMmHjxO4yDIV+WVczgdmjHBweDZA6Z4ydR99yw1zVTIRE2x2YpUATBKy7kOz6ui2BORjh3W9YG8fQnfaJRw/HCNw5GPR2xsoTT107MFG8FkSwDHhoEpg/0Xv+KNqkRBjkzr8fWAumY5VL3bx+gXKw=;
+Message-ID: <816642.8932.qm@web87004.mail.ird.yahoo.com>
+X-YMail-OSG: VVAXdbAVM1kW7JW0GcOuY558q4f.72lYpbO_nUlvLh5DXGd
+ tLYi2QoYR.CVUroMVItvkJHNglSpK88wQl2lz88Anjn4diadv2eCVi_XkfpO
+ hxDPxz0WK4RTjHjIqKfx2Rz6_kkNPBXm6I7qInbReZr7t3A0UtllYuDSb0Hw
+ 9snx46ymL8og5aYkG5J32KML974sTavUwlLms_7KBVHAaaXux4s_qgX4EQGq
+ 0jM_O8.ayP_baZq.nFAUcOzA3Bn7Vnofp.drVhv3k3hExHrTrcBMdev8Ukum
+ A_iPicQ_h0m11yebZZOXMGuCe40BKBZVmGgia6fgUl6xvxfuWxnTvKEmJ8Zr
+ Ma.5_RPDh_FvetmceY0mZIOgdLVCJmtccYi7VL4jzBsTdb_AHjCoQsmMFRe.
+ Dd4rjspPdy7csoROw7OFMrB7d8rwKyTO.NT_MRoF0AdOlWznL2Eqmpv0IeBe
+ ZxUIKQD2V62BXo0ds3SiNl5Ut9aMm1WK72jEYqDbhEYy5JBp5GKGZXZJ6e4.
+ Qvr3MfYGUc_xGdnj8ckNjmdN22JfIUUpO8OMUoCWfe54zTAeOjLwCCBqlkI1
+ aqTNjWd4boOwnUDtB1aIgJ7f8PTe3I8KJUxoCqnBPkH_L5Twgt4.qOP9qemt
+ d1lMDDNrxmN6OVzQr38031YQjxF42sKnGXc5WlA.eBYvWW289XP_l3Poxw3y
+ zuiDwpBbNNA_2rAAyoEzTyfMS1lRN0wvjWjzFHcaFwQEeyc5gsZpdVxukT13
+ .3z3Vpsi3VdAur0_FXotKG5byToXDpyfFx.QGK9ZQq2HAnIEEJJHcXgkzftl
+ hvEdiyczQ9pUQbdZGVQANY1MWU28Pbc7WfWXvtkHYBGoIRdwS.wVm3dVO7TU
+ i6yhZcd2EoCa_HnTGHM1gtiEVEmsBFCIEPYbGP.875A.RC6BGB.mdDrWPGQl
+ sfuNSYJXJGSs3e7Qc8XTGaZ59p4NKNNKc7q9W5FrbHPaJbMBO9IgGYcF1s59
+ NNekKRlBH3VaI4af_KtK4oNFZUok_Qq.t8wTVRWFwwaQgNwQX0ocwEoko9NF
+ G8EJt3RXq1KHESDDDVbUqiU5vxEPtrD1CM4yLKKkUtkRkAJEdGlGTVkilq0H
+ LKiX5EoE5xPlN5OfK3155VAV6ktBwfBgvGjj4IEVf0Nsi21WcAWh0.ZaXQ2N
+ rZrWXz1YID0xq1ZJ75pMfprsJn9flGKvDQKZFfVG0Pkyhs4CZsMv0lEvJYIF
+ aKfl6cz9NXHfpqlxYcJKZM1KkepOw7R2s6QIaH31kmxS7Aw9in3pBKS3Sza8
+ X2LDiZ85Vw0wIjlXAI.2W.DgBaEt4lPb9HKVjGfIbaZNDvlGCFYkzKK3iT4a
+ JxlE6HrUNq7f1myb4U8iJXJIfCrDIMuxN73e3.wRVZYTblFObEJ__XMW5u1h
+ nw5P0drhYnqCoaroHgjNWcIsdXGft9zgKzbJS.cUlBWa45dZEQw--
+Received: from [41.202.80.220] by web87004.mail.ird.yahoo.com via HTTP; Mon, 03 May 2010 02:22:04 GMT
+X-Mailer: YahooMailClassic/10.1.11 YahooMailWebService/0.8.103.269680
+Date: Mon, 3 May 2010 02:22:04 +0000 (GMT)
+From: CECILIA ROBERTS <cecilia.roberts1@btinternet.com>
+Reply-To: ceciliaroberts@hotmail.fr
+Subject: PLEASE HELP ME OUT:
+To: undisclosed recipients: ;
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="0-1750021187-1272853324=:8932"
+
+--0-1750021187-1272853324=:8932
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+Hello Dear,
+=A0
+=A0am writing this mail to you with tears and sorrow from my heart.With due=
+ respect trust and humanity, i appeal to you to exercise a little patience =
+and read through my letter i feel quite safe dealing with you in this impor=
+tant business having gone through your remarkable profile, honestly i am wr=
+iting this email to you with pains, tears and sorrow from my heart, i will =
+really like to have a good relationship with you, I know that this proposal=
+ might be a surprise to you, but do consider it as an emergency. I am Miss =
+Cecilia Roberts=A0 from Cote D' Ivoire=A0 in West Africa It's my pleasure t=
+o contact you for a business venture which I intend to establish in your co=
+untry, Though I have not met with you before but I believe one has to risk,=
+ confiding in someone to succeed sometimes in life.There is huge amount of =
+money Ten million five hundred U.S dollars my late=A0 Father=A0 kept for me=
+ in a Security Company here in Abidjan=A0 Cote D' Ivoire,
+=A0
+My (late) father Dr.Roberts Edesiri was the personal adviser to the former =
+head of states, also a successful business man import and exporter of Cocoa=
+ during his life time. But he was killed along side with my mother during t=
+he longing civil war and all his properties were totally destroyed.
+=A0
+However, after their death I managed to escape with a very important docume=
+nt DEPOSIT CERTIFICATE (USDA$10.5M) Ten million five hundred United State D=
+ollars deposited by my late father in one of the leading security company h=
+ere in Abidjan with my name as the next of kin.
+=A0
+Now, I have decided to invest the money in your country or anywhere safe en=
+ough outside Africa for security purposes, I require your assistance to tra=
+nsfer the truck box out of Africa to a more relaxed environment, an environ=
+ment free from political disturbances, riots, civil war and demonstration, =
+an environment where human rights are respected. I want you to help me to t=
+ransfer this fund to your country for investment purposes on the followings=
+ below:
+=A0
+=A01). Telecommunication
+=A02). International School
+3). Five star hotel
+=A0
+Meanwhile, I am saddled with the problem of securing a trust worthy foreign=
+ personality to help me transfer the consignment box over to his/her countr=
+y and into possession pending my arrival to meet with him.
+=A0
+Furthermore, you can contact the security company for confirmation, I will =
+send to you the full contact address of the security company, once I get yo=
+ur positive response to help me contact the security company and request fo=
+r the release and transfer of my inheritance trunk box for investment of th=
+e funds, and my coming over to join with you in your country.
+In the light of above I will like you to keep it to yourself and don't tell=
+ it to anyone for I am afraid of loosing my life and the money.
+=A0
+I wait your positive response.
+=A0
+Remain Bless
+=A0
+Cecilia Roberts
+--0-1750021187-1272853324=:8932
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+<table cellspacing=3D"0" cellpadding=3D"0" border=3D"0" ><tr><td valign=3D"=
+top" style=3D"font: inherit;">Hello Dear,<BR>&nbsp;<BR>&nbsp;am writing thi=
+s mail to you with tears and sorrow from my heart.With due respect trust an=
+d humanity, i appeal to you to exercise a little patience and read through =
+my letter i feel quite safe dealing with you in this important business hav=
+ing gone through your remarkable profile, honestly i am writing this email =
+to you with pains, tears and sorrow from my heart, i will really like to ha=
+ve a good relationship with you, I know that this proposal might be a surpr=
+ise to you, but do consider it as an emergency. I am Miss Cecilia Roberts&n=
+bsp; from Cote D' Ivoire&nbsp; in West Africa It's my pleasure to contact y=
+ou for a business venture which I intend to establish in your country, Thou=
+gh I have not met with you before but I believe one has to risk, confiding =
+in someone to succeed sometimes in life.There is huge amount of money Ten
+ million five hundred U.S dollars my late&nbsp; Father&nbsp; kept for me in=
+ a Security Company here in Abidjan&nbsp; Cote D' Ivoire,<BR>&nbsp;<BR>My (=
+late) father Dr.Roberts Edesiri was the personal adviser to the former head=
+ of states, also a successful business man import and exporter of Cocoa dur=
+ing his life time. But he was killed along side with my mother during the l=
+onging civil war and all his properties were totally destroyed.<BR>&nbsp;<B=
+R>However, after their death I managed to escape with a very important docu=
+ment DEPOSIT CERTIFICATE (USDA$10.5M) Ten million five hundred United State=
+ Dollars deposited by my late father in one of the leading security company=
+ here in Abidjan with my name as the next of kin.<BR>&nbsp;<BR>Now, I have =
+decided to invest the money in your country or anywhere safe enough outside=
+ Africa for security purposes, I require your assistance to transfer the tr=
+uck box out of Africa to a more relaxed environment, an environment
+ free from political disturbances, riots, civil war and demonstration, an e=
+nvironment where human rights are respected. I want you to help me to trans=
+fer this fund to your country for investment purposes on the followings bel=
+ow:<BR>&nbsp;<BR>&nbsp;1). Telecommunication<BR>&nbsp;2). International Sch=
+ool<BR>3). Five star hotel<BR>&nbsp;<BR>Meanwhile, I am saddled with the pr=
+oblem of securing a trust worthy foreign personality to help me transfer th=
+e consignment box over to his/her country and into possession pending my ar=
+rival to meet with him.<BR>&nbsp;<BR>Furthermore, you can contact the secur=
+ity company for confirmation, I will send to you the full contact address o=
+f the security company, once I get your positive response to help me contac=
+t the security company and request for the release and transfer of my inher=
+itance trunk box for investment of the funds, and my coming over to join wi=
+th you in your country.<BR>In the light of above I will like you to
+ keep it to yourself and don't tell it to anyone for I am afraid of loosing=
+ my life and the money.<BR>&nbsp;<BR>I wait your positive response.<BR>&nbs=
+p;<BR>Remain Bless<BR>&nbsp;<BR>Cecilia Roberts</td></tr></table>
+--0-1750021187-1272853324=:8932--
+

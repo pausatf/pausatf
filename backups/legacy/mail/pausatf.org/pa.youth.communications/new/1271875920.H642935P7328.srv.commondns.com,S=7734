@@ -1,0 +1,131 @@
+Return-path: <mawn2@btinternet.com>
+Envelope-to: pa.youth.communications@pausatf.org
+Delivery-date: Wed, 21 Apr 2010 19:52:00 +0100
+Received: from n22.bullet.mail.ukl.yahoo.com ([87.248.110.139])
+	by srv.commondns.com with smtp (Exim 4.69)
+	(envelope-from <mawn2@btinternet.com>)
+	id 1O4f1k-0001u4-EN
+	for pa.youth.communications@pausatf.org; Wed, 21 Apr 2010 19:52:00 +0100
+Received: from [217.12.4.215] by n22.bullet.mail.ukl.yahoo.com with NNFMP; 21 Apr 2010 18:52:01 -0000
+Received: from [87.248.110.54] by t2.bullet.ukl.yahoo.com with NNFMP; 21 Apr 2010 18:52:00 -0000
+Received: from [127.0.0.1] by omp106.mail.ukl.yahoo.com with NNFMP; 21 Apr 2010 18:52:00 -0000
+X-Yahoo-Newman-Property: ymail-3
+X-Yahoo-Newman-Id: 462373.62978.bm@omp106.mail.ukl.yahoo.com
+Received: (qmail 47815 invoked by uid 60001); 21 Apr 2010 18:52:00 -0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=btinternet.com; s=s1024; t=1271875920; bh=oRAX6vk15My6gXqPzKzbSKjnx2sAjx7fMTkNlAlvsYo=; h=Message-ID:X-YMail-OSG:Received:X-Mailer:Date:From:Reply-To:Subject:To:MIME-Version:Content-Type; b=GUtnMDXuSm0nlXyr9Vi3kooZ/nvqN6HlU3VhHi5fyERcnx4YxDc6cDbAGG19eiMPvmQOdaNzf9YIi0i/Luu94SJ+S5xns/5Bcqfrs2S4FrpMJRQ9K5lF+5Tc26JxtwFTWHw3nEWd7DOzaFxkMlWs0sIYIY2A+7zrXB4axMfx6fs=
+DomainKey-Signature:a=rsa-sha1; q=dns; c=nofws;
+  s=s1024; d=btinternet.com;
+  h=Message-ID:X-YMail-OSG:Received:X-Mailer:Date:From:Reply-To:Subject:To:MIME-Version:Content-Type;
+  b=mQHTe2R8sMwH1lm/P2guCS4uOkZ86QgF6TOXpos1GoQPfmzh2vuUkzDSB9gy6gLlMR6TzMLwI4JP96ff2iXa9d2nqt2zx7tu1ieE60QZeZw8C9nf7VLTGXuHqH5Nki0uXWBegzffr7Sw4WYSWcp2y7z+5TN87WGkoDpGtivBVNQ=;
+Message-ID: <31924.47276.qm@web87112.mail.ird.yahoo.com>
+X-YMail-OSG: P4V4OEcVM1mLDFFoOrHIlwJOUF5I8Vz1EStiLZWIvL8JV08
+ ZuJpe78BsXcB2T_qyMep_ovtrgkq2de1gYxaXrY8drNlqRfndtzO48o.8ewT
+ cjZun6PiL8TX7u.oOtXuIq5WdR5M._87wMnTcx.w1WvVFdCt8qpYVSqomNZj
+ a7VqYMYG5dRGvK6DrFrdUuD0_e73WBHVOMUoNj278_DE8xSgo26Gd.RUzXYG
+ 3aC4ijlUq4y.u54pX0gjUchAb3T6TKu0SkivTdVALCCu5Q5JOkK7V6QGh8b_
+ eIbrqc8yqzh.RzZitQWkb_GMV7TcfZVlusmQOxSW8bziJiMDatovRfXcMHxd
+ poCj8Zc5V4Si6XksNs8lygjGQrY9AHYwLO9g0mMjB5AZlh9FbnhPePqpYhPL
+ RuH0p5mcTpcI7izVTSX5FQ46BizxLgVN.p9opVpoC5inmdwdKMu9gg_I8k.Z
+ L84aCjlYvf1htstQRC4JUdp3a95X8nRpCAwGlc57poa.kWrjAkOKI.A3vd5M
+ uL4.xsdosTtco.qHZCpZ7ue.Mea_9177qSBxNJZck16FYouwwXBQOHFfEZb8
+ GyZC.cc8kRYMyo6vkXQcW6xvVPXTixvRDzINQ1HRAwsfxyX8MT6XUzhFywGH
+ DhGGZskJU3p3.t7qXK2PX.xwIJjCyFmXQQEvee0.GXDgj8KkDPK_hETdzteF
+ l08YGfUZgSYXW1PbcqTv5SSwgPG8TmvCdsOYYzpptIP48wrkAmifssAyucAE
+ hWqXfJ2I7xef6Ad0cR2bbiD.HPHwcZ2IlXqUXwVQr9gnubxsHr6FX7FsqNWr
+ 78t2W7Zr0mOTiTtr9x6wSksY33hmx.Ans3IqgymxqsF8q2pnaTezzGPFut2m
+ TxqkVs94okpcP94Xd_saKY2AobN_Um2y9xCpZKoyZhxwMoQpDSUF7DeTA2Sq
+ bXGfLEqeHU63jqu_ClyAVns88M4Lq1m0_L8Ny2UKQx_llw2Df1D1KnlFJ4.v
+ x_Gvn7e99icEs2VjhklVcZ29t9YxjWdvQAbK4OqsRaCTLLU5TGzcPVWHPbXB
+ HAXPx56SgRsiz2.1T_RRt1rpU97KxwHKlKVnaghJzY0Ydlpz9oq82nQa3DdK
+ Vj04DsFMp0_utVNGx2CzUvf7SC0KJO2kq2v73gmaqLsGj9N06ViUPV7bMitr
+ H9v5bu6wz69WtXF_KnpBERa1pXWi31AC6vS_U_8lMg4ru88NkjoH8iJWrgIZ
+ dY9pByT5lXBgeAiixeWkl39HbefjbP8_YVM7ZqJQn8EEddubNEn5PMW.7F.l
+ a9eWfFIk.pvx19ackGTMQ8E3qlAto40h0b_dbk9XD0YZtz1vgt_08.EGPf9j
+ KA59dZMpCkxFxfn6uUhdQ7QBGyFPpVo7cTBOqdQ4fo.SgQfd5v8u70Ny46s5
+ Dm9Imh9JtDwVA0dOJiK4XP3cY9aBU9A2XU1Sh27lotbTSRcys_PHKZDb_XD0
+ 9_726VkkY_YcEfHZh7oqDULTOQSZ0NeujW0K4HZasTcxUKkvhM842bikk9QN
+ 5xvIuocVmiaPOyvXtG26tVEGH1JJ.Y3JzXTHKSceXQNbIgnGmqN1qxM8uvLC
+ RNHvjZ8wsKVjqId_JpXZu.517jw3dXk5tb0Bapj.4HcJ8IrtKfcf_xt6GRqe
+ hmHhJZDDDcNh0tABIfWufaExgZK7qarVjN_9ZTxA9qUcRcIpjjsilgr6VSId
+ 0K3umf.8N.phbubuH.89rvKgLX4YdKmWPdfiX_1eOBWndk8oZKWJxDx6jZwy
+ B9Hri0Cr.8ujLQjJZbj.fAbHHxvysyXyVR_jzf4Ls5eQRCQYAgV_fSvm80iU
+ h0bT8
+Received: from [41.189.51.121] by web87112.mail.ird.yahoo.com via HTTP; Wed, 21 Apr 2010 18:51:59 GMT
+X-Mailer: YahooMailClassic/10.1.9 YahooMailWebService/0.8.103.269680
+Date: Wed, 21 Apr 2010 18:51:59 +0000 (GMT)
+From: Mawn <mawn2@btinternet.com>
+Reply-To: mawnci@live.fr
+Subject: From Mr Didier.
+To: undisclosed recipients: ;
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="0-2075212156-1271875919=:47276"
+
+--0-2075212156-1271875919=:47276
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+Dear Sir,
+=C2=A0=C2=A0 =C2=A0
+=C2=A0=C2=A0=C2=A0 My name is Didier and i was the personal account manager=
+ to a national of your country who was involved in the ill fated Kenya Airw=
+ays that crash in coast of Abidjan. He is a beneficiary to a deposit with o=
+ur bank which is at a summary of US$15 million.
+=C2=A0=C2=A0 =C2=A0
+=C2=A0Efforts have been made by the management in the time past to locate a=
+ny of his=C2=A0 late beneficiary=E2=80=99s extended family or even far rela=
+tives to come forward for the claim their entitlements, but the efforts pro=
+ved abortive. As he=E2=80=99s account manager, I made inquiries, and had to=
+ trace his surname on the internet, it was during this search that i came a=
+cross your email address and now decided to inform you of this information.
+
+Since you bear the same surname with him i wish to appoint you as his next =
+of kin, with this arrangement, the bank management will acknowledge you as =
+his next of kin and will accept to release this money in your favour. I am =
+giving you this classified information in order to connive with you to get =
+the money out of my bank into your bank account as his next of kin, of whic=
+h we shall be shared accordingly. If you are ready to cooperate with me on =
+the claim of this fund, email me back with the following information:
+=C2=A0=C2=A0 =C2=A0
+=C2=A0=C2=A0=C2=A0 YOUR AGE
+=C2=A0=C2=A0=C2=A0 MARITAIL STATUS
+=C2=A0=C2=A0=C2=A0 ADDRESS
+=C2=A0=C2=A0=C2=A0 PHONE NUMBER
+=C2=A0=C2=A0=C2=A0 YOUR COUNTRY
+=C2=A0=C2=A0=C2=A0 YOUR OCCUPATION
+
+I will be most glad to hear from you.
+=C2=A0=C2=A0 =C2=A0
+Yours Sincerely,
+Mr Didier.
+
+--0-2075212156-1271875919=:47276
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+<table cellspacing=3D"0" cellpadding=3D"0" border=3D"0" ><tr><td valign=3D"=
+top" style=3D"font: inherit;">Dear Sir,<br>&nbsp;&nbsp; &nbsp;<br>&nbsp;&nb=
+sp;&nbsp; My name is Didier and i was the personal account manager to a nat=
+ional of your country who was involved in the ill fated Kenya Airways that =
+crash in coast of Abidjan. He is a beneficiary to a deposit with our bank w=
+hich is at a summary of US$15 million.<br>&nbsp;&nbsp; &nbsp;<br>&nbsp;Effo=
+rts have been made by the management in the time past to locate any of his&=
+nbsp; late beneficiary=E2=80=99s extended family or even far relatives to c=
+ome forward for the claim their entitlements, but the efforts proved aborti=
+ve. As he=E2=80=99s account manager, I made inquiries, and had to trace his=
+ surname on the internet, it was during this search that i came across your=
+ email address and now decided to inform you of this information.<br><br>Si=
+nce you bear the same surname with him i wish to appoint you as his next of=
+ kin, with this
+ arrangement, the bank management will acknowledge you as his next of kin a=
+nd will accept to release this money in your favour. I am giving you this c=
+lassified information in order to connive with you to get the money out of =
+my bank into your bank account as his next of kin, of which we shall be sha=
+red accordingly. If you are ready to cooperate with me on the claim of this=
+ fund, email me back with the following information:<br>&nbsp;&nbsp; &nbsp;=
+<br>&nbsp;&nbsp;&nbsp; YOUR AGE<br>&nbsp;&nbsp;&nbsp; MARITAIL STATUS<br>&n=
+bsp;&nbsp;&nbsp; ADDRESS<br>&nbsp;&nbsp;&nbsp; PHONE NUMBER<br>&nbsp;&nbsp;=
+&nbsp; YOUR COUNTRY<br>&nbsp;&nbsp;&nbsp; YOUR OCCUPATION<br><br>I will be =
+most glad to hear from you.<br>&nbsp;&nbsp; &nbsp;<br>Yours Sincerely,<br>M=
+r Didier.<br></td></tr></table>
+--0-2075212156-1271875919=:47276--
+

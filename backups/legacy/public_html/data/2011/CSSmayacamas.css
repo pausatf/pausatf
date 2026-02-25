@@ -1,0 +1,87 @@
+body {
+	margin-left:20px;
+	margin-top:20px;
+	font-size:12px;
+	font-family:Tahoma, Arial, San Sarif;
+	font-variant: small-caps;
+	color:black;
+	background-image:url(/filenamehere.jpg);
+	background-position: top-left;
+	background-repeat: no-repeat;
+	scrollbar-face-color:black;
+	scrollbar-shadow-color: white;
+	scrollbar-highlight-color: white;
+	scrollbar-3dlight-color:white;
+	scrollbar-darkshadow-color:black;
+	scrollbar-track-color:blue;
+	scrollbar-base-color: red;
+	scrollbar-arrow-color:white}
+
+P {
+	color: black;
+	font-variant: normal;}
+
+td {
+	font-size:12px;
+	font-family:Tahoma;
+	font-variant: small-caps;
+	color:#060050}
+
+
+a:link,a:visited,a:active {
+	text-decoration:none;
+	color:#ffffff;
+	font-weight:normal}
+
+a:hover {
+	color:red;
+	font-weight:normal; 	
+	text-decoration:none;}
+
+.div1 {
+	font-size:20px;
+	font-family:Verdana,Arial,Helvetica,Sans-Serif;
+	color:#9B4D71;
+	font-weight:bold}
+
+#class1  {
+	font-size:16px;
+	font-family:Verdana,Arial,Helvetica,Sans-Serif;
+	color:#9B4D71;
+	font-weight:bold}
+
+hr {
+	color:blue}
+
+
+ul {list-style-image:url(filename.gif);list-style-position:outside}
+
+tt,pre {
+	font-size:12px;
+	font-family:Courier New, Courier;
+	font-variant: normal;
+	color:#000000;
+	background-color:#ffffff}
+
+h1 { font-size: 24 px;
+	color: blue;
+	line-height: 10%}
+
+h2 { font-size: 18 px;
+	color: blue;}
+
+h3 { font-size: 14 px;
+	color: blue;}
+
+h4, h5 {
+	font-weight: bold;
+	color: red;
+	line-height: 0%;
+	 }
+
+TH {
+	font-size:  14 px;
+	font-weight:bold;
+	color: white;
+	background-color: red;
+	font-variant: small-caps;}

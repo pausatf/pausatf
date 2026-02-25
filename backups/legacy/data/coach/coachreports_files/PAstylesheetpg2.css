@@ -1,0 +1,69 @@
+BODY {
+	BACKGROUND-POSITION: left top; MARGIN-TOP: 67px; SCROLLBAR-FACE-COLOR: blue; FONT-SIZE: 13px; BACKGROUND-IMAGE: url(/images/Logopage2.jpg); SCROLLBAR-HIGHLIGHT-COLOR: white; MARGIN-LEFT: 15px; SCROLLBAR-SHADOW-COLOR: black; COLOR: black; SCROLLBAR-3DLIGHT-COLOR: white; SCROLLBAR-ARROW-COLOR: white; SCROLLBAR-TRACK-COLOR: #ffffff; BACKGROUND-REPEAT: no-repeat; FONT-FAMILY: Tahoma, Arial, San Sarif; SCROLLBAR-DARKSHADOW-COLOR: black; SCROLLBAR-BASE-COLOR: blue
+}
+P {
+	COLOR: black; FONT-VARIANT: normal
+}
+MENU {
+	FONT-SIZE: 20px; COLOR: green; FONT-VARIANT: normal
+}
+TD {
+	BORDER-RIGHT: 0px; PADDING-RIGHT: 3px; BORDER-TOP: 0px; PADDING-LEFT: 3px; FONT-SIZE: 13px; PADDING-BOTTOM: 3px; BORDER-LEFT: 0px; COLOR: #060050; PADDING-TOP: 3px; BORDER-BOTTOM: blue 1px solid; FONT-FAMILY: Tahoma; empty-cells: show; rule: row
+}
+A:link {
+	BORDER-RIGHT: medium none; BORDER-TOP: medium none; FONT-WEIGHT: normal; BORDER-LEFT: medium none; COLOR: blue; BORDER-BOTTOM: medium none; TEXT-DECORATION: none
+}
+A:visited {
+	BORDER-RIGHT: medium none; BORDER-TOP: medium none; FONT-WEIGHT: normal; BORDER-LEFT: medium none; COLOR: blue; BORDER-BOTTOM: medium none; TEXT-DECORATION: none
+}
+A:active {
+	BORDER-RIGHT: medium none; BORDER-TOP: medium none; FONT-WEIGHT: normal; BORDER-LEFT: medium none; COLOR: blue; BORDER-BOTTOM: medium none; TEXT-DECORATION: none
+}
+A:hover {
+	FONT-WEIGHT: normal; COLOR: red; TEXT-DECORATION: none
+}
+.title {
+	FONT-WEIGHT: bold; FONT-SIZE: 20px; COLOR: #9b4d71; FONT-FAMILY: Verdana,Arial,Helvetica,Sans-Serif
+}
+HR {
+	BORDER-RIGHT: medium none; BORDER-TOP: medium none; BORDER-LEFT: medium none; COLOR: blue; BORDER-BOTTOM: medium none; HEIGHT: 2px; BACKGROUND-COLOR: blue
+}
+TABLE {
+	BORDER-RIGHT: blue 0px solid; BORDER-TOP: blue 0px solid; BORDER-LEFT: blue 0px solid; BORDER-BOTTOM: blue 0px solid; BORDER-COLLAPSE: collapse; empty-cells: show; rule: rows; frame: hsides
+}
+UL {
+	LIST-STYLE-POSITION: outside; LIST-STYLE-IMAGE: url(____.gif)
+}
+TT {
+	FONT-SIZE: 12px; COLOR: #000000; FONT-FAMILY: Courier New, Courier; BACKGROUND-COLOR: #ffffff; FONT-VARIANT: normal
+}
+PRE {
+	FONT-SIZE: 12px; COLOR: #000000; FONT-FAMILY: Courier New, Courier; BACKGROUND-COLOR: #ffffff; FONT-VARIANT: normal
+}
+TD.photos {
+	BORDER-RIGHT: medium none; BORDER-TOP: medium none; BORDER-LEFT: medium none; BORDER-BOTTOM: medium none
+}
+A:unknown {
+	BORDER-RIGHT: medium none; BORDER-TOP: medium none; BORDER-LEFT: medium none; BORDER-BOTTOM: medium none
+}
+H1 {
+	FONT-WEIGHT: bold; COLOR: blue; LINE-HEIGHT: 80%
+}
+H2 {
+	FONT-WEIGHT: bold; COLOR: blue; LINE-HEIGHT: 80%
+}
+H3 {
+	FONT-WEIGHT: bold; COLOR: blue; LINE-HEIGHT: 80%
+}
+H4 {
+	FONT-WEIGHT: bold; COLOR: blue; LINE-HEIGHT: 80%
+}
+H5 {
+	FONT-WEIGHT: bold; COLOR: blue; LINE-HEIGHT: 80%
+}
+TH {
+	FONT-WEIGHT: bold; FONT-SIZE: 14px; COLOR: white; BACKGROUND-COLOR: blue; FONT-VARIANT: small-caps
+}
+#hotlist IMG {
+	WIDTH: 40px; HEIGHT: 20px
+}

@@ -1,0 +1,95 @@
+/***********************hd*******************************/
+#hd{height:95px;}
+#header-left{float:left; width:218px; height:95px;}
+#header-right{float:right; width:50.154em; *width:48.9em; height:95px; background-color:#E2BBB6; text-align:center;}
+#header-menu{height:2em; margin-top:5.4em; margin-left:2em; text-align:center;}
+#header-menu ul{font-size:93%; color:#FFFFFF; }
+#header-menu ul li{float:left; margin-right:3.4em;}
+#header-menu a{text-decoration:none; color:#F7EEEC; font-weight:bold; display:block; float:left;}
+#header-menu a:hover {color:#FFFFFF;}
+#header-menu a.current {color:#FFFFFF;}
+.border-left {border-left:20px solid #FFFFFF;}
+
+/***********************bd*******************************/
+#bd-right{float:right;}
+#bd-title h2{font-size:18px; color:#FFFFFF; font-weight:bold; margin-left:20px; margin-top:20px; margin-bottom:10px;}
+#bd-main{width:870px; height:435px; color:#999999; font-size:93%;}
+.bd-menu span.sub{display:block; padding-bottom:0.5em; text-decoration:none; color:#666666; cursor:pointer;}
+.bd-menu span.sub:hover{color:#999999;}
+.noscript {text-decoration:none; color:#666666;}
+#bd-main-left{width:25%; float:left; text-align:left;}
+#bd-main-right{width:73%; float:right;}
+#test{border:#999999 medium solid;}
+.home-bd-main-left{float:right; width:100px; margin-right:70px; margin-top:400px;}
+/***********************ft*******************************/
+div#nifty{background: #FFFFFF; margin-top:15px;}
+#ft-text{padding-top:2em; padding-left:1em; color:#FFFFFF; font-size:77%}
+#ft ul li{display:inline; margin-right:1.2em;}
+#ft-text .yui-u{text-align:right;}
+#ft-text .first{text-align:left;}
+b.rtop, b.rbottom{display:block;background: #FFF}
+b.rtop b, b.rbottom b{display:block;height:1px;overflow:hidden;background:#FFFFFF;}
+b.r1{margin: 0 5px}
+b.r2{margin: 0 3px}
+b.r3{margin: 0 2px}
+b.rtop b.r4, b.rbottom b.r4{margin: 0 1px; height: 2px;}
+/***********************the-company*******************************/
+.block-parent {height:200px; width:1200px;}
+.block {width:400px; height:200px; float:left;}
+p{padding-bottom:1em;}
+strong {font-weight:bold;}
+em {font-style:italic;}
+.hid, .hid2, .hid3 {display:none;}
+td{vertical-align:top;}
+#pageNavPosition1, #pageNavPosition2, #pageNavPosition3 {text-align:right;}
+
+.cate{border-left-color:#FFFFFF; }
+
+#pgPrev {float:left;}
+#pgNext {float:right;}
+
+#slideshow {
+  width: 590px;
+  height: 320px;
+  position: relative;
+  overflow: hidden;
+  /* border:1px black solid */;
+  }
+#preview {
+  position: absolute;
+  left:0px;
+}
+#bd #science-of-beauty {
+	 margin-left:10px;
+	 margin-top:50px;
+	 width: 590px;
+	 height:320px;
+	/* border:1px black solid;
+	  border:black 1px solid; */
+}
+
+#link1, #link2{text-decoration:none; color:#999999;  }
+
+.block {padding-right:30px; width:280px; height: 320px; }
+
+.block li {margin-left:2em; list-style:disc; }
+
+#loader-holder{margin:20% 30%;}
+
+.navi{width: 590px;
+  margin-left:10px;
+  margin-top:2em;
+  position: relative;
+ }
+  
+.nav-left {
+text-align:left;
+	float:left;
+	width:49%;
+}
+.nav-right {
+text-align:right;
+	float:right;
+	width:49%;
+	
+}

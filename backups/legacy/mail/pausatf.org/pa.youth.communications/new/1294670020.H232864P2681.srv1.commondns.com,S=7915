@@ -1,0 +1,135 @@
+Return-path: <codymorris133@yahoo.ca>
+Envelope-to: pa.youth.communications@pausatf.org
+Delivery-date: Mon, 10 Jan 2011 09:33:40 -0500
+Received: from nm29.bullet.mail.sp2.yahoo.com ([98.139.91.99])
+	by srv1.commondns.com with smtp (Exim 4.69)
+	(envelope-from <codymorris133@yahoo.ca>)
+	id 1PcIoV-0000gw-QL
+	for pa.youth.communications@pausatf.org; Mon, 10 Jan 2011 09:33:40 -0500
+Received: from [98.139.91.65] by nm29.bullet.mail.sp2.yahoo.com with NNFMP; 10 Jan 2011 14:33:36 -0000
+Received: from [98.139.91.23] by tm5.bullet.mail.sp2.yahoo.com with NNFMP; 10 Jan 2011 14:33:36 -0000
+Received: from [127.0.0.1] by omp1023.mail.sp2.yahoo.com with NNFMP; 10 Jan 2011 14:33:36 -0000
+X-Yahoo-Newman-Property: ymail-3
+X-Yahoo-Newman-Id: 550618.90277.bm@omp1023.mail.sp2.yahoo.com
+Received: (qmail 82654 invoked by uid 60001); 10 Jan 2011 14:33:36 -0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.ca; s=s1024; t=1294670016; bh=Sps3bryOtT9b+aghCznjXrS7FGPVzDKYlh/zWf5pdYw=; h=Message-ID:X-YMail-OSG:Received:X-Mailer:Date:From:Reply-To:Subject:To:MIME-Version:Content-Type; b=IDIzXsJ8asvelOzJRvSEGV2ZqcDS7owXsDxNOFPnP7NYtwD7bHLkKggWHlLB6Xxe43DJsrRbq6FPL3P/IrgmNiXQoy2wC9e4a02xYc8Wcw8FtqJ3TlV+W9mXsuyrIg2T2I5fgsB3WOsx3c2FxSuxh0fafpSL9gnIbzzLFp5+EKA=
+DomainKey-Signature:a=rsa-sha1; q=dns; c=nofws;
+  s=s1024; d=yahoo.ca;
+  h=Message-ID:X-YMail-OSG:Received:X-Mailer:Date:From:Reply-To:Subject:To:MIME-Version:Content-Type;
+  b=KSgmbJJrUo4F2Evwz1gNk9nPpveDnAlDO9uYVxssTZ8PbA5Im9Y+2CwFVrUV4RODg290U69tSaO5e8ePYqPCdmorSK9cXZ1OEj99aYAxkBb2pmZgA6ucxWLyVeC4KWkegNUHGi+bWqXpgn8lECiKe7QpIYAl93wGNrroBqJAG8w=;
+Message-ID: <137718.82442.qm@web44908.mail.sp1.yahoo.com>
+X-YMail-OSG: rULgVGMVM1l2PtmzUGYdDknpFpQWWEU4REIKZ5znT6iwdAw
+ 7MPdWTrBY6rHWwS6qgd.TT8d7OMd9lbbUqUjHTZeFAwERRxYo8sRHaNCDExM
+ M5muYSc93BTcn0_XeI.ULV.fL7jElWhsbWK4zdnJOqdHpF1aeKmGhzbWeB1A
+ 2ZR8cIIXVSzIEyvdYTZomEj_IkhpksIUxiGVTh9f.3dmTjBK2_6xoWGX6fTF
+ wvBLQs1ueUwfTWYID_DWpM5TerErPeQw1xcKJFXrll5hjF5Gkvctk97y95Dy
+ .s3ke_GGj.pEdjk.uHbJ850KGcanQDrqi0i.1biYTjojm5nw98hd3.wnoAAm
+ lPZDK4udHQix7R94UrzsXTn97rYymNyZHh9lXuV.mBOlAQxSj_rQPxc.Tijv
+ WHTTayzHQqoKYTSf5cyYFbEkWNpiQSS_thzTGR8VOpN70MwMOOOc5WQW5Thh
+ HoKZan4LIeUnZQ_KsY0SMgmHyBGsKnKzgodM3mD1M9jvDYoBSEhEe8zopOOo
+ lxfGqKZvuBpDorxY2710drMExPEVq5DDWNOyx23FomM1pJgp4GKTTkMFlL1K
+ iiFdFCSuDE5lZo.sA0ue3OIHylPCMNy44OLQrt9tnHAmuBeg548B3AaJchGI
+ RqgFEEOnQlttQ3zFWHzF2LNDtQ3t3RRalRwrAnLWFzSIjdGCCTpHFLb48XZu
+ s1L9eEg9VPfQVO0BGHOmmUHpFQ.G3Exehb0LCw4dceAGceOsWQWjDP4K6qx3
+ 7jRyPA37PMRigauof9lG5E_1Nxuy1CbGAnpwtkLZ5JwjUA9sdAXWlg_eGfmz
+ Inaim.puVV_v97t3mZO_wxiE5wo08wtrMwHXbpPLwoWB_3ZfGIm2f4cYz.Mx
+ 7tZcG0B9tRXIZ5J_.jlMUWaKnJvOAhGzok47emXMRV5etqJYLec.TDfDhNpw
+ AyhxoVS8Abw78ig7puAHB3YYLdjZvEJ_jUKUXWWHM0jams_VVfAcqD6ACrVi
+ U3RjBfUl3GEX12ivuOtz9JkWHegl5Zy7byGnw7aNTs2VC0HPrHaCHWHX_EIO
+ 2ccJzxLlWlBuki7QS3jPGOpmoRHCGd_zSyGCK42Cdyb7mfvAAuiGb1w.pbdc
+ -
+Received: from [41.216.41.14] by web44908.mail.sp1.yahoo.com via HTTP; Mon, 10 Jan 2011 06:33:35 PST
+X-Mailer: YahooMailClassic/11.4.20 YahooMailWebService/0.8.107.285259
+Date: Mon, 10 Jan 2011 06:33:35 -0800 (PST)
+From: Western Union Money Transfer <codymorris133@yahoo.ca>
+Reply-To: wumtbb.j@w.cn
+Subject: Congratulation.
+To: undisclosed recipients: ;
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="0-247812476-1294670015=:82442"
+
+--0-247812476-1294670015=:82442
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+WELCOME TO WESTERN UNION MONEY TRANSFER
+Send Money Worldwide
+BRANCH: PLOT 117 JEAN PAUL AVENUE
+BENIN REPUBLIC
+Website: www.westernunion.com
+=A0
+Dear Beneficiary,
+=A0
+In reference to the general consensus meeting held with The Benin Fondation=
+ De France (B.F.D.F),UNHCR ORGANIZATION and the Ministry of Finance which t=
+he theme was to settle all astanding Compensation/Grant Debts owed by UNHCR=
+ ORGANIZATION and Government and as well conduct and issue compensation/gra=
+nt to the new beneficiaries.
+=A0
+Your grant donation information is, reference No: STH/UNO/WBO/MM-2010, File=
+ No: GT/55/1209SW. The selection process was carried out through our comput=
+erized email selection system from a database of over 200,000 email address=
+es drawn from all the continents of the world.
+=A0
+Therefore you are a beneficiary of compensation/Grant funds of $1,500,000.0=
+0 ($1.5M). The funds was arranged by the said Organisations to be transferr=
+ed via Western Union Money Transfer. In accordance to the engagement agreem=
+ent with the various Ministries, The Western Union here in Benin Republic h=
+as limited transfer rate because of International communities and Anti-Terr=
+orist/Drug Law so, we are only permitted to transfer $5,000.00 daily until =
+your total funds completely paid.
+=A0
+Please send to us your full names and address with city and country as stat=
+ed below to receive your compensation funds as we are only permitted to tra=
+nsfer $5,000.00 daily.
+=A0
+Receiver Name-------------
+City----------------=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=20
+Country--------------=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=20
+Phone--------------=A0=A0=A0=A0=20
+Test question-------------=A0=A0=A0=20
+Answer----------------=A0=A0=A0=A0=A0=A0=A0=A0=A0=20
+We await your prompt response.
+=A0
+Mr. Dossou Michel
+Senior Management - WESTERN UNION MONEY TRANSFER
+BRANCH: PLOT 117 JEAN PAUL AVENUE
+BENIN REPUBLIC
+Website: www.westernunion.com=A0=A0 =0A=0A
+--0-247812476-1294670015=:82442
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+<table cellspacing=3D"0" cellpadding=3D"0" border=3D"0" ><tr><td valign=3D"=
+top" style=3D"font: inherit;"><DIV>WELCOME TO WESTERN UNION MONEY TRANSFER<=
+BR>Send Money Worldwide<BR>BRANCH: PLOT 117 JEAN PAUL AVENUE<BR>BENIN REPUB=
+LIC<BR>Website: <A href=3D"http://www.westernunion.com">www.westernunion.co=
+m</A><BR>&nbsp;<BR>Dear Beneficiary,<BR>&nbsp;<BR>In reference to the gener=
+al consensus meeting held with The Benin Fondation De France (B.F.D.F),UNHC=
+R ORGANIZATION and the Ministry of Finance which the theme was to settle al=
+l astanding Compensation/Grant Debts owed by UNHCR ORGANIZATION and Governm=
+ent and as well conduct and issue compensation/grant to the new beneficiari=
+es.<BR>&nbsp;<BR>Your grant donation information is, reference No: STH/UNO/=
+WBO/MM-2010, File No: GT/55/1209SW. The selection process was carried out t=
+hrough our computerized email selection system from a database of over 200,=
+000 email addresses drawn from all the continents of the
+ world.<BR>&nbsp;<BR>Therefore you are a beneficiary of compensation/Grant =
+funds of $1,500,000.00 ($1.5M). The funds was arranged by the said Organisa=
+tions to be transferred via Western Union Money Transfer. In accordance to =
+the engagement agreement with the various Ministries, The Western Union her=
+e in Benin Republic has limited transfer rate because of International comm=
+unities and Anti-Terrorist/Drug Law so, we are only permitted to transfer $=
+5,000.00 daily until your total funds completely paid.<BR>&nbsp;<BR>Please =
+send to us your full names and address with city and country as stated belo=
+w to receive your compensation funds as we are only permitted to transfer $=
+5,000.00 daily.<BR>&nbsp;<BR>Receiver Name-------------<BR>City------------=
+----&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <BR>=
+Country--------------&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp; <BR>Phone--------------&nbsp;&nbsp;&nbsp;&nbsp;
+ <BR>Test question-------------&nbsp;&nbsp;&nbsp; <BR>Answer---------------=
+-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </DIV>
+<DIV>We await your prompt response.<BR>&nbsp;<BR>Mr. Dossou Michel<BR>Senio=
+r Management - WESTERN UNION MONEY TRANSFER<BR>BRANCH: PLOT 117 JEAN PAUL A=
+VENUE<BR>BENIN REPUBLIC<BR>Website: <A href=3D"http://www.westernunion.com"=
+>www.westernunion.com</A>&nbsp;&nbsp; </DIV></td></tr></table><br>
+--0-247812476-1294670015=:82442--

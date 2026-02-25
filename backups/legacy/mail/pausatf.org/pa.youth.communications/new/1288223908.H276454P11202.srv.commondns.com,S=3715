@@ -1,0 +1,87 @@
+Return-path: <crosby.freeman@gmail.com>
+Envelope-to: pa.youth.communications@pausatf.org
+Delivery-date: Thu, 28 Oct 2010 00:58:28 +0100
+Received: from mail-bw0-f42.google.com ([209.85.214.42])
+	by srv.commondns.com with esmtp (Exim 4.69)
+	(envelope-from <crosby.freeman@gmail.com>)
+	id 1PBFsy-0002uV-0C
+	for pa.youth.communications@pausatf.org; Thu, 28 Oct 2010 00:58:28 +0100
+Received: by bwz13 with SMTP id 13so1120680bwz.29
+        for <pa.youth.communications@pausatf.org>; Wed, 27 Oct 2010 16:58:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=gamma;
+        h=domainkey-signature:received:mime-version:sender:received:from:date
+         :x-google-sender-auth:message-id:subject:to:content-type;
+        bh=t8Vt0QXwbxLeVF9xctgsd/3sWAhgn47SYsn2wZtuB4c=;
+        b=A1yOxm1sVh2drYZrCFAxIyFKugeOO5djnKnpujTsDi/Ne59CBae1TRfKxcnfcO+p8z
+         yOftbseUuUnZWMdX37m7Y1CB3R3Fb5IqZ07xmW9iT8h0ie32dAijzANxli4dMjlSuV51
+         kyL3RAe11Hk1l9dpHkCDyBu3zvEHTU1Ueiexg=
+DomainKey-Signature: a=rsa-sha1; c=nofws;
+        d=gmail.com; s=gamma;
+        h=mime-version:sender:from:date:x-google-sender-auth:message-id
+         :subject:to:content-type;
+        b=weAgqUHVeN5srT7BNeJAIII7Tjvuk6Ri4suOao5OOdyUCxkZeXMdQzKZDjVbA91IVL
+         O5mQC2XKaDDlP63zBgdJGeJRrwXOjmq8ArsgisHheXCu8LdDWHMbiighH1G+5uMbsM3i
+         7BPG6sBeAcLcKEHhdqYg0suj1TplIZey2OTcI=
+Received: by 10.204.71.12 with SMTP id f12mr5208851bkj.34.1288223915157; Wed,
+ 27 Oct 2010 16:58:35 -0700 (PDT)
+MIME-Version: 1.0
+Sender: crosby.freeman@gmail.com
+Received: by 10.204.24.6 with HTTP; Wed, 27 Oct 2010 16:58:14 -0700 (PDT)
+From: Crosby Freeman <crosby@bayareatrackclub.com>
+Date: Wed, 27 Oct 2010 16:58:14 -0700
+X-Google-Sender-Auth: hTXVwigWdiDVHe2Vvrd2jDkLTek
+Message-ID: <AANLkTi=reOtN1RU0u3+O+KOmWx+NMJpJvxVAioHb2eDX@mail.gmail.com>
+Subject: Upcoming Youth Clinic || BATC
+To: pa.youth.communications@pausatf.org
+Content-Type: multipart/alternative; boundary=0016e6de03efdaaad30493a2006a
+
+--0016e6de03efdaaad30493a2006a
+Content-Type: text/plain; charset=ISO-8859-1
+
+Hi Alex,
+
+The Bay Area Track Club is sponsoring a youth clinic this weekend in Palo
+Alto. Would you mind helping us promote it by posting our link and maybe a
+little blurb on the youth section of the PA site?
+
+Here is the information:
+http://bayareatrackclub.com/article/post/show/id/213-Introducing-the-Fall-2010-BATC-Running-Clinic
+
+We would really appreciate it.
+
+Thanks, and let me know if you have any questions.
+
+Crosby
+
+--
+Crosby Freeman
+Bay Area Track Club
+Director of Communications & Media
+crosby@bayareatrackclub.com
+510-418-1803
+
+--0016e6de03efdaaad30493a2006a
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+Hi Alex,<div><br></div><div>The Bay Area Track Club is sponsoring a youth c=
+linic this weekend in Palo Alto. Would you mind helping us promote it by po=
+sting our link and maybe a little blurb on the youth section of the PA site=
+?</div>
+
+<div><br></div><div>Here is the information:=A0<a href=3D"http://bayareatra=
+ckclub.com/article/post/show/id/213-Introducing-the-Fall-2010-BATC-Running-=
+Clinic">http://bayareatrackclub.com/article/post/show/id/213-Introducing-th=
+e-Fall-2010-BATC-Running-Clinic</a></div>
+
+<div><br></div><div>We would really appreciate it.=A0</div><div><br></div><=
+div>Thanks, and let me know if you have any questions.</div><div><br></div>=
+<div>Crosby</div><div><div><div><br></div><div>--</div>Crosby Freeman<div>
+
+Bay Area Track Club<br>Director of Communications &amp; Media<br><a href=3D=
+"mailto:crosby@bayareatrackclub.com" target=3D"_blank">crosby@bayareatrackc=
+lub.com</a><br>510-418-1803</div><br>
+</div></div>
+
+--0016e6de03efdaaad30493a2006a--

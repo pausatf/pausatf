@@ -1,0 +1,66 @@
+Return-path: <3adzTTRwKAGcFHHTZSY-aJWNKNHFYNTS-STWJUQdLTTLQJ.HTR@gaia.bounces.google.com>
+Envelope-to: pa.youth.communications@pausatf.org
+Delivery-date: Wed, 18 May 2011 10:49:17 -0400
+Received: from mail-pw0-f72.google.com ([209.85.160.72])
+	by srv1.commondns.com with esmtps (TLSv1:RC4-SHA:128)
+	(Exim 4.69)
+	(envelope-from <3adzTTRwKAGcFHHTZSY-aJWNKNHFYNTS-STWJUQdLTTLQJ.HTR@gaia.bounces.google.com>)
+	id 1QMi3o-00015H-PN
+	for pa.youth.communications@pausatf.org; Wed, 18 May 2011 10:49:16 -0400
+Received: by pwi12 with SMTP id 12so1892239pwi.11
+        for <pa.youth.communications@pausatf.org>; Wed, 18 May 2011 07:49:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=beta;
+        h=domainkey-signature:mime-version:message-id:date:subject:from:to
+         :content-type:content-transfer-encoding;
+        bh=YRDPW2oFc7sUIo11c1NVNgfjKtUxLPPvHHJgAyKrr1I=;
+        b=eSNVISjXenQRURaeopwfRA9Xmi5XP5y/RpKkU7hgl9FuWRs/CDpQVb9D9dCs6F4wvq
+         jnTA4Wbun/W5C4tmVoVA==
+DomainKey-Signature: a=rsa-sha1; c=nofws;
+        d=google.com; s=beta;
+        h=mime-version:message-id:date:subject:from:to:content-type
+         :content-transfer-encoding;
+        b=cQj5rhtu+AgdGHxdbGQpnv/pEJRGGYX/dWT3sT6vWFlTTFJnt9H0iRNQoqZa3LHUbQ
+         m7AfkUzYn4SgoXc3CP/A==
+MIME-Version: 1.0
+Received: by 10.143.20.40 with SMTP id x40mr986091wfi.24.1305730153489; Wed,
+ 18 May 2011 07:49:13 -0700 (PDT)
+Message-ID: <8fb3071e10d4bf10.accounts@google.com>
+Date: Wed, 18 May 2011 14:49:13 +0000
+Subject: Google Email Verification
+From: account-verification-noreply@google.com
+To: pa.youth.communications@pausatf.org
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed; delsp=yes
+Content-Transfer-Encoding: base64
+
+V2VsY29tZSB0byBHb29nbGUgQWNjb3VudHMuICBUbyBhY3RpdmF0ZSB5b3VyIGFjY291bnQgYW5k
+IHZlcmlmeSB5b3VyIGVtYWlsDQphZGRyZXNzLCBwbGVhc2UgY2xpY2sgdGhlIGZvbGxvd2luZyBs
+aW5rOg0KDQpodHRwczovL3d3dy5nb29nbGUuY29tL2FjY291bnRzL1ZFP3NlcnZpY2U9eW91dHVi
+ZSZjPUNLN3BrNWJKdmNtTmJCQ1FfdEtHNGVQQjJZOEImaGw9ZW4NCg0KKioqTk9URSoqKiBQbGVh
+c2UgcHJpbnQgdGhpcyBwYWdlIGZvciB5b3VyIHJlY29yZHMuIFlvdSdsbCBuZWVkIHlvdXINCnZl
+cmlmaWNhdGlvbiBsaW5rIGlmIHlvdSBsb3NlIGFjY2VzcyB0byB5b3VyIGFjY291bnQgKGZvciBl
+eGFtcGxlLA0KaWYgeW91IGZvcmdldCB5b3VyIHVzZXJuYW1lIG9yIHBhc3N3b3JkKS4NCg0KSWYg
+eW91J3ZlIHJlY2VpdmVkIHRoaXMgbWFpbCBpbiBlcnJvciwgaXQncyBsaWtlbHkgdGhhdCBhbm90
+aGVyIHVzZXINCmVudGVyZWQgeW91ciBlbWFpbCBhZGRyZXNzIHdoaWxlIHRyeWluZyB0byBjcmVh
+dGUgYW4gYWNjb3VudCBmb3IgYSBkaWZmZXJlbnQNCmVtYWlsIGFkZHJlc3MuIElmIHlvdSBkb24n
+dCBjbGljayB0aGUgdmVyaWZpY2F0aW9uIGxpbmssIHRoZSBhY2NvdW50IHdvbid0DQpiZSBhY3Rp
+dmF0ZWQuDQoNCklmIHlvdSBkaWRuJ3QgcmVxdWVzdCB0aGlzIGVtYWlsLCBidXQgeW91IGRlY2lk
+ZSB0byB1c2UgdGhpcyBhY2NvdW50LA0Kb3IgZGVsZXRlIGl0LCB5b3UnbGwgZmlyc3QgbmVlZCB0
+byByZXNldCB0aGUgYWNjb3VudCBwYXNzd29yZCBieQ0KZW50ZXJpbmcgeW91ciBlbWFpbCBhZGRy
+ZXNzIGF0DQpodHRwczovL3d3dy5nb29nbGUuY29tL2FjY291bnRzL3JlY292ZXJ5P3NlcnZpY2U9
+eW91dHViZSZjb250aW51ZT1odHRwJTNBJTJGJTJGd3d3LnlvdXR1YmUuY29tJTJGZmluaXNoX3Nz
+dSUzRmFjdGlvbl9jcmVhdGUlM0QxJTI2U2lnbnVwS2V5JTNEM0ZMdjFwVFQxSTJsYVp3UjZmbV9U
+S2JZUExQQ1lDWjM0aGdQa2xwWXl6YlpWS29HT1ZDM2ZmT2ZHTGlFUmhCeW5sWHA0S2lHVDJPaGdG
+RzR6MGtZU0UwbUw5QVVxNGJ6TjNDWVgzeGpkRnRYV2dHRDd3TWh2SXhVMlJOWFhkVUZJMG16amFB
+NkJBbXdpNk5BQ21uOGIxb0dadXdDbl9wUHZlRUxfbFQ0YUlhTGZXTlFCOXhpcmxGYWxucW9LWElz
+R0RTaWxsOVZiQTMyR2RHMDdZdjdQa0I1bEZnOEpZUVBkVzMwTGVhYVVEbWNtSTY4VWtJbTliRGhj
+ckRqWkI4OWNpQnlJS2hpT2ZKUG9IRWE1bXRZMXlMSlhNbzB6cDBpMU5jZVg2YUMweGI4a3FoYWNo
+ckEtTWVCbGh4Y2tFLXl1UHh5MVF4aWxyWmNJQ21sZnZZN3ZyU1ZUelFNYUN0VjFYSUNCYTFYTnFJ
+JTI1M0QlMjZuZXh0JTNEJTI1MkYmZW1haWw9cGEueW91dGguY29tbXVuaWNhdGlvbnMlNDBwYXVz
+YXRmLm9yZy4NCg0KSWYgY2xpY2tpbmcgdGhlIGxpbmsgYWJvdmUgZG9lcyBub3Qgd29yaywgY29w
+eSBhbmQgcGFzdGUgdGhlIFVSTCBpbiBhDQpuZXcgYnJvd3NlciB3aW5kb3cgaW5zdGVhZC4NCg0K
+VGhhbmsgeW91IGZvciB1c2luZyBHb29nbGUuDQoNCkZvciBxdWVzdGlvbnMgb3IgY29uY2VybnMg
+YWJvdXQgeW91ciBhY2NvdW50LCBwbGVhc2UgdmlzaXQgdGhlIEdvb2dsZSAgDQpBY2NvdW50cw0K
+SGVscCBDZW50ZXIgYXQgaHR0cDovL3d3dy5nb29nbGUuY29tL3N1cHBvcnQvYWNjb3VudHMvDQoN
+Cg0KVGhpcyBpcyBhIHBvc3Qtb25seSBtYWlsaW5nLiAgUmVwbGllcyB0byB0aGlzIG1lc3NhZ2Ug
+YXJlIG5vdCBtb25pdG9yZWQNCm9yIGFuc3dlcmVkLg0KDQoNCg==

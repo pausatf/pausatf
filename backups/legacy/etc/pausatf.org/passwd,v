@@ -1,0 +1,235 @@
+head	1.15;
+access;
+symbols;
+locks
+	pausat:1.15; strict;
+comment	@# @;
+
+
+1.15
+date	2007.11.26.04.50.13;	author pausat;	state Exp;
+branches;
+next	1.14;
+
+1.14
+date	2007.11.26.04.49.48;	author pausat;	state Exp;
+branches;
+next	1.13;
+
+1.13
+date	2007.11.26.04.49.19;	author pausat;	state Exp;
+branches;
+next	1.12;
+
+1.12
+date	2007.11.26.04.48.48;	author pausat;	state Exp;
+branches;
+next	1.11;
+
+1.11
+date	2007.11.26.04.48.19;	author pausat;	state Exp;
+branches;
+next	1.10;
+
+1.10
+date	2007.11.26.04.47.42;	author pausat;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	2007.11.26.04.47.14;	author pausat;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	2007.11.26.04.46.37;	author pausat;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	2007.11.26.04.46.05;	author pausat;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	2007.11.26.04.44.52;	author pausat;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2007.11.26.04.44.17;	author pausat;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2007.11.26.04.43.48;	author pausat;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2007.11.26.04.42.57;	author pausat;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2007.11.26.04.42.10;	author pausat;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2007.11.26.04.42.09;	author pausat;	state Exp;
+branches;
+next	;
+
+
+desc
+@Init by /usr/local/cpanel/cpanel
+@
+
+
+1.15
+log
+@Modified by /usr/local/cpanel/cpanel .
+@
+text
+@pa.youth.chair:x:32217:32219::/home/pausat/mail/pausatf.org/pa.youth.chair:/usr/local/cpanel/bin/jailshell
+pa.youth.vice.chair:x:32217:32219::/home/pausat/mail/pausatf.org/pa.youth.vice.chair:/usr/local/cpanel/bin/jailshell
+pa.youth.secretary:x:32217:32219::/home/pausat/mail/pausatf.org/pa.youth.secretary:/usr/local/cpanel/bin/jailshell
+pa.youth.treasurer:x:32217:32219::/home/pausat/mail/pausatf.org/pa.youth.treasurer:/usr/local/cpanel/bin/jailshell
+pa.youth.track.events:x:32217:32219::/home/pausat/mail/pausatf.org/pa.youth.track.events:/usr/local/cpanel/bin/jailshell
+pa.youth.field.events:x:32217:32219::/home/pausat/mail/pausatf.org/pa.youth.field.events:/usr/local/cpanel/bin/jailshell
+pa.youth.xc:x:32217:32219::/home/pausat/mail/pausatf.org/pa.youth.xc:/usr/local/cpanel/bin/jailshell
+pa.youth.records:x:32217:32219::/home/pausat/mail/pausatf.org/pa.youth.records:/usr/local/cpanel/bin/jailshell
+pa.youth.members:x:32217:32219::/home/pausat/mail/pausatf.org/pa.youth.members:/usr/local/cpanel/bin/jailshell
+pa.youth.officials:x:32217:32219::/home/pausat/mail/pausatf.org/pa.youth.officials:/usr/local/cpanel/bin/jailshell
+pa.youth.communications:x:32217:32219::/home/pausat/mail/pausatf.org/pa.youth.communications:/usr/local/cpanel/bin/jailshell
+pa.youth.multievents:x:32217:32219::/home/pausat/mail/pausatf.org/pa.youth.multievents:/usr/local/cpanel/bin/jailshell
+pa.youth.high.school:x:32217:32219::/home/pausat/mail/pausatf.org/pa.youth.high.school:/usr/local/cpanel/bin/jailshell
+pa.youth.race.walk:x:32217:32219::/home/pausat/mail/pausatf.org/pa.youth.race.walk:/usr/local/cpanel/bin/jailshell
+@
+
+
+1.14
+log
+@Modified by /usr/local/cpanel/cpanel .
+@
+text
+@d14 1
+@
+
+
+1.13
+log
+@Modified by /usr/local/cpanel/cpanel .
+@
+text
+@d13 1
+@
+
+
+1.12
+log
+@Modified by /usr/local/cpanel/cpanel .
+@
+text
+@d12 1
+@
+
+
+1.11
+log
+@Modified by /usr/local/cpanel/cpanel .
+@
+text
+@d11 1
+@
+
+
+1.10
+log
+@Modified by /usr/local/cpanel/cpanel .
+@
+text
+@d10 1
+@
+
+
+1.9
+log
+@Modified by /usr/local/cpanel/cpanel .
+@
+text
+@d9 1
+@
+
+
+1.8
+log
+@Modified by /usr/local/cpanel/cpanel .
+@
+text
+@d8 1
+@
+
+
+1.7
+log
+@Modified by /usr/local/cpanel/cpanel .
+@
+text
+@d7 1
+@
+
+
+1.6
+log
+@Modified by /usr/local/cpanel/cpanel .
+@
+text
+@d6 1
+@
+
+
+1.5
+log
+@Modified by /usr/local/cpanel/cpanel .
+@
+text
+@d5 1
+@
+
+
+1.4
+log
+@Modified by /usr/local/cpanel/cpanel .
+@
+text
+@d4 1
+@
+
+
+1.3
+log
+@Modified by /usr/local/cpanel/cpanel .
+@
+text
+@d3 1
+@
+
+
+1.2
+log
+@Modified by /usr/local/cpanel/cpanel .
+@
+text
+@d2 1
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1 1
+@

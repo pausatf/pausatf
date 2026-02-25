@@ -1,0 +1,51 @@
+Return-path: <darius352001@yahoo.com>
+Envelope-to: pa.youth.communications@pausatf.org
+Delivery-date: Tue, 17 May 2011 11:59:29 -0400
+Received: from nm16-vm0.bullet.mail.ac4.yahoo.com ([98.139.52.238])
+	by srv1.commondns.com with smtp (Exim 4.69)
+	(envelope-from <darius352001@yahoo.com>)
+	id 1QMMgD-0002QL-Bg
+	for pa.youth.communications@pausatf.org; Tue, 17 May 2011 11:59:29 -0400
+Received: from [98.139.52.192] by nm16.bullet.mail.ac4.yahoo.com with NNFMP; 17 May 2011 15:59:27 -0000
+Received: from [98.139.52.156] by tm5.bullet.mail.ac4.yahoo.com with NNFMP; 17 May 2011 15:59:27 -0000
+Received: from [127.0.0.1] by omp1039.mail.ac4.yahoo.com with NNFMP; 17 May 2011 15:59:27 -0000
+X-Yahoo-Newman-Property: ymail-3
+X-Yahoo-Newman-Id: 768056.25632.bm@omp1039.mail.ac4.yahoo.com
+Received: (qmail 51638 invoked by uid 60001); 17 May 2011 15:59:27 -0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s1024; t=1305647967; bh=uqdoiE9Sp2lPtoxLxAFxIEtBbDpmcXUCBIXTrgHqpUA=; h=Message-ID:X-YMail-OSG:Received:X-Mailer:Date:From:Subject:To:MIME-Version:Content-Type; b=wBDjWMiPkFEpkscdwSjvR41WhLPnKyRP2OYHUNJyqS93NUQMhxD4BK8clzU1tF3ZeRnHrsUMj52izTuxnMV1eqLOQaEzue3ZOIJT2W2Kl+YiL7GgdWFqsHpBaVEtueFhMDjLt7lnRyaX8/y9HWUOLTK17g+xj857FKOEXWPu9nA=
+DomainKey-Signature:a=rsa-sha1; q=dns; c=nofws;
+  s=s1024; d=yahoo.com;
+  h=Message-ID:X-YMail-OSG:Received:X-Mailer:Date:From:Subject:To:MIME-Version:Content-Type;
+  b=4f2rtlx9f2Im0TfF2QioGaqgGniYwNi5QRDHEG6qEk2V/lvEno/7qE7JNSJ6uhQVEpp4s8KeIX2LErYKy/08vafLIge+7CH+yGn1uIZb+3f82B0oa2bOa/MvJR5sWlmyuenD3s5wZHOAz4cSpRNbVRubrLy4Ggv3/Yb5nMzc1GE=;
+Message-ID: <45947.51480.qm@web32206.mail.mud.yahoo.com>
+X-YMail-OSG: qGGTfMwVM1ngBn1IFVzq5b05J4tKtZMQdaLtEeaw04.Z3mM
+ 5D6zWg_sPDVZF2G1dgbqbJBJP4AQQe.w8nmsCPUXwqqry3NHrhVhiH.PHbi0
+ fmGUA1bWqaGVjPZPvA0VKIC_4.dnlSkHm4J.J7x1tU5nXpvylnQL5CfSuoEh
+ YYrCyXfUVHBpFSel5DuWQ0ep32w7z1cGLKY.zyW7gHEc92K0j4VQROCg3HLF
+ KHmLoXtcPmE6KwCYJwN_uaqUwid1EnbD5bIm8tYj67dfm0BgjnLuFD3Gear5
+ DL7Eomg6dDT8HU5jKQs8YUM4KBuG0TihRsTi0Cocs23y39ZuAXfxGtfb7Igg
+ J6eypX9xs6r0LNsGNwlRFebEEMcZxvpW8bOwIG6osVUFT2of0MBNsXUpqk.I
+ vFWh2PCV86sVDjb71
+Received: from [76.103.69.103] by web32206.mail.mud.yahoo.com via HTTP; Tue, 17 May 2011 08:59:26 PDT
+X-Mailer: YahooMailRC/567 YahooMailWebService/0.8.111.303096
+Date: Tue, 17 May 2011 08:59:26 -0700 (PDT)
+From: darius strickland <darius352001@yahoo.com>
+Subject: Results
+To: pa.youth.communications@pausatf.org
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="0-754460708-1305647966=:51480"
+
+--0-754460708-1305647966=:51480
+Content-Type: text/plain; charset=us-ascii
+
+Can you send me the results for the East Bay Heat Club
+
+--0-754460708-1305647966=:51480
+Content-Type: text/html; charset=us-ascii
+
+<html><head><style type="text/css"><!-- DIV {margin:0px;} --></style></head><body><div style="font-family:times new roman,new york,times,serif;font-size:14pt;color:#000000;"><div>Can you send me the results for the East Bay Heat Club<br></div>
+
+
+
+</div></body></html>
+--0-754460708-1305647966=:51480--

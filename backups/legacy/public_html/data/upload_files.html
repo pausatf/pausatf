@@ -1,0 +1,21 @@
+<html>
+<head>
+<title>Upload files</title>
+</head>
+<body>
+	<p>Select file(s) to upload</p>
+	<form name="main" action="upload_files.php" method="post" enctype="multipart/form-data">
+	<div>
+		<label for="year">Enter race year (e.g. 2023):</label>
+		<input type="text" name="year" id="year" size="4" />
+	</div>
+	<div>
+		<label for="files">Select files to upload:</label>
+		<input type="file" name="files[]" id="files" multiple />
+	</div>
+	<div>
+		<input type="submit" name="treasure" value="Upload!">
+	</div>
+	</form>
+</body>
+</html>

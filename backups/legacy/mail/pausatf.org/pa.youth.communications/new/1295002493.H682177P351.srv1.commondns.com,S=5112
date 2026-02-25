@@ -1,0 +1,81 @@
+Return-path: <shadykhaliifa31@att.net>
+Envelope-to: pa.youth.communications@pausatf.org
+Delivery-date: Fri, 14 Jan 2011 05:54:53 -0500
+Received: from nm15.bullet.mail.ne1.yahoo.com ([98.138.90.78])
+	by srv1.commondns.com with smtp (Exim 4.69)
+	(envelope-from <shadykhaliifa31@att.net>)
+	id 1PdhIz-00005A-FE
+	for pa.youth.communications@pausatf.org; Fri, 14 Jan 2011 05:54:53 -0500
+Received: from [98.138.90.51] by nm15.bullet.mail.ne1.yahoo.com with NNFMP; 14 Jan 2011 10:54:51 -0000
+Received: from [98.138.89.174] by tm4.bullet.mail.ne1.yahoo.com with NNFMP; 14 Jan 2011 10:54:51 -0000
+Received: from [127.0.0.1] by omp1030.mail.ne1.yahoo.com with NNFMP; 14 Jan 2011 10:54:51 -0000
+X-Yahoo-Newman-Property: ymail-3
+X-Yahoo-Newman-Id: 557584.84644.bm@omp1030.mail.ne1.yahoo.com
+Received: (qmail 94064 invoked by uid 60001); 14 Jan 2011 10:54:50 -0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=att.net; s=s1024; t=1295002490; bh=K3MOco76r9d/1DUgdnBPDnClyW6sR0ojR4k4RB51IN4=; h=Message-ID:X-YMail-OSG:Received:X-Mailer:Date:From:Reply-To:Subject:To:MIME-Version:Content-Type; b=moS4W1jCf46tC+0mJEOl0tLyp0P5ZbLKZ+npSNWObXYCcKWVlhSeXPJ9kKWx51rTLcJrYjk10J0BgD9ktPDyROKYNunenVh4dDH4n65XXSf2VbUuQIwvg3WQWMIjMk70XKg7/vA6OrWaV31B8MLmhsHOB8g+qXyRCPTPJVznfHY=
+DomainKey-Signature:a=rsa-sha1; q=dns; c=nofws;
+  s=s1024; d=att.net;
+  h=Message-ID:X-YMail-OSG:Received:X-Mailer:Date:From:Reply-To:Subject:To:MIME-Version:Content-Type;
+  b=u62bbpEoR0qKS1iAY7A9iRjf9OXAeJJ8lPOWZ7IVptF91IJYR+LyQ2YRfsY6OhFBdDdH+X4gPsYRczhDBV+JqnmIxigT6C1X0Nozsu2Rophod4XUbCQjPiVOBsOai0dLseuPRkt2vljWJJWnJs7KChoIzV2JaD6nXkvjPHZYEz0=;
+Message-ID: <856875.93171.qm@web180208.mail.gq1.yahoo.com>
+X-YMail-OSG: WylyrLUVM1l8lNqfMSffCbRK_GF2tMo4UuE8yiNSv7_Y3DB
+ bYFQX0q4E8_6V1glgUgEPk4ruO6sYSLzWXnJUD0zz5vFlaINRza1V8EaDekD
+ C_FHS7FiQ2gUiaitGkSQgU.1ng.gmT72cs9oLkekK0.EuOR5.EhirdhWBw44
+ MXk7mcM9pJ6f_SE6AFRP4YtZhPian5wYD6m6625h9iZXTSExnXR8ipbEEJRi
+ hHjJCOvsLD9eKZP8kb3bRi4zWyeR_A28.VpExb1g3DtCag.gIHGb54lwOba.
+ 4LCGIoZpbPP4ZfKh_Io3WUkb6JaD3xl4mNtAPkY8pBLxbojrPGMj5ztMZYG5
+ _LVnJQUj_2tWURZyJ83SFEkljbJVzv9Z1nAouO_NIO6DVEOPElUXoj490CnD
+ M3xwvmVplt28IcKFraVdk8BHwNx7MJTp27SsnS3e0rpeOCl3P3pcMw5WCDG3
+ Yr5UX1aYnpmyfeR0vamuuX8Ow2cJqdfHvoko.4fc0f7vGNizsH0ZW_gJzfqw
+ auTyAipNDwHcSm9iiDp.RMTgbPi28ZO_4B_BoD5Wl8L7r.3D4l4I5WkwSMMH
+ ieZ8zCdl4n9D7PQ8nCdYz.K0uaII.EJvYvKVnDXvgqJ.rrnya8oWnsVgSRgH
+ XvLPmpce3JAsSkqjxyEfXYzpmzteIlEL.Q2aPpYKYXKyY7uU5R1t8nWkmqv1
+ 0by9w.6EzRlD2skIpCi6cpVN6bUN4rEGFlRIE._BBFLDuOxwWf90p0yun_s_
+ zBXZkhlF3m5372waphU.EH91KAHvp10PLoJPtlMX7bQs8D6hVPlegowSAA.r
+ zV4sTfgk.d8cyFG2ID7OBLTKedyygu1bf3XuZDrPlqdT7ujrD.xyjrTPcq97
+ J6B4mgygMoiBapZGwJhCjC3MKxk9FrXc-
+Received: from [196.207.254.241] by web180208.mail.gq1.yahoo.com via HTTP; Fri, 14 Jan 2011 02:54:50 PST
+X-Mailer: YahooMailClassic/11.4.20 YahooMailWebService/0.8.107.285259
+Date: Fri, 14 Jan 2011 02:54:50 -0800 (PST)
+From: shady usman <shadykhaliifa31@att.net>
+Reply-To: shady.usman@hotmail.com
+Subject: Hello my Dear
+To: undisclosed recipients: ;
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="0-433244560-1295002490=:93171"
+
+--0-433244560-1295002490=:93171
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+Hello my Dear
+How are you today, I hope all is well with you .I am sorry to worry you wit=
+h my Proposal for a relationship with you, but I know that you will grant m=
+y request in good=A0 sense and understanding, My name is Miss shady, i saw =
+your profile today in the internet and became intrested in you,i will also =
+like to know=A0 more about you. i'm hoping to hear from you soon,i will be =
+waiting to receive your lovely email to my mail box, so that I can send you=
+ more details about my self Including my picture.I believe we can move from=
+ here. Bear in mind that Love has no colors barrier, no educational back gr=
+ound barrier, no socio-economic Barrier, religious, language, nationality o=
+r distance barrier, the only important Thing is love.
+Yours Sincerely
+shady
+--0-433244560-1295002490=:93171
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+<table cellspacing=3D"0" cellpadding=3D"0" border=3D"0" ><tr><td valign=3D"=
+top" style=3D"font: inherit;"><span style=3D"font-weight: bold;">Hello my D=
+ear<br>How are you today, I hope all is well with you .I am sorry to worry =
+you with my Proposal for a relationship with you, but I know that you will =
+grant my request in good&nbsp; sense and understanding, My name is Miss sha=
+dy, i saw your profile today in the internet and became intrested in you,i =
+will also like to know&nbsp; more about you. i'm hoping to hear from you so=
+on,i will be waiting to receive your lovely email to my mail box, so that I=
+ can send you more details about my self Including my picture.I believe we =
+can move from here. Bear in mind that Love has no colors barrier, no educat=
+ional back ground barrier, no socio-economic Barrier, religious, language, =
+nationality or distance barrier, the only important Thing is love.<br>Yours=
+ Sincerely<br>shady</span></td></tr></table>
+--0-433244560-1295002490=:93171--

@@ -1,0 +1,58 @@
+Return-path: <ctrneditorial@gmail.com>
+Envelope-to: pa.youth.communications@pausatf.org
+Delivery-date: Mon, 02 Aug 2010 04:18:00 +0100
+Received: from mail-qy0-f170.google.com ([209.85.216.170])
+	by srv.commondns.com with esmtp (Exim 4.69)
+	(envelope-from <ctrneditorial@gmail.com>)
+	id 1OflXK-0007vu-Az
+	for pa.youth.communications@pausatf.org; Mon, 02 Aug 2010 04:17:59 +0100
+Received: by qyk1 with SMTP id 1so5141346qyk.8
+        for <pa.youth.communications@pausatf.org>; Sun, 01 Aug 2010 20:17:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=gamma;
+        h=domainkey-signature:mime-version:received:received:date:message-id
+         :subject:from:to:content-type;
+        bh=OrIOGm2OI0gMWek4X/G0eQ3Tx86GxqUmUVVc9dm+bk4=;
+        b=F29Zh5wY4EC/6CtA0/Ypwsbn60scnbQNWFzJSn3UloZfTtaMEg6eANUdrm3bmR8/+j
+         c6JZFNVMELeGi9uQBnEAG5BxGmzQCeF9WB5EaSO12vTz2LJBNCTQP435Kz2mRw4KQ9kJ
+         Vx2kQJzV2kpzAucP+PHRe2X83WOiPRIMr3XzY=
+DomainKey-Signature: a=rsa-sha1; c=nofws;
+        d=gmail.com; s=gamma;
+        h=mime-version:date:message-id:subject:from:to:content-type;
+        b=cnTDnWAXGosPGX00Qo5Uy3SbuRE9WTyhemhtdt0zKMeWh73ST8QBQHtN/gbPiHUcG+
+         sqVhtGa2H6CNNe+qq5/tZrBGm3QUzo19lm6SMy05VYunCnUmHxMJnzEC3qmdcWI3PmrJ
+         bSl5jQVrF5ZLuIHBfFO3FXkqZudhpqysiWb5k=
+MIME-Version: 1.0
+Received: by 10.220.60.204 with SMTP id q12mr3753169vch.185.1280719074182; 
+	Sun, 01 Aug 2010 20:17:54 -0700 (PDT)
+Received: by 10.220.187.194 with HTTP; Sun, 1 Aug 2010 20:17:54 -0700 (PDT)
+Date: Sun, 1 Aug 2010 22:17:54 -0500
+Message-ID: <AANLkTi=SVeFdzjs6+xEO-3vY0Qp_qW5oQzJarVhnAjSk@mail.gmail.com>
+Subject: CTRN Submission?
+From: Christine Johnson <ctrneditorial@gmail.com>
+To: "Hill, Alexander" <ahill@ebay.com>, "Hill, Alexander" <pa.youth.communications@pausatf.org>
+Content-Type: multipart/alternative; boundary=e0cb4e887865794f6b048ccea5d3
+
+--e0cb4e887865794f6b048ccea5d3
+Content-Type: text/plain; charset=ISO-8859-1
+
+Hi, Alex. I haven't received an article from you since we last spoke. Did I
+maybe miss it somehow?
+
+Thanks,
+Christine
+
+-- 
+Christine Johnson
+Group Editor
+Shooting Star Media, Inc.
+608-239-3787
+
+--e0cb4e887865794f6b048ccea5d3
+Content-Type: text/html; charset=ISO-8859-1
+
+Hi, Alex. I haven&#39;t received an article from you since we last spoke. Did I maybe miss it somehow?<div><br></div><div>Thanks,</div><div>Christine<br><div><br>-- <br>Christine Johnson<br>Group Editor<br>Shooting Star Media, Inc.<br>
+608-239-3787<br>
+</div></div>
+
+--e0cb4e887865794f6b048ccea5d3--
