@@ -16,18 +16,46 @@ jobs:
     permissions:
       contents: read
     steps:
+      - name: Check required secrets
+        id: check
+        env:
+          DO_TOKEN: ${{ secrets.DO_TOKEN }}
+          DROPLET_ID: ${{ secrets.DO_PROD_DROPLET_ID }}
+        run: |
+          set -euo pipefail
+          if [ -z "$DO_TOKEN" ] || [ -z "$DROPLET_ID" ]; then
+            echo "::warning::DO_TOKEN or DO_PROD_DROPLET_ID secret not configured. Skipping snapshot."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Install doctl
+        if: steps.check.outputs.skip != 'true'
         uses: digitalocean/action-doctl@5727c67aa3c2c34ae9462d5a0ecfea8a1b31e5ce  # v2
         with:
           token: ${{ secrets.DO_TOKEN }}
 
       - name: Snapshot prod droplet
+        if: steps.check.outputs.skip != 'true'
         env:
           DROPLET_ID: ${{ secrets.DO_PROD_DROPLET_ID }}
         run: |
-          if [ -z "$DROPLET_ID" ]; then
-            echo "DO_PROD_DROPLET_ID secret is required" >&2
-            exit 1
-          fi
+          set -euo pipefail
           doctl compute droplet-action snapshot "$DROPLET_ID" \
             --snapshot-name "prod-nightly-$(date -u +%Y%m%d-%H%M%S)"
+
+      - name: Prune old snapshots (keep last 7)
+        if: steps.check.outputs.skip != 'true'
+        env:
+          DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DO_TOKEN }}
+        run: |
+          # List all prod-nightly snapshots sorted by date, skip the 7 most recent
+          doctl compute snapshot list --resource droplet --format ID,Name --no-header \
+            | grep "^[0-9].*prod-nightly-" \
+            | sort -t- -k3 -k4 \
+            # NOTE: head -n -7 is a GNU coreutils extension (safe on ubuntu-latest runners)
+            | head -n -7 \
+            | awk '{print $1}' \
+            | while read -r snap_id; do
+                echo "Deleting snapshot $snap_id"
+                doctl compute snapshot delete "$snap_id" --force
+              done

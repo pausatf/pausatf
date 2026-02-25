@@ -35,6 +35,7 @@
     dest: /etc/apache2/cloudflare-ips-v4.txt
     mode: '0644'
   register: cf_ips_v4
+  when: web_server | default('apache') == 'apache'
   tags: cloudflare
 
 - name: Update Cloudflare IPv6 ranges
@@ -43,6 +44,7 @@
     dest: /etc/apache2/cloudflare-ips-v6.txt
     mode: '0644'
   register: cf_ips_v6
+  when: web_server | default('apache') == 'apache'
   tags: cloudflare
 
 - name: Verify Cloudflare zone is active
@@ -72,7 +74,6 @@
     body:
       value: "{{ cloudflare_ssl_mode }}"
   when: cloudflare_ssl_mode is defined
-  ignore_errors: yes
   tags: cloudflare
 
 - name: Ensure minimum TLS version
@@ -86,7 +87,6 @@
     body:
       value: "{{ cloudflare_min_tls_version }}"
   when: cloudflare_min_tls_version is defined
-  ignore_errors: yes
   tags: cloudflare
 
 - name: Ensure Always Use HTTPS is enabled
@@ -100,7 +100,6 @@
     body:
       value: "{{ 'on' if cloudflare_always_use_https else 'off' }}"
   when: cloudflare_always_use_https is defined
-  ignore_errors: yes
   tags: cloudflare
 
 - name: Set security level
@@ -114,7 +113,6 @@
     body:
       value: "{{ cloudflare_security_level }}"
   when: cloudflare_security_level is defined
-  ignore_errors: yes
   tags: cloudflare
 
 - name: Deploy Cloudflare IP update script

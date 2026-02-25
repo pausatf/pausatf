@@ -31,7 +31,7 @@ variable "droplet_size" {
 variable "droplet_image" {
   description = "Droplet image/snapshot"
   type        = string
-  default     = "ubuntu-22-04-x64"
+  default     = "ubuntu-24-04-x64"
 }
 
 variable "database_size" {
@@ -42,6 +42,12 @@ variable "database_size" {
 
 variable "ssh_key_fingerprints" {
   description = "List of SSH key fingerprints"
+  type        = list(string)
+  default     = []
+}
+
+variable "ssh_allowed_ips" {
+  description = "IP addresses allowed SSH access"
   type        = list(string)
   default     = []
 }

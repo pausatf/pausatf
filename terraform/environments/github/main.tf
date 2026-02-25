@@ -9,13 +9,7 @@ terraform {
   }
 
   backend "s3" {
-    bucket                      = "pausatf-terraform-state"
-    key                         = "github/terraform.tfstate"
-    region                      = "us-west-2"
-    endpoint                    = "sfo2.digitaloceanspaces.com"
-    skip_credentials_validation = true
-    skip_metadata_api_check     = true
-    skip_region_validation      = true
+    key = "github/terraform.tfstate"
   }
 }
 

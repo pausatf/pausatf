@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Nginx reverse proxy
   nginx:
@@ -17,8 +15,14 @@ services:
     networks:
       - web
     restart: unless-stopped
+    depends_on:
+      - wordpress
 
   # WordPress application
+  # NOTE: No database service is defined here. WordPress connects to an external
+  # managed database (DigitalOcean Managed MySQL). Set WORDPRESS_DB_HOST,
+  # WORDPRESS_DB_USER, WORDPRESS_DB_PASSWORD, and WORDPRESS_DB_NAME in the
+  # environment or a .env file before starting this stack.
   wordpress:
     build:
       context: ./wordpress
@@ -36,8 +40,6 @@ services:
     networks:
       - web
     restart: unless-stopped
-    depends_on:
-      - nginx
 
   # Prometheus monitoring
   prometheus:

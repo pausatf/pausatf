@@ -1,13 +1,4 @@
 ---
-fail2ban_enabled: true
+fail2ban_maxretry: 5
 fail2ban_bantime: 3600
 fail2ban_findtime: 600
-fail2ban_maxretry: 5
-fail2ban_destemail: "root@localhost"
-fail2ban_sendername: "Fail2Ban"
-fail2ban_mta: "sendmail"
-fail2ban_action: "%(action_mwl)s"
-fail2ban_jails:
-  - name: sshd
-    enabled: true
-web_server: "apache"

@@ -1,10 +1,11 @@
 ---
-cloudflare_enabled: true
-cloudflare_ssl_mode: "strict"
+cloudflare_enabled: false
+cloudflare_zone_id: ""
+cloudflare_api_token: ""
+cloudflare_zone: ""
+cloudflare_ssl_mode: "full"
 cloudflare_min_tls_version: "1.2"
-cloudflare_always_use_https: true
 cloudflare_security_level: "medium"
-cloudflare_waf_enabled: true
-cloudflare_manage_dns: false
+cloudflare_always_use_https: true
 cloudflare_purge_cache: false
-web_server: "apache"
+cloudflare_manage_dns: false

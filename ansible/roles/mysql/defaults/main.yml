@@ -1,5 +1,14 @@
 ---
-mysql_version: "8"
-mysql_port: 3306
-mysql_socket: "/var/run/mysqld/mysqld.sock"
 mysql_managed: false
+mysql_root_password: ""
+mysql_socket: /var/run/mysqld/mysqld.sock
+mysql_port: 3306
+mysql_bind_address: "127.0.0.1"
+mysql_datadir: "/var/lib/mysql"
+mysql_key_buffer_size: "16M"
+mysql_max_allowed_packet: "64M"
+mysql_thread_stack: "256K"
+mysql_thread_cache_size: 8
+mysql_expire_logs_days: 14
+mysql_max_binlog_size: "100M"
+wordpress_installs: []

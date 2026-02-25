@@ -3,8 +3,8 @@ variable "environment" {
   type        = string
 
   validation {
-    condition     = contains(["production", "staging", "development"], var.environment)
-    error_message = "Environment must be production, staging, or development."
+    condition     = contains(["production", "staging", "dev", "development"], var.environment)
+    error_message = "Environment must be production, staging, dev, or development."
   }
 }
 
@@ -86,4 +86,62 @@ variable "enable_monitoring" {
   description = "Enable DigitalOcean monitoring agent"
   type        = bool
   default     = true
+}
+
+variable "create_reserved_ip" {
+  description = "Create a reserved IP in the stack module. Set false if the environment manages its own."
+  type        = bool
+  default     = true
+}
+
+variable "create_vpc" {
+  description = "Create a VPC. Set false to use default networking."
+  type        = bool
+  default     = true
+}
+
+variable "vpc_uuid_override" {
+  description = "Use an existing VPC UUID instead of creating one. Only used when create_vpc is false."
+  type        = string
+  default     = null
+}
+
+variable "firewall_http_source_cidrs" {
+  description = "Source CIDRs for HTTP/HTTPS inbound rules. Defaults to Cloudflare IPs."
+  type        = list(string)
+  default     = null
+}
+
+variable "enable_monitoring_alerts" {
+  description = "Create DigitalOcean monitoring alerts."
+  type        = bool
+  default     = true
+}
+
+variable "ssh_allowed_ips" {
+  description = "IPs allowed SSH access via firewall. Empty list means no SSH rule."
+  type        = list(string)
+  default     = []
+}
+
+variable "extra_firewall_rules" {
+  description = "Additional inbound firewall rules."
+  type = list(object({
+    protocol         = string
+    port_range       = string
+    source_addresses = list(string)
+  }))
+  default = []
+}
+
+variable "databases" {
+  description = "List of databases to create in the managed cluster."
+  type        = list(string)
+  default     = ["wordpress"]
+}
+
+variable "database_users" {
+  description = "List of database users to create."
+  type        = list(string)
+  default     = ["wordpress"]
 }

@@ -6,20 +6,13 @@ on:
       - main
   workflow_dispatch:
 
-permissions:
-  contents: read
-
 jobs:
   deploy:
     uses: ./.github/workflows/deploy.yml
     with:
       environment: production
       ansible_limit: production
-      healthcheck_cmd: |
-        ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new \
-          -o IdentitiesOnly=yes \
-          github-deploy@ftp.pausatf.org \
-          "curl -fsS -o /dev/null -w '%{http_code}' http://localhost/ | grep -qE '^(200|301|302)'"
+      healthcheck_host: "github-deploy@ftp.pausatf.org"
     secrets:
       SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
       ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
