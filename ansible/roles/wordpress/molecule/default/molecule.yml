@@ -25,5 +25,7 @@ provisioner:
         ansible_user: root
         wordpress_enabled: true
         environment: staging
+        mysql_managed: true
+        web_server: 'openlitespeed'
 verifier:
   name: ansible
