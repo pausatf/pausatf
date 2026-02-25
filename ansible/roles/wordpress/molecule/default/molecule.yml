@@ -5,15 +5,12 @@ driver:
   name: docker
 platforms:
   - name: wordpress-ubuntu
-    image: ubuntu:24.04
+    image: geerlingguy/docker-ubuntu2404-ansible:latest
     pre_build_image: true
     privileged: true
-    command: /sbin/init
     volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    tmpfs:
-      - /run
-      - /tmp
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
 provisioner:
   name: ansible
   config_options:

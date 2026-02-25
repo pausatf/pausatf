@@ -74,7 +74,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
 
       - name: Run tfsec
-        uses: aquasecurity/tfsec-action@b842aa8571b0120b60891e9fcab20ab5ed5bf26e  # v1.0.3
+        uses: aquasecurity/tfsec-action@b466648d6e39e7c75324f25d83891162a721f2d6  # v1.0.3
         with:
           working_directory: terraform
           soft_fail: false
