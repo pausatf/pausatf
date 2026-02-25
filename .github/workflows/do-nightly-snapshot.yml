@@ -49,10 +49,10 @@ jobs:
           DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DO_TOKEN }}
         run: |
           # List all prod-nightly snapshots sorted by date, skip the 7 most recent
+          # head -n -7 is a GNU coreutils extension; safe on ubuntu-latest runners
           doctl compute snapshot list --resource droplet --format ID,Name --no-header \
             | grep "^[0-9].*prod-nightly-" \
             | sort -t- -k3 -k4 \
-            # NOTE: head -n -7 is a GNU coreutils extension (safe on ubuntu-latest runners)
             | head -n -7 \
             | awk '{print $1}' \
             | while read -r snap_id; do
