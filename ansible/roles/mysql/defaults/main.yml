@@ -1,0 +1,5 @@
+---
+mysql_version: "8"
+mysql_port: 3306
+mysql_socket: "/var/run/mysqld/mysqld.sock"
+mysql_managed: false

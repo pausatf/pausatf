@@ -1,0 +1,10 @@
+---
+cloudflare_enabled: true
+cloudflare_ssl_mode: "strict"
+cloudflare_min_tls_version: "1.2"
+cloudflare_always_use_https: true
+cloudflare_security_level: "medium"
+cloudflare_waf_enabled: true
+cloudflare_manage_dns: false
+cloudflare_purge_cache: false
+web_server: "apache"

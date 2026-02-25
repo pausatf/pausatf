@@ -1,0 +1,9 @@
+---
+backup_enabled: true
+backup_retention_days: 30
+backup_destination: "/var/backups/wordpress"
+backup_schedule: "0 2 * * *"
+backup_items: []
+monit_enabled: true
+monit_check_interval: 120
+monit_start_delay: 240

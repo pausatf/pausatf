@@ -1,0 +1,41 @@
+---
+apache_service_name: apache2
+apache_user: www-data
+apache_group: www-data
+apache_listen_port: 80
+apache_listen_port_ssl: 443
+apache_server_admin: "webmaster@localhost"
+apache_server_name: "localhost"
+apache_conf_dir: "/etc/apache2"
+apache_mpm: "event"
+apache_mpm_prefork:
+  start_servers: 5
+  min_spare_servers: 5
+  max_spare_servers: 8
+  max_request_workers: 256
+  max_connections_per_child: 0
+apache_modules:
+  - access_compat
+  - alias
+  - auth_basic
+  - authn_core
+  - authn_file
+  - authz_core
+  - authz_host
+  - authz_user
+  - autoindex
+  - deflate
+  - dir
+  - env
+  - expires
+  - filter
+  - headers
+  - mime
+  - negotiation
+  - remoteip
+  - reqtimeout
+  - rewrite
+  - setenvif
+  - socache_shmcb
+  - ssl
+  - status
