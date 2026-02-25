@@ -14,12 +14,12 @@
     - role: wordpress
 
   post_tasks:
-    - name: Ensure Nginx is started for tests
+    - name: Ensure OpenLiteSpeed is started for tests
       service:
-        name: nginx
+        name: lsws
         state: started
 
-    - name: Ensure PHP-FPM is started for tests
+    - name: Ensure LSPHP-FPM is started for tests
       service:
-        name: php8.3-fpm
+        name: lsphp83-fpm
         state: started
