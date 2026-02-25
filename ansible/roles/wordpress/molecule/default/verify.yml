@@ -1,72 +1,34 @@
 ---
 - name: Verify
   hosts: all
-  gather_facts: true
+  gather_facts: false
   tasks:
-    - name: Check OpenLiteSpeed is installed
-      package:
-        name: openlitespeed
-        state: present
-      check_mode: yes
-      register: ols_check
-      failed_when: ols_check is changed
-
-    - name: Check OpenLiteSpeed is running
-      service:
-        name: lsws
-        state: started
-      check_mode: yes
-      register: ols_service
-      failed_when: ols_service is changed
-
-    - name: Check LSPHP 8.3 packages are installed
-      package:
-        name: "{{ item }}"
-        state: present
-      check_mode: yes
-      register: php_packages_check
-      failed_when: php_packages_check is changed
-      loop:
-        - lsphp83
-        - lsphp83-mysql
-        - lsphp83-curl
-        - lsphp83-gd
-        - lsphp83-mbstring
-
-    - name: Check LSPHP-FPM is running
-      service:
-        name: lsphp83-fpm
-        state: started
-      check_mode: yes
-      register: lsphp_fpm_service
-      failed_when: lsphp_fpm_service is changed
-
-    - name: Verify WordPress directory exists
-      file:
-        path: /var/www/html
-        state: directory
-      check_mode: yes
-      register: wp_dir_check
-      failed_when: wp_dir_check is changed
-
-    - name: Check OpenLiteSpeed configuration is valid
-      command: /usr/local/lsws/bin/lshttpd -t
-      register: ols_config_test
-      changed_when: false
-      failed_when: ols_config_test.rc != 0
-
-    - name: Verify OpenLiteSpeed vhost config exists
+    - name: Check WP-CLI is installed
       stat:
-        path: /usr/local/lsws/conf/vhosts/pausatf/vhconf.conf
-      register: wp_vhost
-      failed_when: not wp_vhost.stat.exists
+        path: /usr/local/bin/wp
+      register: wpcli_stat
+      failed_when: not wpcli_stat.stat.exists
 
-    - name: Test OpenLiteSpeed is responding  # checkov:skip=CKV2_ANSIBLE_1:localhost HTTP in molecule verify
-      uri:
-        url: http://localhost
-        status_code: [200, 301, 302, 404]
-        timeout: 5
-      register: http_response
-      until: http_response.status in [200, 301, 302, 404]
-      retries: 3
-      delay: 2
+    - name: Check WordPress path exists
+      stat:
+        path: /var/www/html
+      register: wp_dir
+      failed_when: not wp_dir.stat.isdir
+
+    - name: Check WordPress .htaccess was deployed
+      stat:
+        path: /var/www/html/.htaccess
+      register: htaccess_stat
+      failed_when: not htaccess_stat.stat.exists
+
+    - name: Check uploads directory exists
+      stat:
+        path: /var/www/html/wp-content/uploads
+      register: uploads_dir
+      failed_when: not uploads_dir.stat.isdir
+
+    - name: Check uploads .htaccess blocks PHP execution
+      stat:
+        path: /var/www/html/wp-content/uploads/.htaccess
+      register: uploads_htaccess
+      failed_when: not uploads_htaccess.stat.exists

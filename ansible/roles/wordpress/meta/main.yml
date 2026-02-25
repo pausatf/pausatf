@@ -1,4 +1,12 @@
 ---
+galaxy_info:
+  role_name: wordpress
+  namespace: pausatf
+  author: pausatf
+  description: WordPress installation and configuration for PAUSATF
+  license: MIT
+  min_ansible_version: "2.17"
+
 dependencies:
   - role: mysql
     when: not (mysql_managed | default(false))
