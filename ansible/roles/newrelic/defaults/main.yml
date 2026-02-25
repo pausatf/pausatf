@@ -1,0 +1,4 @@
+---
+newrelic_enabled: true
+newrelic_app_name: "WordPress"
+php_version: "8.3"
