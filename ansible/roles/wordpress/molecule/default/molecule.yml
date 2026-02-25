@@ -26,7 +26,7 @@ provisioner:
         wordpress_enabled: true
         environment: staging
         mysql_managed: true
-        web_server: 'openlitespeed'
+        web_server: 'nginx'
         wpcli_update_plugins: false
         wpcli_update_themes: false
         wordpress_installs:
