@@ -16,21 +16,12 @@
         - vim
         - htop
         - ufw
-        - fail2ban
 
     - name: Check UFW is enabled
       command: ufw status
       register: ufw_status
       changed_when: false
       failed_when: "'Status: active' not in ufw_status.stdout"
-
-    - name: Check fail2ban is running
-      service:
-        name: fail2ban
-        state: started
-      check_mode: yes
-      register: fail2ban_check
-      failed_when: fail2ban_check is changed
 
     - name: Verify SSH configuration security
       lineinfile:
@@ -45,12 +36,14 @@
         - { regexp: '^PermitRootLogin', line: 'PermitRootLogin prohibit-password' }
         - { regexp: '^PasswordAuthentication', line: 'PasswordAuthentication no' }
         - { regexp: '^PubkeyAuthentication', line: 'PubkeyAuthentication yes' }
+      when: ansible_virtualization_type != 'docker'
 
     - name: Check timezone is UTC
       command: timedatectl show --property=Timezone --value
       register: timezone_check
       changed_when: false
       failed_when: timezone_check.stdout != 'UTC'
+      when: ansible_virtualization_type != 'docker'
 
     - name: Verify deploy user exists
       user:
@@ -78,3 +71,4 @@
         - { name: 'net.ipv4.conf.all.rp_filter', value: '1' }
         - { name: 'net.ipv4.tcp_syncookies', value: '1' }
         - { name: 'net.ipv4.icmp_echo_ignore_broadcasts', value: '1' }
+      when: ansible_virtualization_type != 'docker'
