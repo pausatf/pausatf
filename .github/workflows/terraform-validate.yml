@@ -82,7 +82,7 @@ jobs:
           additional_args: --concise-output --out results.sarif
 
       - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@4f3212b61783c3c68e8309a0f18842c009e7c1c0  # v4
+        uses: github/codeql-action/upload-sarif@45580472a5bb82c4681c4ac726cfdb60060c2ee1  # v3
         if: always()
         with:
           sarif_file: terraform/results.sarif
