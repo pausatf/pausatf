@@ -3,6 +3,9 @@ name: Capture Prod WP Inventory
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   capture:
     runs-on: ubuntu-latest

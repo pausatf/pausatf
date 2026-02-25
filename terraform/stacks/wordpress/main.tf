@@ -55,6 +55,7 @@ resource "digitalocean_reserved_ip_assignment" "this" {
 # Droplet
 #tfsec:ignore:digitalocean-compute-use-ssh-keys
 resource "digitalocean_droplet" "this" {
+  #checkov:skip=CKV_DIO_2:ssh_keys wired via var.ssh_key_fingerprints
   name   = "pausatf-${var.environment}"
   region = var.region
   size   = var.droplet_size

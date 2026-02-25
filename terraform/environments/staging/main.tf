@@ -38,7 +38,7 @@ module "wordpress" {
   enable_backups           = false
   enable_monitoring        = true
   create_reserved_ip       = false
-  create_vpc = false  # staging uses default networking; no VPC isolation
+  create_vpc               = false # staging uses default networking; no VPC isolation
   enable_monitoring_alerts = false
 
   # Staging uses open firewall (not CF-only)

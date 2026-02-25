@@ -125,3 +125,8 @@
         regexp: "^#?long_query_time"
         line: "long_query_time = 2"
       notify: Restart MySQL
+
+  rescue:
+    - name: MySQL setup failed
+      fail:
+        msg: "MySQL setup failed. Review the task output above for details."
