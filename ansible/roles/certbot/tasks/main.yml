@@ -24,19 +24,24 @@
     group: root
     mode: '0600'
 
+- name: Check if certificate already exists
+  stat:
+    path: "/etc/letsencrypt/live/{{ certbot_domains[0] }}/fullchain.pem"
+  register: certbot_cert_exists
+
 - name: Obtain SSL certificate via DNS-01 challenge
   command: >
     certbot certonly
     --dns-cloudflare
     --dns-cloudflare-credentials /etc/letsencrypt/cloudflare.ini
-    -d pausatf.org
-    -d www.pausatf.org
+    {{ certbot_domains | map('regex_replace', '^', '-d ') | join(' ') }}
     --non-interactive
     --agree-tos
     -m "{{ certbot_email }}"
     --keep-until-expiring
   register: certbot_result
   changed_when: "'Certificate not yet due for renewal' not in certbot_result.stdout"
+  when: not certbot_cert_exists.stat.exists
 
 - name: Ensure certbot systemd timer is enabled
   systemd:
@@ -44,12 +49,12 @@
     state: started
     enabled: yes
 
-- name: Deploy post-renewal hook to reload Apache
+- name: Deploy post-renewal hook to reload web server
   copy:
-    dest: /etc/letsencrypt/renewal-hooks/deploy/reload-apache.sh
+    dest: /etc/letsencrypt/renewal-hooks/deploy/reload-webserver.sh
     content: |
       #!/bin/bash
-      systemctl reload apache2
+      systemctl reload {{ 'apache2' if web_server | default('apache') == 'apache' else 'lsws' }}
     owner: root
     group: root
     mode: '0755'

@@ -14,8 +14,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Enqueue scripts and styles for the theme
  */
 function thesource_child_enqueue_scripts() {
-    // Static version string for cache busting; increment on asset changes.
-    $version = '1.1.0';
+    // Use static version for proper browser caching
+    // Increment version when making changes to CSS/JS files
+    $version = '1.2.0';
 
     // Enqueue parent theme's style.css
     wp_enqueue_style( 'parent-style', get_template_directory_uri() . '/style.css' );
@@ -27,8 +28,7 @@ function thesource_child_enqueue_scripts() {
     wp_enqueue_style( 'red-style', get_stylesheet_directory_uri() . '/style-Red.css', array( 'child-dropdown' ), $version );
 
     // Add browser-specific CSS
-    // PHP 8.1+: FILTER_SANITIZE_STRING is deprecated, use FILTER_SANITIZE_FULL_SPECIAL_CHARS or htmlspecialchars
-    $user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? htmlspecialchars( $_SERVER['HTTP_USER_AGENT'], ENT_QUOTES, 'UTF-8' ) : '';
+    $user_agent = filter_input( INPUT_SERVER, 'HTTP_USER_AGENT' );
 
     if ( $user_agent && false !== strpos( $user_agent, 'Chrome' ) ) {
         wp_enqueue_style( 'chrome-fixes', get_stylesheet_directory_uri() . '/chrome-fixes.css', array( 'child-dropdown' ), $version );
@@ -74,8 +74,7 @@ add_action( 'wp_enqueue_scripts', 'thesource_child_enqueue_scripts', 999 );
  * @return array Modified body classes
  */
 function thesource_child_browser_body_class( $classes ) {
-    // PHP 8.1+: FILTER_SANITIZE_STRING is deprecated
-    $user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? htmlspecialchars( $_SERVER['HTTP_USER_AGENT'], ENT_QUOTES, 'UTF-8' ) : '';
+    $user_agent = filter_input( INPUT_SERVER, 'HTTP_USER_AGENT' );
 
     if ( ! $user_agent ) {
         return $classes;
@@ -96,3 +95,48 @@ function thesource_child_browser_body_class( $classes ) {
     return $classes;
 }
 add_filter( 'body_class', 'thesource_child_browser_body_class' );
+
+/**
+ * Register social media link controls in the Customizer.
+ * Allows Cynci to update URLs via Appearance → Customize → Social Media Links.
+ *
+ * @param WP_Customize_Manager $wp_customize Customizer instance.
+ */
+function pausatf_social_customize_register( WP_Customize_Manager $wp_customize ) {
+    $wp_customize->add_section(
+        'pausatf_social',
+        [
+            'title'    => __( 'Social Media Links', 'TheSource' ),
+            'priority' => 30,
+        ]
+    );
+
+    $controls = [
+        'pausatf_social_facebook' => [
+            'label'   => __( 'Facebook URL', 'TheSource' ),
+            'default' => 'https://www.facebook.com/pausatf',
+        ],
+        'pausatf_social_instagram' => [
+            'label'   => __( 'Instagram URL', 'TheSource' ),
+            'default' => 'https://www.instagram.com/usatfpacificassoc/',
+        ],
+        'pausatf_social_youtube' => [
+            'label'   => __( 'YouTube URL (leave blank to hide)', 'TheSource' ),
+            'default' => 'https://www.youtube.com/channel/UC4UDU5_ALy26O1vU6rAOjjA',
+        ],
+    ];
+
+    foreach ( $controls as $id => $args ) {
+        $wp_customize->add_setting( $id, [
+            'default'           => $args['default'],
+            'sanitize_callback' => 'esc_url_raw',
+            'transport'         => 'refresh',
+        ] );
+        $wp_customize->add_control( $id, [
+            'label'   => $args['label'],
+            'section' => 'pausatf_social',
+            'type'    => 'url',
+        ] );
+    }
+}
+add_action( 'customize_register', 'pausatf_social_customize_register' );

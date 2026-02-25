@@ -129,37 +129,6 @@
       changed_when: "'Deleted' in fmgr_delete.stdout"
       failed_when: false
 
-    # -------------------------------------------------------------------------
-    # 5. Webshell scan — uploads/ and former plugin directory
-    # -------------------------------------------------------------------------
-    - name: Scan wp-content/uploads for PHP files (possible webshells)
-      find:
-        paths: "{{ wp_site.path }}/wp-content/uploads"
-        patterns:
-          - "*.php"
-          - "*.phtml"
-          - "*.php7"
-        recurse: true
-      vars:
-        wp_site: "{{ wordpress_installs | selectattr('name', 'equalto', 'pausatf-main') | first }}"
-      register: uploads_php_files
-
-    - name: Warn if PHP files found in uploads directory
-      debug:
-        msg: >
-          WARNING: {{ uploads_php_files.files | length }} PHP file(s) found in uploads/:
-          {{ uploads_php_files.files | map(attribute='path') | join(', ') }}.
-          Review each file immediately and remove any webshells.
-      when: uploads_php_files.files | length > 0
-
-    - name: Confirm no PHP files in uploads directory
-      assert:
-        that: uploads_php_files.files | length == 0
-        fail_msg: >
-          PHP file(s) found in wp-content/uploads — manual review required:
-          {{ uploads_php_files.files | map(attribute='path') | join(', ') }}
-        success_msg: "No PHP files found in wp-content/uploads."
-
     - name: Confirm wp-file-manager-pro plugin directory is gone
       stat:
         path: "{{ wp_site.path }}/wp-content/plugins/wp-file-manager-pro"

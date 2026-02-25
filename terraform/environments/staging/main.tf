@@ -13,13 +13,7 @@ terraform {
   }
 
   backend "s3" {
-    # DigitalOcean Spaces backend
-    endpoint                    = "sfo2.digitaloceanspaces.com"
-    region                      = "us-west-1"
-    bucket                      = "pausatf-terraform-state"
-    key                         = "staging/terraform.tfstate"
-    skip_credentials_validation = true
-    skip_metadata_api_check     = true
+    key = "staging/terraform.tfstate"
   }
 }
 
@@ -31,129 +25,44 @@ provider "cloudflare" {
   api_token = var.cloudflare_api_token
 }
 
-# Staging Droplet
-#tfsec:ignore:digitalocean-compute-use-ssh-keys
-resource "digitalocean_droplet" "staging" {
-  #checkov:skip=CKV_DIO_2:staging uses cloud-init SSH configuration; no static key required
-  name   = "pausatf-stage"
-  region = var.region
-  size   = var.droplet_size
-  image  = var.droplet_image
+# WordPress stack — shared module for environment parity with production
+module "wordpress" {
+  source = "../../stacks/wordpress"
 
-  tags = [
-    "pausatf",
-    "staging",
-    "web",
-    "wordpress"
+  environment              = "staging"
+  region                   = var.region
+  droplet_size             = var.droplet_size
+  droplet_image            = var.droplet_image
+  database_size            = var.database_size
+  ssh_key_fingerprints     = var.ssh_key_fingerprints
+  enable_backups           = false
+  enable_monitoring        = true
+  create_reserved_ip       = false
+  create_vpc               = false # staging uses default networking; no VPC isolation
+  enable_monitoring_alerts = false
+
+  # Staging uses open firewall (not CF-only)
+  firewall_http_source_cidrs = ["0.0.0.0/0", "::/0"]
+  ssh_allowed_ips            = var.ssh_allowed_ips
+
+  # OLS WebAdmin port
+  extra_firewall_rules = [
+    {
+      protocol         = "tcp"
+      port_range       = "7080"
+      source_addresses = var.ssh_allowed_ips
+    }
   ]
 
-  monitoring = true
-  ipv6       = false
-  backups    = false # No backups for staging to save costs
-
-  ssh_keys = var.ssh_key_fingerprints
-
-  user_data = templatefile("${path.module}/../../modules/droplet/cloud-init-openlitespeed.yml", {
+  cloud_init_content = templatefile("${path.module}/../../modules/droplet/cloud-init-openlitespeed.yml", {
     environment = "staging"
     hostname    = "stage"
   })
 }
 
-# Staging Database
-resource "digitalocean_database_cluster" "staging" {
-  name       = "pausatf-stage-db"
-  engine     = "mysql"
-  version    = "8"
-  size       = var.database_size
-  region     = var.region
-  node_count = 1
-
-  tags = [
-    "pausatf",
-    "staging",
-    "database"
-  ]
-
-  maintenance_window {
-    day  = "saturday"
-    hour = "02:00:00"
-  }
-}
-
-resource "digitalocean_database_firewall" "staging" {
-  cluster_id = digitalocean_database_cluster.staging.id
-
-  rule {
-    type  = "droplet"
-    value = digitalocean_droplet.staging.id
-  }
-}
-
-# VPC for Staging
-# Note: Currently using default VPC
-# Uncomment below if custom VPC is needed
-#
-# resource "digitalocean_vpc" "staging" {
-#   name     = "pausatf-staging-vpc"
-#   region   = var.region
-#   ip_range = "10.20.0.0/16"
-#
-#   description = "Staging VPC for PAUSATF infrastructure"
-# }
-
-# Firewall for Staging
-#tfsec:ignore:digitalocean-compute-no-public-ingress
-#tfsec:ignore:digitalocean-compute-no-public-egress
-resource "digitalocean_firewall" "staging" {
-  #checkov:skip=CKV_DIO_4:staging firewall mirrors dev; tightened before production promotion
-  name = "pausatf-staging-firewall"
-
-  droplet_ids = [digitalocean_droplet.staging.id]
-
-  # HTTP
-  inbound_rule {
-    protocol         = "tcp"
-    port_range       = "80"
-    source_addresses = ["0.0.0.0/0", "::/0"]
-  }
-
-  # HTTPS
-  inbound_rule {
-    protocol         = "tcp"
-    port_range       = "443"
-    source_addresses = ["0.0.0.0/0", "::/0"]
-  }
-
-  # SSH (restricted)
-  inbound_rule {
-    protocol         = "tcp"
-    port_range       = "22"
-    source_addresses = var.ssh_allowed_ips
-  }
-
-  # OpenLiteSpeed WebAdmin
-  inbound_rule {
-    protocol         = "tcp"
-    port_range       = "7080"
-    source_addresses = ["0.0.0.0/0", "::/0"]
-  }
-
-  # Allow all outbound
-  outbound_rule {
-    protocol              = "tcp"
-    port_range            = "1-65535"
-    destination_addresses = ["0.0.0.0/0", "::/0"]
-  }
-
-  outbound_rule {
-    protocol              = "udp"
-    port_range            = "1-65535"
-    destination_addresses = ["0.0.0.0/0", "::/0"]
-  }
-
-  tags = ["staging"]
-}
-
+# NOTE: stage.pausatf.org A record is also managed by the cloudflare environment.
+# If both environments are applied, the last apply wins. Consider removing this
+# module and managing all DNS centrally in the cloudflare environment.
 # Cloudflare DNS for staging
 module "cloudflare_dns_staging" {
   source  = "../../modules/cloudflare/dns"
@@ -163,10 +72,31 @@ module "cloudflare_dns_staging" {
     {
       name    = "stage"
       type    = "A"
-      value   = digitalocean_droplet.staging.ipv4_address
+      value   = module.wordpress.droplet_ip
       ttl     = 1
       proxied = true
       comment = "Staging web droplet"
     }
   ]
+}
+
+# State migration — zero-recreation move from inline resources to stack module
+moved {
+  from = digitalocean_droplet.staging
+  to   = module.wordpress.digitalocean_droplet.this
+}
+
+moved {
+  from = digitalocean_firewall.staging
+  to   = module.wordpress.digitalocean_firewall.this
+}
+
+moved {
+  from = digitalocean_database_cluster.staging
+  to   = module.wordpress.module.database.digitalocean_database_cluster.this
+}
+
+moved {
+  from = digitalocean_database_firewall.staging
+  to   = module.wordpress.module.database.digitalocean_database_firewall.this[0]
 }

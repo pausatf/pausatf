@@ -1,6 +1,6 @@
 output "reserved_ip_address" {
   description = "Reserved IP address for this environment"
-  value       = digitalocean_reserved_ip.this.ip_address
+  value       = var.create_reserved_ip ? digitalocean_reserved_ip.this[0].ip_address : null
 }
 
 output "droplet_id" {
@@ -53,7 +53,7 @@ output "database_urn" {
 
 output "vpc_id" {
   description = "VPC ID"
-  value       = digitalocean_vpc.this.id
+  value       = var.create_vpc ? digitalocean_vpc.this[0].id : var.vpc_uuid_override
 }
 
 output "firewall_id" {

@@ -43,7 +43,13 @@ define( 'WP_MAX_MEMORY_LIMIT', '{{ wp_site.wp_max_memory_limit | default(wordpre
 define( 'WP_CACHE', true );
 
 // ** WordPress Auto-Updates ** //
-define( 'WP_AUTO_UPDATE_CORE', {{ wp_site.auto_update_core | default('"minor"') }} );
+{% if wp_site.auto_update_core | default('minor') is sameas true %}
+define( 'WP_AUTO_UPDATE_CORE', true );
+{% elif wp_site.auto_update_core | default('minor') is sameas false %}
+define( 'WP_AUTO_UPDATE_CORE', false );
+{% else %}
+define( 'WP_AUTO_UPDATE_CORE', '{{ wp_site.auto_update_core | default("minor") }}' );
+{% endif %}
 
 // ** WordPress Content Directory ** //
 define( 'WP_CONTENT_DIR', dirname(__FILE__) . '/wp-content' );

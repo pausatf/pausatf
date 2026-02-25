@@ -8,7 +8,7 @@
 set -euo pipefail
 
 # Configuration
-WP_PATH="{{ item.path }}"
+WP_PATH="{{ wp_site.path }}"
 WP_USER="{{ apache_user }}"
 WP_CLI="{{ wpcli_path }}"
 LOG_FILE="/var/log/wordpress-updates.log"
@@ -19,7 +19,7 @@ EXCLUDE_PLUGINS=({% for plugin in wpcli_exclude_plugins | default([]) %}"{{ plug
 EXCLUDE_THEMES=({% for theme in wpcli_exclude_themes | default([]) %}"{{ theme }}" {% endfor %})
 
 log() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') [{{ item.domain }}] $1" >> "$LOG_FILE"
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [{{ wp_site.domain }}] $1" >> "$LOG_FILE"
 }
 
 # Check if already running
@@ -50,9 +50,9 @@ fi
 CURRENT_WP=$(wp_cmd core version)
 log "Current WordPress version: $CURRENT_WP"
 
-{% if item.auto_update_core | default(false) %}
+{% if wp_site.auto_update_core | default(false) %}
 # Update WordPress Core
-{% if item.auto_update_core == "minor" %}
+{% if wp_site.auto_update_core == "minor" %}
 log "Checking for minor core updates..."
 if wp_cmd core check-update --minor 2>/dev/null | grep -q "version"; then
     log "Minor update available, applying..."

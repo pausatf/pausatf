@@ -13,13 +13,7 @@ terraform {
   }
 
   backend "s3" {
-    # DigitalOcean Spaces backend
-    endpoint                    = "sfo2.digitaloceanspaces.com"
-    region                      = "us-west-1" # Dummy region for DO Spaces
-    bucket                      = "pausatf-terraform-state"
-    key                         = "production/terraform.tfstate"
-    skip_credentials_validation = true
-    skip_metadata_api_check     = true
+    key = "production/terraform.tfstate"
   }
 }
 
@@ -70,6 +64,8 @@ module "wordpress" {
     environment = "production"
     hostname    = "pausatf-prod"
   })
+
+  create_reserved_ip = false
 }
 
 # Alias for reserved IP (project resource reference needs direct resource)
@@ -121,4 +117,14 @@ moved {
 moved {
   from = digitalocean_monitor_alert.disk_high
   to   = module.wordpress.digitalocean_monitor_alert.disk_high
+}
+
+moved {
+  from = module.wordpress.digitalocean_reserved_ip.this[0]
+  to   = digitalocean_reserved_ip.production
+}
+
+moved {
+  from = module.wordpress.digitalocean_reserved_ip_assignment.this[0]
+  to   = digitalocean_reserved_ip_assignment.production
 }

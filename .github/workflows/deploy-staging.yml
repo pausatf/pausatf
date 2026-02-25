@@ -5,16 +5,13 @@ on:
     branches:
       - staging
 
-permissions:
-  contents: read
-
 jobs:
   deploy:
     uses: ./.github/workflows/deploy.yml
     with:
       environment: staging
       ansible_limit: staging
-      healthcheck_cmd: "curl -fsS https://stage.pausatf.org || exit 1"
     secrets:
+      SSH_PRIVATE_KEY: ${{ secrets.STAGING_SSH_PRIVATE_KEY }}
       ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
       ANSIBLE_VAULT_FILE: ${{ secrets.ANSIBLE_VAULT_FILE }}

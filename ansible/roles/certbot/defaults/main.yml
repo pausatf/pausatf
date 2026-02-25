@@ -1,0 +1,6 @@
+---
+certbot_enabled: false
+certbot_email: ""
+certbot_domains:
+  - pausatf.org
+  - www.pausatf.org

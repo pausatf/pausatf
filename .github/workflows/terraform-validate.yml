@@ -22,12 +22,12 @@ jobs:
     if: "!contains(github.event.pull_request.title, 'chore(deps):')"
     steps:
       - name: Checkout code
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd  # v3
+        uses: hashicorp/setup-terraform@b9cd54a3c349d3f85571c5fb643da9750e94b949  # v3
         with:
-          terraform_version: latest
+          terraform_version: '1.10.3'
 
       - name: Terraform Format Check
         run: terraform fmt -check -recursive
@@ -43,14 +43,16 @@ jobs:
           - production
           - staging
           - github
+          - dev
+          - cloudflare
     steps:
       - name: Checkout code
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd  # v3
+        uses: hashicorp/setup-terraform@b9cd54a3c349d3f85571c5fb643da9750e94b949  # v3
         with:
-          terraform_version: latest
+          terraform_version: '1.10.3'
 
       - name: Terraform Init
         run: terraform init -backend=false
@@ -63,13 +65,16 @@ jobs:
   tfsec:
     name: TFSec Security Scan
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
     if: "!contains(github.event.pull_request.title, 'chore(deps):')"
     steps:
       - name: Checkout code
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
 
       - name: Run tfsec
-        uses: aquasecurity/tfsec-action@v1.0.3
+        uses: aquasecurity/tfsec-action@b842aa8571b0120b60891e9fcab20ab5ed5bf26e  # v1.0.3
         with:
           working_directory: terraform
           soft_fail: false
@@ -77,10 +82,10 @@ jobs:
           additional_args: --concise-output --out results.sarif
 
       - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@v4
+        uses: github/codeql-action/upload-sarif@4f3212b61783c3c68e8309a0f18842c009e7c1c0  # v4
         if: always()
         with:
-          sarif_file: results.sarif
+          sarif_file: terraform/results.sarif
 
   tflint:
     name: TFLint
@@ -88,10 +93,10 @@ jobs:
     if: "!contains(github.event.pull_request.title, 'chore(deps):')"
     steps:
       - name: Checkout code
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
 
       - name: Setup TFLint
-        uses: terraform-linters/setup-tflint@v6
+        uses: terraform-linters/setup-tflint@4cb9feea73331a35b422df102992a03a44a3bb33  # v6
         with:
           tflint_version: latest
 

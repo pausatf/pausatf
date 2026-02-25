@@ -1,14 +1,21 @@
 ---
 # Install and configure OpenLiteSpeed for WordPress
 
-- name: Add LiteSpeed repository
-  apt_key:
-    url: https://repo.litespeed.sh/ls.key
-    state: present
+- name: Create keyrings directory
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
 
-- name: Add LiteSpeed repo list
+- name: Download LiteSpeed repository key
+  get_url:
+    url: https://repo.litespeed.sh/ls.key
+    dest: /etc/apt/keyrings/litespeed.gpg
+    mode: '0644'
+
+- name: Add LiteSpeed repository
   apt_repository:
-    repo: "deb http://rpms.litespeedtech.com/debian/ stable main"
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/litespeed.gpg] http://rpms.litespeedtech.com/debian/ stable main"
     state: present
     filename: litespeed
 
@@ -28,7 +35,12 @@
     enabled: yes
 
 - name: Set OLS admin password (idempotent)
-  command: "/usr/local/lsws/admin/misc/admpass.sh << EOF\nadmin\n{{ vault_ols_admin_password | default('changeMe!') }}\n{{ vault_ols_admin_password | default('changeMe!') }}\nEOF"
+  shell: |
+    /usr/local/lsws/admin/misc/admpass.sh << EOF
+    admin
+    {{ ols_admin_password }}
+    {{ ols_admin_password }}
+    EOF
   args:
     creates: /usr/local/lsws/admin/conf/htpasswd
   no_log: true

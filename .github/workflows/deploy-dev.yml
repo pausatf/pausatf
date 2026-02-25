@@ -6,16 +6,12 @@ on:
       - dev
   workflow_dispatch:
 
-permissions:
-  contents: read
-
 jobs:
   deploy:
     uses: ./.github/workflows/deploy.yml
     with:
       environment: development
-      ansible_limit: development
-      healthcheck_cmd: "curl -fsS ${{ vars.DEV_URL || 'https://dev.pausatf.org' }} || echo 'Dev healthcheck skipped (environment not yet provisioned)'"
+      ansible_limit: dev
     secrets:
       SSH_PRIVATE_KEY: ${{ secrets.DEV_SSH_PRIVATE_KEY }}
       ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}

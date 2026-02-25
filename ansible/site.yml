@@ -2,8 +2,8 @@
 # Main playbook that orchestrates all roles
 - name: Configure all servers
   hosts: all
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
 
   pre_tasks:
     - name: Update apt cache
@@ -19,57 +19,97 @@
 
 - name: Configure web servers
   hosts: webservers
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
 
-  roles:
-    # PHP — mod_php (legacy) or PHP-FPM (new)
-    - role: php
-      when:
-        - web_server | default('apache') == 'apache'
-        - not (use_php_fpm | default(false))
+  tasks:
+    - name: Deploy web stack
+      block:
+        - name: Include PHP role (mod_php)
+          include_role:
+            name: php
+          when:
+            - web_server | default('apache') == 'apache'
+            - not (use_php_fpm | default(false))
 
-    - role: php-fpm
-      when:
-        - web_server | default('apache') == 'apache'
-        - use_php_fpm | default(false)
+        - name: Include PHP-FPM role
+          include_role:
+            name: php-fpm
+          when:
+            - web_server | default('apache') == 'apache'
+            - use_php_fpm | default(false)
 
-    - role: apache
-      when: web_server | default('apache') == 'apache'
+        - name: Include Apache role
+          include_role:
+            name: apache
+          when: web_server | default('apache') == 'apache'
 
-    # OpenLiteSpeed path (staging/dev)
-    - role: lsphp
-      when: web_server | default('apache') == 'openlitespeed'
+        - name: Include OpenLiteSpeed PHP role
+          include_role:
+            name: lsphp
+          when: web_server | default('apache') == 'openlitespeed'
 
-    - role: openlitespeed
-      when: web_server | default('apache') == 'openlitespeed'
+        - name: Include OpenLiteSpeed role
+          include_role:
+            name: openlitespeed
+          when: web_server | default('apache') == 'openlitespeed'
 
-    # TLS certificates via Let's Encrypt DNS-01
-    - role: certbot
-      when: certbot_enabled | default(false)
+        - name: Include Certbot role
+          include_role:
+            name: certbot
+          when: certbot_enabled | default(false)
 
-    - role: mysql
-      when: mysql_enabled | default(true)
+        - name: Include MySQL role
+          include_role:
+            name: mysql
+          when: mysql_enabled | default(true)
 
-    # Redis object cache
-    - role: redis
-      when: redis_enabled | default(false)
+        - name: Include Redis role
+          include_role:
+            name: redis
+          when: redis_enabled | default(false)
 
-    - role: fail2ban
+        - name: Include Fail2ban role
+          include_role:
+            name: fail2ban
 
-    - role: wordpress
-      when: wordpress_enabled | default(true)
+        - name: Include WordPress role
+          include_role:
+            name: wordpress
+          when: wordpress_enabled | default(true)
 
-    - role: cloudflare
-      when: cloudflare_enabled | default(false)
+        - name: Include Cloudflare role
+          include_role:
+            name: cloudflare
+          when: cloudflare_enabled | default(false)
 
-    - role: newrelic
-      when: newrelic_enabled | default(false)
+        - name: Include New Relic role
+          include_role:
+            name: newrelic
+          when: newrelic_enabled | default(false)
+
+      rescue:
+        - name: Web stack deployment failed
+          debug:
+            msg: >
+              DEPLOYMENT FAILED on {{ inventory_hostname }}.
+              Role: {{ ansible_failed_task.name | default('unknown') }}.
+              Error: {{ ansible_failed_result.msg | default('unknown error') }}.
+              Manual intervention required. Check service status and logs.
+
+        - name: Verify web server is still running
+          service:
+            name: "{{ 'apache2' if web_server | default('apache') == 'apache' else 'lsws' }}"
+            state: started
+
+        - name: Fail the play after rescue
+          fail:
+            msg: "Deployment failed. Web server recovery attempted. Review errors above."
 
 - name: Configure monitoring
   hosts: all
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
 
   roles:
     - monitoring

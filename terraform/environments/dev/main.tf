@@ -13,12 +13,7 @@ terraform {
   }
 
   backend "s3" {
-    endpoint                    = "sfo2.digitaloceanspaces.com"
-    region                      = "us-west-1"
-    bucket                      = "pausatf-terraform-state"
-    key                         = "dev/terraform.tfstate"
-    skip_credentials_validation = true
-    skip_metadata_api_check     = true
+    key = "dev/terraform.tfstate"
   }
 }
 
@@ -30,104 +25,30 @@ provider "cloudflare" {
   api_token = var.cloudflare_api_token
 }
 
-# Dev Droplet (smaller)
-#tfsec:ignore:digitalocean-compute-use-ssh-keys
-resource "digitalocean_droplet" "dev" {
-  #checkov:skip=CKV_DIO_2:dev environment uses cloud-init; no static SSH key required
-  name   = "pausatf-dev"
-  region = var.region
-  size   = var.droplet_size
-  image  = var.droplet_image
+# WordPress stack — shared module for environment parity with production
+module "wordpress" {
+  source = "../../stacks/wordpress"
 
-  tags = [
-    "pausatf",
-    "dev",
-    "web",
-    "wordpress"
-  ]
+  environment              = "dev"
+  region                   = var.region
+  droplet_size             = var.droplet_size
+  droplet_image            = var.droplet_image
+  database_size            = var.database_size
+  ssh_key_fingerprints     = var.ssh_key_fingerprints
+  vpc_cidr                 = "10.30.0.0/16"
+  enable_backups           = false
+  enable_monitoring        = true
+  create_reserved_ip       = false
+  enable_monitoring_alerts = false
 
-  monitoring = true
-  ipv6       = false
-  backups    = false
+  # Dev uses open firewall (not CF-only)
+  firewall_http_source_cidrs = ["0.0.0.0/0", "::/0"]
+  ssh_allowed_ips            = var.ssh_allowed_ips
 
-  ssh_keys = var.ssh_key_fingerprints
-
-  user_data = templatefile("${path.module}/../../modules/droplet/cloud-init-apache.yml", {
+  cloud_init_content = templatefile("${path.module}/../../modules/droplet/cloud-init-openlitespeed.yml", {
     environment = "dev"
     hostname    = "pausatf-dev"
   })
-}
-
-# Dev Database (single node)
-resource "digitalocean_database_cluster" "dev" {
-  name       = "pausatf-dev-db"
-  engine     = "mysql"
-  version    = "8"
-  size       = var.database_size
-  region     = var.region
-  node_count = 1
-
-  tags = ["pausatf", "dev", "database"]
-}
-
-resource "digitalocean_database_firewall" "dev" {
-  cluster_id = digitalocean_database_cluster.dev.id
-
-  rule {
-    type  = "droplet"
-    value = digitalocean_droplet.dev.id
-  }
-}
-
-# Dev VPC
-resource "digitalocean_vpc" "dev" {
-  name     = "pausatf-dev-vpc"
-  region   = var.region
-  ip_range = "10.30.0.0/16"
-
-  description = "Dev VPC for PAUSATF infrastructure"
-}
-
-# Dev Firewall
-#tfsec:ignore:digitalocean-compute-no-public-ingress
-#tfsec:ignore:digitalocean-compute-no-public-egress
-resource "digitalocean_firewall" "dev" {
-  #checkov:skip=CKV_DIO_4:dev firewall intentionally permissive for local development
-  name = "pausatf-dev-firewall"
-
-  droplet_ids = [digitalocean_droplet.dev.id]
-
-  inbound_rule {
-    protocol         = "tcp"
-    port_range       = "80"
-    source_addresses = ["*******/0", "::/0"]
-  }
-
-  inbound_rule {
-    protocol         = "tcp"
-    port_range       = "443"
-    source_addresses = ["*******/0", "::/0"]
-  }
-
-  inbound_rule {
-    protocol         = "tcp"
-    port_range       = "22"
-    source_addresses = ["*******/0", "::/0"]
-  }
-
-  outbound_rule {
-    protocol              = "tcp"
-    port_range            = "1-65535"
-    destination_addresses = ["*******/0", "::/0"]
-  }
-
-  outbound_rule {
-    protocol              = "udp"
-    port_range            = "1-65535"
-    destination_addresses = ["*******/0", "::/0"]
-  }
-
-  tags = ["dev"]
 }
 
 # Cloudflare DNS for dev
@@ -139,10 +60,36 @@ module "cloudflare_dns_dev" {
     {
       name    = "dev"
       type    = "A"
-      value   = digitalocean_droplet.dev.ipv4_address
+      value   = module.wordpress.droplet_ip
       ttl     = 1
       proxied = true
       comment = "Dev web droplet"
     }
   ]
+}
+
+# State migration — zero-recreation move from inline resources to stack module
+moved {
+  from = digitalocean_droplet.dev
+  to   = module.wordpress.digitalocean_droplet.this
+}
+
+moved {
+  from = digitalocean_firewall.dev
+  to   = module.wordpress.digitalocean_firewall.this
+}
+
+moved {
+  from = digitalocean_vpc.dev
+  to   = module.wordpress.digitalocean_vpc.this[0]
+}
+
+moved {
+  from = digitalocean_database_cluster.dev
+  to   = module.wordpress.module.database.digitalocean_database_cluster.this
+}
+
+moved {
+  from = digitalocean_database_firewall.dev
+  to   = module.wordpress.module.database.digitalocean_database_firewall.this[0]
 }

@@ -1,5 +1,5 @@
 ---
-- name: Restart Apache
+- name: Restart web server
   service:
-    name: apache2
+    name: "{{ 'apache2' if web_server | default('apache') == 'apache' else 'lsws' }}"
     state: restarted
