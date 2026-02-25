@@ -18,6 +18,9 @@ on:
       - 'ansible/playbooks/**'
       - '.github/workflows/ansible-lint.yml'
 
+permissions:
+  contents: read
+
 jobs:
   ansible-lint:
     name: Ansible Lint

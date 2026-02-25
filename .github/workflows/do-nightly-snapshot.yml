@@ -5,6 +5,9 @@ on:
     - cron: '0 10 * * *'  # 2 AM Pacific approx
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   snapshot:
     runs-on: ubuntu-latest

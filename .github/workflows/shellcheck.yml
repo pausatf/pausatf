@@ -12,6 +12,9 @@ on:
       - 'scripts/**.sh'
       - '.github/workflows/shellcheck.yml'
 
+permissions:
+  contents: read
+
 jobs:
   shellcheck:
     name: ShellCheck

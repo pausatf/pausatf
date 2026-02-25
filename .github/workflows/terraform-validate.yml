@@ -12,6 +12,9 @@ on:
       - 'terraform/**.tf'
       - '.github/workflows/terraform-validate.yml'
 
+permissions:
+  contents: read
+
 jobs:
   terraform-fmt:
     name: Terraform Format Check
