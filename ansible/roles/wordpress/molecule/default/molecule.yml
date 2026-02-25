@@ -5,26 +5,47 @@ driver:
   name: docker
 platforms:
   - name: wordpress-ubuntu
-    image: ubuntu:24.04
+    image: geerlingguy/docker-ubuntu2404-ansible:latest
     pre_build_image: true
     privileged: true
-    command: /sbin/init
     volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    tmpfs:
-      - /run
-      - /tmp
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
 provisioner:
   name: ansible
   config_options:
     defaults:
       interpreter_python: auto_silent
       callback_whitelist: profile_tasks, timer, yaml
+  env:
+    ANSIBLE_ROLES_PATH: "${MOLECULE_PROJECT_DIRECTORY}/.."
   inventory:
     host_vars:
       wordpress-ubuntu:
         ansible_user: root
         wordpress_enabled: true
         environment: staging
+        mysql_managed: true
+        web_server: 'nginx'
+        wpcli_update_plugins: false
+        wpcli_update_themes: false
+        wordpress_installs:
+          - path: /var/www/html
+            domain: localhost
+            db_password: molecule_test_pass  # pragma: allowlist secret
+            manage_wp_config: false
 verifier:
   name: ansible
+scenario:
+  test_sequence:
+    - dependency
+    - cleanup
+    - destroy
+    - syntax
+    - create
+    - prepare
+    - converge
+    - side_effect
+    - verify
+    - cleanup
+    - destroy

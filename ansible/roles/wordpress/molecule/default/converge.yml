@@ -12,14 +12,3 @@
 
   roles:
     - role: wordpress
-
-  post_tasks:
-    - name: Ensure OpenLiteSpeed is started for tests
-      service:
-        name: lsws
-        state: started
-
-    - name: Ensure LSPHP-FPM is started for tests
-      service:
-        name: lsphp83-fpm
-        state: started
