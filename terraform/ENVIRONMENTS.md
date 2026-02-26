@@ -41,7 +41,7 @@ Manages the live PAUSATF website infrastructure.
 |----------|------|-------|
 | `digitalocean_project` | PAUSATF | Groups production resources |
 | `digitalocean_vpc` | pausatf-production-vpc | `10.10.0.0/16`, region `sfo2` |
-| `digitalocean_droplet` | pausatf-prod | `s-4vcpu-8gb`, Ubuntu, backups enabled, cloud-init via `cloud-init-apache.yml` |
+| `digitalocean_droplet` | pausatf-prod | `s-4vcpu-8gb`, Ubuntu, backups enabled, cloud-init via `cloud-init-ubuntu-24.yml` |
 | `digitalocean_reserved_ip` | production | Prevents IP change on rebuild |
 | `digitalocean_reserved_ip_assignment` | production | Attaches reserved IP to droplet |
 | `digitalocean_ssh_key` | m3 laptop | Public key from `var.ssh_public_key` |
@@ -278,7 +278,7 @@ Cloud-init templates used as `user_data` when provisioning droplets.
 
 | File | Purpose |
 |------|---------|
-| `cloud-init-apache.yml` | Production — Apache + PHP stack |
+| `cloud-init-ubuntu-24.yml` | Production — Ubuntu 24.04, Apache + PHP stack |
 | `cloud-init-openlitespeed.yml` | Staging — OpenLiteSpeed stack |
 | `cloud-init-base.yml` | Base template (common packages) |
 | `cloud-init-nginx.yml.deprecated` | Deprecated — not in use |
