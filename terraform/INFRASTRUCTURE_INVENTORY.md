@@ -17,9 +17,9 @@ This document compares the actual infrastructure running in DigitalOcean, Cloudf
 | Staging | pausatf-stage | 538411208 | 64.227.85.73 | Ubuntu OpenLiteSpeed WordPress 6.8.2 on Ubuntu 24.04 (marketplace) | s-2vcpu-4gb | sfo2 | ✅ Active | ✅ Yes (but wrong image) |
 
 **Issues:**
-- Production uses custom snapshot, Terraform expects Ubuntu 22.04 base image with cloud-init
-- Staging uses marketplace image, Terraform expects Ubuntu 22.04 base image with cloud-init
-- Both reference old `cloud-init.yml` instead of `cloud-init-apache.yml` and `cloud-init-openlitespeed.yml`
+- Production uses custom snapshot, Terraform expects Ubuntu 24.04 base image with cloud-init
+- Staging uses marketplace image, Terraform expects Ubuntu 24.04 base image with cloud-init
+- Both reference old `cloud-init.yml` instead of `cloud-init-ubuntu-24.yml` and `cloud-init-openlitespeed.yml`
 
 ### Databases
 
@@ -187,7 +187,7 @@ No reserved IPs currently in use.
 ### High Priority
 
 1. **Update cloud-init template references**
-   - Production: Change from `cloud-init.yml` to `cloud-init-apache.yml`
+   - Production: Change from `cloud-init.yml` to `cloud-init-ubuntu-24.yml`
    - Staging: Change from `cloud-init.yml` to `cloud-init-openlitespeed.yml`
 
 2. **Remove non-existent resources from Terraform**
