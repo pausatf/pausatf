@@ -4,11 +4,13 @@ on:
   push:
     branches: [main]
     paths:
-      - '**.php'
+      - '**.js'
+      - '**.ts'
       - '.github/workflows/codeql.yml'
   pull_request:
     paths:
-      - '**.php'
+      - '**.js'
+      - '**.ts'
       - '.github/workflows/codeql.yml'
   schedule:
     - cron: '0 6 * * 1'  # weekly Monday 06:00 UTC
@@ -19,7 +21,7 @@ permissions:
 
 jobs:
   analyze:
-    name: Analyze PHP
+    name: Analyze JavaScript
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -28,7 +30,7 @@ jobs:
       - name: Initialize CodeQL
         uses: github/codeql-action/init@89a39a4e59826350b863aa6b6252a07ad50cf83e  # v4.32.4
         with:
-          languages: php
+          languages: javascript
           queries: security-and-quality
 
       - name: Autobuild
@@ -37,4 +39,4 @@ jobs:
       - name: Analyze
         uses: github/codeql-action/analyze@89a39a4e59826350b863aa6b6252a07ad50cf83e  # v4.32.4
         with:
-          category: /language:php
+          category: /language:javascript
