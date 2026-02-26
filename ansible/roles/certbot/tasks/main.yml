@@ -16,6 +16,14 @@
     group: root
     mode: '0700'
 
+- name: Ensure certbot renewal-hooks directory exists
+  file:
+    path: /etc/letsencrypt/renewal-hooks/deploy
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
 - name: Deploy Cloudflare credentials for certbot
   template:
     src: cloudflare.ini.j2
