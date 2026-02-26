@@ -1,0 +1,62 @@
+- name: Verify
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Check redis-server package is installed
+      package:
+        name: redis-server
+        state: present
+      check_mode: yes
+      register: redis_pkg
+      failed_when: redis_pkg is changed
+
+    - name: Verify redis-server binary is present
+      stat:
+        path: /usr/bin/redis-server
+      register: redis_bin
+      failed_when: not redis_bin.stat.exists
+
+    - name: Verify redis-cli binary is present
+      stat:
+        path: /usr/bin/redis-cli
+      register: redis_cli_bin
+      failed_when: not redis_cli_bin.stat.exists
+
+    - name: Verify Redis configuration was deployed
+      stat:
+        path: /etc/redis/redis.conf
+      register: redis_conf
+      failed_when: not redis_conf.stat.exists
+
+    - name: Verify redis.conf has correct permissions (group-readable, not world-readable)
+      stat:
+        path: /etc/redis/redis.conf
+      register: redis_conf_perms
+      failed_when: redis_conf_perms.stat.mode != '0640'
+
+    - name: Verify www-data is in redis group
+      command: id www-data
+      register: www_data_id
+      changed_when: false
+      failed_when: "'redis' not in www_data_id.stdout"
+
+    - name: Check redis-server service is enabled
+      command: systemctl is-enabled redis-server
+      register: redis_enabled
+      changed_when: false
+      failed_when: redis_enabled.stdout != 'enabled'
+      when: ansible_virtualization_type != 'docker'
+
+    - name: Check redis-server service is running
+      command: systemctl is-active redis-server
+      register: redis_active
+      changed_when: false
+      failed_when: redis_active.stdout != 'active'
+      when: ansible_virtualization_type != 'docker'
+
+    - name: Verify Redis responds to ping
+      command: redis-cli ping
+      register: redis_ping
+      changed_when: false
+      failed_when: "'PONG' not in redis_ping.stdout"
+      when: ansible_virtualization_type != 'docker'
