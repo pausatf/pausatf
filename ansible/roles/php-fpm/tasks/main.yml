@@ -47,9 +47,7 @@
     name: php
     path: /usr/bin/php{{ php_version }}
   register: php_alternatives
-  failed_when:
-    - php_alternatives.rc != 0
-    - "'no alternatives' not in (php_alternatives.stderr | default(''))"
+  failed_when: php_alternatives is failed
 
 - name: Create PHP session directory
   file:
