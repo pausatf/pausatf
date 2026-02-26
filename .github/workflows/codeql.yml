@@ -25,12 +25,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
 
+      # Runner toolcache ships CodeQL v2.24.2 standalone (no PHP extractor).
+      # Removing it forces codeql-action to extract its own full bundle, which
+      # includes the PHP extractor.
+      - name: Clear CodeQL toolcache
+        run: rm -rf /opt/hostedtoolcache/CodeQL
+
       - name: Initialize CodeQL
         uses: github/codeql-action/init@89a39a4e59826350b863aa6b6252a07ad50cf83e  # v4.32.4
         with:
           languages: php
           queries: security-and-quality
-          tools: linked  # use action-bundled CLI; runner toolcache v2.24.2 lacks PHP extractor
 
       - name: Autobuild
         uses: github/codeql-action/autobuild@89a39a4e59826350b863aa6b6252a07ad50cf83e  # v4.32.4
