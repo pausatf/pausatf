@@ -25,6 +25,9 @@ jobs:
         role:
           - common
           - wordpress
+          - php-fpm
+          - redis
+          - certbot
 
     steps:
       - name: Checkout code
