@@ -18,7 +18,11 @@
     { "pattern": "^https://elegantthemes\\.com" },
     { "pattern": "^https://www\\.isitdownrightnow\\.com" },
     { "pattern": "^https://docs\\.digitalocean\\.com/products/droplets/how-to/migrate" },
-    { "pattern": "^https://openlitespeed\\.org/kb" }
+    { "pattern": "^https://openlitespeed\\.org/kb" },
+    { "pattern": "^https://github\\.com/settings/" },
+    { "pattern": "^https://desktop\\.github\\.com" },
+    { "pattern": "^https://github\\.com/angular/angular" },
+    { "pattern": "^https://github\\.com/gdsmith/jquery\\.easing" }
   ],
   "timeout": "20s",
   "retryOn429": true,
