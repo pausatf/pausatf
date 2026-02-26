@@ -2,12 +2,6 @@ name: Ansible Lint
 
 on:
   pull_request:
-    paths:
-      - 'ansible/**.yml'
-      - 'ansible/**.yaml'
-      - 'ansible/roles/**'
-      - 'ansible/playbooks/**'
-      - '.github/workflows/ansible-lint.yml'
   push:
     branches:
       - main
