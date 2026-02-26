@@ -23,14 +23,22 @@
     append: yes
   notify: Restart redis-server
 
+- name: Detect Docker environment
+  stat:
+    path: /.dockerenv
+  register: _dockerenv
+  changed_when: false
+
 - name: Ensure Redis is enabled and running
   service:
     name: redis-server
     state: started
     enabled: yes
+  when: not _dockerenv.stat.exists
 
 - name: Verify Redis is listening on 127.0.0.1 only
   command: redis-cli ping
   register: redis_ping
   changed_when: false
   failed_when: "'PONG' not in redis_ping.stdout"
+  when: not _dockerenv.stat.exists

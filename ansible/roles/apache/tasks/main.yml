@@ -1,4 +1,3 @@
----
 # Apache role — Web server configuration for PAUSATF
 # Supports both mod_php (legacy) and PHP-FPM (Ubuntu 24.04+) via apache_mpm var
 
@@ -23,7 +22,8 @@
     ignore_configcheck: true
   when: apache_mpm | default('prefork') == 'event'
   notify: Restart Apache
-  ignore_errors: yes
+  # Module may already be absent on a fresh install; that is not a failure.
+  failed_when: false
 
 - name: Disable mod_php (when using FPM)
   apache2_module:
@@ -32,7 +32,8 @@
     ignore_configcheck: true
   when: apache_mpm | default('prefork') == 'event'
   notify: Restart Apache
-  ignore_errors: yes
+  # Module may already be absent on a fresh install; that is not a failure.
+  failed_when: false
 
 - name: Enable mpm_event (when using event MPM)
   apache2_module:
@@ -61,7 +62,8 @@
     - mpm_worker
   when: apache_mpm | default('prefork') == 'prefork'
   notify: Restart Apache
-  ignore_errors: yes
+  # Either module may already be absent; that is not a failure.
+  failed_when: false
 
 - name: Enable required Apache modules
   apache2_module:
