@@ -57,8 +57,15 @@
     group: www-data
     mode: '0770'
 
+- name: Detect Docker environment
+  stat:
+    path: /.dockerenv
+  register: _dockerenv
+  changed_when: false
+
 - name: Ensure PHP {{ php_version }}-FPM is enabled and running
   service:
     name: php{{ php_version }}-fpm
     state: started
     enabled: yes
+  when: not _dockerenv.stat.exists
