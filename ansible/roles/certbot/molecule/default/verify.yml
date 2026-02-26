@@ -59,4 +59,4 @@
       register: certbot_timer
       changed_when: false
       failed_when: certbot_timer.stdout != 'enabled'
-      when: ansible_virtualization_type != 'docker'
+      when: certbot_enabled | default(true)
