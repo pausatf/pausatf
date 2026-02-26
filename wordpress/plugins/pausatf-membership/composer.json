@@ -1,0 +1,20 @@
+{
+    "name": "pausatf/pausatf-membership",
+    "description": "PA/USATF membership WordPress plugin",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "php": ">=7.4"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PAUSATF\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "allow-plugins": false
+    }
+}
