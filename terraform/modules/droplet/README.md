@@ -7,7 +7,7 @@ Cloud-init configuration templates for PAUSATF DigitalOcean droplets with pre-co
 | Template | Use Case | Web Server | PHP Version | Environment |
 |----------|----------|------------|-------------|-------------|
 | **cloud-init-base.yml** | Base configuration | None | N/A | All |
-| **cloud-init-apache.yml** | Production WordPress | Apache 2.4 | PHP 7.4 | Production |
+| **cloud-init-ubuntu-24.yml** | Production WordPress | Apache 2.4 | PHP 8.x | Production |
 | **cloud-init-openlitespeed.yml** | Staging/Dev WordPress | OpenLiteSpeed 1.8 | PHP 8.4 | Staging/Dev |
 
 ## Features
@@ -33,7 +33,7 @@ Cloud-init configuration templates for PAUSATF DigitalOcean droplets with pre-co
 
 ### Template-Specific Features
 
-#### cloud-init-apache.yml (Production)
+#### cloud-init-ubuntu-24.yml (Production)
 
 **Web Server:**
 - Apache 2.4 with mod_rewrite, mod_ssl, mod_headers
@@ -41,7 +41,7 @@ Cloud-init configuration templates for PAUSATF DigitalOcean droplets with pre-co
 - Gzip compression and browser caching
 
 **PHP Configuration:**
-- PHP 7.4 (WordPress compatibility)
+- PHP 8.x on Ubuntu 24.04
 - OPcache enabled
 - 256 MB memory limit
 - 128 MB upload size
@@ -104,11 +104,11 @@ module "production_droplet" {
   name        = "pausatf-prod"
   region      = "sfo3"
   size        = "s-4vcpu-8gb"
-  image       = "ubuntu-22-04-x64"
+  image       = "ubuntu-24-04-x64"
   environment = "production"
 
-  # Use Apache template for production
-  user_data = templatefile("${path.module}/../../modules/droplet/cloud-init-apache.yml", {
+  # Use Ubuntu 24.04 template for production
+  user_data = templatefile("${path.module}/../../modules/droplet/cloud-init-ubuntu-24.yml", {
     hostname    = "ftp"
     environment = "production"
   })
@@ -122,18 +122,18 @@ module "production_droplet" {
 ### With doctl (DigitalOcean CLI)
 
 ```bash
-# Create droplet with Apache template
+# Create droplet with Ubuntu 24.04 production template
 doctl compute droplet create pausatf-prod \
-  --image ubuntu-22-04-x64 \
+  --image ubuntu-24-04-x64 \
   --size s-4vcpu-8gb \
   --region sfo3 \
   --ssh-keys YOUR_SSH_KEY_ID \
-  --user-data-file terraform/modules/droplet/cloud-init-apache.yml \
+  --user-data-file terraform/modules/droplet/cloud-init-ubuntu-24.yml \
   --tag-names web,wordpress,production
 
 # Create droplet with OpenLiteSpeed template
 doctl compute droplet create pausatf-stage \
-  --image ubuntu-22-04-x64 \
+  --image ubuntu-24-04-x64 \
   --size s-2vcpu-4gb \
   --region sfo3 \
   --ssh-keys YOUR_SSH_KEY_ID \
@@ -145,7 +145,7 @@ doctl compute droplet create pausatf-stage \
 
 ```bash
 # Render template with variables
-cat cloud-init-apache.yml | \
+cat cloud-init-ubuntu-24.yml | \
   sed "s/\${hostname}/ftp/g" | \
   sed "s/\${environment}/production/g" > /tmp/cloud-init-rendered.yml
 
@@ -163,7 +163,7 @@ All templates support the following variables:
 
 ## Post-Installation Tasks
 
-### For Apache (Production)
+### For Production (Ubuntu 24.04 + Apache)
 
 1. **Configure DNS**
    ```bash
@@ -372,7 +372,7 @@ sudo systemctl restart lsws
 php -v
 
 # Test PHP-FPM (Apache)
-sudo systemctl status php7.4-fpm
+sudo systemctl status php8*-fpm
 
 # Test LSPHP (OpenLiteSpeed)
 /usr/local/lsws/lsphp84/bin/php -v
@@ -523,7 +523,7 @@ redis-cli -s /var/run/redis/redis-server.sock --intrinsic-latency 100
 ### From OpenLiteSpeed to Apache
 
 1. Backup current configuration
-2. Create new droplet with Apache template
+2. Create new droplet with Ubuntu 24.04 production template
 3. Migrate WordPress files and database
 4. Reconfigure permalinks if needed
 5. Test thoroughly
@@ -553,6 +553,7 @@ redis-cli -s /var/run/redis/redis-server.sock --intrinsic-latency 100
 
 ## Version History
 
+- **2026-02-25**: Removed cloud-init-apache.yml (PHP 7.4 / Ubuntu 22.04); production now uses `cloud-init-ubuntu-24.yml`
 - **2025-12-28**: Created comprehensive cloud-init templates
   - Added cloud-init-base.yml
   - Added cloud-init-apache.yml (Production)
@@ -563,8 +564,8 @@ redis-cli -s /var/run/redis/redis-server.sock --intrinsic-latency 100
 
 | Droplet | Template | IP | Size | Status |
 |---------|----------|-----|------|--------|
-| ftp.pausatf.org | Apache | 64.225.40.54 | s-4vcpu-8gb | Production |
-| stage.pausatf.org | OpenLiteSpeed | 64.227.85.73 | s-2vcpu-4gb | Staging |
+| ftp.pausatf.org | cloud-init-ubuntu-24.yml | 64.225.40.54 | s-4vcpu-8gb | Production |
+| stage.pausatf.org | cloud-init-openlitespeed.yml | 64.227.85.73 | s-2vcpu-4gb | Staging |
 
 ## Maintainer
 
