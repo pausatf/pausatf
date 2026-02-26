@@ -28,6 +28,7 @@ provisioner:
         certbot_domains:
           - test.example.com
         web_server: apache
+        vault_cloudflare_api_token: "molecule_test_token"  # pragma: allowlist secret
 verifier:
   name: ansible
 scenario:
