@@ -4,7 +4,6 @@
 
 exclude_paths:
   # Cloud-init is Terraform-rendered, not Ansible — skip linting.
-  - terraform/modules/droplet/cloud-init-apache.yml
   - terraform/modules/droplet/cloud-init-base.yml
   - terraform/modules/droplet/cloud-init-openlitespeed.yml
   - terraform/modules/droplet/cloud-init-ubuntu-24.yml
