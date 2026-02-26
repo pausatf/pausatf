@@ -87,6 +87,33 @@
     - web_server | default('apache') == 'openlitespeed'
     - lscache_installed.rc != 0
 
+- name: Check if redis-cache plugin is installed
+  command: "{{ wpcli_path | default('/usr/local/bin/wp') }} plugin is-installed redis-cache --path={{ wp_site.path }} --allow-root"
+  register: redis_cache_installed
+  changed_when: false
+  failed_when: false
+  when: redis_enabled | default(false)
+
+- name: Install redis-cache plugin
+  command: "{{ wpcli_path | default('/usr/local/bin/wp') }} plugin install redis-cache --path={{ wp_site.path }} --allow-root"
+  when:
+    - redis_enabled | default(false)
+    - redis_cache_installed.rc != 0
+
+- name: Activate redis-cache plugin
+  command: "{{ wpcli_path | default('/usr/local/bin/wp') }} plugin activate redis-cache --path={{ wp_site.path }} --allow-root"
+  register: redis_cache_activate
+  changed_when: "'activated' in redis_cache_activate.stdout | lower"
+  failed_when: false
+  when: redis_enabled | default(false)
+
+- name: Enable Redis object cache drop-in
+  command: "{{ wpcli_path | default('/usr/local/bin/wp') }} redis enable --path={{ wp_site.path }} --allow-root"
+  register: redis_enable_result
+  changed_when: "'enabled' in redis_enable_result.stdout | lower"
+  failed_when: false
+  when: redis_enabled | default(false)
+
 - name: Set WordPress file and directory permissions
   file:
     path: "{{ wp_site.path }}"
