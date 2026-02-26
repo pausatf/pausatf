@@ -1,4 +1,3 @@
----
 # MySQL role - Database configuration for PAUSATF
 # Skipped entirely when using a managed database (mysql_managed: true).
 
@@ -53,7 +52,10 @@
         login_unix_socket: "{{ mysql_socket }}"
         state: present
       no_log: true
-      ignore_errors: yes
+      register: root_pwd_result
+      # Access denied is expected on re-runs when root is already secured via
+      # a different auth method (e.g. auth_socket). Any other failure is real.
+      failed_when: root_pwd_result.failed and 'Access denied' not in (root_pwd_result.msg | default(''))
 
     - name: Create .my.cnf for root
       template:
@@ -69,14 +71,12 @@
         host_all: yes
         state: absent
         login_unix_socket: "{{ mysql_socket }}"
-      ignore_errors: yes
 
     - name: Remove test database
       mysql_db:
         name: test
         state: absent
         login_unix_socket: "{{ mysql_socket }}"
-      ignore_errors: yes
 
     - name: Create WordPress databases
       mysql_db:
