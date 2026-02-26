@@ -342,7 +342,7 @@ runcmd:
 
 # SSH security
 ssh_pwauth: false
-disable_root: false
+disable_root: true
 
 # Final message
 final_message: |
