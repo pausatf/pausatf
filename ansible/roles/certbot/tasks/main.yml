@@ -16,6 +16,14 @@
     group: root
     mode: '0700'
 
+- name: Ensure certbot renewal-hooks directory exists
+  file:
+    path: /etc/letsencrypt/renewal-hooks/deploy
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
 - name: Deploy Cloudflare credentials for certbot
   template:
     src: cloudflare.ini.j2
@@ -41,13 +49,14 @@
     --keep-until-expiring
   register: certbot_result
   changed_when: "'Certificate not yet due for renewal' not in certbot_result.stdout"
-  when: not certbot_cert_exists.stat.exists
+  when: (certbot_enabled | default(true)) and not certbot_cert_exists.stat.exists
 
 - name: Ensure certbot systemd timer is enabled
   systemd:
     name: certbot.timer
     state: started
     enabled: yes
+  when: certbot_enabled | default(true)
 
 - name: Deploy post-renewal hook to reload web server
   copy:

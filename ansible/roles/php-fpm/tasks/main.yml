@@ -47,9 +47,7 @@
     name: php
     path: /usr/bin/php{{ php_version }}
   register: php_alternatives
-  failed_when:
-    - php_alternatives.rc != 0
-    - "'no alternatives' not in (php_alternatives.stderr | default(''))"
+  failed_when: php_alternatives is failed
 
 - name: Create PHP session directory
   file:
@@ -59,8 +57,15 @@
     group: www-data
     mode: '0770'
 
+- name: Detect Docker environment
+  stat:
+    path: /.dockerenv
+  register: _dockerenv
+  changed_when: false
+
 - name: Ensure PHP {{ php_version }}-FPM is enabled and running
   service:
     name: php{{ php_version }}-fpm
     state: started
     enabled: yes
+  when: not _dockerenv.stat.exists
