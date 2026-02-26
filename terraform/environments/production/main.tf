@@ -28,7 +28,7 @@ provider "cloudflare" {
 # DigitalOcean Project
 resource "digitalocean_project" "pausatf" {
   name        = "PAUSATF"
-  description = "PAUSATF - Pan African Ultimate Sports & Training Foundation"
+  description = "Pacific Association of USA Track & Field"
   purpose     = "Website or blog"
   environment = "Production"
 
