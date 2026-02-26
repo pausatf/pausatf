@@ -1,0 +1,58 @@
+name: WordPress Plugin Audit
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'  # Monday 09:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  audit:
+    name: Check for plugin updates
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for available plugin updates
+        id: check
+        env:
+          PROD_SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+          PROD_HOST: ${{ vars.PROD_HOST }}
+        run: |
+          set -euo pipefail
+          if [ -z "${PROD_SSH_PRIVATE_KEY:-}" ] || [ -z "${PROD_HOST:-}" ]; then
+            echo "PROD_SSH_PRIVATE_KEY or PROD_HOST not set — skipping"
+            echo "updates_found=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          mkdir -p ~/.ssh
+          printf '%s\n' "$PROD_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          UPDATES=$(ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
+            github-deploy@"$PROD_HOST" \
+            "/usr/local/bin/wp plugin list --update=available --format=table --path=/var/www/html --allow-root 2>/dev/null" || true)
+          rm -f ~/.ssh/id_rsa
+          # Strip header-only output (no updates)
+          if printf '%s' "$UPDATES" | grep -qv '^+\|^|\|^$\|name'; then
+            echo "updates_found=true" >> "$GITHUB_OUTPUT"
+            {
+              echo "PLUGIN_UPDATES<<EOF"
+              printf '%s' "$UPDATES"
+              echo "EOF"
+            } >> "$GITHUB_ENV"
+          else
+            echo "updates_found=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open issue for available updates
+        if: steps.check.outputs.updates_found == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TODAY=$(date +%Y-%m-%d)
+          gh issue create \
+            --repo pausatf/pausatf \
+            --title "chore(wordpress): plugin updates available ${TODAY}" \
+            --label "wordpress,dependencies" \
+            --body "$(printf 'Plugin updates available as of %s.\n\n```\n%s\n```\n\nTo update: `wp plugin update --all --path=/var/www/html --allow-root`' "$TODAY" "$PLUGIN_UPDATES")"
