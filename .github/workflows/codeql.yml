@@ -30,6 +30,7 @@ jobs:
         with:
           languages: php
           queries: security-and-quality
+          tools: linked  # use action-bundled CLI; runner toolcache v2.24.2 lacks PHP extractor
 
       - name: Autobuild
         uses: github/codeql-action/autobuild@89a39a4e59826350b863aa6b6252a07ad50cf83e  # v4.32.4
