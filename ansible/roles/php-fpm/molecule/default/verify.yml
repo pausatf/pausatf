@@ -1,0 +1,57 @@
+- name: Verify
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Check php-fpm package is installed
+      package:
+        name: "php8.3-fpm"
+        state: present
+      check_mode: yes
+      register: php_fpm_pkg
+      failed_when: php_fpm_pkg is changed
+
+    - name: Check php-cli package is installed
+      package:
+        name: "php8.3-cli"
+        state: present
+      check_mode: yes
+      register: php_cli_pkg
+      failed_when: php_cli_pkg is changed
+
+    - name: Verify PHP binary is present
+      stat:
+        path: /usr/bin/php8.3
+      register: php_bin
+      failed_when: not php_bin.stat.exists
+
+    - name: Verify php-fpm pool config was deployed
+      stat:
+        path: /etc/php/8.3/fpm/pool.d/www.conf
+      register: fpm_pool
+      failed_when: not fpm_pool.stat.exists
+
+    - name: Verify php.ini override was deployed
+      stat:
+        path: /etc/php/8.3/fpm/conf.d/99-pausatf.ini
+      register: php_ini
+      failed_when: not php_ini.stat.exists
+
+    - name: Verify PHP session directory exists with correct permissions
+      stat:
+        path: /var/lib/php/sessions
+      register: session_dir
+      failed_when: not session_dir.stat.exists or session_dir.stat.mode != '0770'
+
+    - name: Check php-fpm service is enabled
+      command: systemctl is-enabled php8.3-fpm
+      register: fpm_enabled
+      changed_when: false
+      failed_when: fpm_enabled.stdout != 'enabled'
+      when: ansible_virtualization_type != 'docker'
+
+    - name: Check php-fpm service is running
+      command: systemctl is-active php8.3-fpm
+      register: fpm_active
+      changed_when: false
+      failed_when: fpm_active.stdout != 'active'
+      when: ansible_virtualization_type != 'docker'
