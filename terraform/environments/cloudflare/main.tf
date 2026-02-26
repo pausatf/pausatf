@@ -378,19 +378,6 @@ resource "cloudflare_dns_record" "dkim_cloudflare" {
 }
 
 # =============================================================================
-# DNS Records — ACME Challenge
-# =============================================================================
-
-resource "cloudflare_dns_record" "acme_challenge_www" {
-  zone_id = cloudflare_zone.pausatf.id
-  name    = "_acme-challenge.www"
-  content = "JmQAJz96_x3ZwO5VqAfTMWAu5GMU7HXgGcaCpoRB2Cg" # pragma: allowlist secret
-  type    = "TXT"
-  ttl     = 1
-  comment = "Let's Encrypt ACME challenge (may be temporary)"
-}
-
-# =============================================================================
 # DNS Records — CAA
 # =============================================================================
 
