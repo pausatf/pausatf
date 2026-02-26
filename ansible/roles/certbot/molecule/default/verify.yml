@@ -1,0 +1,62 @@
+- name: Verify
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Check certbot package is installed
+      package:
+        name: certbot
+        state: present
+      check_mode: yes
+      register: certbot_pkg
+      failed_when: certbot_pkg is changed
+
+    - name: Check python3-certbot-dns-cloudflare is installed
+      package:
+        name: python3-certbot-dns-cloudflare
+        state: present
+      check_mode: yes
+      register: certbot_cf_pkg
+      failed_when: certbot_cf_pkg is changed
+
+    - name: Verify certbot binary is present
+      stat:
+        path: /usr/bin/certbot
+      register: certbot_bin
+      failed_when: not certbot_bin.stat.exists
+
+    - name: Verify /etc/letsencrypt directory exists with correct permissions
+      stat:
+        path: /etc/letsencrypt
+      register: le_dir
+      failed_when: not le_dir.stat.exists or le_dir.stat.mode != '0700'
+
+    - name: Verify Cloudflare credentials file was deployed
+      stat:
+        path: /etc/letsencrypt/cloudflare.ini
+      register: cf_ini
+      failed_when: not cf_ini.stat.exists
+
+    - name: Verify cloudflare.ini is not world-readable (contains API key)
+      stat:
+        path: /etc/letsencrypt/cloudflare.ini
+      register: cf_ini_perms
+      failed_when: cf_ini_perms.stat.mode != '0600'
+
+    - name: Verify post-renewal hook script was deployed
+      stat:
+        path: /etc/letsencrypt/renewal-hooks/deploy/reload-webserver.sh
+      register: renewal_hook
+      failed_when: not renewal_hook.stat.exists or not renewal_hook.stat.executable
+
+    - name: Check certbot --version runs without error
+      command: certbot --version
+      register: certbot_version
+      changed_when: false
+      failed_when: certbot_version.rc != 0
+
+    - name: Check certbot.timer is enabled
+      command: systemctl is-enabled certbot.timer
+      register: certbot_timer
+      changed_when: false
+      failed_when: certbot_timer.stdout != 'enabled'
+      when: ansible_virtualization_type != 'docker'
