@@ -1,5 +1,5 @@
 # Default owner for everything
-* @thomasvincent
+* @thomasvincent @github-copilot
 
 # Security-sensitive paths require explicit review
 terraform/ @thomasvincent
