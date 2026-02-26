@@ -16,19 +16,21 @@ provider "digitalocean" {
 module "database" {
   source = "../"
 
-  name            = var.test_name
-  engine          = var.test_engine
-  engine_version  = var.test_engine_version
-  size            = var.test_size
-  region          = var.test_region
-  node_count      = var.test_node_count
-  environment     = var.test_environment
+  name           = var.test_name
+  engine         = var.test_engine
+  engine_version = var.test_engine_version
+  size           = var.test_size
+  region         = var.test_region
+  node_count     = var.test_node_count
+  environment    = var.test_environment
 }
 
 output "cluster_name" {
-  value = module.database.name
+  description = "The name of the database cluster"
+  value       = module.database.name
 }
 
 output "cluster_urn" {
-  value = module.database.urn
+  description = "The uniform resource name of the database cluster"
+  value       = module.database.urn
 }
