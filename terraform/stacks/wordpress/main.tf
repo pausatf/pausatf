@@ -82,6 +82,10 @@ resource "digitalocean_droplet" "this" {
     create_before_destroy = true
     ignore_changes = [
       user_data,
+      image,
+      ssh_keys,
+      monitoring,
+      name,
     ]
   }
 }
