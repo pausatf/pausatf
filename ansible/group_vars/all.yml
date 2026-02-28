@@ -234,6 +234,19 @@ legacy_sites:
     type: "mixed_html_php"
     description: "Legacy calendar application"
 
+# Legacy PHP scripts that need database access are hosted on x10host.
+# Apache RedirectMatch sends these before the Alias fires (open_basedir
+# blocks PHP execution under the legacy tree).
+legacy_data_redirects:
+  - pattern: "clubs\\.php"
+    target: "http://pausatf.x10host.com/data/clubs.php"
+  - pattern: "members\\.php"
+    target: "http://pausatf.x10host.com/data/members.php"
+  - pattern: "ScoreSheet\\.php"
+    target: "http://pausatf.x10host.com/data/ScoreSheet.php"
+  - pattern: "3024/geolocate\\.php"
+    target: "http://pausatf.x10host.com/data/3024/geolocate.php"
+
 # =============================================================================
 # SSL CONFIGURATION
 # =============================================================================
