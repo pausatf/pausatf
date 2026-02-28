@@ -2,6 +2,7 @@
 *.retry
 *.log
 .vault_pass
+.vault_pass.sh
 .vault_password
 vault_pass.txt
 vault-password.txt
