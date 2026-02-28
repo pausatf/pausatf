@@ -40,6 +40,23 @@ output "database_uri" {
   sensitive   = true
 }
 
+output "database_user" {
+  description = "Production database admin username"
+  value       = module.wordpress.database_user
+  sensitive   = true
+}
+
+output "database_password" {
+  description = "Production database admin password"
+  value       = module.wordpress.database_password
+  sensitive   = true
+}
+
+output "database_name" {
+  description = "Production database default database name"
+  value       = module.wordpress.database_name
+}
+
 output "vpc_id" {
   description = "Production VPC ID"
   value       = module.wordpress.vpc_id
