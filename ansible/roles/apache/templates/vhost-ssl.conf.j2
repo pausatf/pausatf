@@ -62,6 +62,10 @@
         Header always set X-Content-Type-Options "nosniff"
         Header always set X-Frame-Options "SAMEORIGIN"
         Header always set Referrer-Policy "strict-origin-when-cross-origin"
+{% if csp_enabled | default(false) %}
+        Header always set Content-Security-Policy "default-src {{ csp_default_src }}; script-src {{ csp_script_src }}; style-src {{ csp_style_src }}; img-src {{ csp_img_src }}; font-src {{ csp_font_src }}; frame-src {{ csp_frame_src }}; connect-src {{ csp_connect_src }}"
+{% endif %}
+        Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
     </IfModule>
 
     # Cloudflare handles ETags at the edge

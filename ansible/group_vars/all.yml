@@ -248,6 +248,19 @@ ssl_certificate_key: "/etc/letsencrypt/live/pausatf.org/privkey.pem"
 # SECURITY
 # =============================================================================
 
+# Content-Security-Policy — controls which domains the browser may load resources from.
+# Each directive is a list of sources; the template joins them with spaces.
+# yamllint disable rule:line-length
+csp_enabled: true
+csp_default_src: "'self'"
+csp_script_src: "'self' 'unsafe-inline' 'unsafe-eval' *.googleapis.com *.gstatic.com *.google.com *.googletagmanager.com *.google-analytics.com ajax.cloudflare.com static.cloudflareinsights.com challenges.cloudflare.com *.wp.com *.wordpress.com widgetlogic.org"
+csp_style_src: "'self' 'unsafe-inline' fonts.googleapis.com *.wp.com"
+csp_img_src: "'self' data: *.googleapis.com *.gravatar.com *.wp.com *.google-analytics.com *.googletagmanager.com *.instagram.com *.cdninstagram.com *.pausatf.org"
+csp_font_src: "'self' fonts.gstatic.com data:"
+csp_frame_src: "'self' *.google.com *.wp.com"
+csp_connect_src: "'self' *.googleapis.com *.google-analytics.com *.googletagmanager.com *.wp.com *.wordpress.com"
+# yamllint enable rule:line-length
+
 # Fail2ban
 fail2ban_enabled: true
 fail2ban_bantime: 3600
