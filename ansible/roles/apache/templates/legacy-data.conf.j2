@@ -5,6 +5,13 @@
 # does not (data/ lives in the legacy tree, not /var/www/html/).
 {% set legacy_public = legacy_sites | selectattr('name', 'equalto', 'legacy-public') | map(attribute='path') | first %}
 
+# Redirect legacy PHP scripts to x10host mirror (open_basedir blocks
+# PHP execution under the legacy tree). Apache handles the 301 at the
+# URL level — no PHP involved.
+{% for script in legacy_data_redirects | default([]) %}
+RedirectMatch 301 ^/data/{{ script.pattern }}(.*)$ {{ script.target }}$1
+{% endfor %}
+
 Alias /data {{ legacy_public }}/data
 
 <Directory {{ legacy_public }}/data>
