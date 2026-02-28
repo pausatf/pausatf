@@ -51,6 +51,23 @@ output "database_urn" {
   value       = module.database.urn
 }
 
+output "database_user" {
+  description = "Managed database admin username"
+  value       = module.database.user
+  sensitive   = true
+}
+
+output "database_password" {
+  description = "Managed database admin password"
+  value       = module.database.password
+  sensitive   = true
+}
+
+output "database_name" {
+  description = "Managed database default database name"
+  value       = module.database.database
+}
+
 output "vpc_id" {
   description = "VPC ID"
   value       = var.create_vpc ? digitalocean_vpc.this[0].id : var.vpc_uuid_override
