@@ -21,17 +21,6 @@ variable "region" {
   }
 }
 
-variable "droplet_size" {
-  description = "Droplet size slug"
-  type        = string
-  default     = "s-1vcpu-1gb"
-
-  validation {
-    condition     = startswith(var.droplet_size, "s-")
-    error_message = "Droplet size must start with 's-' (shared CPU)."
-  }
-}
-
 variable "droplet_image" {
   description = "Droplet base image"
   type        = string
