@@ -31,12 +31,19 @@ resource "digitalocean_project" "pausatf" {
   description = "Pacific Association of USA Track & Field"
   purpose     = "Website or blog"
   environment = "Production"
+  is_default  = true
 
   resources = [
     module.wordpress.droplet_urn,
     digitalocean_reserved_ip.production.urn,
     module.wordpress.database_urn,
   ]
+
+  lifecycle {
+    ignore_changes = [
+      resources,
+    ]
+  }
 }
 
 # SSH Key
@@ -49,16 +56,19 @@ resource "digitalocean_ssh_key" "m3_laptop" {
 module "wordpress" {
   source = "../../stacks/wordpress"
 
-  environment          = "production"
-  region               = var.region
-  droplet_size         = var.droplet_size
-  droplet_image        = var.droplet_image
-  database_size        = var.database_size
-  ssh_key_fingerprints = [digitalocean_ssh_key.m3_laptop.id]
-  vpc_cidr             = "10.10.0.0/16"
-  alert_emails         = var.alert_email_addresses
-  enable_backups       = true
-  enable_monitoring    = true
+  environment              = "production"
+  region                   = var.region
+  droplet_size             = "s-4vcpu-8gb"
+  droplet_image            = var.droplet_image
+  database_size            = var.database_size
+  ssh_key_fingerprints     = [digitalocean_ssh_key.m3_laptop.id]
+  alert_emails             = var.alert_email_addresses
+  enable_backups           = true
+  enable_monitoring        = false
+  enable_monitoring_alerts = false
+
+  create_vpc        = false
+  vpc_uuid_override = "4ee39499-dc85-11e8-9f23-3cfdfea9fff1"
 
   cloud_init_content = templatefile("${path.module}/../../modules/droplet/cloud-init-ubuntu-24.yml", {
     environment = "production"
