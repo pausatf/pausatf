@@ -165,6 +165,13 @@ mysql_managed: false
 mysql_enabled: false
 mysql_port: 3306
 
+# DigitalOcean Managed MySQL (populated from Terraform outputs + vault)
+# To populate: terraform -chdir=terraform/environments/production output
+managed_db_host: "{{ vault_managed_db_host | default('') }}"
+managed_db_port: 25060
+managed_db_user: "{{ vault_managed_db_user | default('') }}"
+managed_db_password: "{{ vault_managed_db_password | default('') }}"
+
 # =============================================================================
 # WORDPRESS INSTALL DEFAULTS
 # =============================================================================
