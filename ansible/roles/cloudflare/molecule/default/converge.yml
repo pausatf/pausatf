@@ -6,22 +6,19 @@
     web_server: apache
     cloudflare_zone: "example.com"
     cloudflare_zone_id: "test-zone-id-molecule"
-    cloudflare_api_token: "test-api-token-molecule"
+    cloudflare_api_token: "test-api-token-molecule"  # pragma: allowlist secret
     cloudflare_email: "test@example.com"
-    cloudflare_ssl_mode: "strict"
-    cloudflare_min_tls_version: "1.2"
-    cloudflare_always_use_https: true
-    cloudflare_security_level: "medium"
     cloudflare_manage_dns: false
     cloudflare_purge_cache: false
     cloudflare_verify_zone: false
     legacy_content_path: /var/www/legacy
   pre_tasks:
-    - name: Install Apache (dependency)
+    - name: Install Apache and dependencies
       apt:
         name:
           - apache2
           - python3-pip
+          - cron
         state: present
         update_cache: true
     - name: Enable remoteip module
