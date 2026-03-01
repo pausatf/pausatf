@@ -28,8 +28,9 @@
 
 - name: Download WordPress core (if not installed)
   command: "{{ wpcli_path | default('/usr/local/bin/wp') }} core download --path={{ wp_site.path }} --version={{ wp_site.wp_version | default('latest') }} --skip-content --allow-root"
+  register: wp_download
   when: wp_installed.rc != 0
-  failed_when: false
+  failed_when: wp_download.rc != 0 and 'already exists' not in (wp_download.stderr | default(''))
 
 - name: Verify WordPress checksums
   command: "{{ wpcli_path | default('/usr/local/bin/wp') }} core verify-checksums --path={{ wp_site.path }} --allow-root"
@@ -85,7 +86,7 @@
   command: "{{ wpcli_path | default('/usr/local/bin/wp') }} plugin install litespeed-cache --activate --path={{ wp_site.path }} --allow-root"
   when:
     - web_server | default('apache') == 'openlitespeed'
-    - lscache_installed.rc != 0
+    - lscache_installed is defined and lscache_installed.rc != 0
 
 - name: Check if redis-cache plugin is installed
   command: "{{ wpcli_path | default('/usr/local/bin/wp') }} plugin is-installed redis-cache --path={{ wp_site.path }} --allow-root"
@@ -98,7 +99,7 @@
   command: "{{ wpcli_path | default('/usr/local/bin/wp') }} plugin install redis-cache --path={{ wp_site.path }} --allow-root"
   when:
     - redis_enabled | default(false)
-    - redis_cache_installed.rc != 0
+    - redis_cache_installed is defined and redis_cache_installed.rc != 0
 
 - name: Activate redis-cache plugin
   command: "{{ wpcli_path | default('/usr/local/bin/wp') }} plugin activate redis-cache --path={{ wp_site.path }} --allow-root"
@@ -114,15 +115,24 @@
   failed_when: false
   when: redis_enabled | default(false)
 
-- name: Set WordPress file and directory permissions
+- name: Set WordPress directory ownership
   file:
     path: "{{ wp_site.path }}"
     state: directory
     owner: www-data
     group: www-data
-    mode: '0755'
     recurse: yes
   changed_when: false
+
+- name: Set WordPress directory permissions
+  command: find {{ wp_site.path }} -type d -not -perm 0755 -exec chmod 755 {} +
+  register: dir_perms
+  changed_when: dir_perms.rc == 0 and dir_perms.stdout != ''
+
+- name: Set WordPress file permissions
+  command: find {{ wp_site.path }} -type f -not -perm 0644 -exec chmod 644 {} +
+  register: file_perms
+  changed_when: file_perms.rc == 0 and file_perms.stdout != ''
 
 - name: Ensure uploads directory exists
   file:

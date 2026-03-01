@@ -24,7 +24,8 @@ $allowed_ips = [
 {% endfor %}
 ];
 
-$client_ip = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['REMOTE_ADDR'] ?? '';
+// mod_remoteip already rewrites REMOTE_ADDR for Cloudflare traffic
+$client_ip = $_SERVER['REMOTE_ADDR'] ?? '';
 
 $is_allowed = in_array($client_ip, $allowed_ips);
 
@@ -50,12 +51,29 @@ $checks['php'] = [
     'version' => PHP_VERSION,
 ];
 
-// Check 2: MySQL connection
+// Check 2: MySQL connection (credentials read from wp-config.php at runtime)
 try {
-    $db_host = '{{ wordpress_installs[0].db_host | default("localhost") }}';
-    $db_name = '{{ wordpress_installs[0].db_name | default("wordpress") }}';
-    $db_user = '{{ wordpress_installs[0].db_user | default("wordpress") }}';
-    $db_pass = '{{ wordpress_installs[0].db_password | default("") }}';
+    $wp_config = "$wp_path/wp-config.php";
+    $db_host = 'localhost';
+    $db_name = 'wordpress';
+    $db_user = 'wordpress';
+    $db_pass = '';
+
+    if (file_exists($wp_config)) {
+        $config_content = file_get_contents($wp_config);
+        if (preg_match("/define\s*\(\s*'DB_HOST'\s*,\s*'([^']+)'/", $config_content, $m)) {
+            $db_host = $m[1];
+        }
+        if (preg_match("/define\s*\(\s*'DB_NAME'\s*,\s*'([^']+)'/", $config_content, $m)) {
+            $db_name = $m[1];
+        }
+        if (preg_match("/define\s*\(\s*'DB_USER'\s*,\s*'([^']+)'/", $config_content, $m)) {
+            $db_user = $m[1];
+        }
+        if (preg_match("/define\s*\(\s*'DB_PASSWORD'\s*,\s*'([^']+)'/", $config_content, $m)) {
+            $db_pass = $m[1];
+        }
+    }
 
     $pdo = new PDO(
         "mysql:host=$db_host;dbname=$db_name;charset=utf8mb4",

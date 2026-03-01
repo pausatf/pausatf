@@ -15,8 +15,8 @@
     SSLSessionCacheTimeout 300
 
     # OCSP Stapling
-    SSLUseStapling Off
-    # SSLStaplingCache shmcb:${APACHE_RUN_DIR}/ssl_stapling(32768)
+    SSLUseStapling On
+    SSLStaplingCache shmcb:${APACHE_RUN_DIR}/ssl_stapling(32768)
 
     # Strict SNI
     SSLStrictSNIVHostCheck Off
