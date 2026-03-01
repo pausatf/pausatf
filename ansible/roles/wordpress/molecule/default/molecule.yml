@@ -32,7 +32,10 @@ provisioner:
         wordpress_installs:
           - path: /var/www/html
             domain: localhost
+            db_name: wordpress
+            db_user: wordpress
             db_password: molecule_test_pass  # pragma: allowlist secret
+            db_host: localhost
             manage_wp_config: false
 verifier:
   name: ansible
