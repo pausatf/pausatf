@@ -23,9 +23,11 @@
       - path: /var/www/html
         name: wordpress-files
   pre_tasks:
-    - name: Install Apache (dependency)
+    - name: Install Apache and cron (dependencies)
       apt:
-        name: apache2
+        name:
+          - apache2
+          - cron
         state: present
         update_cache: true
     - name: Create WordPress directory

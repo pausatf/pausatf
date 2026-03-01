@@ -94,7 +94,7 @@
       changed_when: false
 
     - name: Verify tmp dir is NOT under /tmp
-      command: grep -c '/tmp' /etc/modsecurity/modsecurity.conf
+      shell: grep -cE '^\s*Sec(Tmp|Data)Dir\s+/tmp(/|\s|$)' /etc/modsecurity/modsecurity.conf
       register: tmp_check
       changed_when: false
       failed_when: tmp_check.rc == 0
