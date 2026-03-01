@@ -1,0 +1,31 @@
+# Cache Control for Race Results Directory
+# Managed by Ansible - do not edit manually
+
+<IfModule mod_headers.c>
+    # HTML files - AGGRESSIVE no-cache (race results must always be fresh)
+    <FilesMatch "\.(html|htm)$">
+        Header set Cache-Control "no-cache, no-store, must-revalidate, max-age=0"
+        Header set Pragma "no-cache"
+        Header set Expires "0"
+        # Tell Cloudflare to bypass cache for these files
+        Header set CF-Cache-Control "no-cache"
+    </FilesMatch>
+
+    # Static assets - 30 day TTL
+    # Use versioned filenames (e.g., logo-v2.png) when updating images
+    <FilesMatch "\.(jpg|jpeg|png|gif|ico|svg|webp)$">
+        Header set Cache-Control "public, max-age=2592000, immutable"
+    </FilesMatch>
+
+    <FilesMatch "\.(css|js)$">
+        Header set Cache-Control "public, max-age=2592000, immutable"
+    </FilesMatch>
+</IfModule>
+
+# Prevent directory listing
+Options -Indexes
+
+# Security: Block access to sensitive files
+<FilesMatch "^(\.htaccess|\.htpasswd|\.git)">
+    Require all denied
+</FilesMatch>

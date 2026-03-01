@@ -72,3 +72,18 @@
     weekday: "{{ (backup_schedule.split(' '))[4] }}"
     job: "/usr/local/sbin/backup-wordpress.sh >> /var/log/wordpress-backup.log 2>&1"
     state: "{{ 'present' if backup_enabled | default(true) else 'absent' }}"
+
+- name: Deploy Apache health check script
+  template:
+    src: httpd-check.sh.j2
+    dest: /etc/cron.d/httpd-check.sh
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Schedule Apache health check every 30 minutes
+  cron:
+    name: "Apache health check"
+    minute: "*/30"
+    job: "/etc/cron.d/httpd-check.sh"
+    user: root
