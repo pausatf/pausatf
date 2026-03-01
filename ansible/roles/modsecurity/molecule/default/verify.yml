@@ -1,0 +1,100 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  tasks:
+    - name: Check libapache2-mod-security2 is installed
+      command: dpkg -s libapache2-mod-security2
+      changed_when: false
+
+    - name: Check modsecurity-crs is installed
+      command: dpkg -s modsecurity-crs
+      changed_when: false
+
+    - name: Check ModSecurity config exists
+      stat:
+        path: /etc/modsecurity/modsecurity.conf
+      register: modsec_conf
+    - name: Assert ModSecurity config exists
+      assert:
+        that:
+          - modsec_conf.stat.exists
+          - modsec_conf.stat.mode == '0644'
+
+    - name: Check CRS directory exists
+      stat:
+        path: /etc/modsecurity/crs
+      register: crs_dir
+    - name: Assert CRS directory
+      assert:
+        that:
+          - crs_dir.stat.exists
+          - crs_dir.stat.isdir
+
+    - name: Check pre-rules exclusion file
+      stat:
+        path: /etc/modsecurity/crs/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf
+      register: pre_rules
+    - name: Assert pre-rules file exists
+      assert:
+        that: pre_rules.stat.exists
+
+    - name: Check post-rules exclusion file
+      stat:
+        path: /etc/modsecurity/crs/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf
+      register: post_rules
+    - name: Assert post-rules file exists
+      assert:
+        that: post_rules.stat.exists
+
+    - name: Check working directory /var/lib/modsecurity/tmp
+      stat:
+        path: /var/lib/modsecurity/tmp
+      register: modsec_tmp
+    - name: Assert tmp dir ownership and permissions
+      assert:
+        that:
+          - modsec_tmp.stat.exists
+          - modsec_tmp.stat.isdir
+          - modsec_tmp.stat.mode == '0750'
+          - modsec_tmp.stat.gr_name == 'www-data'
+
+    - name: Check working directory /var/lib/modsecurity/data
+      stat:
+        path: /var/lib/modsecurity/data
+      register: modsec_data
+    - name: Assert data dir ownership and permissions
+      assert:
+        that:
+          - modsec_data.stat.exists
+          - modsec_data.stat.isdir
+          - modsec_data.stat.mode == '0750'
+          - modsec_data.stat.gr_name == 'www-data'
+
+    - name: Check audit log exists
+      stat:
+        path: /var/log/apache2/modsec_audit.log
+      register: audit_log
+    - name: Assert audit log permissions
+      assert:
+        that:
+          - audit_log.stat.exists
+          - audit_log.stat.mode == '0640'
+
+    - name: Check logrotate config
+      stat:
+        path: /etc/logrotate.d/modsecurity
+      register: logrotate_conf
+    - name: Assert logrotate config exists
+      assert:
+        that: logrotate_conf.stat.exists
+
+    - name: Verify ModSecurity config contains SecRuleEngine
+      command: grep -q 'SecRuleEngine' /etc/modsecurity/modsecurity.conf
+      changed_when: false
+
+    - name: Verify tmp dir is NOT under /tmp
+      command: grep -c '/tmp' /etc/modsecurity/modsecurity.conf
+      register: tmp_check
+      changed_when: false
+      failed_when: tmp_check.rc == 0

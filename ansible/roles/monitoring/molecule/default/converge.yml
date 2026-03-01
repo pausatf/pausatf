@@ -1,0 +1,38 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+  vars:
+    backup_enabled: true
+    backup_schedule: "0 2 * * *"
+    backup_destination: /var/backups/wordpress
+    backup_retention_days: 30
+    healthcheck_enabled: true
+    healthcheck_token: "test-token-molecule"
+    healthcheck_allowed_ips:
+      - "127.0.0.1"
+      - "::1"
+    wordpress_installs:
+      - name: pausatf-main
+        path: /var/www/html
+        db_name: wordpress
+        db_user: wordpress
+        db_host: localhost
+    backup_items:
+      - path: /var/www/html
+        name: wordpress-files
+  pre_tasks:
+    - name: Install Apache (dependency)
+      apt:
+        name: apache2
+        state: present
+        update_cache: true
+    - name: Create WordPress directory
+      file:
+        path: /var/www/html/.well-known
+        state: directory
+        owner: www-data
+        group: www-data
+        mode: '0755'
+  roles:
+    - role: monitoring
