@@ -18,6 +18,7 @@
           - php-curl
           - php-xml
           - php-mbstring
+          - php-zip
           - cron
           - nginx
         state: present
