@@ -277,6 +277,30 @@
     group: root
     mode: '0755'
 
+- name: Create scorer credentials directory
+  file:
+    path: /etc/pausatf
+    state: directory
+    owner: root
+    group: www-data
+    mode: '0750'
+
+- name: Deploy scorer upload token
+  copy:
+    content: "{{ vault_scorer_upload_token | default('') }}"
+    dest: /etc/pausatf/scorer-upload-token
+    owner: root
+    group: www-data
+    mode: '0640'
+
+- name: Deploy scorer salt
+  copy:
+    content: "{{ vault_scorer_salt | default('') }}"
+    dest: /etc/pausatf/scorer-salt
+    owner: root
+    group: www-data
+    mode: '0640'
+
 - name: Deploy scorer_upload.php
   copy:
     src: scorer_upload.php

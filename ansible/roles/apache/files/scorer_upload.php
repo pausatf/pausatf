@@ -13,21 +13,23 @@ class Scorer_upload {
 	// Base directory where year subdirectories live
 	private $data_dir = "/var/www/legacy/public_html/data";
 
-	private $md5_hashes = [];   // md5 hash of each file
-	private $salt = "ju75f34M9";  // salt for md5
-	private $year;  // directory for storing uploaded files
-	public $report;  // message to display on successful upload.  Starts with "success"
+	private $md5_hashes = [];
+	private $year;
+	public $report;
 	private $uploaded_file_hashes;
 	private $existing_file_hashes;
 	private $upload_results;
 
+	// Allowed file extensions for upload
+	private $allowed_extensions = ['html', 'htm', 'csv', 'txt', 'css', 'js', 'png', 'jpg', 'jpeg', 'gif', 'svg', 'ico', 'pdf', 'xls', 'xlsx'];
 
 	function __construct() {
+		$this->check_auth();
 		$this->year = $this->get_year();
 		$form_hash = $this->get_form_hash();
 		$files_hash = $this->get_files_hash();
-		if($form_hash != $files_hash) {
-			die("Hash mismatch, files not uploaded:<br>form_hash='$form_hash'<br>files_hash='$files_hash'");
+		if(!hash_equals($form_hash, $files_hash)) {
+			die("Hash mismatch, files not uploaded");
 		}
 		$this->get_existing_file_hashes();
 		$this->move_files();
@@ -41,21 +43,47 @@ class Scorer_upload {
 		$this->report = $msg;
 	}
 
+	private function check_auth() {
+		$token_file = '/etc/pausatf/scorer-upload-token';
+		if (!is_file($token_file)) {
+			// No token file deployed; auth disabled (first-run compatibility)
+			return;
+		}
+		$expected = trim(file_get_contents($token_file));
+		if (empty($expected)) {
+			return;
+		}
+		$provided = $_SERVER['HTTP_X_UPLOAD_TOKEN'] ?? $_REQUEST['token'] ?? '';
+		if (!hash_equals($expected, $provided)) {
+			http_response_code(403);
+			die('Forbidden: invalid upload token');
+		}
+	}
+
+	private function get_salt() {
+		$salt_file = '/etc/pausatf/scorer-salt';
+		if (is_file($salt_file)) {
+			return trim(file_get_contents($salt_file));
+		}
+		// Fallback for backwards compatibility during migration
+		return "ju75f34M9";
+	}
+
 	private function get_year() {
 		if(!isset($_REQUEST["year"])) {
 			die("Year not specified");
 		}
 		$year = $_REQUEST["year"];
-		if(!preg_match("/^\d\d\d\d$/", $year)) {
-			die("Invalid year: '$year'");
+		if(!preg_match("/^\d{4}$/", $year)) {
+			die("Invalid year");
 		}
 		$year_path = $this->data_dir . "/" . $year;
 		if(!is_dir($year_path)) {
-			die("Directory '$year' not found");
+			die("Directory not found");
 		}
-		$current_year = date("Y");
-		if($year < $current_year) {
-			die("Destination directory year ($year) is earlier than curret year ($current_year)");
+		$current_year = (int) date("Y");
+		if((int) $year < $current_year) {
+			die("Destination directory year is earlier than current year");
 		}
 		return $year;
 	}
@@ -64,12 +92,24 @@ class Scorer_upload {
 		if(!isset($_REQUEST["hash"])) {
 			die("Hash not specified");
 		}
-		$form_hash = $_REQUEST["hash"];
-		return $form_hash;
+		return $_REQUEST["hash"];
 	}
 
 	private function compute_hash($content) {
-		return substr(md5($content . $this->salt), 3, 11);
+		$salt = $this->get_salt();
+		return substr(hash_hmac('sha256', $content, $salt), 0, 16);
+	}
+
+	private function validate_filename($name) {
+		$name = basename($name);
+		if ($name === '' || $name[0] === '.') {
+			die("Invalid filename");
+		}
+		$ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+		if (!in_array($ext, $this->allowed_extensions, true)) {
+			die("File type not allowed: $ext");
+		}
+		return $name;
 	}
 
 	private function get_files_hash(){
@@ -77,7 +117,7 @@ class Scorer_upload {
 		foreach ($_FILES["files"]["error"] as $key => $error) {
 			if ($error == UPLOAD_ERR_OK) {
 				$tmp_name = $_FILES["files"]["tmp_name"][$key];
-				$name = basename($_FILES["files"]["name"][$key]);
+				$name = $this->validate_filename($_FILES["files"]["name"][$key]);
 				$content = file_get_contents($tmp_name);
 				$this->uploaded_file_hashes[$name] = $this->compute_hash($content);
 			}
@@ -90,7 +130,7 @@ class Scorer_upload {
 		$this->existing_file_hashes = [];
 		foreach ($_FILES["files"]["error"] as $key => $error) {
 			if ($error == UPLOAD_ERR_OK) {
-				$name = basename($_FILES["files"]["name"][$key]);
+				$name = $this->validate_filename($_FILES["files"]["name"][$key]);
 				$path = $this->data_dir . "/" . $this->year . "/" . $name;
 				if(is_file($path)) {
 					$content = file_get_contents($path);
@@ -104,7 +144,7 @@ class Scorer_upload {
 		$this->upload_results = [];
 		foreach ($_FILES["files"]["error"] as $key => $error) {
 			if ($error == UPLOAD_ERR_OK) {
-				$name = basename($_FILES["files"]["name"][$key]);
+				$name = $this->validate_filename($_FILES["files"]["name"][$key]);
 				if(isset($this->existing_file_hashes[$name])) {
 					if ($this->existing_file_hashes[$name] == $this->uploaded_file_hashes[$name]) {
 						$this->upload_results[$name] = "No change to previous file";

@@ -239,13 +239,13 @@ legacy_sites:
 # blocks PHP execution under the legacy tree).
 legacy_data_redirects:
   - pattern: "clubs\\.php"
-    target: "http://pausatf.x10host.com/data/clubs.php"
+    target: "https://pausatf.x10host.com/data/clubs.php"
   - pattern: "members\\.php"
-    target: "http://pausatf.x10host.com/data/members.php"
+    target: "https://pausatf.x10host.com/data/members.php"
   - pattern: "ScoreSheet\\.php"
-    target: "http://pausatf.x10host.com/data/ScoreSheet.php"
+    target: "https://pausatf.x10host.com/data/ScoreSheet.php"
   - pattern: "3024/geolocate\\.php"
-    target: "http://pausatf.x10host.com/data/3024/geolocate.php"
+    target: "https://pausatf.x10host.com/data/3024/geolocate.php"
 
 # =============================================================================
 # SSL CONFIGURATION
