@@ -88,7 +88,7 @@
       loop: "{{ wordpress_installs }}"
       loop_control:
         # Suppress full item dict (contains db_password) from log output
-        label: "{{ item.db_name }}"
+        label: "{{ item.db_name | default('unknown') }}"
       when: item.db_name is defined
 
     - name: Create WordPress database users
@@ -101,7 +101,7 @@
         login_unix_socket: "{{ mysql_socket }}"
       loop: "{{ wordpress_installs }}"
       loop_control:
-        label: "{{ item.db_name }}"
+        label: "{{ item.db_name | default('unknown') }}"
       when: item.db_user is defined
       no_log: true
 

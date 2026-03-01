@@ -44,7 +44,7 @@
           - health_check.stat.mode == '0640'
 
     - name: Verify health check reads DB creds from wp-config at runtime
-      command: grep -q 'file_get_contents.*wp-config' /var/www/html/.well-known/health-check.php
+      shell: grep -q 'file_get_contents' /var/www/html/.well-known/health-check.php && grep -q 'wp-config' /var/www/html/.well-known/health-check.php
       changed_when: false
 
     - name: Verify health check uses REMOTE_ADDR (not HTTP header)
