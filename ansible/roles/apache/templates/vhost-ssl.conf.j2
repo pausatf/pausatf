@@ -14,14 +14,8 @@
 
     # SSL Configuration
     SSLEngine on
-{% if apache_mpm | default('prefork') == 'event' %}
-    # Let's Encrypt certificates (certbot with Cloudflare DNS plugin)
-    SSLCertificateFile /etc/letsencrypt/live/pausatf.org/fullchain.pem
-    SSLCertificateKeyFile /etc/letsencrypt/live/pausatf.org/privkey.pem
-{% else %}
     SSLCertificateFile {{ item.ssl_certificate }}
     SSLCertificateKeyFile {{ item.ssl_certificate_key }}
-{% endif %}
 
     # Modern SSL Configuration
     SSLProtocol {{ ssl_protocol | default('all -SSLv3 -TLSv1 -TLSv1.1') }}
@@ -29,8 +23,8 @@
     SSLHonorCipherOrder off
     SSLSessionTickets off
 
-    # HSTS — preload-ready
-    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+    # HSTS
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
 
     <Directory {{ item.path }}>
         Options FollowSymLinks
@@ -41,7 +35,7 @@
 {% if apache_mpm | default('prefork') == 'event' %}
     # PHP-FPM via unix socket (event MPM)
     <FilesMatch "\.php$">
-        SetHandler "proxy:unix:{{ php_fpm_socket | default('/run/php/php8.3-fpm.sock') }}|fcgi://localhost"
+        SetHandler "proxy:unix:{{ php_fpm_socket | default('/run/php/php' + php_version + '-fpm.sock') }}|fcgi://localhost"
     </FilesMatch>
     <Proxy "fcgi://localhost">
     </Proxy>
@@ -52,20 +46,26 @@
     </FilesMatch>
 {% endif %}
 
-    # Logging — include X-Forwarded-For for real client IP behind Cloudflare
+    # Logging
     ErrorLog ${APACHE_LOG_DIR}/{{ item.name }}-ssl-error.log
-    LogFormat "%{X-Forwarded-For}i %h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" cloudflare_combined
-    CustomLog ${APACHE_LOG_DIR}/{{ item.name }}-ssl-access.log cloudflare_combined
+    CustomLog ${APACHE_LOG_DIR}/{{ item.name }}-ssl-access.log combined
 
     # Security headers
     <IfModule mod_headers.c>
         Header always set X-Content-Type-Options "nosniff"
         Header always set X-Frame-Options "SAMEORIGIN"
+        Header always set X-XSS-Protection "1; mode=block"
         Header always set Referrer-Policy "strict-origin-when-cross-origin"
 {% if csp_enabled | default(false) %}
         Header always set Content-Security-Policy "default-src {{ csp_default_src }}; script-src {{ csp_script_src }}; style-src {{ csp_style_src }}; img-src {{ csp_img_src }}; font-src {{ csp_font_src }}; frame-src {{ csp_frame_src }}; connect-src {{ csp_connect_src }}"
 {% endif %}
         Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+    </IfModule>
+
+    # Cloudflare headers (for upload support)
+    <IfModule mod_headers.c>
+        SetEnvIf X-Forwarded-For "^.*\..*\..*\..*" CLOUDFLARE=1
+        Header set X-Upload-Allowed "1" env=CLOUDFLARE
     </IfModule>
 
     # Cloudflare handles ETags at the edge

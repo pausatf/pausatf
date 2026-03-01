@@ -36,6 +36,15 @@
     group: root
     mode: '0644'
 
+- name: Deploy PHP security hardening
+  template:
+    src: security.ini.j2
+    dest: "/etc/php/{{ php_version }}/apache2/conf.d/99-security.ini"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart Apache
+
 - name: Deploy OPcache configuration
   template:
     src: opcache.ini.j2

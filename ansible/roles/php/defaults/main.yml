@@ -1,2 +1,6 @@
 ---
 php_version: "8.3"
+
+# 99-security.ini defaults
+php_open_basedir: "/var/www/html:/tmp:/var/tmp:/usr/share/php"
+php_disable_functions: "exec,passthru,shell_exec,system,proc_open,popen,parse_ini_file,show_source"

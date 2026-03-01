@@ -63,6 +63,10 @@ cloudflare_dns_records:
 hostname: "pausatf-prod"
 web_server: apache
 
+# Production overrides — server runs prefork + mod_php 8.4 (not event + FPM)
+apache_mpm: "prefork"
+php_version: "8.4"
+
 # =============================================================================
 # WORDPRESS — PRODUCTION INSTALL
 # =============================================================================
@@ -77,8 +81,8 @@ wordpress_installs:
       'wp_memory_limit': '256M',
       'wp_max_memory_limit': '512M',
       'ssl_enabled': true,
-      'ssl_certificate': '/etc/letsencrypt/live/pausatf.org/fullchain.pem',
-      'ssl_certificate_key': '/etc/letsencrypt/live/pausatf.org/privkey.pem',
+      'ssl_certificate': '/etc/letsencrypt/live/www.pausatf.org/fullchain.pem',
+      'ssl_certificate_key': '/etc/letsencrypt/live/www.pausatf.org/privkey.pem',
       'manage_wp_config': true,
       'db_password': vault_wp_main_db_password,
       'auth_key': vault_wp_main_auth_key,
@@ -90,6 +94,15 @@ wordpress_installs:
       'logged_in_salt': vault_wp_main_logged_in_salt,
       'nonce_salt': vault_wp_main_nonce_salt,
     }) }}"
+
+# =============================================================================
+# ADDITIONAL VHOSTS (non-WordPress)
+# =============================================================================
+additional_vhosts:
+  - name: "pausatf-transit"
+    domain: "transit.pausatf.org"
+    path: "/var/www/transit/html"
+    ssl_enabled: false
 
 # =============================================================================
 # WORDPRESS THEMES (production site)
