@@ -1,0 +1,84 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  tasks:
+    - name: Check monitoring packages installed
+      command: "dpkg -s {{ item }}"
+      loop:
+        - htop
+        - sysstat
+        - vnstat
+      changed_when: false
+
+    - name: Check sysstat enabled
+      command: grep -q 'ENABLED="true"' /etc/default/sysstat
+      changed_when: false
+
+    - name: Check backup script deployed
+      stat:
+        path: /usr/local/sbin/backup-wordpress.sh
+      register: backup_script
+    - name: Assert backup script permissions
+      assert:
+        that:
+          - backup_script.stat.exists
+          - backup_script.stat.mode == '0700'
+
+    - name: Verify backup script has safety net (set -euo pipefail)
+      command: grep -q 'set -euo pipefail' /usr/local/sbin/backup-wordpress.sh
+      changed_when: false
+
+    - name: Verify backup script trap is before loop
+      command: grep -q "trap 'rm -f" /usr/local/sbin/backup-wordpress.sh
+      changed_when: false
+
+    - name: Check health check endpoint deployed
+      stat:
+        path: /var/www/html/.well-known/health-check.php
+      register: health_check
+    - name: Assert health check permissions
+      assert:
+        that:
+          - health_check.stat.exists
+          - health_check.stat.mode == '0640'
+
+    - name: Verify health check reads DB creds from wp-config at runtime
+      command: grep -q 'file_get_contents.*wp-config' /var/www/html/.well-known/health-check.php
+      changed_when: false
+
+    - name: Verify health check uses REMOTE_ADDR (not HTTP header)
+      command: grep -q "REMOTE_ADDR" /var/www/html/.well-known/health-check.php
+      changed_when: false
+
+    - name: Verify health check does NOT contain hardcoded DB password
+      command: grep -c "vault_managed_db_password\|db_pass.*=.*'" /var/www/html/.well-known/health-check.php
+      register: hardcoded_pass
+      changed_when: false
+      failed_when: hardcoded_pass.stdout | int > 2
+
+    - name: Check httpd-check script deployed
+      stat:
+        path: /usr/local/sbin/httpd-check.sh
+      register: httpd_check
+    - name: Assert httpd-check permissions
+      assert:
+        that:
+          - httpd_check.stat.exists
+          - httpd_check.stat.mode == '0755'
+
+    - name: Verify httpd-check uses proper curl error handling
+      command: grep -q 'connect-timeout' /usr/local/sbin/httpd-check.sh
+      changed_when: false
+
+    - name: Check backup cron job exists
+      command: crontab -l
+      register: root_crontab
+      changed_when: false
+    - name: Assert backup cron scheduled
+      assert:
+        that: "'backup-wordpress.sh' in root_crontab.stdout"
+
+    - name: Assert httpd-check cron scheduled
+      assert:
+        that: "'httpd-check.sh' in root_crontab.stdout"

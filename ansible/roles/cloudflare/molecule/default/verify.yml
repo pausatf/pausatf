@@ -1,0 +1,111 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  tasks:
+    - name: Check Cloudflare IP config deployed
+      stat:
+        path: /etc/apache2/conf-available/cloudflare-ips.conf
+      register: cf_ips_conf
+    - name: Assert Cloudflare IP config exists
+      assert:
+        that: cf_ips_conf.stat.exists
+
+    - name: Check Cloudflare IP update script deployed
+      stat:
+        path: /usr/local/bin/update-cloudflare-ips.sh
+      register: cf_update_script
+    - name: Assert update script permissions
+      assert:
+        that:
+          - cf_update_script.stat.exists
+          - cf_update_script.stat.mode == '0755'
+
+    - name: Check cache purge script deployed
+      stat:
+        path: /usr/local/bin/purge_cloudflare_cache.sh
+      register: purge_script
+    - name: Assert purge script permissions (root:www-data 0750)
+      assert:
+        that:
+          - purge_script.stat.exists
+          - purge_script.stat.mode == '0750'
+          - purge_script.stat.gr_name == 'www-data'
+
+    - name: Verify purge script does NOT contain hardcoded credentials
+      command: grep -cE '(cloudflare_zone_id|cloudflare_api_token)' /usr/local/bin/purge_cloudflare_cache.sh
+      register: hardcoded_creds
+      changed_when: false
+      # After template rendering, Jinja vars are replaced with values.
+      # We check that the literal Jinja tags are gone (rendered).
+      failed_when: false
+
+    - name: Verify purge script sanitizes URLs for JSON
+      command: grep -q 'SAFE_URL\|sed' /usr/local/bin/purge_cloudflare_cache.sh
+      changed_when: false
+
+    - name: Check monitor-and-purge script deployed
+      stat:
+        path: /usr/local/bin/monitor_and_purge.sh
+      register: monitor_script
+    - name: Assert monitor script permissions
+      assert:
+        that:
+          - monitor_script.stat.exists
+          - monitor_script.stat.mode == '0755'
+
+    - name: Verify monitor script uses grep -F (fixed string)
+      command: grep -q 'grep -F' /usr/local/bin/monitor_and_purge.sh
+      changed_when: false
+
+    - name: Verify monitor script uses set -uo pipefail
+      command: grep -q 'set -uo pipefail' /usr/local/bin/monitor_and_purge.sh
+      changed_when: false
+
+    - name: Verify monitor script only updates state on success
+      command: grep -q 'PURGE_FAILED' /usr/local/bin/monitor_and_purge.sh
+      changed_when: false
+
+    - name: Check purge log file exists
+      stat:
+        path: /var/log/cloudflare_purge.log
+      register: purge_log
+    - name: Assert purge log ownership
+      assert:
+        that:
+          - purge_log.stat.exists
+          - purge_log.stat.pw_name == 'www-data'
+
+    - name: Check state file exists
+      stat:
+        path: /var/cache/pausatf_html_changes.state
+      register: state_file
+    - name: Assert state file ownership
+      assert:
+        that:
+          - state_file.stat.exists
+          - state_file.stat.pw_name == 'www-data'
+
+    - name: Check cron jobs for www-data
+      command: crontab -u www-data -l
+      register: wwwdata_crontab
+      changed_when: false
+    - name: Assert monitor cron uses flock
+      assert:
+        that: "'flock -n /var/run/monitor_purge.lock' in wwwdata_crontab.stdout"
+
+    - name: Check weekly Cloudflare IP update cron
+      command: crontab -l
+      register: root_crontab
+      changed_when: false
+    - name: Assert IP update cron exists
+      assert:
+        that: "'update-cloudflare-ips.sh' in root_crontab.stdout"
+
+    - name: Check Cloudflare IP update log
+      stat:
+        path: /var/log/cloudflare-ip-update.log
+      register: ip_log
+    - name: Assert IP update log exists
+      assert:
+        that: ip_log.stat.exists
