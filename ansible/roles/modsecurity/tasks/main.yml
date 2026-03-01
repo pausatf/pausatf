@@ -9,6 +9,17 @@
       - modsecurity-crs
     state: present
 
+- name: Create ModSecurity working directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: www-data
+    mode: '0750'
+  loop:
+    - "{{ modsecurity_tmp_dir }}"
+    - "{{ modsecurity_data_dir }}"
+
 - name: Deploy ModSecurity configuration
   template:
     src: modsecurity.conf.j2

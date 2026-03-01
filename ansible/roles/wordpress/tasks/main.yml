@@ -46,23 +46,28 @@
   loop: "{{ wordpress_installs | default([]) }}"
   when: item.wp_cron_system | default(true)
 
-- name: Ensure legacy data year directories exist
+- name: Ensure legacy data year directory exists for current year
   file:
-    path: "/var/www/legacy/public_html/data/{{ item }}"
+    path: "/var/www/legacy/public_html/data/{{ ansible_date_time.year }}"
     state: directory
     owner: www-data
     group: www-data
     mode: '0755'
-  loop:
-    - "{{ ansible_date_time.year }}"
+
+- name: Find existing legacy data year directories
+  find:
+    paths: /var/www/legacy/public_html/data
+    file_type: directory
+    patterns: '20[0-9][0-9]'
+  register: legacy_year_dirs
 
 - name: Deploy legacy data directory .htaccess
   template:
     src: legacy-data-htaccess.j2
-    dest: "/var/www/legacy/public_html/data/{{ item }}/.htaccess"
+    dest: "{{ item.path }}/.htaccess"
     owner: www-data
     group: www-data
     mode: '0644'
-  loop:
-    - "2025"
-    - "{{ ansible_date_time.year }}"
+  loop: "{{ legacy_year_dirs.files }}"
+  loop_control:
+    label: "{{ item.path }}"

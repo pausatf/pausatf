@@ -76,7 +76,7 @@
 - name: Deploy Apache health check script
   template:
     src: httpd-check.sh.j2
-    dest: /etc/cron.d/httpd-check.sh
+    dest: /usr/local/sbin/httpd-check.sh
     owner: root
     group: root
     mode: '0755'
@@ -85,5 +85,5 @@
   cron:
     name: "Apache health check"
     minute: "*/30"
-    job: "/etc/cron.d/httpd-check.sh"
+    job: "/usr/local/sbin/httpd-check.sh"
     user: root

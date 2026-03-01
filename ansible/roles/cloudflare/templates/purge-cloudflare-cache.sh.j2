@@ -33,10 +33,12 @@ else
         exit 1
     fi
 
+    # Sanitize URL for JSON embedding (escape backslashes and double quotes)
+    SAFE_URL=$(printf '%s' "$URL" | sed 's/\\/\\\\/g; s/"/\\"/g')
     response=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/purge_cache" \
         -H "Authorization: Bearer ${API_TOKEN}" \
         -H "Content-Type: application/json" \
-        --data "{\"files\":[\"${URL}\"]}")
+        --data "{\"files\":[\"${SAFE_URL}\"]}")
 fi
 
 if echo "$response" | grep -q '"success":true'; then
