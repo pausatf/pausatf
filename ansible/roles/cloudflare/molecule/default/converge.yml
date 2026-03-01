@@ -14,6 +14,7 @@
     cloudflare_security_level: "medium"
     cloudflare_manage_dns: false
     cloudflare_purge_cache: false
+    cloudflare_verify_zone: false
     legacy_content_path: /var/www/legacy
   pre_tasks:
     - name: Install Apache (dependency)
@@ -36,20 +37,3 @@
         mode: '0755'
   roles:
     - role: cloudflare
-      vars:
-        # Skip tasks that call the real Cloudflare API
-        cloudflare_ssl_mode: null
-        cloudflare_min_tls_version: null
-        cloudflare_always_use_https: null
-        cloudflare_security_level: null
-      tags:
-        - cloudflare
-  tasks:
-    # Run only local-file tasks (skip API calls) by overriding the
-    # uri tasks to be skipped via tags. The converge focuses on
-    # file deployment, not API integration.
-    - name: Note
-      debug:
-        msg: >
-          Cloudflare API tasks are skipped in molecule.
-          This test verifies script deployment and cron scheduling only.

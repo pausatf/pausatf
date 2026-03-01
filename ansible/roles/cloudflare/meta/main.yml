@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: pausatf
-  description: "Cloudflare role for PAUSATF WordPress infrastructure"
+  description: "Cloudflare CDN and DNS configuration for PAUSATF"
   license: MIT
   min_ansible_version: "2.17"
   platforms:

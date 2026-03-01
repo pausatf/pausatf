@@ -56,11 +56,13 @@
       Content-Type: "application/json"
     return_content: yes
   register: cf_zone_status
+  when: cloudflare_verify_zone | default(true)
   tags: cloudflare
 
 - name: Display Cloudflare zone status
   debug:
     msg: "Zone {{ cloudflare_zone }} is {{ cf_zone_status.json.result.status }}"
+  when: cloudflare_verify_zone | default(true)
   tags: cloudflare
 
 - name: Ensure SSL mode is set correctly
