@@ -33,6 +33,12 @@ jobs:
           pip install ansible-core==2.17.5 ansible-lint==25.12.2
           ansible-galaxy collection install community.general community.mysql ansible.posix
 
+      - name: Create dummy vault password for CI
+        run: |
+          echo '#!/bin/sh' > ansible/.vault_pass.sh
+          echo 'echo ci-dummy-vault-password' >> ansible/.vault_pass.sh
+          chmod +x ansible/.vault_pass.sh
+
       - name: Run ansible-lint
         run: ansible-lint --offline
         working-directory: ansible
@@ -71,6 +77,12 @@ jobs:
 
       - name: Install Ansible
         run: pip install ansible
+
+      - name: Create dummy vault password for CI
+        run: |
+          echo '#!/bin/sh' > ansible/.vault_pass.sh
+          echo 'echo ci-dummy-vault-password' >> ansible/.vault_pass.sh
+          chmod +x ansible/.vault_pass.sh
 
       - name: Check playbook syntax
         run: |
