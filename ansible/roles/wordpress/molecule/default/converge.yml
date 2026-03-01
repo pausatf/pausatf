@@ -10,5 +10,25 @@
         update_cache: yes
         cache_valid_time: 3600
 
+    - name: Install PHP and dependencies for WP-CLI
+      apt:
+        name:
+          - php-cli
+          - php-mysql
+          - php-curl
+          - php-xml
+          - php-mbstring
+          - cron
+          - nginx
+        state: present
+
+    - name: Create legacy data directory
+      file:
+        path: /var/www/legacy/public_html/data
+        state: directory
+        owner: www-data
+        group: www-data
+        mode: '0755'
+
   roles:
     - role: wordpress
