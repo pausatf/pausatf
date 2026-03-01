@@ -12,9 +12,8 @@ implicit_flush = Off
 serialize_precision = -1
 zend.enable_gc = On
 
-; Security
+; Security (hardening values are in 99-security.ini which loads later)
 expose_php = Off
-disable_functions = exec,passthru,shell_exec,system,proc_open,popen,curl_exec,curl_multi_exec,parse_ini_file,show_source
 
 ; Resource Limits
 max_execution_time = {{ php_max_execution_time }}

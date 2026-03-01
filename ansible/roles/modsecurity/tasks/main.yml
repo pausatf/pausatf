@@ -1,0 +1,75 @@
+---
+# ModSecurity role — WAF configuration for PAUSATF
+# CRS is installed via the modsecurity-crs Debian package.
+
+- name: Install ModSecurity CRS package
+  apt:
+    name:
+      - libapache2-mod-security2
+      - modsecurity-crs
+    state: present
+
+- name: Deploy ModSecurity configuration
+  template:
+    src: modsecurity.conf.j2
+    dest: /etc/modsecurity/modsecurity.conf
+    owner: root
+    group: root
+    mode: '0644'
+    backup: yes
+  notify: Reload Apache
+
+- name: Ensure CRS setup directory exists
+  file:
+    path: /etc/modsecurity/crs
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Deploy CRS pre-rules exclusion file
+  copy:
+    src: REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf
+    dest: /etc/modsecurity/crs/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload Apache
+
+- name: Deploy CRS post-rules exclusion file
+  copy:
+    src: RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf
+    dest: /etc/modsecurity/crs/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload Apache
+
+- name: Ensure ModSecurity audit log exists
+  file:
+    path: "{{ modsecurity_audit_log }}"
+    state: touch
+    owner: root
+    group: adm
+    mode: '0640'
+    modification_time: preserve
+    access_time: preserve
+
+- name: Deploy ModSecurity audit log rotation
+  copy:
+    dest: /etc/logrotate.d/modsecurity
+    content: |
+      {{ modsecurity_audit_log }} {
+          weekly
+          missingok
+          rotate 12
+          compress
+          delaycompress
+          notifempty
+          postrotate
+              systemctl reload apache2 > /dev/null 2>&1 || true
+          endscript
+      }
+    owner: root
+    group: root
+    mode: '0644'

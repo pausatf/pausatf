@@ -1,0 +1,15 @@
+; PHP Security Hardening
+; Managed by Ansible - Do not edit manually
+; Loaded after php.ini via conf.d/ — these values take precedence.
+
+expose_php = Off
+session.cookie_httponly = On
+session.cookie_secure = On
+session.use_strict_mode = On
+session.cookie_samesite = Lax
+open_basedir = {{ php_open_basedir | default('/var/www/html:/tmp:/var/tmp:/usr/share/php') }}
+disable_functions = {{ php_disable_functions | default('exec,passthru,shell_exec,system,proc_open,popen,parse_ini_file,show_source') }}
+allow_url_fopen = On
+allow_url_include = Off
+display_errors = Off
+log_errors = On

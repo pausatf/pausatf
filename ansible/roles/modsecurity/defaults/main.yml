@@ -1,0 +1,11 @@
+---
+modsecurity_rule_engine: "On"
+modsecurity_request_body_limit: 13107200
+modsecurity_request_body_nofiles_limit: 131072
+modsecurity_request_body_inmemory_limit: 131072
+modsecurity_response_body_limit: 524288
+modsecurity_audit_engine: "RelevantOnly"
+modsecurity_audit_log: "/var/log/apache2/modsec_audit.log"
+modsecurity_tmp_dir: "/tmp/"
+modsecurity_data_dir: "/tmp/"
+modsecurity_unicode_map_file: "unicode.mapping 20127"
