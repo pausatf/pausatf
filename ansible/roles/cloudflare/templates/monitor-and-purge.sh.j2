@@ -2,6 +2,8 @@
 # Monitor HTML files in legacy data directory for changes and trigger Cloudflare cache purge
 # Managed by Ansible - do not edit manually
 
+set -uo pipefail
+
 WATCH_DIR="/var/www/legacy/public_html/data/$(date +%Y)"
 STATE_FILE="/var/cache/pausatf_html_changes.state"
 LOG_FILE="/var/log/cloudflare_purge.log"
@@ -15,14 +17,20 @@ trap 'rm -f "$TEMP_STATE"' EXIT
 
 find "$WATCH_DIR" -type f -name "*.html" -exec stat -c "%n %Y" {} \; > "$TEMP_STATE"
 
+PURGE_FAILED=0
 while IFS=' ' read -r file mtime; do
-    prev_mtime=$(grep "^$file " "$STATE_FILE" | awk '{print $2}')
+    prev_mtime=$(grep -F "$file " "$STATE_FILE" | awk '{print $2}')
 
     if [ -z "$prev_mtime" ] || [ "$prev_mtime" != "$mtime" ]; then
         echo "Detected change in $file at $(date)" >> "$LOG_FILE"
         RELATIVE="$(date +%Y)/$(basename "$file")"
-        bash "$PURGE_SCRIPT" "$RELATIVE"
+        if ! bash "$PURGE_SCRIPT" "$RELATIVE"; then
+            PURGE_FAILED=1
+        fi
     fi
 done < "$TEMP_STATE"
 
-mv "$TEMP_STATE" "$STATE_FILE"
+# Only update state if all purges succeeded, so failed ones get retried
+if [ "$PURGE_FAILED" -eq 0 ]; then
+    mv "$TEMP_STATE" "$STATE_FILE"
+fi

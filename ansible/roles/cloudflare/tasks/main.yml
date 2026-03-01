@@ -18,7 +18,7 @@
     group: root
     mode: '0644'
   notify: Reload Apache
-  when: web_server | default('apache') == 'apache'
+  when: (web_server | default('apache')) == 'apache'
   tags: cloudflare
 
 - name: Enable Cloudflare IP configuration
@@ -26,7 +26,7 @@
   args:
     creates: /etc/apache2/conf-enabled/cloudflare-ips.conf
   notify: Reload Apache
-  when: web_server | default('apache') == 'apache'
+  when: (web_server | default('apache')) == 'apache'
   tags: cloudflare
 
 - name: Update Cloudflare IP ranges
@@ -35,7 +35,7 @@
     dest: /etc/apache2/cloudflare-ips-v4.txt
     mode: '0644'
   register: cf_ips_v4
-  when: web_server | default('apache') == 'apache'
+  when: (web_server | default('apache')) == 'apache'
   tags: cloudflare
 
 - name: Update Cloudflare IPv6 ranges
@@ -44,7 +44,7 @@
     dest: /etc/apache2/cloudflare-ips-v6.txt
     mode: '0644'
   register: cf_ips_v6
-  when: web_server | default('apache') == 'apache'
+  when: (web_server | default('apache')) == 'apache'
   tags: cloudflare
 
 - name: Verify Cloudflare zone is active
@@ -154,7 +154,7 @@
     src: purge-cloudflare-cache.sh.j2
     dest: /usr/local/bin/purge_cloudflare_cache.sh
     owner: root
-    group: root
+    group: www-data
     mode: '0750'
   tags: cloudflare
 
@@ -190,7 +190,7 @@
 - name: Schedule per-minute cache change monitor
   cron:
     name: "Monitor and purge Cloudflare cache"
-    job: "/usr/local/bin/monitor_and_purge.sh >> /var/log/cloudflare_purge.log 2>&1"
+    job: "flock -n /var/run/monitor_purge.lock /usr/local/bin/monitor_and_purge.sh >> /var/log/cloudflare_purge.log 2>&1"
     user: www-data
   tags: cloudflare
 
