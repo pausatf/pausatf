@@ -1,0 +1,13 @@
+#!/bin/bash
+# Apache health check - restarts service if unresponsive
+# Managed by Ansible - do not edit manually
+
+url="https://{{ wordpress_installs[0].domain | default('www.pausatf.org') }}"
+response=$(curl --write-out "%{http_code}" --connect-timeout 5 --silent --output /dev/null "$url")
+
+if [ "$response" -eq 200 ]; then
+    echo "All working well"
+else
+    echo "$(date): HTTP $response from $url - restarting Apache" >> /var/log/httpd-check.log
+    systemctl restart apache2
+fi

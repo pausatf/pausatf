@@ -18,8 +18,6 @@ log "Starting WordPress backup..."
 # Create backup directory
 mkdir -p "$BACKUP_DIR"
 
-trap 'rm -f /root/.my-backup-*.cnf' EXIT
-
 {% for wp in wordpress_installs %}
 # Backup {{ wp.name }}
 log "Backing up {{ wp.name }}..."
@@ -29,6 +27,7 @@ log "Backing up {{ wp.name }}..."
 # separate /root/.my-backup.cnf managed by Ansible instead.
 # Database backup — credentials via temp file to avoid MYSQL_PWD env exposure
 _MYCNF=$(mktemp /root/.my-backup-XXXXXX.cnf)
+trap 'rm -f "$_MYCNF"' EXIT
 chmod 600 "$_MYCNF"
 printf '[client]\nuser=%s\npassword=%s\n' '{{ wp.db_user }}' '{{ wp.db_password }}' > "$_MYCNF"
 mysqldump --defaults-extra-file="$_MYCNF" --host='{{ wp.db_host | default("localhost") }}' {{ wp.db_name }} | gzip > "$BACKUP_DIR/{{ wp.name }}-db-$DATE.sql.gz"
@@ -54,6 +53,15 @@ log "{{ item.name }} backup complete"
 # Cleanup old backups
 log "Cleaning up backups older than $RETENTION_DAYS days..."
 find "$BACKUP_DIR" -name "*.gz" -mtime +$RETENTION_DAYS -delete
+
+# Safety net: keep only the {{ backup_keep_count | default(3) }} most recent of each type
+{% for wp in wordpress_installs %}
+ls -t "$BACKUP_DIR"/{{ wp.name }}-files-*.tar.gz 2>/dev/null | tail -n +{{ (backup_keep_count | default(3)) + 1 }} | xargs -r rm -f
+ls -t "$BACKUP_DIR"/{{ wp.name }}-db-*.sql.gz 2>/dev/null | tail -n +{{ (backup_keep_count | default(3)) + 1 }} | xargs -r rm -f
+{% endfor %}
+{% for item in backup_items | rejectattr('db_name', 'defined') | list %}
+ls -t "$BACKUP_DIR"/{{ item.name }}-files-*.tar.gz 2>/dev/null | tail -n +{{ (backup_keep_count | default(3)) + 1 }} | xargs -r rm -f
+{% endfor %}
 
 # Show backup sizes
 log "Backup sizes:"

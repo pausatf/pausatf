@@ -149,6 +149,51 @@
   failed_when: false
   tags: cloudflare
 
+- name: Deploy Cloudflare cache purge script
+  template:
+    src: purge-cloudflare-cache.sh.j2
+    dest: /usr/local/bin/purge_cloudflare_cache.sh
+    owner: root
+    group: root
+    mode: '0750'
+  tags: cloudflare
+
+- name: Deploy cache change monitor script
+  template:
+    src: monitor-and-purge.sh.j2
+    dest: /usr/local/bin/monitor_and_purge.sh
+    owner: root
+    group: root
+    mode: '0755'
+  tags: cloudflare
+
+- name: Create log file for Cloudflare cache purges
+  file:
+    path: /var/log/cloudflare_purge.log
+    state: touch
+    owner: www-data
+    group: www-data
+    mode: '0644'
+  changed_when: false
+  tags: cloudflare
+
+- name: Create state file for cache monitor
+  file:
+    path: /var/cache/pausatf_html_changes.state
+    state: touch
+    owner: www-data
+    group: www-data
+    mode: '0644'
+  changed_when: false
+  tags: cloudflare
+
+- name: Schedule per-minute cache change monitor
+  cron:
+    name: "Monitor and purge Cloudflare cache"
+    job: "/usr/local/bin/monitor_and_purge.sh >> /var/log/cloudflare_purge.log 2>&1"
+    user: www-data
+  tags: cloudflare
+
 - name: Purge Cloudflare cache (optional)
   uri:
     url: "https://api.cloudflare.com/client/v4/zones/{{ cloudflare_zone_id }}/purge_cache"

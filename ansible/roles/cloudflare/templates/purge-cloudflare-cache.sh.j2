@@ -1,0 +1,47 @@
+#!/bin/bash
+# Purge Cloudflare cache for a specific results URL on publish
+# Managed by Ansible - do not edit manually
+
+set -euo pipefail
+
+ZONE_ID="{{ cloudflare_zone_id }}"
+API_TOKEN="{{ cloudflare_api_token }}"
+
+URL="https://www.pausatf.org/data/"
+DIR="/var/www/legacy/public_html/data/"
+
+if [ -z "${1:-}" ]; then
+    echo "Usage: $0 <year/filename.html|all>"
+    echo "Example: $0 2026/XCGAR2026.html"
+    exit 1
+fi
+
+if [[ "$1" == "all" ]]; then
+    echo "Clearing all cached files under $DIR"
+    response=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/purge_cache" \
+        -H "Authorization: Bearer ${API_TOKEN}" \
+        -H "Content-Type: application/json" \
+        --data '{"purge_everything":true}')
+else
+    DPATH="$DIR$1"
+    echo "Clearing cache for $DPATH"
+    if [ -f "$DPATH" ]; then
+        URL="$URL$1"
+        echo "File '$DPATH' exists."
+    else
+        echo "File '$DPATH' does not exist; exiting"
+        exit 1
+    fi
+
+    response=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/purge_cache" \
+        -H "Authorization: Bearer ${API_TOKEN}" \
+        -H "Content-Type: application/json" \
+        --data "{\"files\":[\"${URL}\"]}")
+fi
+
+if echo "$response" | grep -q '"success":true'; then
+    echo "Cache purged successfully for ${URL} at $(date)" >> /var/log/cloudflare_purge.log
+else
+    echo "Failed to purge cache for ${URL} at $(date): $response" >> /var/log/cloudflare_purge.log
+    exit 1
+fi

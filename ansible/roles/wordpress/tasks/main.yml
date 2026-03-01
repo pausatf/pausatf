@@ -37,3 +37,32 @@
   loop: "{{ wordpress_installs | default([]) }}"
   loop_control:
     loop_var: wp_site
+
+- name: Schedule WordPress cron via system cron
+  cron:
+    name: "WordPress cron for {{ item.domain }}"
+    job: "wget -q -O - https://{{ item.domain }}/wp-cron.php?doing_wp_cron > /dev/null 2>&1"
+    user: root
+  loop: "{{ wordpress_installs | default([]) }}"
+  when: item.wp_cron_system | default(true)
+
+- name: Ensure legacy data year directories exist
+  file:
+    path: "/var/www/legacy/public_html/data/{{ item }}"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+  loop:
+    - "{{ ansible_date_time.year }}"
+
+- name: Deploy legacy data directory .htaccess
+  template:
+    src: legacy-data-htaccess.j2
+    dest: "/var/www/legacy/public_html/data/{{ item }}/.htaccess"
+    owner: www-data
+    group: www-data
+    mode: '0644'
+  loop:
+    - "2025"
+    - "{{ ansible_date_time.year }}"
