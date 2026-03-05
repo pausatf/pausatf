@@ -1,0 +1,130 @@
+#!/bin/bash
+# WordPress Backup Script
+# {{ ansible_managed }}
+
+set -euo pipefail
+
+BACKUP_DIR="{{ backup_dir }}"
+RETENTION_DAYS="{{ backup_retention_days }}"
+RETENTION_COUNT="{{ backup_retention_count }}"
+DISK_THRESHOLD_PCT={{ backup_disk_threshold_pct }}
+DATE=$(date +%Y%m%d-%H%M%S)
+LOG_FILE="{{ backup_log_file }}"
+DB_NAME="{{ backup_db_name }}"
+DB_CRED_FILE="{{ backup_db_cred_file }}"
+
+# DO Spaces config
+DO_SPACES_BUCKET="{{ backup_do_spaces_bucket }}"
+DO_SPACES_ENDPOINT="{{ backup_do_spaces_endpoint }}"
+DO_SPACES_PREFIX="{{ backup_do_spaces_prefix }}"
+
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
+}
+
+disk_usage_pct() {
+    df --output=pcent / | tail -1 | tr -d ' %'
+}
+
+emergency_cleanup() {
+    local usage
+    usage=$(disk_usage_pct)
+    if [ "$usage" -ge 95 ]; then
+        log "CRITICAL: disk at ${usage}%%, emergency cleanup (keeping newest only)"
+        ls -t "$BACKUP_DIR"/pausatf-main-files-*.tar.gz 2>/dev/null | tail -n +2 | xargs -r rm -f
+        ls -t "$BACKUP_DIR"/legacy-data-files-*.tar.gz 2>/dev/null | tail -n +2 | xargs -r rm -f
+        ls -t "$BACKUP_DIR"/pausatf-main-db-*.sql.gz 2>/dev/null | tail -n +2 | xargs -r rm -f
+        usage=$(disk_usage_pct)
+        log "After emergency cleanup: disk at ${usage}%%"
+    fi
+}
+
+rotate_backups() {
+    log "Cleaning up backups older than $RETENTION_DAYS days..."
+    find "$BACKUP_DIR" -name "*.gz" -mtime +"$RETENTION_DAYS" -delete
+
+    ls -t "$BACKUP_DIR"/pausatf-main-files-*.tar.gz 2>/dev/null | tail -n +"$((RETENTION_COUNT + 1))" | xargs -r rm -f
+    ls -t "$BACKUP_DIR"/pausatf-main-db-*.sql.gz 2>/dev/null | tail -n +"$((RETENTION_COUNT + 1))" | xargs -r rm -f
+    ls -t "$BACKUP_DIR"/legacy-data-files-*.tar.gz 2>/dev/null | tail -n +"$((RETENTION_COUNT + 1))" | xargs -r rm -f
+}
+
+offload_to_spaces() {
+    if [ -z "$DO_SPACES_BUCKET" ]; then
+        return 0
+    fi
+    if ! command -v s3cmd &>/dev/null; then
+        log "WARN: s3cmd not installed, skipping DO Spaces offload"
+        return 0
+    fi
+    log "Offloading to DO Spaces: s3://$DO_SPACES_BUCKET/$DO_SPACES_PREFIX/"
+    for f in "$BACKUP_DIR"/*-"$DATE"*; do
+        if [ -f "$f" ]; then
+            s3cmd put "$f" "s3://$DO_SPACES_BUCKET/$DO_SPACES_PREFIX/$(basename "$f")" \
+                --host="$DO_SPACES_ENDPOINT" \
+                --host-bucket="%(bucket)s.$DO_SPACES_ENDPOINT" \
+                --no-mime-magic 2>&1 | tee -a "$LOG_FILE" || {
+                log "WARN: failed to upload $(basename "$f") to Spaces"
+            }
+        fi
+    done
+    # Prune remote backups older than {{ backup_do_spaces_remote_retention_days }} days
+    s3cmd ls "s3://$DO_SPACES_BUCKET/$DO_SPACES_PREFIX/" \
+        --host="$DO_SPACES_ENDPOINT" \
+        --host-bucket="%(bucket)s.$DO_SPACES_ENDPOINT" 2>/dev/null | \
+        awk -v cutoff="$(date -d '{{ backup_do_spaces_remote_retention_days }} days ago' +%Y-%m-%d 2>/dev/null || date -v-{{ backup_do_spaces_remote_retention_days }}d +%Y-%m-%d)" \
+        '$1 < cutoff {print $4}' | \
+        xargs -r -I{} s3cmd del {} \
+        --host="$DO_SPACES_ENDPOINT" \
+        --host-bucket="%(bucket)s.$DO_SPACES_ENDPOINT" 2>&1 | tee -a "$LOG_FILE" || true
+    log "DO Spaces offload complete"
+}
+
+if [ ! -r "$DB_CRED_FILE" ]; then
+    log "ERROR: Missing DB credentials file $DB_CRED_FILE"
+    exit 1
+fi
+
+mkdir -p "$BACKUP_DIR"
+
+# Cleanup FIRST to ensure space for new backup
+emergency_cleanup
+rotate_backups
+
+# Pre-flight disk check
+USAGE=$(disk_usage_pct)
+if [ "$USAGE" -ge "$DISK_THRESHOLD_PCT" ]; then
+    log "ERROR: disk at ${USAGE}%% after cleanup (threshold: ${DISK_THRESHOLD_PCT}%%), skipping backup"
+    exit 1
+fi
+
+log "Starting WordPress backup (disk at ${USAGE}%%)..."
+
+log "Backing up pausatf-main database..."
+mysqldump --defaults-extra-file="$DB_CRED_FILE" "$DB_NAME" | gzip > "$BACKUP_DIR/pausatf-main-db-$DATE.sql.gz"
+
+USAGE=$(disk_usage_pct)
+if [ "$USAGE" -ge "$DISK_THRESHOLD_PCT" ]; then
+    log "ERROR: disk at ${USAGE}%% after DB dump, skipping file backup"
+    exit 1
+fi
+
+log "Backing up pausatf-main files..."
+tar -czf "$BACKUP_DIR/pausatf-main-files-$DATE.tar.gz" \
+    -C "$(dirname {{ backup_webroot }})" "$(basename {{ backup_webroot }})" \
+    --exclude="wp-content/cache" --exclude="wp-content/uploads/cache"
+log "pausatf-main backup complete"
+
+{% if backup_legacy_data_path %}
+log "Backing up legacy-data (files only)..."
+tar -czf "$BACKUP_DIR/legacy-data-files-$DATE.tar.gz" \
+    -C "$(dirname {{ backup_legacy_data_path }})" "$(basename {{ backup_legacy_data_path }})"
+log "legacy-data backup complete"
+{% endif %}
+
+log "Backup sizes:"
+ls -lh "$BACKUP_DIR"/*-"$DATE"* 2>/dev/null | tee -a "$LOG_FILE"
+
+offload_to_spaces
+
+USAGE=$(disk_usage_pct)
+log "Backup complete! Disk at ${USAGE}%%"
