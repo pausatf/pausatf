@@ -1,0 +1,45 @@
+---
+- name: Ensure backup directory exists
+  ansible.builtin.file:
+    path: "{{ backup_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0750"
+
+- name: Install s3cmd for DO Spaces offload
+  ansible.builtin.apt:
+    name: s3cmd
+    state: present
+  when: backup_do_spaces_bucket | length > 0
+
+- name: Deploy backup script
+  ansible.builtin.template:
+    src: backup-wordpress.sh.j2
+    dest: /usr/local/sbin/backup-wordpress.sh
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Configure backup cron job
+  ansible.builtin.cron:
+    name: "WordPress backup"
+    hour: "{{ backup_cron_hour }}"
+    minute: "{{ backup_cron_minute }}"
+    job: "/usr/local/sbin/backup-wordpress.sh >> {{ backup_log_file }} 2>&1"
+    user: root
+
+- name: Configure logrotate for backup log
+  ansible.builtin.copy:
+    dest: /etc/logrotate.d/wordpress-backup
+    content: |
+      {{ backup_log_file }} {
+          weekly
+          rotate 4
+          compress
+          missingok
+          notifempty
+      }
+    owner: root
+    group: root
+    mode: "0644"
