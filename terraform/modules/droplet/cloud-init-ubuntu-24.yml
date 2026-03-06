@@ -1,7 +1,7 @@
 #cloud-config
 # Ubuntu 24.04 Cloud-init for PAUSATF
 #
-# Stack: Apache 2.4 event MPM + PHP 8.3-FPM + Redis + Managed MySQL 8
+# Stack: Apache 2.4 event MPM + PHP 8.4-FPM + HTTP/2 + Redis + Managed MySQL 8
 # SSH: Tailscale only (no public port 22)
 # SSL: Certbot with Cloudflare DNS plugin
 #
@@ -42,23 +42,23 @@ packages:
   - apache2
   - apache2-utils
 
-  # PHP 8.3-FPM (no mod_php)
-  - php8.3-fpm
-  - php8.3-mysql
-  - php8.3-redis
-  - php8.3-curl
-  - php8.3-xml
-  - php8.3-mbstring
-  - php8.3-zip
-  - php8.3-gd
-  - php8.3-intl
-  - php8.3-soap
-  - php8.3-bcmath
-  - php8.3-imagick
-  - php8.3-opcache
-  - php8.3-cli
+  # PHP 8.4-FPM (no mod_php)
+  - php8.4-fpm
+  - php8.4-mysql
+  - php8.4-redis
+  - php8.4-curl
+  - php8.4-xml
+  - php8.4-mbstring
+  - php8.4-zip
+  - php8.4-gd
+  - php8.4-intl
+  - php8.4-soap
+  - php8.4-bcmath
+  - php8.4-imagick
+  - php8.4-opcache
+  - php8.4-cli
 
-  # MySQL client only — database is DO Managed MySQL
+  # MySQL client only - database is DO Managed MySQL
   - mysql-client-8.0
 
   # Redis (local object cache)
@@ -85,7 +85,7 @@ write_files:
       ENVIRONMENT=${environment}
       HOSTNAME=${hostname}
       WEB_SERVER=apache
-      PHP_VERSION=8.3
+      PHP_VERSION=8.4
     append: true
 
   # Apache security hardening
@@ -154,7 +154,7 @@ runcmd:
 
   # Apache: enable event MPM + proxy_fcgi, disable prefork + mod_php
   - a2dismod mpm_prefork || true
-  - a2dismod php8.3 || true
+  - a2dismod php8.4 || true
   - a2enmod mpm_event
   - a2enmod proxy
   - a2enmod proxy_fcgi
@@ -164,14 +164,15 @@ runcmd:
   - a2enmod headers
   - a2enmod deflate
   - a2enmod expires
+  - a2enmod http2
   - a2enconf security-hardening
   - a2dissite 000-default
 
   # PHP-FPM
-  - systemctl enable php8.3-fpm
-  - systemctl start php8.3-fpm
+  - systemctl enable php8.4-fpm
+  - systemctl start php8.4-fpm
 
-  # Redis — bind localhost, no persistence, allkeys-lru
+  # Redis - bind localhost, no persistence, allkeys-lru
   - sed -i 's/^bind .*/bind 127.0.0.1/' /etc/redis/redis.conf
   - sed -i 's/^# maxmemory .*/maxmemory 256mb/' /etc/redis/redis.conf
   - sed -i 's/^# maxmemory-policy .*/maxmemory-policy allkeys-lru/' /etc/redis/redis.conf
@@ -184,9 +185,10 @@ runcmd:
   - chown -R www-data:www-data /var/www/html
   - chmod -R 755 /var/www/html
 
-  # UFW — HTTP/S + Tailscale SSH only
+  # UFW - SSH + HTTP/S + Tailscale
   - ufw default deny incoming
   - ufw default allow outgoing
+  - ufw allow 22/tcp
   - ufw allow 80/tcp
   - ufw allow 443/tcp
   - ufw allow in on tailscale0
@@ -222,12 +224,12 @@ runcmd:
 
   # Log completion
   - echo "Ubuntu 24.04 cloud-init completed at $(date)" > /var/log/cloud-init-ubuntu24.log
-  - php-fpm8.3 -v >> /var/log/cloud-init-ubuntu24.log
+  - php-fpm8.4 -v >> /var/log/cloud-init-ubuntu24.log
   - apache2 -v >> /var/log/cloud-init-ubuntu24.log
   - redis-server --version >> /var/log/cloud-init-ubuntu24.log
 
 ssh_pwauth: false
-disable_root: true
+disable_root: false
 
 final_message: |
   ========================================
@@ -236,7 +238,7 @@ final_message: |
   Environment: ${environment}
   Hostname: ${hostname}
   Web Server: Apache 2.4 (event MPM)
-  PHP: 8.3-FPM
+  PHP: 8.4-FPM
   Cache: Redis 127.0.0.1 (256mb allkeys-lru)
   Database: DO Managed MySQL 8 (external)
   SSH: Tailscale only

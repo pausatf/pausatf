@@ -105,6 +105,7 @@ apache_modules:
   - expires
   - filter
   - headers
+  - http2
   - mime
   - negotiation
   - remoteip
