@@ -30,7 +30,7 @@
   command: "{{ wpcli_path | default('/usr/local/bin/wp') }} core download --path={{ wp_site.path }} --version={{ wp_site.wp_version | default('latest') }} --skip-content --allow-root"
   register: wp_download
   when: wp_installed.rc != 0
-  failed_when: wp_download.rc != 0 and 'already exists' not in (wp_download.stderr | default(''))
+  failed_when: wp_download.rc != 0 and 'already' not in (wp_download.stderr | default(''))
 
 - name: Verify WordPress checksums
   command: "{{ wpcli_path | default('/usr/local/bin/wp') }} core verify-checksums --path={{ wp_site.path }} --allow-root"
@@ -93,12 +93,15 @@
   register: redis_cache_installed
   changed_when: false
   failed_when: false
-  when: redis_enabled | default(false)
+  when:
+    - redis_enabled | default(false)
+    - wp_installed.rc == 0
 
 - name: Install redis-cache plugin
   command: "{{ wpcli_path | default('/usr/local/bin/wp') }} plugin install redis-cache --path={{ wp_site.path }} --allow-root"
   when:
     - redis_enabled | default(false)
+    - wp_installed.rc == 0
     - redis_cache_installed is defined and redis_cache_installed.rc != 0
 
 - name: Activate redis-cache plugin
@@ -106,7 +109,9 @@
   register: redis_cache_activate
   changed_when: "'activated' in redis_cache_activate.stdout | lower"
   failed_when: false
-  when: redis_enabled | default(false)
+  when:
+    - redis_enabled | default(false)
+    - wp_installed.rc == 0
 
 - name: Enable Redis object cache drop-in
   command: "{{ wpcli_path | default('/usr/local/bin/wp') }} redis enable --path={{ wp_site.path }} --allow-root"
@@ -173,6 +178,26 @@
     mode: '0644'
     directory_mode: '0755'
   when: wp_site.active_theme | default('') == 'TheSource-child'
+
+- name: Ensure fallback theme is installed
+  command: "{{ wpcli_path | default('/usr/local/bin/wp') }} theme install twentytwentyfive --path={{ wp_site.path }} --allow-root"
+  register: fallback_theme
+  changed_when: "'installed successfully' in fallback_theme.stdout | lower"
+  failed_when: fallback_theme.rc != 0 and 'already installed' not in (fallback_theme.stderr | default(''))
+  when: wp_installed.rc == 0
+
+- name: Check if any theme is active
+  command: "{{ wpcli_path | default('/usr/local/bin/wp') }} theme list --status=active --field=name --path={{ wp_site.path }} --allow-root"
+  register: active_theme_check
+  changed_when: false
+  failed_when: false
+  when: wp_installed.rc == 0
+
+- name: Activate fallback theme if none active
+  command: "{{ wpcli_path | default('/usr/local/bin/wp') }} theme activate twentytwentyfive --path={{ wp_site.path }} --allow-root"
+  when:
+    - wp_installed.rc == 0
+    - active_theme_check.stdout | default('') | trim == ''
 
 - name: Enforce WordPress user security (remove unauthorized accounts, audit admins)
   include_tasks: user-security.yml

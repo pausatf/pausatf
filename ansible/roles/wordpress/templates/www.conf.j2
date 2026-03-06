@@ -1,7 +1,7 @@
 [www]
 user = www-data
 group = www-data
-listen = /var/run/php/php8.3-fpm.sock
+listen = /var/run/php/php{{ php_version | default('8.4') }}-fpm.sock
 listen.owner = www-data
 listen.group = www-data
 pm = dynamic
@@ -14,6 +14,7 @@ pm.max_requests = 500
 ; Security
 php_admin_value[disable_functions] = exec,passthru,shell_exec,system
 php_admin_flag[allow_url_fopen] = off
+php_admin_value[open_basedir] = /var/www/html:{{ legacy_content_path | default('/var/www/legacy') }}/public_html/data:/tmp:/var/tmp:/usr/share/php
 
 ; Error logging
 php_admin_value[error_log] = /var/log/php-fpm/www-error.log
