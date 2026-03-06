@@ -2,6 +2,11 @@
 # The script lives in /var/www/html/teeters-php/ (inside open_basedir)
 # but needs filesystem access to {{ legacy_content_path }}/public_html/data/
 # where year subdirectories (2024/, 2025/, 2026/, ...) contain race results.
+{% if use_php_fpm | default(false) %}
+# open_basedir is set in the PHP-FPM pool config (www.conf) when using FPM.
+# php_admin_value is a mod_php directive and cannot be used with event MPM + FPM.
+{% else %}
 <Directory /var/www/html/teeters-php>
     php_admin_value open_basedir /var/www/html:{{ legacy_content_path }}/public_html/data:/tmp:/var/tmp:/usr/share/php
 </Directory>
+{% endif %}

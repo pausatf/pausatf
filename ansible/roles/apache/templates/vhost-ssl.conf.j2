@@ -33,6 +33,9 @@
     </Directory>
 
 {% if apache_mpm | default('prefork') == 'event' %}
+    # HTTP/2 (requires event MPM)
+    Protocols h2 http/1.1
+
     # PHP-FPM via unix socket (event MPM)
     <FilesMatch "\.php$">
         SetHandler "proxy:unix:{{ php_fpm_socket | default('/run/php/php' + php_version + '-fpm.sock') }}|fcgi://localhost"
@@ -74,18 +77,25 @@
     # mod_expires — browser cache hints for static assets
     <IfModule mod_expires.c>
         ExpiresActive On
-        ExpiresByType image/jpeg "access plus 1 month"
-        ExpiresByType image/png "access plus 1 month"
-        ExpiresByType image/gif "access plus 1 month"
-        ExpiresByType image/svg+xml "access plus 1 month"
-        ExpiresByType image/webp "access plus 1 month"
-        ExpiresByType image/x-icon "access plus 1 month"
-        ExpiresByType text/css "access plus 1 week"
-        ExpiresByType application/javascript "access plus 1 week"
-        ExpiresByType application/x-javascript "access plus 1 week"
-        ExpiresByType font/woff "access plus 1 month"
-        ExpiresByType font/woff2 "access plus 1 month"
-        ExpiresByType application/font-woff "access plus 1 month"
-        ExpiresByType application/font-woff2 "access plus 1 month"
+        ExpiresByType image/jpeg "access plus 1 year"
+        ExpiresByType image/png "access plus 1 year"
+        ExpiresByType image/gif "access plus 1 year"
+        ExpiresByType image/svg+xml "access plus 1 year"
+        ExpiresByType image/webp "access plus 1 year"
+        ExpiresByType image/x-icon "access plus 1 year"
+        ExpiresByType text/css "access plus 1 month"
+        ExpiresByType application/javascript "access plus 1 month"
+        ExpiresByType application/x-javascript "access plus 1 month"
+        ExpiresByType font/woff "access plus 1 year"
+        ExpiresByType font/woff2 "access plus 1 year"
+        ExpiresByType application/font-woff "access plus 1 year"
+        ExpiresByType application/font-woff2 "access plus 1 year"
+    </IfModule>
+
+    # Static assets: public cache so Cloudflare can edge-cache
+    <IfModule mod_headers.c>
+        <FilesMatch "\.(css|js|jpg|jpeg|png|gif|svg|webp|ico|woff|woff2|ttf|eot)$">
+            Header set Cache-Control "public, max-age=2592000"
+        </FilesMatch>
     </IfModule>
 </VirtualHost>
