@@ -54,6 +54,13 @@
             name: openlitespeed
           when: web_server | default('apache') == 'openlitespeed'
 
+        - name: Include ModSecurity role
+          include_role:
+            name: modsecurity
+          when:
+            - web_server | default('apache') == 'apache'
+            - modsecurity_enabled | default(true)
+
         - name: Include Certbot role
           include_role:
             name: certbot

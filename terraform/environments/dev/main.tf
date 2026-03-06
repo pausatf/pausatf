@@ -45,7 +45,7 @@ module "wordpress" {
   firewall_http_source_cidrs = ["0.0.0.0/0", "::/0"]
   ssh_allowed_ips            = var.ssh_allowed_ips
 
-  cloud_init_content = templatefile("${path.module}/../../modules/droplet/cloud-init-openlitespeed.yml", {
+  cloud_init_content = templatefile("${path.module}/../../modules/droplet/cloud-init-ubuntu-24.yml", {
     environment = "dev"
     hostname    = "pausatf-dev"
   })

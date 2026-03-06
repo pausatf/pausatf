@@ -1,6 +1,13 @@
 ---
 # New Relic role - Application monitoring for PAUSATF
 
+- name: Validate New Relic license key is set
+  assert:
+    that:
+      - newrelic_license_key | length > 0
+    fail_msg: "newrelic_license_key must be set when newrelic_enabled is true"
+    quiet: true
+
 - name: Create keyrings directory
   file:
     path: /etc/apt/keyrings
