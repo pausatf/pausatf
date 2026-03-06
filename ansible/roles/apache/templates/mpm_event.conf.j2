@@ -1,0 +1,11 @@
+# MPM event configuration
+# Tuned for 4-vCPU / 8GB DigitalOcean droplet
+<IfModule mpm_event_module>
+    StartServers             3
+    MinSpareThreads         75
+    MaxSpareThreads        250
+    ThreadLimit             64
+    ThreadsPerChild         25
+    MaxRequestWorkers      400
+    MaxConnectionsPerChild   0
+</IfModule>
