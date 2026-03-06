@@ -45,6 +45,39 @@
     mode: '0644'
   notify: Restart Apache
 
+- name: Deploy PHP apache2 security hardening baseline ini
+  copy:
+    dest: "/etc/php/{{ php_version }}/apache2/conf.d/99-security-hardening.ini"
+    owner: root
+    group: root
+    mode: '0644'
+    content: |
+      ; Security hardening baseline (web/apache2 context)
+      ; Managed by Ansible - Do not edit manually
+      expose_php = Off
+      session.cookie_secure = On
+      session.cookie_httponly = On
+      session.use_strict_mode = On
+      session.cookie_samesite = Lax
+      allow_url_include = Off
+      disable_functions = exec,passthru,shell_exec,system,proc_open,popen
+  notify: Restart Apache
+
+- name: Deploy PHP CLI security hardening baseline ini (no disable_functions)
+  copy:
+    dest: "/etc/php/{{ php_version }}/cli/conf.d/99-security-hardening.ini"
+    owner: root
+    group: root
+    mode: '0644'
+    content: |
+      ; Security hardening baseline (CLI context)
+      ; Managed by Ansible - Do not edit manually
+      ; disable_functions intentionally omitted: CLI runs as root via SSH and
+      ; wp-cli requires proc_open/popen/exec. Web restrictions live in
+      ; /etc/php/{{ php_version }}/apache2/conf.d/99-security-hardening.ini
+      expose_php = Off
+      allow_url_include = Off
+
 - name: Deploy OPcache configuration
   template:
     src: opcache.ini.j2

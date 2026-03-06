@@ -1,8 +1,12 @@
 ---
 # Dev environment overrides
-web_server: openlitespeed
+web_server: apache
+apache_mpm: "event"
+use_php_fpm: true
 php_version: "8.4"
 mysql_version: "8"
+mysql_enabled: false   # skip standalone MySQL role in site.yml
+mysql_managed: true    # DO Managed MySQL; skip mysql dependency in wordpress role
 
 # WordPress — dev overrides merged with defaults from all.yml
 wordpress_installs:
@@ -10,7 +14,7 @@ wordpress_installs:
       'domain': 'dev.pausatf.org',
       'wp_version': 'latest',
       'debug_mode': true,
-      'db_password': vault_wp_dev_db_password,
+      'db_password': vault_wp_dev_db_password | default(lookup('password', '/dev/null length=32 chars=ascii_letters,digits')),
       'auth_key': vault_wp_dev_auth_key | default(lookup('password', '/dev/null length=64 chars=ascii_letters,digits,punctuation')),
       'secure_auth_key': vault_wp_dev_secure_auth_key | default(lookup('password', '/dev/null length=64 chars=ascii_letters,digits,punctuation')),
       'logged_in_key': vault_wp_dev_logged_in_key | default(lookup('password', '/dev/null length=64 chars=ascii_letters,digits,punctuation')),

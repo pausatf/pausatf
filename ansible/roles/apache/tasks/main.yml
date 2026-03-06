@@ -13,39 +13,40 @@
     path: /etc/apache2/mods-available
     state: directory
 
+# apache2_module is broken for idempotent runs: fails on "already enabled/disabled"
+# modules due to conflict/dependency messages in a2enmod/a2dismod output.
+# Use command tasks with proper changed_when/failed_when guards instead.
+
 # MPM selection — event for FPM, prefork for mod_php
 - name: Disable mpm_prefork (when using event MPM)
-  apache2_module:
-    name: mpm_prefork
-    state: absent
-    ignore_configcheck: true
+  command: a2dismod mpm_prefork
+  register: _dis_prefork
+  changed_when: "'Module mpm_prefork disabled' in _dis_prefork.stdout"
+  failed_when: false
   when: apache_mpm | default('prefork') == 'event'
   notify: Restart Apache
-  # Module may already be absent on a fresh install; that is not a failure.
-  failed_when: false
 
 - name: Disable mod_php (when using FPM)
-  apache2_module:
-    name: "php{{ php_version | default('7.4') | regex_replace('\\.', '') }}"
-    state: absent
-    ignore_configcheck: true
+  command: "a2dismod php{{ php_version | default('7.4') }}"
+  register: _dis_php
+  changed_when: "'Module' in _dis_php.stdout and 'disabled' in _dis_php.stdout"
+  failed_when: false
   when: apache_mpm | default('prefork') == 'event'
   notify: Restart Apache
-  # Module may already be absent on a fresh install; that is not a failure.
-  failed_when: false
 
 - name: Enable mpm_event (when using event MPM)
-  apache2_module:
-    name: mpm_event
-    state: present
-    ignore_configcheck: true
+  command: a2enmod mpm_event
+  register: _en_event
+  changed_when: "'Enabling module' in _en_event.stdout"
+  failed_when: "_en_event.rc != 0 and 'already enabled' not in _en_event.stdout"
   when: apache_mpm | default('prefork') == 'event'
   notify: Restart Apache
 
 - name: Enable proxy and proxy_fcgi for PHP-FPM
-  apache2_module:
-    name: "{{ item }}"
-    state: present
+  command: "a2enmod {{ item }}"
+  register: _en_proxy
+  changed_when: "'Enabling module' in _en_proxy.stdout"
+  failed_when: "_en_proxy.rc != 0 and 'already enabled' not in _en_proxy.stdout"
   loop:
     - proxy
     - proxy_fcgi
@@ -53,21 +54,21 @@
   notify: Restart Apache
 
 - name: Disable conflicting MPM modules (when using prefork)
-  apache2_module:
-    name: "{{ item }}"
-    state: absent
+  command: "a2dismod {{ item }}"
+  register: _dis_mpm
+  changed_when: "'disabled' in _dis_mpm.stdout"
+  failed_when: false
   loop:
     - mpm_event
     - mpm_worker
   when: apache_mpm | default('prefork') == 'prefork'
   notify: Restart Apache
-  # Either module may already be absent; that is not a failure.
-  failed_when: false
 
 - name: Enable required Apache modules
-  apache2_module:
-    name: "{{ item }}"
-    state: present
+  command: "a2enmod {{ item }}"
+  register: _en_mod
+  changed_when: "'Enabling module' in _en_mod.stdout"
+  failed_when: "_en_mod.rc != 0 and 'already enabled' not in _en_mod.stdout"
   loop: "{{ apache_modules }}"
   notify: Restart Apache
 
@@ -98,6 +99,16 @@
     group: root
     mode: '0644'
   when: apache_mpm | default('prefork') == 'prefork'
+  notify: Restart Apache
+
+- name: Deploy MPM event configuration
+  template:
+    src: mpm_event.conf.j2
+    dest: /etc/apache2/mods-available/mpm_event.conf
+    owner: root
+    group: root
+    mode: '0644'
+  when: apache_mpm | default('prefork') == 'event'
   notify: Restart Apache
 
 - name: Deploy security configuration
