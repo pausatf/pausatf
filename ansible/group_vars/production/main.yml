@@ -63,8 +63,9 @@ cloudflare_dns_records:
 hostname: "pausatf-prod"
 web_server: apache
 
-# Production overrides — server runs prefork + mod_php 8.4 (not event + FPM)
-apache_mpm: "prefork"
+# event MPM + PHP-FPM (enables HTTP/2, lower memory per connection)
+apache_mpm: "event"
+use_php_fpm: true
 php_version: "8.4"
 
 # =============================================================================
