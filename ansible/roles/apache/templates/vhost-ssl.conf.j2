@@ -10,14 +10,6 @@
 {% endif %}
     ServerAdmin {{ apache_server_admin }}
 
-{% if legacy_data_redirects is defined %}
-    # Legacy /data/ PHP redirects - PHP execution blocked in /data/ for security.
-    # Defined in group_vars/all.yml: legacy_data_redirects
-{% for r in legacy_data_redirects %}
-    Redirect 302 /data/{{ r.pattern | replace('\\.', '.') }} {{ r.target }}
-{% endfor %}
-
-{% endif %}
     DocumentRoot {{ item.path }}
 
     # SSL Configuration

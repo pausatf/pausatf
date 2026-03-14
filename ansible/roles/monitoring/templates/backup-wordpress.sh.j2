@@ -13,23 +13,56 @@ log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
 }
 
+cleanup() {
+    rm -f /root/.my-backup-*.cnf
+}
+
 log "Starting WordPress backup..."
 
 # Create backup directory
 mkdir -p "$BACKUP_DIR"
 
 # Clean up all temp credential files on exit
-trap 'rm -f /root/.my-backup-*.cnf' EXIT
+trap cleanup EXIT
+trap 'log "Backup failed at line ${LINENO}"' ERR
 
 {% for wp in wordpress_installs %}
 # Backup {{ wp.name }}
 log "Backing up {{ wp.name }}..."
 
+DB_HOST_RAW='{{ wp.db_host | default("localhost") }}'
+DB_HOST="$DB_HOST_RAW"
+DB_PORT='{{ wp.db_port | default("") }}'
+DB_SSL_MODE='{{ wp.db_ssl_mode | default("") }}'
+
+if [[ -z "$DB_PORT" && "$DB_HOST_RAW" == *:* ]]; then
+    CANDIDATE_PORT="${DB_HOST_RAW##*:}"
+    CANDIDATE_HOST="${DB_HOST_RAW%:*}"
+    if [[ "$CANDIDATE_PORT" =~ ^[0-9]+$ ]]; then
+        DB_HOST="$CANDIDATE_HOST"
+        DB_PORT="$CANDIDATE_PORT"
+    fi
+fi
+
+if [[ -z "$DB_SSL_MODE" && "$DB_HOST" != "localhost" && "$DB_HOST" != "127.0.0.1" && "$DB_HOST" != "::1" ]]; then
+    DB_SSL_MODE="REQUIRED"
+fi
+
+log "Database backup connection for {{ wp.name }}: host=${DB_HOST} port=${DB_PORT:-default} ssl_mode=${DB_SSL_MODE:-default}"
+
 # Database backup — credentials via temp file to avoid MYSQL_PWD env exposure
 _MYCNF=$(mktemp /root/.my-backup-XXXXXX.cnf)
 chmod 600 "$_MYCNF"
 printf '[client]\nuser=%s\npassword=%s\n' '{{ wp.db_user }}' '{{ wp.db_password }}' > "$_MYCNF"
-mysqldump --defaults-extra-file="$_MYCNF" --host='{{ wp.db_host | default("localhost") }}' {{ wp.db_name }} | gzip > "$BACKUP_DIR/{{ wp.name }}-db-$DATE.sql.gz"
+MYSQLDUMP_ARGS=(--defaults-extra-file="$_MYCNF" --host="$DB_HOST")
+if [[ -n "$DB_PORT" ]]; then
+    MYSQLDUMP_ARGS+=(--port="$DB_PORT")
+fi
+if [[ -n "$DB_SSL_MODE" ]]; then
+    MYSQLDUMP_ARGS+=(--ssl-mode="$DB_SSL_MODE")
+fi
+mysqldump "${MYSQLDUMP_ARGS[@]}" '{{ wp.db_name }}' | gzip > "$BACKUP_DIR/{{ wp.name }}-db-$DATE.sql.gz"
+rm -f "$_MYCNF"
 
 # Files backup
 tar -czf "$BACKUP_DIR/{{ wp.name }}-files-$DATE.tar.gz" -C "$(dirname '{{ wp.path }}')" "$(basename '{{ wp.path }}')" --exclude="wp-content/cache" --exclude="wp-content/uploads/cache"
