@@ -91,14 +91,6 @@ wordpress_installs:
       'db_password': managed_wp_db_password,
       'db_ssl_mode': 'REQUIRED',
       'db_ssl_required': true,
-      'auth_key': vault_wp_main_auth_key | default(wordpress_auth_key),
-      'secure_auth_key': vault_wp_main_secure_auth_key | default(wordpress_secure_auth_key),
-      'logged_in_key': vault_wp_main_logged_in_key | default(wordpress_logged_in_key),
-      'nonce_key': vault_wp_main_nonce_key | default(wordpress_nonce_key),
-      'auth_salt': vault_wp_main_auth_salt | default(wordpress_auth_salt),
-      'secure_auth_salt': vault_wp_main_secure_auth_salt | default(wordpress_secure_auth_salt),
-      'logged_in_salt': vault_wp_main_logged_in_salt | default(wordpress_logged_in_salt),
-      'nonce_salt': vault_wp_main_nonce_salt | default(wordpress_nonce_salt),
     }) }}"
 
 # =============================================================================
