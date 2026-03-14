@@ -39,6 +39,13 @@
             - web_server | default('apache') == 'apache'
             - use_php_fpm | default(false)
 
+        - name: Include ModSecurity role
+          include_role:
+            name: modsecurity
+          when:
+            - web_server | default('apache') == 'apache'
+            - modsecurity_enabled | default(true)
+
         - name: Include Apache role
           include_role:
             name: apache
@@ -53,13 +60,6 @@
           include_role:
             name: openlitespeed
           when: web_server | default('apache') == 'openlitespeed'
-
-        - name: Include ModSecurity role
-          include_role:
-            name: modsecurity
-          when:
-            - web_server | default('apache') == 'apache'
-            - modsecurity_enabled | default(true)
 
         - name: Include Certbot role
           include_role:
