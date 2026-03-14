@@ -43,6 +43,12 @@ variable "alert_email_addresses" {
   default     = []
 }
 
+variable "ssh_allowed_ips" {
+  description = "IPs allowed SSH access (CIDR notation)"
+  type        = list(string)
+  default     = []
+}
+
 variable "database_size" {
   description = "Database cluster size slug"
   type        = string
