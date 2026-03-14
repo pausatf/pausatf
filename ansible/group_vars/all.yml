@@ -320,7 +320,7 @@ ufw_allowed_ports:
 
 # New Relic APM
 newrelic_enabled: true
-newrelic_license_key: "{{ vault_newrelic_license_key }}"
+newrelic_license_key: "{{ vault_newrelic_license_key | default('') }}"
 newrelic_app_name: "PAUSATF WordPress"
 
 # Monit
