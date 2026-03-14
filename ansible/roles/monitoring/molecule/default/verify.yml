@@ -29,8 +29,16 @@
       command: grep -q 'set -euo pipefail' /usr/local/sbin/backup-wordpress.sh
       changed_when: false
 
-    - name: Verify backup script trap is before loop
-      command: grep -q "trap 'rm -f" /usr/local/sbin/backup-wordpress.sh
+    - name: Verify backup script cleanup trap uses helper
+      command: grep -q "trap cleanup EXIT" /usr/local/sbin/backup-wordpress.sh
+      changed_when: false
+
+    - name: Verify backup script defines cleanup helper
+      command: grep -q "^cleanup()" /usr/local/sbin/backup-wordpress.sh
+      changed_when: false
+
+    - name: Verify backup script logs failures via ERR trap
+      command: grep -q "Backup failed at line" /usr/local/sbin/backup-wordpress.sh
       changed_when: false
 
     - name: Check health check endpoint deployed
