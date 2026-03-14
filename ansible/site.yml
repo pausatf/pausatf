@@ -39,6 +39,13 @@
             - web_server | default('apache') == 'apache'
             - use_php_fpm | default(false)
 
+        - name: Include ModSecurity role
+          include_role:
+            name: modsecurity
+          when:
+            - web_server | default('apache') == 'apache'
+            - modsecurity_enabled | default(true)
+
         - name: Include Apache role
           include_role:
             name: apache
@@ -53,13 +60,6 @@
           include_role:
             name: openlitespeed
           when: web_server | default('apache') == 'openlitespeed'
-
-        - name: Include ModSecurity role
-          include_role:
-            name: modsecurity
-          when:
-            - web_server | default('apache') == 'apache'
-            - modsecurity_enabled | default(true)
 
         - name: Include Certbot role
           include_role:
@@ -88,12 +88,31 @@
         - name: Include Cloudflare role
           include_role:
             name: cloudflare
-          when: cloudflare_enabled | default(false)
+          when:
+            - cloudflare_enabled | default(false)
+            - cloudflare_zone_id | default('') | length > 0
+            - cloudflare_api_token | default('') | length > 0
+
+        - name: Warn when Cloudflare role is skipped due missing credentials
+          debug:
+            msg: "Skipping Cloudflare role because cloudflare_zone_id/cloudflare_api_token are not set"
+          when:
+            - cloudflare_enabled | default(false)
+            - (cloudflare_zone_id | default('') | length == 0) or (cloudflare_api_token | default('') | length == 0)
 
         - name: Include New Relic role
           include_role:
             name: newrelic
-          when: newrelic_enabled | default(false)
+          when:
+            - newrelic_enabled | default(false)
+            - newrelic_license_key | default('') | length > 0
+
+        - name: Warn when New Relic role is skipped due missing license key
+          debug:
+            msg: "Skipping New Relic role because newrelic_license_key is not set"
+          when:
+            - newrelic_enabled | default(false)
+            - newrelic_license_key | default('') | length == 0
 
       rescue:
         - name: Web stack deployment failed

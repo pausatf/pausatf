@@ -36,6 +36,9 @@ define( 'SCRIPT_DEBUG', false );
 define( 'DISALLOW_FILE_EDIT', {{ 'true' if wp_site.disallow_file_edit | default(true) else 'false' }} );
 define( 'DISALLOW_FILE_MODS', {{ 'true' if wp_site.disallow_file_mods | default(false) else 'false' }} );
 define( 'FORCE_SSL_ADMIN', true );
+{% if wp_site.db_ssl_required | default(false) %}
+define( 'MYSQL_CLIENT_FLAGS', MYSQLI_CLIENT_SSL );
+{% endif %}
 
 // ** WordPress Performance ** //
 define( 'WP_MEMORY_LIMIT', '{{ wp_site.wp_memory_limit | default(wordpress_memory_limit) | default("256M") }}' );

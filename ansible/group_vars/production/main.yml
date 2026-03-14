@@ -10,7 +10,7 @@
 # These values describe the live production droplet and must not bleed into
 # dev/staging, which use different (or no) DigitalOcean resources.
 digitalocean_droplet_id: "{{ vault_digitalocean_droplet_id }}"
-digitalocean_droplet_name: "pausatforg20230516-primary"
+digitalocean_droplet_name: "pausatf-prod"
 digitalocean_region: "sfo2"
 digitalocean_region_name: "San Francisco 2"
 digitalocean_size: "s-4vcpu-8gb"
@@ -26,10 +26,10 @@ digitalocean_features:
   - droplet_agent
   - private_networking
 digitalocean_tags:
-  - test
   - pausatf
   - production
   - web
+  - wordpress
 
 # =============================================================================
 # CLOUDFLARE — PRODUCTION DNS RECORDS
@@ -63,10 +63,14 @@ cloudflare_dns_records:
 hostname: "pausatf-prod"
 web_server: apache
 
-# event MPM + PHP-FPM (enables HTTP/2, lower memory per connection)
-apache_mpm: "event"
-use_php_fpm: true
+# Production is currently Ubuntu 20.04; keep Apache on prefork + mod_php until OS uplift.
+apache_mpm: "prefork"
+use_php_fpm: false
 php_version: "8.4"
+
+# Production WordPress runs on DigitalOcean Managed MySQL, not local MySQL.
+mysql_managed: true
+mysql_enabled: false
 
 # =============================================================================
 # WORDPRESS — PRODUCTION INSTALL
@@ -84,16 +88,13 @@ wordpress_installs:
       'ssl_enabled': true,
       'ssl_certificate': '/etc/letsencrypt/live/www.pausatf.org/fullchain.pem',
       'ssl_certificate_key': '/etc/letsencrypt/live/www.pausatf.org/privkey.pem',
-      'manage_wp_config': true,
-      'db_password': vault_wp_main_db_password,
-      'auth_key': vault_wp_main_auth_key,
-      'secure_auth_key': vault_wp_main_secure_auth_key,
-      'logged_in_key': vault_wp_main_logged_in_key,
-      'nonce_key': vault_wp_main_nonce_key,
-      'auth_salt': vault_wp_main_auth_salt,
-      'secure_auth_salt': vault_wp_main_secure_auth_salt,
-      'logged_in_salt': vault_wp_main_logged_in_salt,
-      'nonce_salt': vault_wp_main_nonce_salt,
+      'manage_wp_config': false,
+      'db_host': managed_db_host ~ ':' ~ (managed_db_port | string),
+      'db_port': managed_db_port,
+      'db_user': managed_wp_db_user,
+      'db_password': managed_wp_db_password,
+      'db_ssl_mode': 'REQUIRED',
+      'db_ssl_required': true,
     }) }}"
 
 # =============================================================================

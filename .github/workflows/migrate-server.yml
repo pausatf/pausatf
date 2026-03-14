@@ -240,17 +240,10 @@ jobs:
 
           # WP-CLI reads credentials from wp-config.php and scopes to the WordPress DB only,
           # avoiding the risk of dumping all MySQL databases including system tables.
-          if [[ "$ENVIRONMENT" == "production" ]]; then
-            ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new "$ANSIBLE_USER@$OLD_HOST" \
-              "sudo -u www-data wp db export - --path=$WP_PATH" \
-              | ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new "$ANSIBLE_USER@$NEW_SERVER_IP" \
-              "sudo -u www-data wp db import - --path=$WP_PATH"
-          else
-            ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new "$ANSIBLE_USER@$OLD_HOST" \
-              "wp db export - --path=$WP_PATH --allow-root" \
-              | ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new "$ANSIBLE_USER@$NEW_SERVER_IP" \
-              "wp db import - --path=$WP_PATH --allow-root"
-          fi
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new "$ANSIBLE_USER@$OLD_HOST" \
+            "sudo -u www-data wp db export - --path=$WP_PATH" \
+            | ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new "$ANSIBLE_USER@$NEW_SERVER_IP" \
+            "sudo -u www-data wp db import - --path=$WP_PATH"
 
           echo "Database migration complete"
 
