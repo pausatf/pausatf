@@ -8,8 +8,8 @@
     that:
       - wordpress_installs is defined
       - wordpress_installs | length > 0
-      - wordpress_installs[0].db_password | default('') | length > 0
-    fail_msg: "wordpress_installs must be defined with a non-empty db_password"
+      - not (wordpress_installs[0].manage_wp_config | default(false)) or (wordpress_installs[0].db_password | default('') | length > 0)
+    fail_msg: "wordpress_installs[].db_password must be set when manage_wp_config=true"
   when: wordpress_enabled | default(true)
 
 - name: Assert WordPress auth keys are wired through wordpress_installs
