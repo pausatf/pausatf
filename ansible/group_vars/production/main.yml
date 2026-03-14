@@ -63,10 +63,10 @@ cloudflare_dns_records:
 hostname: "pausatf-prod"
 web_server: apache
 
-# event MPM + PHP-FPM (enables HTTP/2, lower memory per connection)
-apache_mpm: "event"
-use_php_fpm: true
-php_version: "7.4"
+# Production is currently Ubuntu 20.04; keep Apache on prefork + mod_php until OS uplift.
+apache_mpm: "prefork"
+use_php_fpm: false
+php_version: "8.4"
 
 # =============================================================================
 # WORDPRESS — PRODUCTION INSTALL
