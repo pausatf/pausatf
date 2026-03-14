@@ -3,13 +3,13 @@
 # IMPORTANT: Encrypt this file with ansible-vault before committing!
 # ansible-vault encrypt group_vars/production/wordpress.yml
 
-wordpress_db_name: "pausatf_wordpress"
-wordpress_db_user: "wpuser"
+wordpress_db_name: "wordpress"
+wordpress_db_user: "wordpress"
 wordpress_db_password: !vault |
           $ANSIBLE_VAULT;1.1;AES256
           # Replace with actual vault-encrypted password
 
-wordpress_db_host: "pausatf-stage-db-do-user-183006-0.m.db.ondigitalocean.com:25060"
+wordpress_db_host: "{{ managed_db_host }}:{{ managed_db_port }}"
 
 wordpress_site_url: "pausatf.org"
 wordpress_admin_email: "admin@pausatf.org"

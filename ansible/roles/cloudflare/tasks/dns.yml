@@ -19,6 +19,7 @@
           Authorization: "Bearer {{ cloudflare_api_token }}"
           Content-Type: "application/json"
       register: cf_lookup
+      no_log: true
 
     - name: Create or update record
       uri:
@@ -35,6 +36,7 @@
           ttl: "{{ item.ttl | default(1) }}"
           proxied: "{{ item.proxied | default(true) }}"
       register: cf_upsert
+      no_log: true
 
     - name: Report DNS change
       debug:

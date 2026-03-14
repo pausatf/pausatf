@@ -44,6 +44,7 @@ if (!$is_allowed) {
 
 $checks = [];
 $all_healthy = true;
+$wp_path = '{{ wordpress_installs[0].path | default("/var/www/html") }}';
 
 // Check 1: PHP is running (implicit - we're here)
 $checks['php'] = [
@@ -54,7 +55,10 @@ $checks['php'] = [
 // Check 2: MySQL connection (credentials read from wp-config.php at runtime)
 try {
     $wp_config = "$wp_path/wp-config.php";
+    $db_host_raw = 'localhost';
     $db_host = 'localhost';
+    $db_port = 3306;
+    $db_socket = null;
     $db_name = 'wordpress';
     $db_user = 'wordpress';
     $db_pass = '';
@@ -62,7 +66,7 @@ try {
     if (file_exists($wp_config)) {
         $config_content = file_get_contents($wp_config);
         if (preg_match("/define\s*\(\s*'DB_HOST'\s*,\s*'([^']+)'/", $config_content, $m)) {
-            $db_host = $m[1];
+            $db_host_raw = trim($m[1]);
         }
         if (preg_match("/define\s*\(\s*'DB_NAME'\s*,\s*'([^']+)'/", $config_content, $m)) {
             $db_name = $m[1];
@@ -75,16 +79,45 @@ try {
         }
     }
 
+    if ($db_host_raw !== '') {
+        if (strpos($db_host_raw, '/') === 0) {
+            $db_socket = $db_host_raw;
+        } elseif (preg_match('/^\[([^\]]+)\](?::([0-9]+))?$/', $db_host_raw, $host_parts)) {
+            $db_host = $host_parts[1];
+            if (isset($host_parts[2]) && $host_parts[2] !== '') {
+                $db_port = (int) $host_parts[2];
+            }
+        } else {
+            $host_parts = explode(':', $db_host_raw);
+            if (count($host_parts) === 2 && ctype_digit($host_parts[1])) {
+                $db_host = $host_parts[0];
+                $db_port = (int) $host_parts[1];
+            } else {
+                $db_host = $db_host_raw;
+            }
+        }
+    }
+
+    if ($db_socket !== null) {
+        $dsn = "mysql:unix_socket=$db_socket;dbname=$db_name;charset=utf8mb4";
+    } else {
+        $dsn = "mysql:host=$db_host;port=$db_port;dbname=$db_name;charset=utf8mb4";
+    }
+
     $pdo = new PDO(
-        "mysql:host=$db_host;dbname=$db_name;charset=utf8mb4",
+        $dsn,
         $db_user,
         $db_pass,
-        [PDO::ATTR_TIMEOUT => 5]
+        [
+            PDO::ATTR_TIMEOUT => 5,
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        ]
     );
     $pdo->query('SELECT 1');
     $checks['mysql'] = [
         'status' => 'healthy',
         'connection' => 'ok',
+        'endpoint' => $db_socket !== null ? 'unix_socket' : "$db_host:$db_port",
     ];
 } catch (PDOException $e) {
     $checks['mysql'] = [
@@ -95,7 +128,6 @@ try {
 }
 
 // Check 3: WordPress files exist
-$wp_path = '{{ wordpress_installs[0].path | default("/var/www/html") }}';
 $wp_files = ['wp-config.php', 'wp-includes/version.php', 'index.php'];
 $wp_healthy = true;
 
