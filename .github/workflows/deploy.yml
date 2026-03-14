@@ -54,6 +54,7 @@ jobs:
             install -m 700 -d ~/.ssh
             printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
             chmod 600 ~/.ssh/deploy_key
+            ln -sf ~/.ssh/deploy_key ~/.ssh/pausatf-prod
           fi
 
       - name: Decrypt vault file
@@ -74,8 +75,15 @@ jobs:
         env:
           ANSIBLE_LIMIT: ${{ inputs.ansible_limit }}
         run: |
+          RUNNER_IP=$(curl -fsS https://api.ipify.org)
+          if [ -z "$RUNNER_IP" ]; then
+            echo "ERROR: Could not determine GitHub runner public IP" >&2
+            exit 1
+          fi
+
           ansible-playbook -i inventory/hosts.yml site.yml \
             -l "$ANSIBLE_LIMIT" \
+            -e "ansible_controller_cidr=${RUNNER_IP}/32" \
             --vault-password-file ../vault.pass
 
       - name: Healthcheck
@@ -91,4 +99,4 @@ jobs:
       - name: Cleanup secrets
         if: always()
         run: |
-          rm -f vault.pass ansible/group_vars/vault.yml ~/.ssh/deploy_key
+          rm -f vault.pass ansible/group_vars/vault.yml ~/.ssh/deploy_key ~/.ssh/pausatf-prod

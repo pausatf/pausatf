@@ -7,16 +7,32 @@
   vars:
     wp_path: "{{ wordpress_path | default('/var/www/html') }}"
     wpcli: "{{ wpcli_path | default('/usr/local/bin/wp') }}"
-    migration_timestamp: "{{ lookup('pipe', 'date +%Y%m%dT%H%M%S') }}"
     tmp_export: "/tmp/wordpress-export-{{ migration_timestamp }}.sql"
     tmp_fullbackup: "/tmp/wordpress-db-premigration-{{ migration_timestamp }}.sql.gz"
     tmp_mycnf: "/tmp/.managed-db-{{ migration_timestamp }}.cnf"
+    tmp_wp_mycnf: "/tmp/.managed-wp-db-{{ migration_timestamp }}.cnf"
     spaces_backup_prefix: "db-migration/{{ migration_timestamp }}"
+    web_service_name: "{{ 'apache2' if (web_server | default('apache')) == 'apache' else ('lsws' if (web_server | default('apache')) == 'openlitespeed' else (web_server | default('apache2'))) }}"
+    critical_wp_tables:
+      - posts
+      - postmeta
+      - options
+      - users
+      - usermeta
+      - comments
+      - commentmeta
+      - terms
+      - term_taxonomy
+      - term_relationships
 
   pre_tasks:
     # ========================================
     # Phase 1: Pre-flight checks
     # ========================================
+    - name: Set migration timestamp
+      set_fact:
+        migration_timestamp: "{{ lookup('pipe', 'date +%Y%m%dT%H%M%S') }}"
+
     - name: Validate production safety gate
       fail:
         msg: >-
@@ -45,6 +61,17 @@
       when: managed_db_password is not defined or managed_db_password | length == 0
       no_log: true
 
+    - name: Validate managed_wp_db_user is defined
+      fail:
+        msg: "managed_wp_db_user must be set in vault/group_vars for wp-config runtime credentials"
+      when: managed_wp_db_user is not defined or managed_wp_db_user | length == 0
+
+    - name: Validate managed_wp_db_password is defined
+      fail:
+        msg: "managed_wp_db_password must be set in vault/group_vars for wp-config runtime credentials"
+      when: managed_wp_db_password is not defined or managed_wp_db_password | length == 0
+      no_log: true
+
     - name: Fail if managed_db_host resolves to localhost
       fail:
         msg: "managed_db_host ({{ managed_db_host }}) must not be localhost"
@@ -68,8 +95,21 @@
       no_log: true
 
     - name: Verify managed MySQL is reachable
-      command: mysqladmin ping --defaults-extra-file={{ tmp_mycnf }}
+      command: mysqladmin --defaults-extra-file={{ tmp_mycnf }} ping
       changed_when: false
+      no_log: true
+
+    - name: Create temporary credentials file for managed WP runtime user
+      copy:
+        dest: "{{ tmp_wp_mycnf }}"
+        mode: '0600'
+        content: |
+          [client]
+          host={{ managed_db_host }}
+          port={{ managed_db_port }}
+          user={{ managed_wp_db_user }}
+          password={{ managed_wp_db_password }}
+          ssl-mode=REQUIRED
       no_log: true
 
     - name: Verify s3cmd is available
@@ -199,225 +239,295 @@
         - not ansible_check_mode
 
     # ========================================
-    # Phase 4: Export WordPress database
+    # Phase 4-8: Export, import, cutover, verify
     # ========================================
-    - name: Enable WordPress maintenance mode
-      command: >-
-        {{ wpcli }} maintenance-mode activate
-        --path={{ wp_path }} --allow-root
+    - name: Run export, import, and cutover workflow
+      block:
+        - name: Enable WordPress maintenance mode
+          command: >-
+            {{ wpcli }} maintenance-mode activate
+            --path={{ wp_path }} --allow-root
 
-    - name: Export WordPress database via WP-CLI
-      command: >-
-        {{ wpcli }} db export {{ tmp_export }}
-        --path={{ wp_path }} --allow-root
-      register: wp_export
+        - name: Export WordPress database via WP-CLI
+          command: >-
+            {{ wpcli }} db export {{ tmp_export }}
+            --path={{ wp_path }} --allow-root
+          register: wp_export
 
-    - name: Verify export file line count
-      command: wc -l {{ tmp_export }}
-      register: export_linecount
-      changed_when: false
-      when: not ansible_check_mode
+        - name: Verify export file line count
+          command: wc -l {{ tmp_export }}
+          register: export_linecount
+          changed_when: false
+          when: not ansible_check_mode
 
-    - name: Fail if export is suspiciously small
-      fail:
-        msg: "Export has only {{ export_linecount.stdout.split()[0] }} lines — expected a larger database"
-      when:
-        - not ansible_check_mode
-        - export_linecount.stdout.split()[0] | int < 100
+        - name: Fail if export is suspiciously small
+          fail:
+            msg: "Export has only {{ export_linecount.stdout.split()[0] }} lines — expected a larger database"
+          when:
+            - not ansible_check_mode
+            - export_linecount.stdout.split()[0] | int < 100
 
-    - name: Display export stats
-      debug:
-        msg: "Exported {{ export_linecount.stdout.split()[0] }} lines to {{ tmp_export }}"
-      when: not ansible_check_mode
+        - name: Display export stats
+          debug:
+            msg: "Exported {{ export_linecount.stdout.split()[0] }} lines to {{ tmp_export }}"
+          when: not ansible_check_mode
+
+        # ========================================
+        # Phase 5: Import to managed MySQL
+        # ========================================
+        - name: Set WordPress table prefix fact
+          set_fact:
+            wp_table_prefix_name: "{{ (wp_table_prefix.stdout | default('wp_')) | trim }}"
+
+        - name: Get local row count before import
+          command: >-
+            {{ wpcli }} db query
+            "SELECT COUNT(*) FROM {{ wp_table_prefix_name }}posts"
+            --path={{ wp_path }} --allow-root --skip-column-names
+          register: local_post_count
+          changed_when: false
+
+        - name: Check if managed DB already has WordPress tables
+          command: >-
+            mysql --defaults-extra-file={{ tmp_mycnf }}
+            {{ wp_db_name.stdout | default('wordpress') }}
+            --skip-column-names
+            -e "SHOW TABLES LIKE '{{ wp_table_prefix_name }}%'"
+          register: managed_existing_tables
+          changed_when: false
+
+        - name: Fail if managed DB already has data
+          fail:
+            msg: >-
+              Managed DB already contains WordPress tables. This may indicate a
+              previous partial migration. Pass --extra-vars "force_reimport=yes"
+              to drop and reimport, or investigate manually.
+          when:
+            - not ansible_check_mode
+            - managed_existing_tables.stdout | default('') | length > 0
+            - force_reimport | default('no') != 'yes'
+
+        - name: Import WordPress database to managed MySQL
+          shell: >-
+            set -o pipefail &&
+            { echo "SET SESSION sql_require_primary_key=0;"; cat {{ tmp_export }}; } |
+            mysql --defaults-extra-file={{ tmp_mycnf }}
+            {{ wp_db_name.stdout | default('wordpress') }}
+          args:
+            executable: /bin/bash
+          no_log: true
+
+        # ========================================
+        # Phase 6: Verify managed DB data
+        # ========================================
+        - name: Get managed DB row count
+          command: >-
+            mysql --defaults-extra-file={{ tmp_mycnf }}
+            {{ wp_db_name.stdout | default('wordpress') }}
+            --skip-column-names
+            -e "SELECT COUNT(*) FROM {{ wp_table_prefix_name }}posts"
+          register: managed_post_count
+          changed_when: false
+
+        - name: Compare row counts
+          fail:
+            msg: >-
+              Row count mismatch — local: {{ local_post_count.stdout | trim }},
+              managed: {{ managed_post_count.stdout | trim }}
+          when:
+            - not ansible_check_mode
+            - local_post_count.stdout | default('') | trim != managed_post_count.stdout | default('') | trim
+
+        - name: Verify siteurl in managed DB
+          command: >-
+            mysql --defaults-extra-file={{ tmp_mycnf }}
+            {{ wp_db_name.stdout | default('wordpress') }}
+            --skip-column-names
+            -e "SELECT option_value FROM {{ wp_table_prefix_name }}options WHERE option_name = 'siteurl'"
+          register: managed_siteurl
+          changed_when: false
+
+        - name: Get local core table row counts
+          command: >-
+            {{ wpcli }} db query
+            "SELECT COUNT(*) FROM {{ wp_table_prefix_name }}{{ item }}"
+            --path={{ wp_path }} --allow-root --skip-column-names
+          loop: "{{ critical_wp_tables }}"
+          register: local_core_counts
+          changed_when: false
+
+        - name: Get managed core table row counts
+          command: >-
+            mysql --defaults-extra-file={{ tmp_mycnf }}
+            {{ wp_db_name.stdout | default('wordpress') }}
+            --skip-column-names
+            -e "SELECT COUNT(*) FROM {{ wp_table_prefix_name }}{{ item }}"
+          loop: "{{ critical_wp_tables }}"
+          register: managed_core_counts
+          changed_when: false
+
+        - name: Compare core table row counts
+          assert:
+            that:
+              - (local_core_counts.results[idx].stdout | trim) == (managed_core_counts.results[idx].stdout | trim)
+            fail_msg: >-
+              Row count mismatch for {{ wp_table_prefix_name }}{{ critical_wp_tables[idx] }}
+              (local={{ local_core_counts.results[idx].stdout | trim }},
+              managed={{ managed_core_counts.results[idx].stdout | trim }})
+          loop: "{{ range(0, critical_wp_tables | length) | list }}"
+          loop_control:
+            loop_var: idx
+          when: not ansible_check_mode
+
+        - name: Display data verification results
+          debug:
+            msg: |
+              === Data Verification ===
+              Posts rows (local):   {{ local_post_count.stdout | default('(check mode)') | trim }}
+              Posts rows (managed): {{ managed_post_count.stdout | default('(check mode)') | trim }}
+              siteurl (managed): {{ managed_siteurl.stdout | default('(check mode)') | trim }}
+          when: not ansible_check_mode
+
+        - name: Verify managed DB application user is reachable
+          command: >-
+            mysql --defaults-extra-file={{ tmp_wp_mycnf }}
+            --skip-column-names
+            -e "SELECT 1"
+          changed_when: false
+          no_log: true
+
+        # ========================================
+        # Phase 7: Switch wp-config.php
+        # ========================================
+        - name: Check wp-config.php exists
+          stat:
+            path: "{{ wp_path }}/wp-config.php"
+          register: wpconfig_stat
+          when: not ansible_check_mode
+
+        - name: Backup current wp-config.php
+          copy:
+            src: "{{ wp_path }}/wp-config.php"
+            dest: "{{ wp_path }}/wp-config.php.local-mysql.bak"
+            remote_src: true
+            mode: '0640'
+            owner: "{{ apache_user | default('www-data') }}"
+            group: "{{ apache_group | default('www-data') }}"
+          when: not ansible_check_mode
+
+        - name: Update DB_HOST in wp-config.php
+          command: >-
+            {{ wpcli }} config set DB_HOST '{{ managed_db_host }}:{{ managed_db_port }}'
+            --path={{ wp_path }} --allow-root
+
+        - name: Update DB_USER in wp-config.php
+          command: >-
+            {{ wpcli }} config set DB_USER '{{ managed_wp_db_user }}'
+            --path={{ wp_path }} --allow-root
+
+        - name: Update DB_PASSWORD in wp-config.php
+          command: >-
+            {{ wpcli }} config set DB_PASSWORD '{{ managed_wp_db_password }}'
+            --path={{ wp_path }} --allow-root
+          no_log: true
+
+        - name: Add MYSQL_CLIENT_FLAGS for SSL
+          command: >-
+            {{ wpcli }} config set MYSQL_CLIENT_FLAGS MYSQLI_CLIENT_SSL
+            --path={{ wp_path }} --allow-root --raw --type=constant
+
+        - name: Reload web server to pick up wp-config changes
+          service:
+            name: "{{ web_service_name }}"
+            state: reloaded
+          when: not ansible_check_mode
+
+        # ========================================
+        # Phase 8: Verify WordPress on managed DB
+        # ========================================
+        - name: Verify WordPress is installed (managed DB)
+          command: >-
+            {{ wpcli }} core is-installed
+            --path={{ wp_path }} --allow-root
+
+        - name: Verify WordPress database integrity
+          command: >-
+            {{ wpcli }} db check
+            --path={{ wp_path }} --allow-root
+
+        - name: HTTP health check — WP REST API
+          uri:
+            url: "https://www.pausatf.org/wp-json/"
+            method: GET
+            status_code: 200
+            timeout: 30
+          register: rest_check
+          delegate_to: localhost
+          become: false
+
+        - name: HTTP health check — WP login page
+          uri:
+            url: "https://www.pausatf.org/wp-login.php"
+            method: GET
+            status_code: 200
+            timeout: 30
+          register: login_check
+          delegate_to: localhost
+          become: false
+
+        - name: Display health check results
+          debug:
+            msg: |
+              === Health Checks Passed ===
+              wp core is-installed: OK
+              wp db check: OK
+              /wp-json/ HTTP {{ rest_check.status | default('(check mode)') }}
+              /wp-login.php HTTP {{ login_check.status | default('(check mode)') }}
+          when: not ansible_check_mode
+
+      rescue:
+        - name: Report migration workflow failure
+          debug:
+            msg: >-
+              Migration failed during export/import/cutover. Cleanup ran in always;
+              review prior task output and use wp-config.php.local-mysql.bak for rollback.
+
+        - name: Fail migration workflow
+          fail:
+            msg: "Migration workflow failed; review prior task output."
+
+      always:
+        - name: Disable WordPress maintenance mode (best effort)
+          command: >-
+            {{ wpcli }} maintenance-mode deactivate
+            --path={{ wp_path }} --allow-root
+          changed_when: false
+          failed_when: false
+          when: not ansible_check_mode
+
+        - name: Remove temporary credentials file
+          file:
+            path: "{{ tmp_mycnf }}"
+            state: absent
+
+        - name: Remove temporary WP credentials file
+          file:
+            path: "{{ tmp_wp_mycnf }}"
+            state: absent
+
+        - name: Remove local SQL export from /tmp
+          file:
+            path: "{{ tmp_export }}"
+            state: absent
+
+        - name: Remove full backup from /tmp
+          file:
+            path: "{{ tmp_fullbackup }}"
+            state: absent
 
     # ========================================
-    # Phase 5: Import to managed MySQL
+    # Phase 9: Summary
     # ========================================
-    - name: Get local row count before import
-      command: >-
-        {{ wpcli }} db query
-        "SELECT COUNT(*) FROM {{ (wp_table_prefix.stdout | default('wp_')) | trim }}posts"
-        --path={{ wp_path }} --allow-root --skip-column-names
-      register: local_post_count
-      changed_when: false
-
-    - name: Check if managed DB already has WordPress tables
-      command: >-
-        mysql --defaults-extra-file={{ tmp_mycnf }}
-        {{ wp_db_name.stdout | default('wordpress') }}
-        --skip-column-names
-        -e "SHOW TABLES LIKE '{{ (wp_table_prefix.stdout | default('wp_')) | trim }}%'"
-      register: managed_existing_tables
-      changed_when: false
-
-    - name: Fail if managed DB already has data
-      fail:
-        msg: >-
-          Managed DB already contains WordPress tables. This may indicate a
-          previous partial migration. Pass --extra-vars "force_reimport=yes"
-          to drop and reimport, or investigate manually.
-      when:
-        - not ansible_check_mode
-        - managed_existing_tables.stdout | default('') | length > 0
-        - force_reimport | default('no') != 'yes'
-
-    - name: Import WordPress database to managed MySQL
-      shell: >-
-        mysql --defaults-extra-file={{ tmp_mycnf }}
-        {{ wp_db_name.stdout | default('wordpress') }} < {{ tmp_export }}
-      no_log: true
-
-    # ========================================
-    # Phase 6: Verify managed DB data
-    # ========================================
-    - name: Get managed DB row count
-      command: >-
-        mysql --defaults-extra-file={{ tmp_mycnf }}
-        {{ wp_db_name.stdout | default('wordpress') }}
-        --skip-column-names
-        -e "SELECT COUNT(*) FROM {{ (wp_table_prefix.stdout | default('wp_')) | trim }}posts"
-      register: managed_post_count
-      changed_when: false
-
-    - name: Compare row counts
-      fail:
-        msg: >-
-          Row count mismatch — local: {{ local_post_count.stdout | trim }},
-          managed: {{ managed_post_count.stdout | trim }}
-      when:
-        - not ansible_check_mode
-        - local_post_count.stdout | default('') | trim != managed_post_count.stdout | default('') | trim
-
-    - name: Verify siteurl in managed DB
-      command: >-
-        mysql --defaults-extra-file={{ tmp_mycnf }}
-        {{ wp_db_name.stdout | default('wordpress') }}
-        --skip-column-names
-        -e "SELECT option_value FROM {{ (wp_table_prefix.stdout | default('wp_')) | trim }}options WHERE option_name = 'siteurl'"
-      register: managed_siteurl
-      changed_when: false
-
-    - name: Display data verification results
-      debug:
-        msg: |
-          === Data Verification ===
-          Posts rows (local):   {{ local_post_count.stdout | default('(check mode)') | trim }}
-          Posts rows (managed): {{ managed_post_count.stdout | default('(check mode)') | trim }}
-          siteurl (managed): {{ managed_siteurl.stdout | default('(check mode)') | trim }}
-      when: not ansible_check_mode
-
-    # ========================================
-    # Phase 7: Switch wp-config.php
-    # ========================================
-    - name: Check wp-config.php exists
-      stat:
-        path: "{{ wp_path }}/wp-config.php"
-      register: wpconfig_stat
-      when: not ansible_check_mode
-
-    - name: Backup current wp-config.php
-      copy:
-        src: "{{ wp_path }}/wp-config.php"
-        dest: "{{ wp_path }}/wp-config.php.local-mysql.bak"
-        remote_src: true
-        mode: '0640'
-        owner: "{{ apache_user | default('www-data') }}"
-        group: "{{ apache_group | default('www-data') }}"
-      when: not ansible_check_mode
-
-    - name: Update DB_HOST in wp-config.php
-      command: >-
-        {{ wpcli }} config set DB_HOST '{{ managed_db_host }}:{{ managed_db_port }}'
-        --path={{ wp_path }} --allow-root
-
-    - name: Update DB_USER in wp-config.php
-      command: >-
-        {{ wpcli }} config set DB_USER '{{ managed_db_user }}'
-        --path={{ wp_path }} --allow-root
-
-    - name: Update DB_PASSWORD in wp-config.php
-      command: >-
-        {{ wpcli }} config set DB_PASSWORD '{{ managed_db_password }}'
-        --path={{ wp_path }} --allow-root
-      no_log: true
-
-    - name: Add MYSQL_CLIENT_FLAGS for SSL
-      command: >-
-        {{ wpcli }} config set MYSQL_CLIENT_FLAGS MYSQLI_CLIENT_SSL
-        --path={{ wp_path }} --allow-root --raw --type=constant
-
-    - name: Reload PHP-FPM to pick up wp-config changes
-      service:
-        name: "php{{ php_version }}-fpm"
-        state: reloaded
-      when: not ansible_check_mode
-
-    # ========================================
-    # Phase 8: Verify WordPress on managed DB
-    # ========================================
-    - name: Verify WordPress is installed (managed DB)
-      command: >-
-        {{ wpcli }} core is-installed
-        --path={{ wp_path }} --allow-root
-
-    - name: Verify WordPress database integrity
-      command: >-
-        {{ wpcli }} db check
-        --path={{ wp_path }} --allow-root
-
-    - name: HTTP health check — WP REST API
-      uri:
-        url: "https://www.pausatf.org/wp-json/"
-        method: GET
-        status_code: 200
-        timeout: 30
-      register: rest_check
-      delegate_to: localhost
-      become: false
-
-    - name: HTTP health check — WP login page
-      uri:
-        url: "https://www.pausatf.org/wp-login.php"
-        method: GET
-        status_code: 200
-        timeout: 30
-      register: login_check
-      delegate_to: localhost
-      become: false
-
-    - name: Display health check results
-      debug:
-        msg: |
-          === Health Checks Passed ===
-          wp core is-installed: OK
-          wp db check: OK
-          /wp-json/ HTTP {{ rest_check.status | default('(check mode)') }}
-          /wp-login.php HTTP {{ login_check.status | default('(check mode)') }}
-      when: not ansible_check_mode
-
-    # ========================================
-    # Phase 9: Cleanup
-    # ========================================
-    - name: Disable WordPress maintenance mode
-      command: >-
-        {{ wpcli }} maintenance-mode deactivate
-        --path={{ wp_path }} --allow-root
-
-    - name: Remove temporary credentials file
-      file:
-        path: "{{ tmp_mycnf }}"
-        state: absent
-
-    - name: Remove local SQL export from /tmp
-      file:
-        path: "{{ tmp_export }}"
-        state: absent
-
-    - name: Remove full backup from /tmp
-      file:
-        path: "{{ tmp_fullbackup }}"
-        state: absent
-
     - name: Display migration summary
       debug:
         msg: |
@@ -439,5 +549,5 @@
 
           === ROLLBACK (if needed) ===
           cp {{ wp_path }}/wp-config.php.local-mysql.bak {{ wp_path }}/wp-config.php
-          systemctl reload php{{ php_version }}-fpm
+          systemctl reload {{ web_service_name }}
           ============================================
