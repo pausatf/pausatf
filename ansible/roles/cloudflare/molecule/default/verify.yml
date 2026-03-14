@@ -25,20 +25,30 @@
       stat:
         path: /usr/local/bin/purge_cloudflare_cache.sh
       register: purge_script
-    - name: Assert purge script permissions (root:www-data 0750)
+    - name: Assert purge script permissions (root:root 0700)
       assert:
         that:
           - purge_script.stat.exists
-          - purge_script.stat.mode == '0750'
-          - purge_script.stat.gr_name == 'www-data'
+          - purge_script.stat.mode == '0700'
+          - purge_script.stat.gr_name == 'root'
 
-    - name: Verify purge script does NOT contain hardcoded credentials
-      command: grep -cE '(cloudflare_zone_id|cloudflare_api_token)' /usr/local/bin/purge_cloudflare_cache.sh
-      register: hardcoded_creds
+    - name: Verify purge script does NOT contain hardcoded API token
+      command: grep -q "test-api-token-molecule" /usr/local/bin/purge_cloudflare_cache.sh
+      register: hardcoded_token
       changed_when: false
-      # After template rendering, Jinja vars are replaced with values.
-      # We check that the literal Jinja tags are gone (rendered).
-      failed_when: false
+      failed_when: hardcoded_token.rc == 0
+
+    - name: Check Cloudflare token file exists
+      stat:
+        path: /etc/pausatf/cloudflare-api-token
+      register: cf_token_file
+    - name: Assert Cloudflare token file permissions
+      assert:
+        that:
+          - cf_token_file.stat.exists
+          - cf_token_file.stat.mode == '0600'
+          - cf_token_file.stat.pw_name == 'root'
+          - cf_token_file.stat.gr_name == 'root'
 
     - name: Verify purge script sanitizes URLs for JSON
       command: grep -q 'SAFE_URL\|sed' /usr/local/bin/purge_cloudflare_cache.sh
@@ -74,7 +84,7 @@
       assert:
         that:
           - purge_log.stat.exists
-          - purge_log.stat.pw_name == 'www-data'
+          - purge_log.stat.pw_name == 'root'
 
     - name: Check state file exists
       stat:
@@ -84,15 +94,15 @@
       assert:
         that:
           - state_file.stat.exists
-          - state_file.stat.pw_name == 'www-data'
+          - state_file.stat.pw_name == 'root'
 
-    - name: Check cron jobs for www-data
-      command: crontab -u www-data -l
-      register: wwwdata_crontab
+    - name: Check root cron jobs for monitor
+      command: crontab -l
+      register: root_monitor_crontab
       changed_when: false
     - name: Assert monitor cron uses flock
       assert:
-        that: "'flock -n /var/run/monitor_purge.lock' in wwwdata_crontab.stdout"
+        that: "'flock -n /var/run/monitor_purge.lock' in root_monitor_crontab.stdout"
 
     - name: Check weekly Cloudflare IP update cron
       command: crontab -l

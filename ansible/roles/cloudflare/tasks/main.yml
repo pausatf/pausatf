@@ -10,6 +10,33 @@
     state: present
   tags: cloudflare
 
+- name: Assert Cloudflare API credentials are configured
+  assert:
+    that:
+      - cloudflare_zone_id | default('') | length > 0
+      - cloudflare_api_token | default('') | length > 0
+    fail_msg: "cloudflare_zone_id and cloudflare_api_token must be set when cloudflare role is enabled"
+  tags: cloudflare
+
+- name: Ensure Cloudflare credential directory exists
+  file:
+    path: /etc/pausatf
+    state: directory
+    owner: root
+    group: root
+    mode: '0700'
+  tags: cloudflare
+
+- name: Deploy Cloudflare API token file (root-only)
+  copy:
+    dest: /etc/pausatf/cloudflare-api-token
+    content: "{{ cloudflare_api_token }}"
+    owner: root
+    group: root
+    mode: '0600'
+  no_log: true
+  tags: cloudflare
+
 - name: Configure Apache to trust Cloudflare IPs
   template:
     src: cloudflare-ips.conf.j2
@@ -56,6 +83,7 @@
       Content-Type: "application/json"
     return_content: yes
   register: cf_zone_status
+  no_log: true
   when: cloudflare_verify_zone | default(true)
   tags: cloudflare
 
@@ -75,6 +103,7 @@
     body_format: json
     body:
       value: "{{ cloudflare_ssl_mode }}"
+  no_log: true
   when:
     - cloudflare_ssl_mode is defined
     - cloudflare_enabled | default(false)
@@ -90,6 +119,7 @@
     body_format: json
     body:
       value: "{{ cloudflare_min_tls_version }}"
+  no_log: true
   when:
     - cloudflare_min_tls_version is defined
     - cloudflare_enabled | default(false)
@@ -105,6 +135,7 @@
     body_format: json
     body:
       value: "{{ 'on' if cloudflare_always_use_https else 'off' }}"
+  no_log: true
   when:
     - cloudflare_always_use_https is defined
     - cloudflare_enabled | default(false)
@@ -120,6 +151,7 @@
     body_format: json
     body:
       value: "{{ cloudflare_security_level }}"
+  no_log: true
   when:
     - cloudflare_security_level is defined
     - cloudflare_enabled | default(false)
@@ -164,8 +196,8 @@
     src: purge-cloudflare-cache.sh.j2
     dest: /usr/local/bin/purge_cloudflare_cache.sh
     owner: root
-    group: www-data
-    mode: '0750'
+    group: root
+    mode: '0700'
   tags: cloudflare
 
 - name: Deploy cache change monitor script
@@ -181,8 +213,8 @@
   file:
     path: /var/log/cloudflare_purge.log
     state: touch
-    owner: www-data
-    group: www-data
+    owner: root
+    group: root
     mode: '0644'
   changed_when: false
   tags: cloudflare
@@ -191,8 +223,8 @@
   file:
     path: /var/cache/pausatf_html_changes.state
     state: touch
-    owner: www-data
-    group: www-data
+    owner: root
+    group: root
     mode: '0644'
   changed_when: false
   tags: cloudflare
@@ -201,7 +233,7 @@
   cron:
     name: "Monitor and purge Cloudflare cache"
     job: "flock -n /var/run/monitor_purge.lock /usr/local/bin/monitor_and_purge.sh >> /var/log/cloudflare_purge.log 2>&1"
-    user: www-data
+    user: root
   tags: cloudflare
 
 - name: Purge Cloudflare cache (optional)
@@ -214,6 +246,7 @@
     body_format: json
     body:
       purge_everything: true
+  no_log: true
   when: cloudflare_purge_cache | default(false)
   tags:
     - cloudflare

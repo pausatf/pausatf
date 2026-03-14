@@ -125,6 +125,7 @@
     src: /etc/apache2/conf-available/security.conf
     dest: /etc/apache2/conf-enabled/security.conf
     state: link
+    force: true
   notify: Reload Apache
 
 - name: Deploy SSL configuration
@@ -168,6 +169,7 @@
     src: "/etc/apache2/sites-available/{{ item.name }}.conf"
     dest: "/etc/apache2/sites-enabled/{{ item.name }}.conf"
     state: link
+    force: true
   loop: "{{ wordpress_installs }}"
   notify: Reload Apache
 
@@ -176,6 +178,7 @@
     src: "/etc/apache2/sites-available/{{ item.name }}-ssl.conf"
     dest: "/etc/apache2/sites-enabled/{{ item.name }}-ssl.conf"
     state: link
+    force: true
   loop: "{{ wordpress_installs }}"
   when: item.ssl_enabled | default(false)
   notify: Reload Apache
@@ -195,6 +198,7 @@
     src: "/etc/apache2/sites-available/{{ item.name }}.conf"
     dest: "/etc/apache2/sites-enabled/{{ item.name }}.conf"
     state: link
+    force: true
   loop: "{{ additional_vhosts | default([]) }}"
   notify: Reload Apache
 
@@ -216,6 +220,7 @@
     src: /etc/apache2/conf-available/block-backups.conf
     dest: /etc/apache2/conf-enabled/block-backups.conf
     state: link
+    force: true
   notify: Reload Apache
 
 - name: Deploy block-xmlrpc configuration
@@ -234,6 +239,7 @@
     src: /etc/apache2/conf-available/block-xmlrpc.conf
     dest: /etc/apache2/conf-enabled/block-xmlrpc.conf
     state: link
+    force: true
   notify: Reload Apache
 
 - name: Disable default-ssl virtual host (conflicts with pausatf-main-ssl)
@@ -263,6 +269,7 @@
     src: /etc/apache2/conf-available/phpmyadmin-restrict.conf
     dest: /etc/apache2/conf-enabled/phpmyadmin-restrict.conf
     state: link
+    force: true
   notify: Reload Apache
 
 - name: Block HTTP access to ai1wm-backups directory
@@ -334,6 +341,7 @@
     src: /etc/apache2/conf-available/teeters-php.conf
     dest: /etc/apache2/conf-enabled/teeters-php.conf
     state: link
+    force: true
   notify: Reload Apache
 
 - name: Deploy legacy /data/ alias configuration
@@ -350,6 +358,7 @@
     src: /etc/apache2/conf-available/legacy-data.conf
     dest: /etc/apache2/conf-enabled/legacy-data.conf
     state: link
+    force: true
   notify: Reload Apache
 
 - name: Ensure Apache is started and enabled

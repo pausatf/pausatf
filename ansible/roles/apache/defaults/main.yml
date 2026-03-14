@@ -7,3 +7,11 @@ apache_modules:
   - proxy
   - proxy_fcgi
 wordpress_installs: []
+apache_block_xmlrpc: true
+apache_dev_local_enabled: false
+apache_dev_local_vhost_name: "pausatf-dev-local"
+apache_dev_local_listen: "127.0.0.1:8081"
+apache_dev_local_docroot: "/var/www/dev-html"
+apache_main_docroot: "/var/www/html"
+apache_legacy_php_hardening_enabled: false
+apache_php_openbasedir_hardening_enabled: false
