@@ -103,7 +103,16 @@
         - name: Include New Relic role
           include_role:
             name: newrelic
-          when: newrelic_enabled | default(false)
+          when:
+            - newrelic_enabled | default(false)
+            - newrelic_license_key | default('') | length > 0
+
+        - name: Warn when New Relic role is skipped due missing license key
+          debug:
+            msg: "Skipping New Relic role because newrelic_license_key is not set"
+          when:
+            - newrelic_enabled | default(false)
+            - newrelic_license_key | default('') | length == 0
 
       rescue:
         - name: Web stack deployment failed
