@@ -64,8 +64,9 @@ module "wordpress" {
   ssh_key_fingerprints     = [digitalocean_ssh_key.m3_laptop.id]
   alert_emails             = var.alert_email_addresses
   enable_backups           = true
-  enable_monitoring        = false
-  enable_monitoring_alerts = false
+  enable_monitoring        = true
+  enable_monitoring_alerts = length(var.alert_email_addresses) > 0
+  ssh_allowed_ips          = var.ssh_allowed_ips
 
   create_vpc        = false
   vpc_uuid_override = "4ee39499-dc85-11e8-9f23-3cfdfea9fff1"

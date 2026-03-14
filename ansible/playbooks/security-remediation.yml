@@ -289,7 +289,7 @@
           Cron jobs        : displayed above — review output manually
           ============================================================
           Next steps:
-            - Rotate WordPress database password (vault_wp_main_db_password)
+            - Rotate WordPress managed DB password (vault_managed_wp_db_password)
             - Rotate all admin user passwords manually
             - Review server access logs for the Jan-2026 breach window
             - Re-run capture-wp-inventory.yml to refresh group_vars

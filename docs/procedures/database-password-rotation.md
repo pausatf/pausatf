@@ -61,12 +61,14 @@ wp db check --path=/var/www/html --allow-root
 
 ### Step 5 — Update Ansible Vault
 
-The Ansible `group_vars/production/wordpress.yml` contains `vault_wp_main_db_password`. Update it:
+Production now runs on DigitalOcean Managed MySQL. Update the runtime DB secret used by
+`wp-config.php`:
 
 ```bash
 # On your local machine
 ansible-vault edit ansible/group_vars/production/vault.yml
-# Update vault_wp_main_db_password to the new value
+# Update vault_managed_wp_db_password to the new value
+# (Optional legacy compatibility fallback: vault_wp_main_db_password)
 ```
 
 Then commit the encrypted vault update:
