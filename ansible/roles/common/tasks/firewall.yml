@@ -12,11 +12,25 @@
     - { direction: 'incoming', policy: 'deny' }
     - { direction: 'outgoing', policy: 'allow' }
 
-- name: Allow SSH
+- name: Compute SSH allow networks
+  set_fact:
+    ssh_allow_networks_effective: "{{ allowed_ssh_networks | default([]) }}"
+
+- name: Allow SSH from configured networks
   ufw:
     rule: allow
     port: '22'
     proto: tcp
+    src: "{{ item }}"
+  loop: "{{ ssh_allow_networks_effective }}"
+  when: ssh_allow_networks_effective | length > 0
+
+- name: Allow SSH from anywhere when no networks are configured
+  ufw:
+    rule: allow
+    port: '22'
+    proto: tcp
+  when: ssh_allow_networks_effective | length == 0
 
 - name: Allow HTTP
   ufw:
