@@ -7,6 +7,34 @@
     group: root
     mode: "0750"
 
+- name: Validate DB credentials file exists
+  ansible.builtin.stat:
+    path: "{{ backup_db_cred_file }}"
+  register: backup_db_cred_file_stat
+
+- name: Assert DB credentials file is present and readable
+  ansible.builtin.assert:
+    that:
+      - backup_db_cred_file_stat.stat.exists
+      - backup_db_cred_file_stat.stat.isreg
+      - backup_db_cred_file_stat.stat.readable
+    fail_msg: "backup_db_cred_file ({{ backup_db_cred_file }}) must exist and be readable by root"
+
+- name: Validate s3cmd config exists when DO Spaces offload is enabled
+  ansible.builtin.stat:
+    path: "{{ backup_do_spaces_config_file }}"
+  register: backup_spaces_config_stat
+  when: backup_do_spaces_bucket | length > 0
+
+- name: Assert s3cmd config is present and readable when DO Spaces offload is enabled
+  ansible.builtin.assert:
+    that:
+      - backup_spaces_config_stat.stat.exists
+      - backup_spaces_config_stat.stat.isreg
+      - backup_spaces_config_stat.stat.readable
+    fail_msg: "backup_do_spaces_config_file ({{ backup_do_spaces_config_file }}) must exist and be readable when backup_do_spaces_bucket is set"
+  when: backup_do_spaces_bucket | length > 0
+
 - name: Install s3cmd for DO Spaces offload
   ansible.builtin.apt:
     name: s3cmd
