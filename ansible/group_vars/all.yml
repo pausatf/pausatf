@@ -173,6 +173,11 @@ managed_db_port: 25060
 managed_db_user: "{{ vault_managed_db_user | default('') }}"
 managed_db_password: "{{ vault_managed_db_password | default('') }}"
 
+# Managed MySQL application credentials used by WordPress runtime.
+# Keep these separate from admin/import credentials.
+managed_wp_db_user: "{{ vault_managed_wp_db_user | default('wordpress') }}"
+managed_wp_db_password: "{{ vault_managed_wp_db_password | default(vault_wp_main_db_password | default('')) }}"
+
 # =============================================================================
 # WORDPRESS INSTALL DEFAULTS
 # =============================================================================
@@ -185,6 +190,9 @@ wordpress_install_defaults:
   db_name: "wordpress"
   db_user: "wordpress"
   db_host: "localhost"
+  db_port: ""
+  db_ssl_mode: ""
+  db_ssl_required: false
   table_prefix: "wp_"
   active_theme: "TheSource-child"
   cron_enabled: true
@@ -298,6 +306,9 @@ fail2ban_jails:
 
 # UFW Firewall
 ufw_enabled: true
+# Restrict SSH to specific CIDRs when possible (e.g. office/VPN ranges).
+# Empty list preserves current behavior (allow 22 from anywhere); DO firewall should still enforce perimeter rules.
+allowed_ssh_networks: []
 ufw_allowed_ports:
   - "22/tcp"
   - "80/tcp"
