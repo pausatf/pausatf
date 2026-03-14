@@ -75,8 +75,15 @@ jobs:
         env:
           ANSIBLE_LIMIT: ${{ inputs.ansible_limit }}
         run: |
+          RUNNER_IP=$(curl -fsS https://api.ipify.org)
+          if [ -z "$RUNNER_IP" ]; then
+            echo "ERROR: Could not determine GitHub runner public IP" >&2
+            exit 1
+          fi
+
           ansible-playbook -i inventory/hosts.yml site.yml \
             -l "$ANSIBLE_LIMIT" \
+            -e "ansible_controller_cidr=${RUNNER_IP}/32" \
             --vault-password-file ../vault.pass
 
       - name: Healthcheck
