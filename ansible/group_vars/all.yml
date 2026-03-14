@@ -21,9 +21,9 @@ digitalocean_api_token: "{{ vault_digitalocean_api_token }}"
 # Cloudflare zone/API — shared across environments
 cloudflare_enabled: true
 cloudflare_zone: "pausatf.org"
-cloudflare_zone_id: "{{ vault_cloudflare_zone_id }}"
-cloudflare_api_token: "{{ vault_cloudflare_api_token }}"
-cloudflare_email: "{{ vault_cloudflare_email }}"
+cloudflare_zone_id: "{{ vault_cloudflare_zone_id | default('') }}"
+cloudflare_api_token: "{{ vault_cloudflare_api_token | default('') }}"
+cloudflare_email: "{{ vault_cloudflare_email | default('') }}"
 cloudflare_plan: "Free Website"
 cloudflare_status: "active"
 cloudflare_manage_dns: false  # DNS is managed via Terraform
