@@ -88,7 +88,17 @@
         - name: Include Cloudflare role
           include_role:
             name: cloudflare
-          when: cloudflare_enabled | default(false)
+          when:
+            - cloudflare_enabled | default(false)
+            - cloudflare_zone_id | default('') | length > 0
+            - cloudflare_api_token | default('') | length > 0
+
+        - name: Warn when Cloudflare role is skipped due missing credentials
+          debug:
+            msg: "Skipping Cloudflare role because cloudflare_zone_id/cloudflare_api_token are not set"
+          when:
+            - cloudflare_enabled | default(false)
+            - (cloudflare_zone_id | default('') | length == 0) or (cloudflare_api_token | default('') | length == 0)
 
         - name: Include New Relic role
           include_role:
