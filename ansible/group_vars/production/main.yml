@@ -88,7 +88,7 @@ wordpress_installs:
       'ssl_enabled': true,
       'ssl_certificate': '/etc/letsencrypt/live/www.pausatf.org/fullchain.pem',
       'ssl_certificate_key': '/etc/letsencrypt/live/www.pausatf.org/privkey.pem',
-      'manage_wp_config': true,
+      'manage_wp_config': false,
       'db_host': managed_db_host ~ ':' ~ (managed_db_port | string),
       'db_port': managed_db_port,
       'db_user': managed_wp_db_user,
