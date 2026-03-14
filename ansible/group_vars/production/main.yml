@@ -68,6 +68,10 @@ apache_mpm: "prefork"
 use_php_fpm: false
 php_version: "8.4"
 
+# Production WordPress runs on DigitalOcean Managed MySQL, not local MySQL.
+mysql_managed: true
+mysql_enabled: false
+
 # =============================================================================
 # WORDPRESS — PRODUCTION INSTALL
 # =============================================================================
