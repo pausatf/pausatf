@@ -5,7 +5,18 @@
 set -euo pipefail
 
 ZONE_ID="{{ cloudflare_zone_id }}"
-API_TOKEN="{{ cloudflare_api_token }}"
+TOKEN_FILE="/etc/pausatf/cloudflare-api-token"
+
+if [ ! -r "$TOKEN_FILE" ]; then
+    echo "Cloudflare token file $TOKEN_FILE is missing or unreadable" >&2
+    exit 1
+fi
+
+API_TOKEN=$(<"$TOKEN_FILE")
+if [ -z "$API_TOKEN" ]; then
+    echo "Cloudflare token file $TOKEN_FILE is empty" >&2
+    exit 1
+fi
 
 URL="https://www.pausatf.org/data/"
 DIR="/var/www/legacy/public_html/data/"

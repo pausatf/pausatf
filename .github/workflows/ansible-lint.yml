@@ -76,7 +76,9 @@ jobs:
           python-version: '3.11'
 
       - name: Install Ansible
-        run: pip install ansible
+        run: |
+          pip install ansible-core==2.17.5
+          ansible-galaxy collection install community.general community.mysql ansible.posix
 
       - name: Create dummy vault password for CI
         run: |
@@ -88,10 +90,17 @@ jobs:
         run: |
           for playbook in playbooks/*.yml; do
             echo "Checking $playbook"
-            ansible-playbook --syntax-check "$playbook"
+            ansible-playbook --syntax-check -i inventory/hosts.yml "$playbook"
           done
         working-directory: ansible
 
       - name: Syntax-check site.yml
         working-directory: ansible
-        run: ansible-playbook --syntax-check site.yml
+        run: ansible-playbook --syntax-check -i inventory/hosts.yml site.yml
+
+      - name: Validate inventory host variable rendering
+        working-directory: ansible
+        run: |
+          ansible-inventory -i inventory/hosts.yml --host pausatf-prod
+          ansible-inventory -i inventory/hosts.yml --host pausatf-stage
+          ansible-inventory -i inventory/hosts.yml --host pausatf-dev
