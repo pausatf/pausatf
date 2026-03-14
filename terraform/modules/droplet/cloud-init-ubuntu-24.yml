@@ -2,7 +2,7 @@
 # Ubuntu 24.04 Cloud-init for PAUSATF
 #
 # Stack: Apache 2.4 event MPM + PHP 8.4-FPM + HTTP/2 + Redis + Managed MySQL 8
-# SSH: Tailscale only (no public port 22)
+# SSH: Public key auth on port 22 (firewall-restricted) + optional Tailscale overlay
 # SSL: Certbot with Cloudflare DNS plugin
 #
 # Variables:
@@ -186,6 +186,7 @@ runcmd:
   - chmod -R 755 /var/www/html
 
   # UFW - SSH + HTTP/S + Tailscale
+  # Port 22 remains available for key-based break-glass access; restrict at DO firewall.
   - ufw default deny incoming
   - ufw default allow outgoing
   - ufw allow 22/tcp
@@ -241,10 +242,10 @@ final_message: |
   PHP: 8.4-FPM
   Cache: Redis 127.0.0.1 (256mb allkeys-lru)
   Database: DO Managed MySQL 8 (external)
-  SSH: Tailscale only
+  SSH: Key-based auth (public 22 restricted by firewall), Tailscale optional
 
   Next Steps:
-  1. tailscale up --authkey <key> --hostname ${hostname}
+  1. (Optional) tailscale up --authkey <key> --hostname ${hostname}
   2. certbot certonly --dns-cloudflare ...
   3. Ansible provision
   ========================================
