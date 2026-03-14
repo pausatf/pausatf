@@ -18,10 +18,11 @@ Manages: backup directory, the `/usr/local/sbin/backup-wordpress.sh` script, a r
 | `backup_cron_hour` | `2` | Cron hour (root crontab) |
 | `backup_cron_minute` | `0` | Cron minute |
 | `backup_webroot` | `/var/www/html` | WordPress document root |
-| `backup_legacy_data_path` | `/var/www/legacy/public_html/data` | Legacy data dir; set to `""` to skip |
+| `backup_legacy_data_path` | `""` | Legacy data dir; empty means skip |
 | `backup_do_spaces_bucket` | `""` | DO Spaces bucket name; leave empty to disable offload |
 | `backup_do_spaces_endpoint` | `sfo2.digitaloceanspaces.com` | Spaces endpoint |
 | `backup_do_spaces_prefix` | `pausatf-backups` | Key prefix inside the bucket |
+| `backup_do_spaces_config_file` | `/root/.s3cfg` | s3cmd config file used for DO Spaces authentication |
 | `backup_do_spaces_remote_retention_days` | `30` | Prune remote archives older than N days |
 
 ## Usage
@@ -41,3 +42,6 @@ The DB credentials file must exist before this role runs. Create it with:
 user     = backup
 password = secret
 ```
+
+When `backup_do_spaces_bucket` is set, `backup_do_spaces_config_file` must also exist
+and contain valid Spaces credentials for `s3cmd`.

@@ -9,8 +9,9 @@ backup_log_file: /var/log/wordpress-backup.log
 backup_cron_hour: "2"
 backup_cron_minute: "0"
 backup_webroot: /var/www/html
-backup_legacy_data_path: /var/www/legacy/public_html/data
+backup_legacy_data_path: ""
 backup_do_spaces_bucket: ""
 backup_do_spaces_endpoint: "sfo2.digitaloceanspaces.com"
 backup_do_spaces_prefix: "pausatf-backups"
+backup_do_spaces_config_file: /root/.s3cfg
 backup_do_spaces_remote_retention_days: 30
