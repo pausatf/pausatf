@@ -4,6 +4,12 @@ on:
   schedule:
     - cron: '0 9 * * 1'  # Monday 09:00 UTC
   workflow_dispatch:
+    inputs:
+      probe_auth_mail:
+        description: "Run auth/mail diagnostics on production instead of plugin update audit"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -14,7 +20,68 @@ jobs:
     name: Check for plugin updates
     runs-on: ubuntu-latest
     steps:
+      - name: Probe production auth and mail health
+        if: ${{ inputs.probe_auth_mail == true }}
+        env:
+          PROD_SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+          PROD_HOST: ${{ vars.PROD_HOST }}
+        run: |
+          set -euo pipefail
+          if [ -z "${PROD_SSH_PRIVATE_KEY:-}" ]; then
+            echo "PROD_SSH_PRIVATE_KEY not set" >&2
+            exit 1
+          fi
+
+          TARGET_HOST="${PROD_HOST:-REDACTED_PROD_NEW_IP}"
+          mkdir -p ~/.ssh
+          printf '%s\n' "$PROD_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+          REMOTE_SHELL="bash -s"
+          if ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
+            github-deploy@"$TARGET_HOST" "sudo -n true" >/dev/null 2>&1; then
+            REMOTE_SHELL="sudo -n bash -s"
+          fi
+
+          ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
+            github-deploy@"$TARGET_HOST" "$REMOTE_SHELL" <<'REMOTE'
+          set -euo pipefail
+
+          WP_PATH="/var/www/html"
+          APACHE_LOG_DIR="/var/log/apache2"
+
+          echo "HOST=$(hostname -f 2>/dev/null || hostname)"
+          echo "UTC_NOW=$(date -u --iso-8601=seconds)"
+
+          echo "=== WordPress auth/mail configuration ==="
+          sudo -u www-data wp core version --path="$WP_PATH"
+          sudo -u www-data wp plugin is-active wp-mail-smtp --path="$WP_PATH" \
+            && echo "wp-mail-smtp=active" || echo "wp-mail-smtp=inactive"
+          sudo -u www-data wp option get admin_email --path="$WP_PATH" || true
+
+          echo "=== Mail transport status ==="
+          systemctl is-active postfix || true
+          (mailq || true) | head -n 40
+          journalctl -u postfix --since '2 days ago' --no-pager | tail -n 120 || true
+
+          echo "=== Recent wp-login/lostpassword access entries ==="
+          grep -hE 'wp-login\\.php|action=lostpassword' "$APACHE_LOG_DIR"/access.log* 2>/dev/null | tail -n 120 || true
+
+          echo "=== Recent Apache/PHP errors for auth/mail ==="
+          grep -hiE 'wp-login|lostpassword|phpmailer|wp_mail|mail\\(|SMTP|postfix' "$APACHE_LOG_DIR"/error.log* 2>/dev/null | tail -n 120 || true
+
+          if [ -f "$WP_PATH/wp-content/debug.log" ]; then
+            echo "=== Recent WordPress debug.log auth/mail lines ==="
+            grep -iE 'wp-login|lostpassword|phpmailer|wp_mail|SMTP|mail' "$WP_PATH/wp-content/debug.log" | tail -n 120 || true
+          else
+            echo "wp-content/debug.log not present"
+          fi
+          REMOTE
+
+          rm -f ~/.ssh/id_rsa
+
       - name: Check for available plugin updates
+        if: ${{ inputs.probe_auth_mail != true }}
         id: check
         env:
           PROD_SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
@@ -46,7 +113,7 @@ jobs:
           fi
 
       - name: Open issue for available updates
-        if: steps.check.outputs.updates_found == 'true'
+        if: steps.check.outputs.updates_found == 'true' && inputs.probe_auth_mail != true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
