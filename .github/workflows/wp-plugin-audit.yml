@@ -89,6 +89,11 @@ jobs:
             echo "jetpack_cli_unavailable"
           fi
 
+          echo "=== Locate login challenge source ==="
+          grep -R --line-number --fixed-strings \
+            "Please solve this math problem to prove that you are not a bot" \
+            "$WP_PATH/wp-content" 2>/dev/null | head -n 20 || true
+
           echo "=== Synthetic login transaction ==="
           TEST_USER="copilot-login-probe-$(date +%s)"
           TEST_EMAIL="${TEST_USER}@pausatf.org"
