@@ -37,24 +37,29 @@ jobs:
       - name: Setup SSH key
         env:
           SSH_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+          PROD_HOST: ${{ vars.PROD_HOST }}
         run: |
+          TARGET_HOST="${PROD_HOST:-ftp.pausatf.org}"
           install -m 700 -d ~/.ssh
           printf "%s" "$SSH_KEY" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H ftp.pausatf.org >> ~/.ssh/known_hosts 2>/dev/null || true
+          ssh-keyscan -H "$TARGET_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
 
       - name: Probe widgets log timeline (prod)
         if: ${{ inputs.probe_widgets == true }}
+        env:
+          PROD_HOST: ${{ vars.PROD_HOST }}
         run: |
           set -euo pipefail
+          TARGET_HOST="${PROD_HOST:-ftp.pausatf.org}"
           REMOTE_SHELL="bash -s"
           if ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new \
-            github-deploy@ftp.pausatf.org "sudo -n true" >/dev/null 2>&1; then
+            github-deploy@"$TARGET_HOST" "sudo -n true" >/dev/null 2>&1; then
             REMOTE_SHELL="sudo -n bash -s"
           fi
 
           ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new \
-            github-deploy@ftp.pausatf.org "$REMOTE_SHELL" <<'REMOTE'
+            github-deploy@"$TARGET_HOST" "$REMOTE_SHELL" <<'REMOTE'
           set -euo pipefail
 
           list_logs() {
