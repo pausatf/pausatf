@@ -10,6 +10,11 @@ on:
         required: false
         default: false
         type: boolean
+      disable_jetpack_protect:
+        description: "Emergency: disable Jetpack Protect module before login probe"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -25,6 +30,7 @@ jobs:
         env:
           PROD_SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
           PROD_HOST: ${{ vars.PROD_HOST }}
+          DISABLE_JETPACK_PROTECT: ${{ inputs.disable_jetpack_protect }}
         run: |
           set -euo pipefail
           if [ -z "${PROD_SSH_PRIVATE_KEY:-}" ]; then
@@ -68,6 +74,20 @@ jobs:
             echo "wp-mail-smtp-config=missing";
           }
           ' --path="$WP_PATH" || true
+
+          if sudo -u www-data wp help jetpack >/dev/null 2>&1; then
+            if [ "${DISABLE_JETPACK_PROTECT}" = "true" ]; then
+              echo "=== Emergency action: disabling Jetpack Protect ==="
+              sudo -u www-data wp jetpack module deactivate protect --path="$WP_PATH" || true
+            fi
+            if sudo -u www-data wp jetpack module is-active protect --path="$WP_PATH" >/dev/null 2>&1; then
+              echo "jetpack_protect_active=yes"
+            else
+              echo "jetpack_protect_active=no"
+            fi
+          else
+            echo "jetpack_cli_unavailable"
+          fi
 
           echo "=== Synthetic login transaction ==="
           TEST_USER="copilot-login-probe-$(date +%s)"
