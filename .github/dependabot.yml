@@ -1,5 +1,7 @@
 version: 2
 updates:
+  # JavaScript assets are vendored/static in this repo and currently have no npm/yarn/pnpm manifests.
+  # Add an npm ecosystem block when a package manager manifest is introduced.
   # GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
