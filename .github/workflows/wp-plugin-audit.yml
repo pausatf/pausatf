@@ -55,6 +55,7 @@ jobs:
 
           echo "=== WordPress auth/mail configuration ==="
           sudo -u www-data wp core version --path="$WP_PATH"
+          sudo -u www-data wp plugin list --status=active --field=name --path="$WP_PATH" | sed -n '1,200p'
           sudo -u www-data wp plugin is-active wp-mail-smtp --path="$WP_PATH" \
             && echo "wp-mail-smtp=active" || echo "wp-mail-smtp=inactive"
           sudo -u www-data wp option get admin_email --path="$WP_PATH" || true
