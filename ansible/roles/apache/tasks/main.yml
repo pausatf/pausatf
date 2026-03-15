@@ -175,6 +175,16 @@
   loop: "{{ wordpress_installs }}"
   notify: Reload Apache
 
+- name: Disable SSL virtual hosts during bootstrap mode
+  file:
+    path: "/etc/apache2/sites-enabled/{{ item.name }}-ssl.conf"
+    state: absent
+  loop: "{{ wordpress_installs }}"
+  when:
+    - item.ssl_enabled | default(false)
+    - not (apache_enable_ssl_vhosts | default(true))
+  notify: Reload Apache
+
 - name: Enable SSL virtual hosts
   file:
     src: "/etc/apache2/sites-available/{{ item.name }}-ssl.conf"
