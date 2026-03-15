@@ -148,3 +148,48 @@ add_action( 'customize_register', 'pausatf_social_customize_register' );
  * For stable operations, force the classic widgets UI in wp-admin.
  */
 add_filter( 'use_widgets_block_editor', '__return_false' );
+
+/**
+ * Disable Jetpack Protect math fallback to prevent login lockouts.
+ *
+ * Jetpack's brute-force fallback can challenge valid users in this stack.
+ * Remove those callbacks so normal login and password reset continue to work.
+ */
+function pausatf_disable_jetpack_math_challenge() {
+    $target_class = 'Automattic\\Jetpack\\Waf\\Brute_Force_Protection\\Brute_Force_Protection_Math_Authenticate';
+
+    if ( ! class_exists( $target_class ) ) {
+        return;
+    }
+
+    global $wp_filter;
+
+    foreach ( array( 'login_form', 'authenticate' ) as $hook_name ) {
+        if ( empty( $wp_filter[ $hook_name ] ) || ! $wp_filter[ $hook_name ] instanceof WP_Hook ) {
+            continue;
+        }
+
+        foreach ( $wp_filter[ $hook_name ]->callbacks as $priority => $callbacks ) {
+            foreach ( $callbacks as $callback ) {
+                if ( empty( $callback['function'] ) || ! is_array( $callback['function'] ) ) {
+                    continue;
+                }
+
+                $callable = $callback['function'];
+                $owner    = $callable[0];
+                $method   = isset( $callable[1] ) ? (string) $callable[1] : '';
+
+                if ( ! in_array( $method, array( 'math_form', 'math_authenticate', 'process_generate_math_page' ), true ) ) {
+                    continue;
+                }
+
+                $owner_class = is_object( $owner ) ? get_class( $owner ) : ( is_string( $owner ) ? $owner : '' );
+
+                if ( $owner_class === $target_class ) {
+                    remove_filter( $hook_name, $callable, $priority );
+                }
+            }
+        }
+    }
+}
+add_action( 'init', 'pausatf_disable_jetpack_math_challenge', 1000 );
