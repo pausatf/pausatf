@@ -30,7 +30,7 @@ jobs:
 
       - name: Install doctl
         if: steps.check.outputs.skip != 'true'
-        uses: digitalocean/action-doctl@5727c67aa3c2c34ae9462d5a0ecfea8a1b31e5ce  # v2
+        uses: digitalocean/action-doctl@6374d029dfd5f449281f186d65663779c706c994  # v2
         with:
           token: ${{ secrets.DO_TOKEN }}
 
