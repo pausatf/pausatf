@@ -99,6 +99,10 @@ jobs:
           grep -R --line-number --fixed-strings \
             "Please solve this math problem to prove that you are not a bot" \
             "$WP_PATH/wp-content" 2>/dev/null | head -n 20 || true
+          grep -R --line-number --fixed-strings \
+            "IP_ALLOW_LIST_OPTION_NAME" \
+            "$WP_PATH/wp-content/plugins/jetpack/jetpack_vendor/automattic/jetpack-waf/src" \
+            2>/dev/null | head -n 20 || true
 
           echo "=== Jetpack WAF brute-force internals ==="
           JETPACK_MATH_FILE="$WP_PATH/wp-content/plugins/jetpack/jetpack_vendor/automattic/jetpack-waf/src/brute-force-protection/class-math-fallback.php"
@@ -170,7 +174,7 @@ jobs:
             $body = "Automated diagnostics mail probe.";
             $ok = wp_mail($to, $subject, $body);
             echo $ok ? "accepted_by_wp_mail" : "wp_mail_returned_false";
-            ' --path="$WP_PATH" 2>&1
+            ' --path="$WP_PATH" 2>&1 || true
           )"
           echo "synthetic_wp_mail_result=$MAIL_RESULT"
 
