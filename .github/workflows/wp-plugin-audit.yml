@@ -59,6 +59,50 @@ jobs:
             && echo "wp-mail-smtp=active" || echo "wp-mail-smtp=inactive"
           sudo -u www-data wp option get admin_email --path="$WP_PATH" || true
 
+          echo "=== Synthetic login transaction ==="
+          TEST_USER="copilot-login-probe-$(date +%s)"
+          TEST_EMAIL="${TEST_USER}@pausatf.org"
+          TEST_PASS="$(openssl rand -hex 16)"
+          COOKIE_FILE="$(mktemp)"
+          HEADER_FILE="$(mktemp)"
+          BODY_FILE="$(mktemp)"
+
+          cleanup_probe_user() {
+            sudo -u www-data wp user delete "$TEST_USER" --yes --path="$WP_PATH" >/dev/null 2>&1 || true
+            rm -f "$COOKIE_FILE" "$HEADER_FILE" "$BODY_FILE"
+          }
+          trap cleanup_probe_user EXIT
+
+          sudo -u www-data wp user create "$TEST_USER" "$TEST_EMAIL" \
+            --user_pass="$TEST_PASS" --role=subscriber --path="$WP_PATH" >/dev/null
+
+          curl -sS -D "$HEADER_FILE" -o "$BODY_FILE" \
+            -c "$COOKIE_FILE" -b "$COOKIE_FILE" \
+            -H 'Host: www.pausatf.org' \
+            --data-urlencode "log=$TEST_USER" \
+            --data-urlencode "pwd=$TEST_PASS" \
+            --data 'wp-submit=Log In&redirect_to=http%3A%2F%2Fwww.pausatf.org%2Fwp-admin%2F&testcookie=1' \
+            http://127.0.0.1/wp-login.php
+
+          if ! grep -qi '^Set-Cookie: wordpress_logged_in_' "$HEADER_FILE"; then
+            echo "ERROR: synthetic login failed to set wordpress_logged_in cookie" >&2
+            sed -n '1,120p' "$BODY_FILE" >&2 || true
+            exit 1
+          fi
+
+          ADMIN_STATUS="$(
+            curl -sS -o /dev/null -w '%{http_code}' \
+              -b "$COOKIE_FILE" \
+              -H 'Host: www.pausatf.org' \
+              http://127.0.0.1/wp-admin/
+          )"
+          echo "synthetic_wp_admin_http_status=$ADMIN_STATUS"
+          if [ "$ADMIN_STATUS" != "200" ] && [ "$ADMIN_STATUS" != "302" ]; then
+            echo "ERROR: synthetic login reached unexpected wp-admin status ($ADMIN_STATUS)" >&2
+            exit 1
+          fi
+          echo "synthetic_login_result=PASS"
+
           echo "=== Mail transport status ==="
           systemctl is-active postfix || true
           (mailq || true) | head -n 40
