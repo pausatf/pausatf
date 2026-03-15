@@ -2,6 +2,12 @@ name: Capture Prod WP Inventory
 
 on:
   workflow_dispatch:
+    inputs:
+      probe_widgets:
+        description: "Collect widgets.php and widget REST error timeline from production logs"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -37,11 +43,72 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H ftp.pausatf.org >> ~/.ssh/known_hosts 2>/dev/null || true
 
+      - name: Probe widgets log timeline (prod)
+        if: ${{ inputs.probe_widgets == true }}
+        run: |
+          set -euo pipefail
+          REMOTE_SHELL="bash -s"
+          if ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new \
+            github-deploy@ftp.pausatf.org "sudo -n true" >/dev/null 2>&1; then
+            REMOTE_SHELL="sudo -n bash -s"
+          fi
+
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new \
+            github-deploy@ftp.pausatf.org "$REMOTE_SHELL" <<'REMOTE'
+          set -euo pipefail
+
+          list_logs() {
+            ls -1 "$1" 2>/dev/null | sort -V -r || true
+          }
+
+          mapfile -t ACCESS_LOGS < <(list_logs "/var/log/apache2/access.log*")
+          mapfile -t ERROR_LOGS < <(list_logs "/var/log/apache2/error.log*")
+
+          echo "HOST=$(hostname -f 2>/dev/null || hostname)"
+          echo "UTC_NOW=$(date -u --iso-8601=seconds)"
+          echo "ACCESS_LOG_FILES=${#ACCESS_LOGS[@]}"
+          echo "ERROR_LOG_FILES=${#ERROR_LOGS[@]}"
+
+          if [ "${#ACCESS_LOGS[@]}" -eq 0 ]; then
+            echo "ERROR: no Apache access logs found" >&2
+            exit 1
+          fi
+
+          WIDGET_LINES="$(zgrep -h ' /wp-admin/widgets\.php' "${ACCESS_LOGS[@]}" 2>/dev/null || true)"
+          WIDGET_ERR_LINES="$(printf '%s\n' "$WIDGET_LINES" | grep -E '" [45][0-9][0-9] ' || true)"
+          REST_ERR_LINES="$(
+            zgrep -hE '/wp-json/wp/v2/(widgets|widget-types)' "${ACCESS_LOGS[@]}" 2>/dev/null \
+            | grep -E '" [45][0-9][0-9] ' || true
+          )"
+          APACHE_WIDGET_ERR_LINES="$(zgrep -hiE 'widgets\.php|/wp-json/wp/v2/(widgets|widget-types)|widget' "${ERROR_LOGS[@]}" 2>/dev/null || true)"
+
+          FIRST_WIDGET_REQ_LINE="$(printf '%s\n' "$WIDGET_LINES" | head -n 1 || true)"
+          FIRST_WIDGET_HTTP_ERROR_LINE="$(printf '%s\n' "$WIDGET_ERR_LINES" | head -n 1 || true)"
+          FIRST_WIDGET_REST_HTTP_ERROR_LINE="$(printf '%s\n' "$REST_ERR_LINES" | head -n 1 || true)"
+          FIRST_APACHE_WIDGET_ERROR_LINE="$(printf '%s\n' "$APACHE_WIDGET_ERR_LINES" | head -n 1 || true)"
+
+          echo "FIRST_WIDGET_REQ_LINE=$FIRST_WIDGET_REQ_LINE"
+          echo "FIRST_WIDGET_HTTP_ERROR_LINE=$FIRST_WIDGET_HTTP_ERROR_LINE"
+          echo "FIRST_WIDGET_REST_HTTP_ERROR_LINE=$FIRST_WIDGET_REST_HTTP_ERROR_LINE"
+          echo "FIRST_APACHE_WIDGET_ERROR_LINE=$FIRST_APACHE_WIDGET_ERROR_LINE"
+
+          echo "=== OLDEST widgets.php requests (first 20) ==="
+          printf '%s\n' "$WIDGET_LINES" | head -n 20 || true
+          echo "=== OLDEST widgets.php 4xx/5xx (first 20) ==="
+          printf '%s\n' "$WIDGET_ERR_LINES" | head -n 20 || true
+          echo "=== OLDEST widget REST 4xx/5xx (first 20) ==="
+          printf '%s\n' "$REST_ERR_LINES" | head -n 20 || true
+          echo "=== OLDEST Apache error lines mentioning widgets (first 40) ==="
+          printf '%s\n' "$APACHE_WIDGET_ERR_LINES" | head -n 40 || true
+          REMOTE
+
       - name: Run capture playbook (prod)
+        if: ${{ inputs.probe_widgets != true }}
         run: |
           ansible-playbook -i ansible/inventory/hosts.yml ansible/playbooks/capture-wp-inventory.yml -l production
 
       - name: Commit and open inventory PR
+        if: ${{ inputs.probe_widgets != true }}
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
