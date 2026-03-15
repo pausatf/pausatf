@@ -15,6 +15,11 @@ on:
         required: false
         default: false
         type: boolean
+      skip_synthetic_login:
+        description: "Diagnostics only: skip synthetic login transaction"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -31,6 +36,7 @@ jobs:
           PROD_SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
           PROD_HOST: ${{ vars.PROD_HOST }}
           DISABLE_JETPACK_PROTECT: ${{ inputs.disable_jetpack_protect }}
+          SKIP_SYNTHETIC_LOGIN: ${{ inputs.skip_synthetic_login }}
         run: |
           set -euo pipefail
           if [ -z "${PROD_SSH_PRIVATE_KEY:-}" ]; then
@@ -94,49 +100,64 @@ jobs:
             "Please solve this math problem to prove that you are not a bot" \
             "$WP_PATH/wp-content" 2>/dev/null | head -n 20 || true
 
-          echo "=== Synthetic login transaction ==="
-          TEST_USER="copilot-login-probe-$(date +%s)"
-          TEST_EMAIL="${TEST_USER}@pausatf.org"
-          TEST_PASS="$(openssl rand -hex 16)"
-          COOKIE_FILE="$(mktemp)"
-          HEADER_FILE="$(mktemp)"
-          BODY_FILE="$(mktemp)"
-
-          cleanup_probe_user() {
-            sudo -u www-data wp user delete "$TEST_USER" --yes --path="$WP_PATH" >/dev/null 2>&1 || true
-            rm -f "$COOKIE_FILE" "$HEADER_FILE" "$BODY_FILE"
-          }
-          trap cleanup_probe_user EXIT
-
-          sudo -u www-data wp user create "$TEST_USER" "$TEST_EMAIL" \
-            --user_pass="$TEST_PASS" --role=subscriber --path="$WP_PATH" >/dev/null
-
-          curl -sS -D "$HEADER_FILE" -o "$BODY_FILE" \
-            -c "$COOKIE_FILE" -b "$COOKIE_FILE" \
-            --resolve 'www.pausatf.org:443:127.0.0.1' \
-            --data-urlencode "log=$TEST_USER" \
-            --data-urlencode "pwd=$TEST_PASS" \
-            --data 'wp-submit=Log In&redirect_to=http%3A%2F%2Fwww.pausatf.org%2Fwp-admin%2F&testcookie=1' \
-            https://www.pausatf.org/wp-login.php
-
-          if ! grep -qi '^Set-Cookie: wordpress_logged_in_' "$HEADER_FILE"; then
-            echo "ERROR: synthetic login failed to set wordpress_logged_in cookie" >&2
-            sed -n '1,120p' "$BODY_FILE" >&2 || true
-            exit 1
+          echo "=== Jetpack WAF brute-force internals ==="
+          JETPACK_MATH_FILE="$WP_PATH/wp-content/plugins/jetpack/jetpack_vendor/automattic/jetpack-waf/src/brute-force-protection/class-math-fallback.php"
+          if [ -f "$JETPACK_MATH_FILE" ]; then
+            sed -n '1,220p' "$JETPACK_MATH_FILE" | sed -n '1,220p'
+            grep -R --line-number -E 'get_option|update_option|apply_filters|do_action|brute|protect|math|ip' \
+              "$WP_PATH/wp-content/plugins/jetpack/jetpack_vendor/automattic/jetpack-waf/src/brute-force-protection" \
+              2>/dev/null | head -n 200 || true
+          else
+            echo "jetpack_math_fallback_file_missing"
           fi
 
-          ADMIN_STATUS="$(
-            curl -sS -o /dev/null -w '%{http_code}' \
-              -b "$COOKIE_FILE" \
+          if [ "${SKIP_SYNTHETIC_LOGIN}" != "true" ]; then
+            echo "=== Synthetic login transaction ==="
+            TEST_USER="copilot-login-probe-$(date +%s)"
+            TEST_EMAIL="${TEST_USER}@pausatf.org"
+            TEST_PASS="$(openssl rand -hex 16)"
+            COOKIE_FILE="$(mktemp)"
+            HEADER_FILE="$(mktemp)"
+            BODY_FILE="$(mktemp)"
+
+            cleanup_probe_user() {
+              sudo -u www-data wp user delete "$TEST_USER" --yes --path="$WP_PATH" >/dev/null 2>&1 || true
+              rm -f "$COOKIE_FILE" "$HEADER_FILE" "$BODY_FILE"
+            }
+            trap cleanup_probe_user EXIT
+
+            sudo -u www-data wp user create "$TEST_USER" "$TEST_EMAIL" \
+              --user_pass="$TEST_PASS" --role=subscriber --path="$WP_PATH" >/dev/null
+
+            curl -sS -D "$HEADER_FILE" -o "$BODY_FILE" \
+              -c "$COOKIE_FILE" -b "$COOKIE_FILE" \
               --resolve 'www.pausatf.org:443:127.0.0.1' \
-              https://www.pausatf.org/wp-admin/
-          )"
-          echo "synthetic_wp_admin_http_status=$ADMIN_STATUS"
-          if [ "$ADMIN_STATUS" != "200" ] && [ "$ADMIN_STATUS" != "302" ]; then
-            echo "ERROR: synthetic login reached unexpected wp-admin status ($ADMIN_STATUS)" >&2
-            exit 1
+              --data-urlencode "log=$TEST_USER" \
+              --data-urlencode "pwd=$TEST_PASS" \
+              --data 'wp-submit=Log In&redirect_to=http%3A%2F%2Fwww.pausatf.org%2Fwp-admin%2F&testcookie=1' \
+              https://www.pausatf.org/wp-login.php
+
+            if ! grep -qi '^Set-Cookie: wordpress_logged_in_' "$HEADER_FILE"; then
+              echo "ERROR: synthetic login failed to set wordpress_logged_in cookie" >&2
+              sed -n '1,120p' "$BODY_FILE" >&2 || true
+              exit 1
+            fi
+
+            ADMIN_STATUS="$(
+              curl -sS -o /dev/null -w '%{http_code}' \
+                -b "$COOKIE_FILE" \
+                --resolve 'www.pausatf.org:443:127.0.0.1' \
+                https://www.pausatf.org/wp-admin/
+            )"
+            echo "synthetic_wp_admin_http_status=$ADMIN_STATUS"
+            if [ "$ADMIN_STATUS" != "200" ] && [ "$ADMIN_STATUS" != "302" ]; then
+              echo "ERROR: synthetic login reached unexpected wp-admin status ($ADMIN_STATUS)" >&2
+              exit 1
+            fi
+            echo "synthetic_login_result=PASS"
+          else
+            echo "synthetic_login_skipped=true"
           fi
-          echo "synthetic_login_result=PASS"
 
           echo "=== Synthetic wp_mail transaction ==="
           MAIL_RESULT="$(
