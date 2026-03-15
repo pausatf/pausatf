@@ -76,7 +76,7 @@ jobs:
 
       - name: Setup SSH key
         env:
-          SSH_KEY: ${{ inputs.environment == 'production' && secrets.PROD_SSH_PRIVATE_KEY || inputs.environment == 'staging' && secrets.STAGING_SSH_PRIVATE_KEY || secrets.DEV_SSH_PRIVATE_KEY }}
+          SSH_KEY: ${{ secrets.MIGRATION_NEW_SSH_PRIVATE_KEY != '' && secrets.MIGRATION_NEW_SSH_PRIVATE_KEY || inputs.environment == 'production' && secrets.PROD_SSH_PRIVATE_KEY || inputs.environment == 'staging' && secrets.STAGING_SSH_PRIVATE_KEY || secrets.DEV_SSH_PRIVATE_KEY }}
         run: |
           install -m 700 -d ~/.ssh
           if [ -z "$SSH_KEY" ]; then
@@ -167,7 +167,7 @@ jobs:
 
       - name: Setup SSH key
         env:
-          SSH_KEY: ${{ inputs.environment == 'production' && secrets.PROD_SSH_PRIVATE_KEY || inputs.environment == 'staging' && secrets.STAGING_SSH_PRIVATE_KEY || secrets.DEV_SSH_PRIVATE_KEY }}
+          SSH_KEY: ${{ secrets.MIGRATION_NEW_SSH_PRIVATE_KEY != '' && secrets.MIGRATION_NEW_SSH_PRIVATE_KEY || inputs.environment == 'production' && secrets.PROD_SSH_PRIVATE_KEY || inputs.environment == 'staging' && secrets.STAGING_SSH_PRIVATE_KEY || secrets.DEV_SSH_PRIVATE_KEY }}
           OLD_HOST: ${{ inputs.environment == 'production' && 'ftp.pausatf.org' || inputs.environment == 'staging' && 'stage.pausatf.org' || 'dev.pausatf.org' }}
         run: |
           install -m 700 -d ~/.ssh
