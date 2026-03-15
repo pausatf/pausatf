@@ -163,7 +163,7 @@
   loop: "{{ wordpress_installs }}"
   when:
     - item.ssl_enabled | default(false)
-    - apache_enable_ssl_vhosts | default(true)
+    - apache_enable_ssl_vhosts | default(true) | bool
   notify: Reload Apache
 
 - name: Enable virtual hosts
@@ -182,7 +182,7 @@
   loop: "{{ wordpress_installs }}"
   when:
     - item.ssl_enabled | default(false)
-    - not (apache_enable_ssl_vhosts | default(true))
+    - not (apache_enable_ssl_vhosts | default(true) | bool)
   notify: Reload Apache
 
 - name: Enable SSL virtual hosts
@@ -194,7 +194,7 @@
   loop: "{{ wordpress_installs }}"
   when:
     - item.ssl_enabled | default(false)
-    - apache_enable_ssl_vhosts | default(true)
+    - apache_enable_ssl_vhosts | default(true) | bool
   notify: Reload Apache
 
 - name: Deploy additional (non-WordPress) virtual hosts
