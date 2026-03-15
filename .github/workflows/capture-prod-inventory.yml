@@ -39,7 +39,7 @@ jobs:
           SSH_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
           PROD_HOST: ${{ vars.PROD_HOST }}
         run: |
-          TARGET_HOST="${PROD_HOST:-ftp.pausatf.org}"
+          TARGET_HOST="${PROD_HOST:-REDACTED_PROD_NEW_IP}"
           install -m 700 -d ~/.ssh
           printf "%s" "$SSH_KEY" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
@@ -51,7 +51,7 @@ jobs:
           PROD_HOST: ${{ vars.PROD_HOST }}
         run: |
           set -euo pipefail
-          TARGET_HOST="${PROD_HOST:-ftp.pausatf.org}"
+          TARGET_HOST="${PROD_HOST:-REDACTED_PROD_NEW_IP}"
           REMOTE_SHELL="bash -s"
           if ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new \
             github-deploy@"$TARGET_HOST" "sudo -n true" >/dev/null 2>&1; then
