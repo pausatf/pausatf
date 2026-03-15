@@ -15,6 +15,7 @@
 
   vars:
     wp_path: /var/www/html
+    wpcli: "{{ wpcli_path | default('/usr/local/bin/wp') }}"
     legacy_path: /var/www/legacy
     temp_restore_dir: /tmp/pausatf-restore
 
@@ -95,35 +96,54 @@
       args:
         creates: "{{ temp_restore_dir }}/wordpress-db.sql"
 
-    - name: Get database credentials from wp-config
-      shell: grep {{ item.key }} {{ wp_path }}/wp-config.php | cut -d "'" -f 4
-      register: db_creds
-      loop:
-        - { key: 'DB_NAME', var: 'db_name' }
-        - { key: 'DB_USER', var: 'db_user' }
-        - { key: 'DB_PASSWORD', var: 'db_pass' }
-        - { key: 'DB_HOST', var: 'db_host' }
+    - name: Get database name from wp-config
+      command: >-
+        {{ wpcli }} config get DB_NAME
+        --path={{ wp_path }} --allow-root
+      register: wp_db_name
+      changed_when: false
+
+    - name: Get database user from wp-config
+      command: >-
+        {{ wpcli }} config get DB_USER
+        --path={{ wp_path }} --allow-root
+      register: wp_db_user
+      changed_when: false
+
+    - name: Get database password from wp-config
+      command: >-
+        {{ wpcli }} config get DB_PASSWORD
+        --path={{ wp_path }} --allow-root
+      register: wp_db_password
       changed_when: false
       no_log: true
 
+    - name: Validate wp-config database credentials are non-empty
+      assert:
+        that:
+          - wp_db_name.stdout | trim | length > 0
+          - wp_db_user.stdout | trim | length > 0
+          - wp_db_password.stdout | trim | length > 0
+        fail_msg: "Could not read DB_NAME/DB_USER/DB_PASSWORD from wp-config.php"
+
     - name: Create WordPress database
       mysql_db:
-        name: "{{ db_creds.results[0].stdout }}"
+        name: "{{ wp_db_name.stdout | trim }}"
         state: present
         login_user: root
 
     - name: Create WordPress database user
       mysql_user:
-        name: "{{ db_creds.results[1].stdout }}"
-        password: "{{ db_creds.results[2].stdout }}"
-        priv: "{{ db_creds.results[0].stdout }}.*:SELECT,INSERT,UPDATE,DELETE,CREATE,DROP,INDEX,ALTER,CREATE TEMPORARY TABLES"
+        name: "{{ wp_db_user.stdout | trim }}"
+        password: "{{ wp_db_password.stdout | trim }}"
+        priv: "{{ wp_db_name.stdout | trim }}.*:SELECT,INSERT,UPDATE,DELETE,CREATE,DROP,INDEX,ALTER,CREATE TEMPORARY TABLES"
         state: present
         login_user: root
       no_log: true
 
     - name: Import WordPress database
       mysql_db:
-        name: "{{ db_creds.results[0].stdout }}"
+        name: "{{ wp_db_name.stdout | trim }}"
         state: import
         target: "{{ temp_restore_dir }}/wordpress-db.sql"
         login_user: root

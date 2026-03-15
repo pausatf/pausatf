@@ -3,6 +3,7 @@
   hosts: production
   gather_facts: no
   become: true
+  force_handlers: true
 
   vars:
     wp_path: "{{ wordpress_path | default('/var/www/html') }}"
@@ -23,6 +24,15 @@
           This playbook migrates the production database to managed MySQL.
           Pass --extra-vars "confirm_production=yes" to proceed.
       when: confirm_production | default('no') != 'yes'
+
+    - name: Validate destructive reimport confirmation gate
+      fail:
+        msg: >-
+          force_reimport=yes is destructive and requires
+          --extra-vars "confirm_data_loss=yes" to proceed.
+      when:
+        - force_reimport | default('no') == 'yes'
+        - confirm_data_loss | default('no') != 'yes'
 
     - name: Validate managed_db_host is defined
       fail:
@@ -66,6 +76,7 @@
           password={{ managed_db_password }}
           ssl-mode=REQUIRED
       no_log: true
+      notify: cleanup temporary migration artifacts
 
     - name: Verify managed MySQL is reachable
       command: mysqladmin ping --defaults-extra-file={{ tmp_mycnf }}
@@ -182,6 +193,7 @@
       args:
         executable: /bin/bash
       no_log: true
+      notify: cleanup temporary migration artifacts
 
     - name: Verify full backup file exists and is non-empty
       stat:
@@ -205,12 +217,14 @@
       command: >-
         {{ wpcli }} maintenance-mode activate
         --path={{ wp_path }} --allow-root
+      notify: deactivate wordpress maintenance mode
 
     - name: Export WordPress database via WP-CLI
       command: >-
         {{ wpcli }} db export {{ tmp_export }}
         --path={{ wp_path }} --allow-root
       register: wp_export
+      notify: cleanup temporary migration artifacts
 
     - name: Verify export file line count
       command: wc -l {{ tmp_export }}
@@ -250,6 +264,11 @@
       register: managed_existing_tables
       changed_when: false
 
+    - name: Normalize existing managed WordPress table list
+      set_fact:
+        managed_existing_table_list: "{{ managed_existing_tables.stdout_lines | map('trim') | reject('equalto', '') | list }}"
+      changed_when: false
+
     - name: Fail if managed DB already has data
       fail:
         msg: >-
@@ -258,8 +277,19 @@
           to drop and reimport, or investigate manually.
       when:
         - not ansible_check_mode
-        - managed_existing_tables.stdout | default('') | length > 0
+        - managed_existing_table_list | length > 0
         - force_reimport | default('no') != 'yes'
+
+    - name: Drop existing managed WordPress tables before forced reimport
+      command: >-
+        mysql --defaults-extra-file={{ tmp_mycnf }}
+        {{ wp_db_name.stdout | default('wordpress') }}
+        -e "SET FOREIGN_KEY_CHECKS=0; DROP TABLE IF EXISTS \`{{ item | replace('`', '``') }}\`; SET FOREIGN_KEY_CHECKS=1;"
+      loop: "{{ managed_existing_table_list | default([]) }}"
+      when:
+        - not ansible_check_mode
+        - managed_existing_table_list | length > 0
+        - force_reimport | default('no') == 'yes'
 
     - name: Import WordPress database to managed MySQL
       shell: >-
@@ -441,3 +471,20 @@
           cp {{ wp_path }}/wp-config.php.local-mysql.bak {{ wp_path }}/wp-config.php
           systemctl reload php{{ php_version }}-fpm
           ============================================
+
+  handlers:
+    - name: deactivate wordpress maintenance mode
+      command: >-
+        {{ wpcli }} maintenance-mode deactivate
+        --path={{ wp_path }} --allow-root
+      failed_when: false
+      changed_when: false
+
+    - name: cleanup temporary migration artifacts
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "{{ tmp_mycnf }}"
+        - "{{ tmp_export }}"
+        - "{{ tmp_fullbackup }}"
