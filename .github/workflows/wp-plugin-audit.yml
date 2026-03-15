@@ -30,7 +30,7 @@ jobs:
           printf '%s\n' "$PROD_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           UPDATES=$(ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
-            root@"$PROD_HOST" \
+            github-deploy@"$PROD_HOST" \
             "/usr/local/bin/wp plugin list --update=available --format=table --path=/var/www/html --allow-root 2>/dev/null" || true)
           rm -f ~/.ssh/id_rsa
           # Strip header-only output (no updates)

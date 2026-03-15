@@ -15,7 +15,7 @@ jobs:
     with:
       environment: production
       ansible_limit: production
-      healthcheck_host: "root@REDACTED_PROD_NEW_IP"
+      healthcheck_host: "github-deploy@REDACTED_PROD_NEW_IP"
     secrets:
       SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
       ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}

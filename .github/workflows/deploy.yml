@@ -15,7 +15,7 @@ on:
         required: false
         type: string
         default: ""
-        description: "SSH host for post-deploy healthcheck (e.g., root@ftp.pausatf.org)"
+        description: "SSH host for post-deploy healthcheck (e.g., github-deploy@ftp.pausatf.org)"
     secrets:
       SSH_PRIVATE_KEY:
         required: false

@@ -60,7 +60,7 @@ jobs:
           PROD_HOST: ${{ vars.PROD_HOST }}
           TEST_DOMAIN: www.pausatf.org
           TEST_SSH_KEY: ~/.ssh/id_rsa
-          TEST_SSH_USER: root
+          TEST_SSH_USER: github-deploy
         run: |
           pytest docs/tests/integration/ \
             -v \
