@@ -1,6 +1,7 @@
 name: PAUSATF CodeQL Configuration
 
 paths-ignore:
+  - '**/*.php'
   - content/**
   # Vendored parent theme code (do not modify directly; child theme is customized instead).
   - themes/thesource/**
