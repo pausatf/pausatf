@@ -72,8 +72,8 @@ For full operational procedures see [RUNBOOK.md](RUNBOOK.md).
 
 | Environment | Host | Web server | PHP | Ansible user |
 |-------------|------|------------|-----|--------------|
-| Production | `ftp.pausatf.org` (64.225.40.54) | Apache 2 + MPM Prefork | 7.4 | `root` |
-| Staging | `stage.pausatf.org` | OpenLiteSpeed | 8.3 | `root` |
+| Production | `ftp.pausatf.org` (64.225.40.54) | Apache 2 + MPM Prefork | 7.4 | `github-deploy` |
+| Staging | `stage.pausatf.org` | OpenLiteSpeed | 8.3 | `github-deploy` |
 | Dev | `dev.pausatf.org` | OpenLiteSpeed | 8.4 | `root` |
 
 All servers: Ubuntu 20.04 LTS, DigitalOcean `sfo2`, MySQL 5.7 (prod local) / MySQL 8 (staging/dev managed cluster).
@@ -108,7 +108,7 @@ All servers: Ubuntu 20.04 LTS, DigitalOcean `sfo2`, MySQL 5.7 (prod local) / MyS
 
 | Secret | Used by | Description |
 |--------|---------|-------------|
-| `PROD_SSH_PRIVATE_KEY` | deploy-prod, backup-legacy, capture-prod-inventory, do-nightly-snapshot | ED25519 private key authorized on `ftp.pausatf.org` as `root` |
+| `PROD_SSH_PRIVATE_KEY` | deploy-prod, backup-legacy, capture-prod-inventory, do-nightly-snapshot | ED25519 private key authorized on `ftp.pausatf.org` as `github-deploy` |
 | `DEV_SSH_PRIVATE_KEY` | deploy-dev | Private key for dev host |
 | `ANSIBLE_VAULT_PASSWORD` | deploy-prod, deploy-staging, deploy-dev, capture-prod-inventory | Ansible vault decryption password |
 | `DO_TOKEN` | infra-staging, do-nightly-snapshot | DigitalOcean API token |

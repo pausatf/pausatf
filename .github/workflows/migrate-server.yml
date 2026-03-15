@@ -76,7 +76,7 @@ jobs:
 
       - name: Setup SSH key
         env:
-          SSH_KEY: ${{ inputs.environment == 'production' && secrets.PROD_SSH_PRIVATE_KEY || secrets.DEV_SSH_PRIVATE_KEY }}
+          SSH_KEY: ${{ inputs.environment == 'production' && secrets.PROD_SSH_PRIVATE_KEY || inputs.environment == 'staging' && secrets.STAGING_SSH_PRIVATE_KEY || secrets.DEV_SSH_PRIVATE_KEY }}
         run: |
           install -m 700 -d ~/.ssh
           printf "%s" "$SSH_KEY" > ~/.ssh/id_ed25519
@@ -162,7 +162,7 @@ jobs:
 
       - name: Setup SSH key
         env:
-          SSH_KEY: ${{ inputs.environment == 'production' && secrets.PROD_SSH_PRIVATE_KEY || secrets.DEV_SSH_PRIVATE_KEY }}
+          SSH_KEY: ${{ inputs.environment == 'production' && secrets.PROD_SSH_PRIVATE_KEY || inputs.environment == 'staging' && secrets.STAGING_SSH_PRIVATE_KEY || secrets.DEV_SSH_PRIVATE_KEY }}
           OLD_HOST: ${{ inputs.environment == 'production' && 'ftp.pausatf.org' || inputs.environment == 'staging' && 'stage.pausatf.org' || 'dev.pausatf.org' }}
         run: |
           install -m 700 -d ~/.ssh
@@ -183,7 +183,7 @@ jobs:
         working-directory: ansible
         env:
           ANSIBLE_USER: root
-          ENV_GROUP: ${{ inputs.environment == 'production' && 'production' || inputs.environment == 'staging' && 'staging' || 'development' }}
+          ENV_GROUP: ${{ inputs.environment == 'production' && 'production' || inputs.environment == 'staging' && 'staging' || 'dev' }}
           VAULT_ARGS: ${{ secrets.ANSIBLE_VAULT_PASSWORD != '' && '--vault-password-file ../vault.pass' || '' }}
         run: |
           # shellcheck disable=SC2086
@@ -215,7 +215,7 @@ jobs:
     steps:
       - name: Setup SSH key
         env:
-          SSH_KEY: ${{ inputs.environment == 'production' && secrets.PROD_SSH_PRIVATE_KEY || secrets.DEV_SSH_PRIVATE_KEY }}
+          SSH_KEY: ${{ inputs.environment == 'production' && secrets.PROD_SSH_PRIVATE_KEY || inputs.environment == 'staging' && secrets.STAGING_SSH_PRIVATE_KEY || secrets.DEV_SSH_PRIVATE_KEY }}
         run: |
           install -m 700 -d ~/.ssh
           printf "%s" "$SSH_KEY" > ~/.ssh/id_ed25519
@@ -231,7 +231,8 @@ jobs:
       - name: Migrate WordPress database
         env:
           OLD_HOST: ${{ inputs.environment == 'production' && 'ftp.pausatf.org' || inputs.environment == 'staging' && 'stage.pausatf.org' || 'dev.pausatf.org' }}
-          ANSIBLE_USER: root
+          OLD_SSH_USER: ${{ inputs.environment == 'production' && 'github-deploy' || inputs.environment == 'staging' && 'github-deploy' || 'root' }}
+          NEW_SSH_USER: root
         run: |
           set -euo pipefail
           WP_PATH="/var/www/html"
@@ -240,9 +241,9 @@ jobs:
 
           # WP-CLI reads credentials from wp-config.php and scopes to the WordPress DB only,
           # avoiding the risk of dumping all MySQL databases including system tables.
-          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new "$ANSIBLE_USER@$OLD_HOST" \
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new "$OLD_SSH_USER@$OLD_HOST" \
             "sudo -u www-data wp db export - --path=$WP_PATH" \
-            | ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new "$ANSIBLE_USER@$NEW_SERVER_IP" \
+            | ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new "$NEW_SSH_USER@$NEW_SERVER_IP" \
             "sudo -u www-data wp db import - --path=$WP_PATH"
 
           echo "Database migration complete"
@@ -250,12 +251,13 @@ jobs:
       - name: Sync wp-content/uploads
         env:
           OLD_HOST: ${{ inputs.environment == 'production' && 'ftp.pausatf.org' || inputs.environment == 'staging' && 'stage.pausatf.org' || 'dev.pausatf.org' }}
-          ANSIBLE_USER: root
+          OLD_SSH_USER: ${{ inputs.environment == 'production' && 'github-deploy' || inputs.environment == 'staging' && 'github-deploy' || 'root' }}
+          NEW_SSH_USER: root
         run: |
           rsync -az --delete \
             -e "ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new" \
-            "$ANSIBLE_USER@$OLD_HOST:/var/www/html/wp-content/uploads/" \
-            "$ANSIBLE_USER@$NEW_SERVER_IP:/var/www/html/wp-content/uploads/"
+            "$OLD_SSH_USER@$OLD_HOST:/var/www/html/wp-content/uploads/" \
+            "$NEW_SSH_USER@$NEW_SERVER_IP:/var/www/html/wp-content/uploads/"
 
       - name: Report
         run: echo "Data migration complete"
