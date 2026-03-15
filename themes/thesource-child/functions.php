@@ -140,3 +140,11 @@ function pausatf_social_customize_register( WP_Customize_Manager $wp_customize )
     }
 }
 add_action( 'customize_register', 'pausatf_social_customize_register' );
+
+/**
+ * Use classic widgets editor for legacy theme compatibility.
+ *
+ * The block-based widgets screen can fail for this legacy theme stack.
+ * For stable operations, force the classic widgets UI in wp-admin.
+ */
+add_filter( 'use_widgets_block_editor', '__return_false' );
