@@ -12,7 +12,7 @@ jobs:
     with:
       environment: production
       ansible_limit: production
-      healthcheck_host: "github-deploy@64.225.40.54"
+      healthcheck_host: "root@64.225.40.54"
     secrets:
       SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
       ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}

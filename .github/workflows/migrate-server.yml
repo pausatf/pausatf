@@ -130,7 +130,7 @@ jobs:
 
       - name: Verify new server is reachable via SSH
         env:
-          ANSIBLE_USER: ${{ inputs.environment == 'production' && 'github-deploy' || 'root' }}
+          ANSIBLE_USER: root
         run: |
           ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=accept-new \
             -i ~/.ssh/id_ed25519 \
@@ -182,7 +182,7 @@ jobs:
       - name: Run playbook against new server
         working-directory: ansible
         env:
-          ANSIBLE_USER: ${{ inputs.environment == 'production' && 'github-deploy' || 'root' }}
+          ANSIBLE_USER: root
           ENV_GROUP: ${{ inputs.environment == 'production' && 'production' || inputs.environment == 'staging' && 'staging' || 'development' }}
           VAULT_ARGS: ${{ secrets.ANSIBLE_VAULT_PASSWORD != '' && '--vault-password-file ../vault.pass' || '' }}
         run: |
@@ -231,7 +231,7 @@ jobs:
       - name: Migrate WordPress database
         env:
           OLD_HOST: ${{ inputs.environment == 'production' && 'ftp.pausatf.org' || inputs.environment == 'staging' && 'stage.pausatf.org' || 'dev.pausatf.org' }}
-          ANSIBLE_USER: ${{ inputs.environment == 'production' && 'github-deploy' || 'root' }}
+          ANSIBLE_USER: root
         run: |
           set -euo pipefail
           WP_PATH="/var/www/html"
@@ -250,7 +250,7 @@ jobs:
       - name: Sync wp-content/uploads
         env:
           OLD_HOST: ${{ inputs.environment == 'production' && 'ftp.pausatf.org' || inputs.environment == 'staging' && 'stage.pausatf.org' || 'dev.pausatf.org' }}
-          ANSIBLE_USER: ${{ inputs.environment == 'production' && 'github-deploy' || 'root' }}
+          ANSIBLE_USER: root
         run: |
           rsync -az --delete \
             -e "ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new" \

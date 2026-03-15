@@ -30,7 +30,7 @@ jobs:
           printf '%s\n' "$PROD_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           UPDATES=$(ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
-            github-deploy@"$PROD_HOST" \
+            root@"$PROD_HOST" \
             "/usr/local/bin/wp plugin list --update=available --format=table --path=/var/www/html --allow-root 2>/dev/null" || true)
           rm -f ~/.ssh/id_rsa
           # Strip header-only output (no updates)
@@ -51,8 +51,9 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TODAY=$(date +%Y-%m-%d)
+          ISSUE_BODY=$(printf "Plugin updates available as of %s.\n\n\`\`\`\n%s\n\`\`\`\n\nTo update: \`wp plugin update --all --path=/var/www/html --allow-root\`" "$TODAY" "$PLUGIN_UPDATES")
           gh issue create \
             --repo pausatf/pausatf \
             --title "chore(wordpress): plugin updates available ${TODAY}" \
             --label "wordpress,dependencies" \
-            --body "$(printf 'Plugin updates available as of %s.\n\n```\n%s\n```\n\nTo update: `wp plugin update --all --path=/var/www/html --allow-root`' "$TODAY" "$PLUGIN_UPDATES")"
+            --body "$ISSUE_BODY"
