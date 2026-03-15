@@ -1,0 +1,4 @@
+name: PAUSATF CodeQL Configuration
+
+paths-ignore:
+  - content/**
