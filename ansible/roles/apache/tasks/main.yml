@@ -273,6 +273,15 @@
   notify: Reload Apache
 
 - name: Block HTTP access to ai1wm-backups directory
+  file:
+    path: /var/www/html/wp-content/ai1wm-backups
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0750'
+  when: wordpress_installs | selectattr('path', 'equalto', '/var/www/html') | list | length > 0
+
+- name: Deploy ai1wm-backups deny-all .htaccess
   copy:
     dest: /var/www/html/wp-content/ai1wm-backups/.htaccess
     content: |
