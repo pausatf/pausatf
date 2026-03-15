@@ -86,6 +86,7 @@ jobs:
           printf '%s\n' "$SSH_KEY" | tr -d '\r' > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
           ssh-keygen -y -f ~/.ssh/id_ed25519 > /dev/null
+          ln -sf ~/.ssh/id_ed25519 ~/.ssh/pausatf-prod
 
       - name: Look up old server and snapshot
         id: get-old-ip
@@ -179,6 +180,7 @@ jobs:
           printf '%s\n' "$SSH_KEY" | tr -d '\r' > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
           ssh-keygen -y -f ~/.ssh/id_ed25519 > /dev/null
+          ln -sf ~/.ssh/id_ed25519 ~/.ssh/pausatf-prod
           ssh-keyscan -H "$OLD_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
           ssh-keyscan -H "$NEW_SERVER_IP" >> ~/.ssh/known_hosts 2>/dev/null || true
 
@@ -202,6 +204,7 @@ jobs:
             -l "$ENV_GROUP" \
             -e "ansible_host=$NEW_SERVER_IP" \
             -e "ansible_user=$ANSIBLE_USER" \
+            -e "ansible_ssh_private_key_file=~/.ssh/id_ed25519" \
             $VAULT_ARGS
 
       - name: Report
@@ -236,6 +239,7 @@ jobs:
           printf '%s\n' "$SSH_KEY" | tr -d '\r' > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
           ssh-keygen -y -f ~/.ssh/id_ed25519 > /dev/null
+          ln -sf ~/.ssh/id_ed25519 ~/.ssh/pausatf-prod
 
       - name: Add old server to known_hosts
         env:
