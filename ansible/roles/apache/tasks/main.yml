@@ -161,7 +161,9 @@
     group: root
     mode: '0644'
   loop: "{{ wordpress_installs }}"
-  when: item.ssl_enabled | default(false)
+  when:
+    - item.ssl_enabled | default(false)
+    - apache_enable_ssl_vhosts | default(true)
   notify: Reload Apache
 
 - name: Enable virtual hosts
@@ -180,7 +182,9 @@
     state: link
     force: true
   loop: "{{ wordpress_installs }}"
-  when: item.ssl_enabled | default(false)
+  when:
+    - item.ssl_enabled | default(false)
+    - apache_enable_ssl_vhosts | default(true)
   notify: Reload Apache
 
 - name: Deploy additional (non-WordPress) virtual hosts
