@@ -58,6 +58,15 @@ jobs:
           sudo -u www-data wp plugin is-active wp-mail-smtp --path="$WP_PATH" \
             && echo "wp-mail-smtp=active" || echo "wp-mail-smtp=inactive"
           sudo -u www-data wp option get admin_email --path="$WP_PATH" || true
+          sudo -u www-data wp eval '
+          $o = get_option("wp_mail_smtp");
+          if (is_array($o)) {
+            echo "wp-mail-smtp-mailer=" . ($o["mail"]["mailer"] ?? "unknown") . PHP_EOL;
+            echo "wp-mail-smtp-from-email=" . ($o["mail"]["from_email"] ?? "unknown") . PHP_EOL;
+          } else {
+            echo "wp-mail-smtp-config=missing";
+          }
+          ' --path="$WP_PATH" || true
 
           echo "=== Synthetic login transaction ==="
           TEST_USER="copilot-login-probe-$(date +%s)"
@@ -102,6 +111,21 @@ jobs:
             exit 1
           fi
           echo "synthetic_login_result=PASS"
+
+          echo "=== Synthetic wp_mail transaction ==="
+          MAIL_RESULT="$(
+            sudo -u www-data wp eval '
+            add_action("wp_mail_failed", function($error) {
+              fwrite(STDERR, "wp_mail_failed: " . $error->get_error_message() . PHP_EOL);
+            });
+            $to = get_option("admin_email");
+            $subject = "PAUSATF mail probe " . gmdate("c");
+            $body = "Automated diagnostics mail probe.";
+            $ok = wp_mail($to, $subject, $body);
+            echo $ok ? "accepted_by_wp_mail" : "wp_mail_returned_false";
+            ' --path="$WP_PATH" 2>&1
+          )"
+          echo "synthetic_wp_mail_result=$MAIL_RESULT"
 
           echo "=== Mail transport status ==="
           systemctl is-active postfix || true
