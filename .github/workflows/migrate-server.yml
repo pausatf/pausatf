@@ -205,6 +205,7 @@ jobs:
             -e "ansible_host=$NEW_SERVER_IP" \
             -e "ansible_user=$ANSIBLE_USER" \
             -e "ansible_ssh_private_key_file=~/.ssh/id_ed25519" \
+            -e "apache_enable_ssl_vhosts=false" \
             $VAULT_ARGS
 
       - name: Report
