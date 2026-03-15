@@ -56,11 +56,14 @@ jobs:
           fi
 
           ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
-            github-deploy@"$TARGET_HOST" "$REMOTE_SHELL" <<'REMOTE'
+            github-deploy@"$TARGET_HOST" \
+            "DISABLE_JETPACK_PROTECT='${DISABLE_JETPACK_PROTECT:-false}' SKIP_SYNTHETIC_LOGIN='${SKIP_SYNTHETIC_LOGIN:-false}' $REMOTE_SHELL" <<'REMOTE'
           set -euo pipefail
 
           WP_PATH="/var/www/html"
           APACHE_LOG_DIR="/var/log/apache2"
+          DISABLE_JETPACK_PROTECT="${DISABLE_JETPACK_PROTECT:-false}"
+          SKIP_SYNTHETIC_LOGIN="${SKIP_SYNTHETIC_LOGIN:-false}"
 
           echo "HOST=$(hostname -f 2>/dev/null || hostname)"
           echo "UTC_NOW=$(date -u --iso-8601=seconds)"
@@ -103,6 +106,9 @@ jobs:
             "IP_ALLOW_LIST_OPTION_NAME" \
             "$WP_PATH/wp-content/plugins/jetpack/jetpack_vendor/automattic/jetpack-waf/src" \
             2>/dev/null | head -n 20 || true
+          grep -R --line-number -E 'https?://|api\\.wordpress\\.com|public-api\\.wordpress\\.com|jetpack\\.wordpress\\.com' \
+            "$WP_PATH/wp-content/plugins/jetpack/jetpack_vendor/automattic/jetpack-waf/src" \
+            2>/dev/null | head -n 80 || true
 
           echo "=== Jetpack WAF brute-force internals ==="
           JETPACK_MATH_FILE="$WP_PATH/wp-content/plugins/jetpack/jetpack_vendor/automattic/jetpack-waf/src/brute-force-protection/class-math-fallback.php"
@@ -114,6 +120,31 @@ jobs:
           else
             echo "jetpack_math_fallback_file_missing"
           fi
+
+          echo "=== Jetpack Protect API reachability ==="
+          for URL in "https://public-api.wordpress.com/rest/v1.1/" "https://jetpack.wordpress.com/"; do
+            HOST="$(printf '%s' "$URL" | awk -F/ '{print $3}')"
+            echo "-- DNS $HOST --"
+            getent ahostsv4 "$HOST" | head -n 3 || true
+            echo "-- curl $HOST --"
+            curl -sS --max-time 20 -o /dev/null \
+              -w "$HOST http=%{http_code} ip=%{remote_ip} connect=%{time_connect} total=%{time_total}\n" \
+              "$URL" || true
+          done
+          sudo -u www-data wp eval '
+          $urls = array(
+            "https://public-api.wordpress.com/rest/v1.1/",
+            "https://jetpack.wordpress.com/",
+          );
+          foreach ( $urls as $url ) {
+            $response = wp_remote_get( $url, array( "timeout" => 20 ) );
+            if ( is_wp_error( $response ) ) {
+              echo "wp_http_error[" . $url . "]=" . $response->get_error_code() . ":" . $response->get_error_message() . PHP_EOL;
+              continue;
+            }
+            echo "wp_http_status[" . $url . "]=" . wp_remote_retrieve_response_code( $response ) . PHP_EOL;
+          }
+          ' --path="$WP_PATH" || true
 
           if [ "${SKIP_SYNTHETIC_LOGIN}" != "true" ]; then
             echo "=== Synthetic login transaction ==="
