@@ -11,6 +11,14 @@
 # Per-environment overrides (staging, dev) live in:
 #   ansible/group_vars/staging.yml
 #   ansible/group_vars/dev.yml
+#
+# Variable precedence (lowest -> highest):
+#   defaults/main.yml         (role defaults, widest scope)
+#   -> group_vars/all.yml     (this file, applies to all hosts)
+#   -> group_vars/<ENV>.yml   (environment-specific, e.g. staging.yml)
+#   -> host_vars/<HOST>.yml   (host-specific, highest precedence)
+# Use host_vars only for values that genuinely differ per host (e.g. IP,
+# hostname). Prefer group_vars for shared configuration.
 
 # =============================================================================
 # INFRASTRUCTURE / HOSTING
@@ -261,8 +269,9 @@ legacy_data_redirects:
 # =============================================================================
 ssl_enabled: true
 ssl_protocol: "all -SSLv3 -TLSv1 -TLSv1.1"
+# ECDHE+AESGCM suites only — forward secrecy, authenticated encryption, no CBC.
 # yamllint disable-line rule:line-length
-ssl_cipher_suite: "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384"
+ssl_cipher_suite: "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305"
 ssl_certificate: "/etc/letsencrypt/live/pausatf.org/fullchain.pem"
 ssl_certificate_key: "/etc/letsencrypt/live/pausatf.org/privkey.pem"
 
