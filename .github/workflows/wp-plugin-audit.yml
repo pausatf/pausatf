@@ -126,7 +126,9 @@ jobs:
           )"
           if [ -n "$LATEST_DB_BACKUP" ]; then
             echo "latest_db_backup=$LATEST_DB_BACKUP"
-            BACKUP_WIDGET_LOGIC_TOKEN_COUNT="$(zgrep -ao 'widget_logic' "$LATEST_DB_BACKUP" 2>/dev/null | wc -l | tr -d ' ')"
+            BACKUP_WIDGET_LOGIC_TOKEN_COUNT="$(
+              gzip -cd "$LATEST_DB_BACKUP" 2>/dev/null | grep -ao 'widget_logic' | wc -l | tr -d ' ' || true
+            )"
             BACKUP_WIDGET_LOGIC_TOKEN_COUNT="${BACKUP_WIDGET_LOGIC_TOKEN_COUNT:-0}"
             echo "backup_widget_logic_token_count=${BACKUP_WIDGET_LOGIC_TOKEN_COUNT}"
           fi
