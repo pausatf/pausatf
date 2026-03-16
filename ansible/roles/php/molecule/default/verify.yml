@@ -1,12 +1,14 @@
 ---
-- name: Verify
+- name: Verify php
   hosts: all
   become: true
   tasks:
     - name: Gather service facts
       ansible.builtin.service_facts:
 
-    - name: Assert role applied successfully
+    - name: Assert php8.4-fpm is running
       ansible.builtin.assert:
-        that: true
-        success_msg: "php role applied successfully"
+        that:
+          - "'php8.4-fpm.service' in ansible_facts.services"
+          - "ansible_facts.services['php8.4-fpm.service'].state == 'running'"
+        fail_msg: "php8.4-fpm is not running"
