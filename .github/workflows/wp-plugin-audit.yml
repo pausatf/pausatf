@@ -120,6 +120,16 @@ jobs:
               \( -name '*.sql' -o -name '*.sql.gz' -o -name '*.sql.zst' -o -name '*.wpress' -o -name '*.tar' -o -name '*.tar.gz' \) \
               -printf '%TY-%Tm-%Td %TH:%TM %p\n' 2>/dev/null | sort -r | head -n 80 || true
           fi
+          LATEST_DB_BACKUP="$(
+            find /var/backups/wordpress -maxdepth 2 -type f -name '*main-db*.sql.gz' 2>/dev/null \
+              | sort -r | head -n 1
+          )"
+          if [ -n "$LATEST_DB_BACKUP" ]; then
+            echo "latest_db_backup=$LATEST_DB_BACKUP"
+            BACKUP_WIDGET_LOGIC_TOKEN_COUNT="$(zgrep -ao 'widget_logic' "$LATEST_DB_BACKUP" 2>/dev/null | wc -l | tr -d ' ')"
+            BACKUP_WIDGET_LOGIC_TOKEN_COUNT="${BACKUP_WIDGET_LOGIC_TOKEN_COUNT:-0}"
+            echo "backup_widget_logic_token_count=${BACKUP_WIDGET_LOGIC_TOKEN_COUNT}"
+          fi
 
           CUR_OPT_COUNT="$(wpdb_query "SELECT COUNT(*) FROM \`${DB_NAME}\`.\`${CURRENT_OPTIONS_TABLE}\` WHERE option_name LIKE 'widget_%' AND option_value LIKE '%widget_logic%';" | head -n1 || echo 0)"
           CUR_OPT_COUNT="${CUR_OPT_COUNT:-0}"
