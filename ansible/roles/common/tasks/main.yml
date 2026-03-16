@@ -1,12 +1,12 @@
 ---
 # Common server configuration tasks
 - name: Set hostname
-  hostname:
+  ansible.builtin.hostname:
     name: "{{ inventory_hostname }}"
   when: ansible_virtualization_type != 'docker'
 
 - name: Update /etc/hosts for {{ inventory_hostname }}
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/hosts
     regexp: '^127\.0\.1\.1'
     line: "127.0.1.1 {{ inventory_hostname }}"
@@ -14,7 +14,7 @@
   when: ansible_virtualization_type != 'docker'
 
 - name: Install essential packages
-  apt:
+  ansible.builtin.apt:
     name:
       - apt-transport-https
       - ca-certificates
@@ -38,10 +38,10 @@
     update_cache: yes
 
 - name: Configure UFW firewall
-  include_tasks: firewall.yml
+  ansible.builtin.include_tasks: firewall.yml
 
 - name: Create deployment user
-  user:
+  ansible.builtin.user:
     name: deploy
     shell: /bin/bash
     groups: sudo
@@ -49,22 +49,22 @@
     create_home: yes
 
 - name: Configure SSH
-  include_tasks: ssh.yml
+  ansible.builtin.include_tasks: ssh.yml
 
 - name: Set timezone
-  timezone:
+  community.general.timezone:
     name: "{{ timezone }}"
   when: ansible_virtualization_type != 'docker'
 
 - name: Configure automatic security updates
-  apt:
+  ansible.builtin.apt:
     name:
       - unattended-upgrades
       - apt-listchanges
     state: present
 
 - name: Enable unattended upgrades
-  copy:
+  ansible.builtin.copy:
     dest: /etc/apt/apt.conf.d/20auto-upgrades
     content: |
       APT::Periodic::Update-Package-Lists "1";
@@ -74,7 +74,7 @@
     mode: '0644'
 
 - name: Configure sysctl for security
-  sysctl:
+  ansible.posix.sysctl:
     name: "{{ item.name }}"
     value: "{{ item.value }}"
     state: present
