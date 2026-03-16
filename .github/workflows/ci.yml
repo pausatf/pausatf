@@ -40,7 +40,7 @@ jobs:
           chmod +x ansible/.vault_pass.sh
 
       - name: Run ansible-lint
-        run: ansible-lint --offline
+        run: ansible-lint --offline --strict
         working-directory: ansible
 
   yamllint:
