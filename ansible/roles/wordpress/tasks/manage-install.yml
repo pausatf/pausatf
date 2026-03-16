@@ -59,9 +59,18 @@
     mode: '0640'
   when: wp_site.manage_wp_config | default(false)
 
+- name: Check pending plugin updates
+  command: "{{ wpcli_path | default('/usr/local/bin/wp') }} plugin list --update=available --format=count --path={{ wp_site.path }} --allow-root"
+  register: plugin_updates
+  changed_when: false
+  failed_when: false
+  when: wpcli_update_plugins | default(true)
+
 - name: Update all plugins except excluded
   command: "{{ wpcli_path | default('/usr/local/bin/wp') }} plugin update --all --path={{ wp_site.path }} --allow-root --quiet"
-  when: wpcli_update_plugins | default(true)
+  when:
+    - wpcli_update_plugins | default(true)
+    - plugin_updates.stdout | default('0') | int > 0
   register: plugin_update_result
   # wp-cli exits non-zero when no updates are available; treat that as success.
   failed_when: false
@@ -138,14 +147,6 @@
   command: find {{ wp_site.path }} -type f -not -perm 0644 -exec chmod 644 {} +
   register: file_perms
   changed_when: file_perms.rc == 0 and file_perms.stdout != ''
-
-- name: Tighten wp-config.php permissions
-  file:
-    path: "{{ wp_site.path }}/wp-config.php"
-    mode: "0640"
-    owner: "{{ web_user | default('www-data') }}"
-    group: "{{ web_user | default('www-data') }}"
-  when: wp_installed.rc == 0
 
 - name: Ensure uploads directory exists
   file:
