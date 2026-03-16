@@ -23,8 +23,14 @@
               if (ansible_controller_cidr | default('') | length > 0)
               else []
             )
+          + ['100.64.0.0/10']
         ) | unique
       }}
+
+- name: Warn if no explicit SSH networks configured
+  debug:
+    msg: "WARNING: No allowed_ssh_networks defined. SSH limited to Tailscale (100.64.0.0/10) and ansible controller CIDR only."
+  when: allowed_ssh_networks | default([]) | length == 0
 
 - name: Allow SSH from configured networks
   ufw:
@@ -33,14 +39,6 @@
     proto: tcp
     src: "{{ item }}"
   loop: "{{ ssh_allow_networks_effective }}"
-  when: ssh_allow_networks_effective | length > 0
-
-- name: Allow SSH from anywhere when no networks are configured
-  ufw:
-    rule: allow
-    port: '22'
-    proto: tcp
-  when: ssh_allow_networks_effective | length == 0
 
 - name: Allow HTTP
   ufw:
