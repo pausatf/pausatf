@@ -1,0 +1,17 @@
+---
+- name: Assert apache_mpm is a supported value
+  ansible.builtin.assert:
+    that:
+      - apache_mpm | default('event') in ['event', 'prefork', 'worker']
+    fail_msg: "apache_mpm must be one of: event, prefork, worker (got: {{ apache_mpm | default('event') }})"
+    quiet: true
+
+- name: Assert dev-local vhost config is complete when enabled
+  ansible.builtin.assert:
+    that:
+      - apache_dev_local_vhost_name | default('') | length > 0
+      - apache_dev_local_listen | default('') | length > 0
+      - apache_dev_local_docroot | default('') | length > 0
+    fail_msg: "apache_dev_local_vhost_name, apache_dev_local_listen, and apache_dev_local_docroot must all be set when apache_dev_local_enabled is true"
+    quiet: true
+  when: apache_dev_local_enabled | default(false)
