@@ -226,7 +226,6 @@ jobs:
 
             curl -sS -D "$HEADER_FILE" -o "$BODY_FILE" \
               -c "$COOKIE_FILE" -b "$COOKIE_FILE" \
-              --resolve 'www.pausatf.org:443:127.0.0.1' \
               --data-urlencode "log=$TEST_USER" \
               --data-urlencode "pwd=$TEST_PASS" \
               --data 'wp-submit=Log In&redirect_to=http%3A%2F%2Fwww.pausatf.org%2Fwp-admin%2F&testcookie=1' \
@@ -241,7 +240,6 @@ jobs:
             ADMIN_STATUS="$(
               curl -sS -o /dev/null -w '%{http_code}' \
                 -b "$COOKIE_FILE" \
-                --resolve 'www.pausatf.org:443:127.0.0.1' \
                 https://www.pausatf.org/wp-admin/
             )"
             echo "synthetic_wp_admin_http_status=$ADMIN_STATUS"
