@@ -1,6 +1,14 @@
 ---
 # Certbot role — Let's Encrypt via Cloudflare DNS-01 challenge
 
+- name: Assert certbot_domains is defined and non-empty
+  ansible.builtin.assert:
+    that:
+      - certbot_domains is defined
+      - certbot_domains | length > 0
+    fail_msg: "certbot_domains must be defined and contain at least one domain"
+  when: certbot_enabled | default(true)
+
 - name: Install certbot and Cloudflare DNS plugin
   apt:
     name:
