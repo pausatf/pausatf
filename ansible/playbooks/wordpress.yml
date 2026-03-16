@@ -1,0 +1,15 @@
+---
+- name: Deploy WordPress
+  hosts: webservers
+  gather_facts: true
+  become: true
+  serial: "{{ deploy_serial | default(omit) }}"
+  roles:
+    - role: fail2ban
+      tags: [security, fail2ban]
+    - role: wordpress
+      tags: [wordpress, deploy]
+      when: wordpress_enabled | default(true)
+    - role: cloudflare
+      tags: [cloudflare, cdn]
+      when: cloudflare_enabled | default(false) and cloudflare_zone_id | default('') | length > 0
