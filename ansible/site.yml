@@ -3,140 +3,135 @@
 - name: Configure all servers
   hosts: all
   gather_facts: true
+  gather_subset:
+    - '!all'
+    - 'distribution'
+    - 'network'
   become: true
 
   pre_tasks:
     - name: Update apt cache
-      apt:
+      ansible.builtin.apt:
         update_cache: yes
         cache_valid_time: 3600
       when: ansible_os_family == "Debian"
 
   roles:
-    - common
+    - role: common
+      tags: [common, base]
     - role: tailscale
+      tags: [tailscale, networking]
       when: tailscale_enabled | default(false)
 
 - name: Configure web servers
   hosts: webservers
   gather_facts: true
+  gather_subset:
+    - '!all'
+    - 'distribution'
+    - 'network'
   become: true
-
-  pre_tasks:
-    - name: Assert MySQL is running before WordPress role
-      ansible.builtin.service_facts:
-
-    - name: Fail if MySQL is not active
-      ansible.builtin.assert:
-        that:
-          - "'mysql.service' in ansible_facts.services or 'mariadb.service' in ansible_facts.services"
-          - >
-            (ansible_facts.services['mysql.service'] is defined and
-             ansible_facts.services['mysql.service'].state == 'running') or
-            (ansible_facts.services['mariadb.service'] is defined and
-             ansible_facts.services['mariadb.service'].state == 'running')
-        fail_msg: "MySQL/MariaDB must be running before the WordPress role executes"
-      when: wordpress_enabled | default(true) and mysql_enabled | default(true)
-
-    - name: Fail if Redis is not active
-      ansible.builtin.assert:
-        that:
-          - "'redis.service' in ansible_facts.services or 'redis-server.service' in ansible_facts.services"
-          - >
-            (ansible_facts.services['redis.service'] is defined and
-             ansible_facts.services['redis.service'].state == 'running') or
-            (ansible_facts.services['redis-server.service'] is defined and
-             ansible_facts.services['redis-server.service'].state == 'running')
-        fail_msg: "Redis must be running before the WordPress role executes"
-      when: wordpress_enabled | default(true) and redis_enabled | default(false)
 
   tasks:
     - name: Deploy web stack
       block:
         - name: Include PHP role (mod_php)
-          include_role:
+          ansible.builtin.include_role:
             name: php
+          tags: [php]
           when:
             - web_server | default('apache') == 'apache'
             - not (use_php_fpm | default(false))
 
         - name: Include PHP-FPM role
-          include_role:
+          ansible.builtin.include_role:
             name: php-fpm
+          tags: [php]
           when:
             - web_server | default('apache') == 'apache'
             - use_php_fpm | default(false)
 
         - name: Include ModSecurity role
-          include_role:
+          ansible.builtin.include_role:
             name: modsecurity
+          tags: [webserver]
           when:
             - web_server | default('apache') == 'apache'
             - modsecurity_enabled | default(true)
 
         - name: Include Apache role
-          include_role:
+          ansible.builtin.include_role:
             name: apache
+          tags: [webserver]
           when: web_server | default('apache') == 'apache'
 
         - name: Include OpenLiteSpeed PHP role
-          include_role:
+          ansible.builtin.include_role:
             name: lsphp
+          tags: [webserver]
           when: web_server | default('apache') == 'openlitespeed'
 
         - name: Include OpenLiteSpeed role
-          include_role:
+          ansible.builtin.include_role:
             name: openlitespeed
+          tags: [webserver]
           when: web_server | default('apache') == 'openlitespeed'
 
         - name: Include Certbot role
-          include_role:
+          ansible.builtin.include_role:
             name: certbot
+          tags: [ssl, certbot]
           when: certbot_enabled | default(false)
 
         - name: Include MySQL role
-          include_role:
+          ansible.builtin.include_role:
             name: mysql
+          tags: [database, mysql]
           when: mysql_enabled | default(true)
 
         - name: Include Redis role
-          include_role:
+          ansible.builtin.include_role:
             name: redis
+          tags: [cache, redis]
           when: redis_enabled | default(false)
 
         - name: Include Fail2ban role
-          include_role:
+          ansible.builtin.include_role:
             name: fail2ban
+          tags: [security, fail2ban]
 
         - name: Include WordPress role
-          include_role:
+          ansible.builtin.include_role:
             name: wordpress
+          tags: [wordpress, deploy]
           when: wordpress_enabled | default(true)
 
         - name: Include Cloudflare role
-          include_role:
+          ansible.builtin.include_role:
             name: cloudflare
+          tags: [cloudflare, cdn]
           when:
             - cloudflare_enabled | default(false)
             - cloudflare_zone_id | default('') | length > 0
             - cloudflare_api_token | default('') | length > 0
 
         - name: Warn when Cloudflare role is skipped due missing credentials
-          debug:
+          ansible.builtin.debug:
             msg: "Skipping Cloudflare role because cloudflare_zone_id/cloudflare_api_token are not set"
           when:
             - cloudflare_enabled | default(false)
             - (cloudflare_zone_id | default('') | length == 0) or (cloudflare_api_token | default('') | length == 0)
 
         - name: Include New Relic role
-          include_role:
+          ansible.builtin.include_role:
             name: newrelic
+          tags: [monitoring]
           when:
             - newrelic_enabled | default(false)
             - newrelic_license_key | default('') | length > 0
 
         - name: Warn when New Relic role is skipped due missing license key
-          debug:
+          ansible.builtin.debug:
             msg: "Skipping New Relic role because newrelic_license_key is not set"
           when:
             - newrelic_enabled | default(false)
@@ -144,7 +139,7 @@
 
       rescue:
         - name: Web stack deployment failed
-          debug:
+          ansible.builtin.debug:
             msg: >
               DEPLOYMENT FAILED on {{ inventory_hostname }}.
               Role: {{ ansible_failed_task.name | default('unknown') }}.
@@ -152,18 +147,23 @@
               Manual intervention required. Check service status and logs.
 
         - name: Verify web server is still running
-          service:
+          ansible.builtin.service:
             name: "{{ 'apache2' if web_server | default('apache') == 'apache' else 'lsws' }}"
             state: started
 
         - name: Fail the play after rescue
-          fail:
+          ansible.builtin.fail:
             msg: "Deployment failed. Web server recovery attempted. Review errors above."
 
 - name: Configure monitoring
   hosts: all
   gather_facts: true
+  gather_subset:
+    - '!all'
+    - 'distribution'
+    - 'network'
   become: true
 
   roles:
-    - monitoring
+    - role: monitoring
+      tags: [monitoring]
