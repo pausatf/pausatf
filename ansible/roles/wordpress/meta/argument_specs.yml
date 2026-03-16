@@ -1,0 +1,58 @@
+---
+argument_specs:
+  main:
+    short_description: WordPress application management role
+    options:
+      wordpress_installs:
+        type: list
+        elements: dict
+        default: []
+        description: >
+          List of WordPress installations to manage. Each element is a dict
+          with keys: path, db_name, db_user, db_password, db_host,
+          manage_wp_config, auth_key, secure_auth_key, logged_in_key,
+          nonce_key, auth_salt, secure_auth_salt, logged_in_salt, nonce_salt.
+      wordpress_version:
+        type: str
+        default: latest
+        description: WordPress core version to install or update to
+      wordpress_install_dir:
+        type: str
+        default: /var/www/html
+        description: Base directory for WordPress installations
+      wordpress_db_name:
+        type: str
+        default: wordpress
+        description: Default database name (overridden per-install via wordpress_installs)
+      wordpress_db_user:
+        type: str
+        default: wpuser
+        description: Default database user (overridden per-install via wordpress_installs)
+      wordpress_db_password:
+        type: str
+        required: false
+        no_log: true
+        description: >
+          Default database password. Must be provided via Ansible vault when
+          manage_wp_config is true. Empty default triggers fast-fail assertion.
+      wordpress_db_host:
+        type: str
+        default: localhost
+        description: Database host
+      wpcli_enabled:
+        type: bool
+        default: true
+        description: Whether to install and manage WP-CLI
+      wpcli_path:
+        type: str
+        default: /usr/local/bin/wp
+        description: Path to WP-CLI binary
+      wordpress_enabled:
+        type: bool
+        default: true
+        description: Gate to skip all WordPress tasks when false
+      wp_users_remove:
+        type: list
+        elements: dict
+        default: []
+        description: WordPress user accounts to remove (e.g. breach-created accounts)
