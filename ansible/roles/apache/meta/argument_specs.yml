@@ -1,0 +1,52 @@
+---
+argument_specs:
+  main:
+    short_description: Apache web server role
+    options:
+      apache_mpm:
+        type: str
+        default: event
+        choices: [event, prefork, worker]
+        description: Apache MPM module; use event for PHP-FPM, prefork for mod_php
+      apache_modules:
+        type: list
+        elements: str
+        default: [rewrite, headers, ssl, proxy, proxy_fcgi]
+        description: Apache modules to enable
+      apache_main_docroot:
+        type: str
+        default: /var/www/html
+        description: Primary document root for the main vhost
+      apache_block_xmlrpc:
+        type: bool
+        default: true
+        description: Block XML-RPC endpoint at the Apache level
+      apache_dev_local_enabled:
+        type: bool
+        default: false
+        description: Enable a secondary local-only vhost for development
+      apache_dev_local_vhost_name:
+        type: str
+        default: pausatf-dev-local
+        description: ServerName for the dev-local vhost
+      apache_dev_local_listen:
+        type: str
+        default: "127.0.0.1:8081"
+        description: Listen directive for the dev-local vhost
+      apache_dev_local_docroot:
+        type: str
+        default: /var/www/dev-html
+        description: Document root for the dev-local vhost
+      apache_legacy_php_hardening_enabled:
+        type: bool
+        default: false
+        description: Enable legacy mod_php hardening directives
+      apache_php_openbasedir_hardening_enabled:
+        type: bool
+        default: false
+        description: Restrict PHP open_basedir at the Apache level
+      wordpress_installs:
+        type: list
+        elements: dict
+        default: []
+        description: WordPress installations to generate vhosts for (shared with wordpress role)
