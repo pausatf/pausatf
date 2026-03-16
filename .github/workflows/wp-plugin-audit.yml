@@ -145,6 +145,7 @@ jobs:
               "        remove_filter( 'authenticate', 'Automattic\\\\Jetpack\\\\Waf\\\\Brute_Force_Protection\\\\Brute_Force_Protection_Math_Authenticate::math_authenticate', \$priority );" \
               "    }" \
               "}" \
+              "add_action('login_head', function () { echo '<!-- pausatf-mu-hotfix -->'; }, 1);" \
               "add_action('plugins_loaded', 'pausatf_remove_jetpack_math_fallback', 9999);" \
               "add_action('init', 'pausatf_remove_jetpack_math_fallback', 9999);" \
               "add_action('login_init', 'pausatf_remove_jetpack_math_fallback', 9999);" \
