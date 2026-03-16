@@ -1,0 +1,68 @@
+name: Update SSH Firewall IP
+
+on:
+  workflow_dispatch:
+    inputs:
+      new_ip:
+        description: 'Your current public IP (leave blank to auto-detect from runner)'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Determine IP
+        id: ip
+        run: |
+          if [ -n "${{ inputs.new_ip }}" ]; then
+            echo "ip=${{ inputs.new_ip }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "Auto-detecting is not useful here (this is the runner IP, not yours)."
+            echo "Please re-run with your IP. Find it at: https://api.ipify.org"
+            exit 1
+          fi
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DO_TOKEN }}
+
+      - name: Fetch current Cloudflare IPs
+        id: cf
+        run: |
+          CF_IPS=$(curl -sS https://www.cloudflare.com/ips-v4 | sed 's/^/address:/' | tr '\n' ',' | sed 's/,$//')
+          echo "cf_http=$CF_IPS" >> "$GITHUB_OUTPUT"
+
+      - name: Update all firewalls
+        env:
+          MY_IP: ${{ steps.ip.outputs.ip }}
+          CF_HTTP: ${{ steps.cf.outputs.cf_http }}
+        run: |
+          echo "Updating firewalls to allow SSH from $MY_IP"
+          
+          # Production
+          doctl compute firewall update a4e42798-ab22-467f-a821-daa290f56655 \
+            --name pausatf-production-firewall \
+            --droplet-ids 355909945,558515101 \
+            --inbound-rules "protocol:tcp,ports:22,address:100.64.0.0/10,address:${MY_IP}/32 protocol:tcp,ports:80,${CF_HTTP} protocol:tcp,ports:443,${CF_HTTP} protocol:tcp,ports:7844,address:0.0.0.0/0 protocol:udp,ports:7844,address:0.0.0.0/0" \
+            --outbound-rules "protocol:tcp,ports:1-65535,address:0.0.0.0/0,address:::/0 protocol:udp,ports:1-65535,address:0.0.0.0/0,address:::/0 protocol:icmp,address:0.0.0.0/0,address:::/0"
+          
+          # Staging
+          doctl compute firewall update c12dfc7f-f43a-4b32-96c6-80ba34035b1a \
+            --name pausatf-staging \
+            --droplet-ids 538411208 \
+            --inbound-rules "protocol:tcp,ports:22,address:100.64.0.0/10,address:${MY_IP}/32 protocol:tcp,ports:80,address:0.0.0.0/0 protocol:tcp,ports:443,address:0.0.0.0/0 protocol:tcp,ports:7844,address:0.0.0.0/0 protocol:udp,ports:7844,address:0.0.0.0/0 protocol:icmp,address:0.0.0.0/0" \
+            --outbound-rules "protocol:tcp,ports:1-65535,address:0.0.0.0/0,address:::/0 protocol:udp,ports:1-65535,address:0.0.0.0/0,address:::/0 protocol:icmp,address:0.0.0.0/0,address:::/0"
+          
+          # Dev
+          doctl compute firewall update 77eafd16-9a0f-4d1c-bf49-7408809b8d81 \
+            --name pausatf-dev \
+            --droplet-ids 556246582 \
+            --inbound-rules "protocol:tcp,ports:22,address:100.64.0.0/10,address:${MY_IP}/32 protocol:tcp,ports:80,address:0.0.0.0/0 protocol:tcp,ports:443,address:0.0.0.0/0 protocol:tcp,ports:7844,address:0.0.0.0/0 protocol:udp,ports:7844,address:0.0.0.0/0 protocol:icmp,address:0.0.0.0/0" \
+            --outbound-rules "protocol:tcp,ports:1-65535,address:0.0.0.0/0,address:::/0 protocol:udp,ports:1-65535,address:0.0.0.0/0,address:::/0 protocol:icmp,address:0.0.0.0/0,address:::/0"
+          
+          echo "All firewalls updated for IP: $MY_IP"
