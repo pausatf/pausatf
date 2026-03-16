@@ -1,6 +1,6 @@
 ---
 - name: Harden SSH configuration
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
@@ -19,7 +19,7 @@
   when: ansible_virtualization_type != 'docker'
 
 - name: Restrict SSH access to known users
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
     regexp: '^#?AllowUsers'
     line: "AllowUsers {{ ssh_allow_users | default('deploy root') }}"
