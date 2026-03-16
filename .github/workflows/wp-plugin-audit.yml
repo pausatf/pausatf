@@ -45,6 +45,11 @@ on:
         required: false
         default: false
         type: boolean
+      enable_widget_logic_filter:
+        description: "Enable Widget Logic runtime filter option when it is blank"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -63,6 +68,7 @@ jobs:
           APPLY_WIDGET_LOGIC_RECOVERY: ${{ inputs.apply_widget_logic_recovery }}
           WIDGET_SOURCE_DB: ${{ inputs.widget_source_db }}
           REPAIR_ACTIVE_WIDGET_LOGIC: ${{ inputs.repair_active_widget_logic }}
+          ENABLE_WIDGET_LOGIC_FILTER: ${{ inputs.enable_widget_logic_filter }}
         run: |
           set -euo pipefail
           if [ -z "${PROD_SSH_PRIVATE_KEY:-}" ]; then
@@ -83,13 +89,14 @@ jobs:
 
           ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
             github-deploy@"$TARGET_HOST" \
-            "APPLY_WIDGET_LOGIC_RECOVERY='${APPLY_WIDGET_LOGIC_RECOVERY:-false}' WIDGET_SOURCE_DB='${WIDGET_SOURCE_DB:-}' REPAIR_ACTIVE_WIDGET_LOGIC='${REPAIR_ACTIVE_WIDGET_LOGIC:-false}' $REMOTE_SHELL" <<'REMOTE'
+            "APPLY_WIDGET_LOGIC_RECOVERY='${APPLY_WIDGET_LOGIC_RECOVERY:-false}' WIDGET_SOURCE_DB='${WIDGET_SOURCE_DB:-}' REPAIR_ACTIVE_WIDGET_LOGIC='${REPAIR_ACTIVE_WIDGET_LOGIC:-false}' ENABLE_WIDGET_LOGIC_FILTER='${ENABLE_WIDGET_LOGIC_FILTER:-false}' $REMOTE_SHELL" <<'REMOTE'
           set -euo pipefail
 
           WP_PATH="/var/www/html"
           APPLY_WIDGET_LOGIC_RECOVERY="$(printf '%s' "${APPLY_WIDGET_LOGIC_RECOVERY:-false}" | tr '[:upper:]' '[:lower:]')"
           WIDGET_SOURCE_DB="${WIDGET_SOURCE_DB:-}"
           REPAIR_ACTIVE_WIDGET_LOGIC="$(printf '%s' "${REPAIR_ACTIVE_WIDGET_LOGIC:-false}" | tr '[:upper:]' '[:lower:]')"
+          ENABLE_WIDGET_LOGIC_FILTER="$(printf '%s' "${ENABLE_WIDGET_LOGIC_FILTER:-false}" | tr '[:upper:]' '[:lower:]')"
 
           wpdb_query() {
             sudo -u www-data wp db query "$1" --skip-column-names --path="$WP_PATH" --allow-root 2>/dev/null
@@ -125,6 +132,30 @@ jobs:
             echo "widget_logic_option_eval_title=" . ( $wl["widget_logic-options-eval_title"] ?? "" ) . PHP_EOL;
           }
           ' --path="$WP_PATH" --allow-root || true
+          if [ "${ENABLE_WIDGET_LOGIC_FILTER}" = "true" ]; then
+            sudo -u www-data wp eval '
+            $wl = get_option( "widget_logic" );
+            if ( ! is_array( $wl ) ) {
+              $wl = [];
+            }
+            $before_filter = (string) ( $wl["widget_logic-options-filter"] ?? "" );
+            $before_load   = (string) ( $wl["widget_logic-options-load_point"] ?? "" );
+            if ( $before_filter === "" ) {
+              $wl["widget_logic-options-filter"] = "1";
+            }
+            if ( $before_load === "" ) {
+              $wl["widget_logic-options-load_point"] = "parse_query";
+            }
+            update_option( "widget_logic", $wl );
+            echo "widget_logic_filter_fix_applied=true" . PHP_EOL;
+            echo "widget_logic_filter_fix_before_filter={$before_filter}" . PHP_EOL;
+            echo "widget_logic_filter_fix_before_load_point={$before_load}" . PHP_EOL;
+            echo "widget_logic_filter_fix_after_filter=" . ( $wl["widget_logic-options-filter"] ?? "" ) . PHP_EOL;
+            echo "widget_logic_filter_fix_after_load_point=" . ( $wl["widget_logic-options-load_point"] ?? "" ) . PHP_EOL;
+            ' --path="$WP_PATH" --allow-root
+          else
+            echo "widget_logic_filter_fix_applied=false"
+          fi
           if [ -f "$WP_PATH/wp-content/plugins/widget-logic/widget_logic.php" ]; then
             echo "=== widget-logic hook declarations ==="
             grep -nE "add_(action|filter)\s*\(|function widget_logic_|in_widget_form|widget_display_callback|widget_update_callback" \
