@@ -111,6 +111,16 @@ jobs:
           echo "current_db=$DB_NAME"
           echo "current_options_table=$CURRENT_OPTIONS_TABLE"
           echo "mysql_root_access=$MYSQL_ROOT_OK"
+          echo "=== Widget Logic plugin/runtime status ==="
+          sudo -u www-data wp plugin list --path="$WP_PATH" --allow-root --fields=name,status,version,update_version --format=table \
+            | (head -n 1 && grep -E '^widget-logic[[:space:]]' || true)
+          sudo -u www-data wp option list --path="$WP_PATH" --allow-root --search='widget_logic%' --fields=option_name,size_bytes --format=table || true
+          sudo -u www-data wp eval '
+          echo "widget_logic_display_hook_priority=" . ( has_filter( "widget_display_callback", "widget_logic_widget_display_callback" ) ?: 0 ) . PHP_EOL;
+          echo "widget_logic_control_hook_priority=" . ( has_filter( "in_widget_form", "widget_logic_widget_control" ) ?: 0 ) . PHP_EOL;
+          echo "widget_logic_update_hook_priority=" . ( has_filter( "widget_update_callback", "widget_logic_widget_update_callback" ) ?: 0 ) . PHP_EOL;
+          echo "widgets_block_editor_enabled=" . ( wp_use_widgets_block_editor() ? "yes" : "no" ) . PHP_EOL;
+          ' --path="$WP_PATH" --allow-root || true
           if [ -n "$WIDGET_SOURCE_DB" ]; then
             echo "widget_source_db_override=$WIDGET_SOURCE_DB"
           fi
