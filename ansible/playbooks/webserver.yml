@@ -1,0 +1,30 @@
+---
+- name: Configure web server
+  hosts: webservers
+  gather_facts: true
+  become: true
+  pre_tasks:
+    - name: Gather service facts
+      ansible.builtin.service_facts:
+  roles:
+    - role: php
+      tags: [php]
+      when: web_server | default('apache') == 'apache' and not (use_php_fpm | default(false))
+    - role: php-fpm
+      tags: [php]
+      when: web_server | default('apache') == 'apache' and use_php_fpm | default(false)
+    - role: lsphp
+      tags: [php]
+      when: web_server | default('apache') == 'openlitespeed'
+    - role: modsecurity
+      tags: [security, modsecurity]
+      when: web_server | default('apache') == 'apache' and modsecurity_enabled | default(true)
+    - role: apache
+      tags: [webserver, apache]
+      when: web_server | default('apache') == 'apache'
+    - role: openlitespeed
+      tags: [webserver, openlitespeed]
+      when: web_server | default('apache') == 'openlitespeed'
+    - role: certbot
+      tags: [ssl, certbot]
+      when: certbot_enabled | default(false)
