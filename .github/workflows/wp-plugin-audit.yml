@@ -167,6 +167,83 @@ jobs:
           echo "widget_logic_instances_non_empty=" . $non_empty . PHP_EOL;
           ' --path="$WP_PATH" | sed -n '1,220p'
 
+          echo "=== Active sidebar widget_logic summary ==="
+          sudo -u www-data wp eval '
+          $sidebars = wp_get_sidebars_widgets();
+          $active_ids = [];
+          foreach ( $sidebars as $sidebar => $widgets ) {
+            if ( ! is_array( $widgets ) || $sidebar === "wp_inactive_widgets" || strpos( $sidebar, "orphaned_widgets" ) === 0 ) {
+              continue;
+            }
+            foreach ( $widgets as $widget_id ) {
+              if ( is_string( $widget_id ) && $widget_id !== "" ) {
+                $active_ids[ $widget_id ] = $sidebar;
+              }
+            }
+          }
+
+          $active_total       = 0;
+          $active_non_empty   = 0;
+          $active_empty       = 0;
+          $active_missing_key = 0;
+          $sidebar_totals     = [];
+          $sidebar_non_empty  = [];
+          $empty_examples     = [];
+
+          foreach ( $active_ids as $widget_id => $sidebar ) {
+            if ( ! preg_match( "/^(.+)-(\\d+)$/", $widget_id, $m ) ) {
+              continue;
+            }
+            $base = "widget_" . str_replace( "-", "_", $m[1] );
+            $idx  = (int) $m[2];
+            $opt  = get_option( $base );
+            $expr = null;
+            if ( is_array( $opt ) && isset( $opt[ $idx ] ) && is_array( $opt[ $idx ] ) && array_key_exists( "widget_logic", $opt[ $idx ] ) ) {
+              $expr = trim( (string) $opt[ $idx ]["widget_logic"] );
+            }
+
+            $active_total++;
+            if ( ! isset( $sidebar_totals[ $sidebar ] ) ) {
+              $sidebar_totals[ $sidebar ] = 0;
+              $sidebar_non_empty[ $sidebar ] = 0;
+            }
+            $sidebar_totals[ $sidebar ]++;
+
+            if ( $expr === null ) {
+              $active_missing_key++;
+              if ( count( $empty_examples ) < 30 ) {
+                $empty_examples[] = "active_widget_missing_logic_key widget_id={$widget_id} sidebar={$sidebar} option={$base} instance={$idx}";
+              }
+              continue;
+            }
+
+            if ( $expr === "" ) {
+              $active_empty++;
+              if ( count( $empty_examples ) < 30 ) {
+                $empty_examples[] = "active_widget_empty_logic widget_id={$widget_id} sidebar={$sidebar} option={$base} instance={$idx}";
+              }
+            } else {
+              $active_non_empty++;
+              $sidebar_non_empty[ $sidebar ]++;
+            }
+          }
+
+          echo "active_widgets_total=" . $active_total . PHP_EOL;
+          echo "active_widgets_non_empty_logic=" . $active_non_empty . PHP_EOL;
+          echo "active_widgets_empty_logic=" . $active_empty . PHP_EOL;
+          echo "active_widgets_missing_logic_key=" . $active_missing_key . PHP_EOL;
+
+          ksort( $sidebar_totals );
+          foreach ( $sidebar_totals as $sidebar => $total ) {
+            $non_empty = $sidebar_non_empty[ $sidebar ] ?? 0;
+            echo "sidebar_widget_logic_summary sidebar={$sidebar} total={$total} non_empty_logic={$non_empty}" . PHP_EOL;
+          }
+
+          foreach ( $empty_examples as $line ) {
+            echo $line . PHP_EOL;
+          }
+          ' --path="$WP_PATH" | sed -n '1,260p'
+
           CANDIDATE_FILE="$(mktemp)"
           DB_LIST_FILE="$(mktemp)"
           trap 'rm -f "$CANDIDATE_FILE" "$DB_LIST_FILE"' EXIT
