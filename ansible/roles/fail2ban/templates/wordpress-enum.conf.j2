@@ -1,6 +1,8 @@
-# Fail2ban filter for WordPress user enumeration attacks
+# Fail2ban filter for WordPress user enumeration
 # Managed by Ansible
-# Requires wp-fail2ban MU plugin (writes to /var/log/auth.log via syslog)
+
+[INCLUDES]
+before = common.conf
 
 [Definition]
 failregex = ^%(__prefix_line)sBlocked user enumeration attempt from <HOST>$
