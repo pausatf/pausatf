@@ -1,0 +1,261 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # --- Ansible ---
+
+  ansible-lint:
+    name: Ansible Lint
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.pull_request.title, 'chore(deps):')"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
+
+      - name: Setup Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Ansible and ansible-lint
+        run: |
+          pip install ansible-core==2.17.5 ansible-lint==25.12.2
+          ansible-galaxy collection install community.general community.mysql ansible.posix
+
+      - name: Create dummy vault password for CI
+        run: |
+          echo '#!/bin/sh' > ansible/.vault_pass.sh
+          echo 'echo ci-dummy-vault-password' >> ansible/.vault_pass.sh
+          chmod +x ansible/.vault_pass.sh
+
+      - name: Run ansible-lint
+        run: ansible-lint --offline
+        working-directory: ansible
+
+  yamllint:
+    name: YAML Lint
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.pull_request.title, 'chore(deps):')"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
+
+      - name: Setup Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v5
+        with:
+          python-version: '3.11'
+
+      - name: Install yamllint
+        run: pip install yamllint
+
+      - name: Run yamllint
+        run: |
+          yamllint .
+        working-directory: ansible
+
+  syntax-check:
+    name: Ansible Syntax Check
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.pull_request.title, 'chore(deps):')"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
+
+      - name: Setup Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Ansible
+        run: |
+          pip install ansible-core==2.17.5
+          ansible-galaxy collection install community.general community.mysql ansible.posix
+
+      - name: Create dummy vault password for CI
+        run: |
+          echo '#!/bin/sh' > ansible/.vault_pass.sh
+          echo 'echo ci-dummy-vault-password' >> ansible/.vault_pass.sh
+          chmod +x ansible/.vault_pass.sh
+
+      - name: Check playbook syntax
+        run: |
+          for playbook in playbooks/*.yml; do
+            echo "Checking $playbook"
+            ansible-playbook --syntax-check -i inventory/hosts.yml "$playbook"
+          done
+        working-directory: ansible
+
+      - name: Syntax-check site.yml
+        working-directory: ansible
+        run: ansible-playbook --syntax-check -i inventory/hosts.yml site.yml
+
+      - name: Validate inventory host variable rendering
+        working-directory: ansible
+        run: |
+          ansible-inventory -i inventory/hosts.yml --host pausatf-prod
+          ansible-inventory -i inventory/hosts.yml --host pausatf-stage
+          ansible-inventory -i inventory/hosts.yml --host pausatf-dev
+
+  # --- Shell ---
+
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
+
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@00b27aa7cb85167568cb48a3838b75f4265f2bca  # master
+        with:
+          scandir: './scripts'
+          severity: warning
+          format: gcc
+
+  bash-syntax:
+    name: Bash Syntax Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
+
+      - name: Check bash syntax
+        run: |
+          shopt -s globstar nullglob
+          for script in **/*.sh; do
+            echo "Checking $script"
+            bash -n "$script"
+          done
+        working-directory: scripts
+
+  # --- Markdown ---
+
+  markdown-lint:
+    name: Markdown Lint
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.pull_request.title, 'chore(deps):')"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
+
+      - name: Run markdownlint
+        uses: nosborn/github-action-markdown-cli@508d6cefd8f0cc99eab5d2d4685b1d5f470042c1  # v3.5.0
+        with:
+          files: .
+          config_file: .markdownlint.json
+          ignore_files: node_modules/
+
+  link-check:
+    name: Markdown Link Check
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.pull_request.title, 'chore(deps):')"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
+
+      - name: Check links
+        uses: gaurav-nelson/github-action-markdown-link-check@5c5dfc0ac2e225883c0e5f03a85311ec2830d368  # v1
+        with:
+          use-quiet-mode: 'yes'
+          use-verbose-mode: 'yes'
+          config-file: '.markdown-link-check.json'
+
+  # --- Terraform ---
+
+  terraform-fmt:
+    name: Terraform Format
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.pull_request.title, 'chore(deps):')"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@5e8dbf3c6d9deaf4193ca7a8fb23f2ac83bb6c85  # v4.0.0
+        with:
+          terraform_version: '1.10.3'
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+        working-directory: terraform
+
+  terraform-validate:
+    name: Terraform Validate (${{ matrix.environment }})
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.pull_request.title, 'chore(deps):')"
+    strategy:
+      matrix:
+        environment: [production, staging, github, dev, cloudflare]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@5e8dbf3c6d9deaf4193ca7a8fb23f2ac83bb6c85  # v4.0.0
+        with:
+          terraform_version: '1.10.3'
+
+      - name: Terraform Init
+        run: terraform init -backend=false
+        working-directory: terraform/environments/${{ matrix.environment }}
+
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: terraform/environments/${{ matrix.environment }}
+
+  tfsec:
+    name: TFSec
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    if: "!contains(github.event.pull_request.title, 'chore(deps):')"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
+
+      - name: Run tfsec
+        uses: aquasecurity/tfsec-action@b466648d6e39e7c75324f25d83891162a721f2d6  # v1.0.3
+        with:
+          working_directory: terraform
+          soft_fail: false
+          format: sarif
+          additional_args: --concise-output --out results.sarif
+
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@0d579ffd059c29b07949a3cce3983f0780820c98  # v4.32.6
+        if: always()
+        with:
+          sarif_file: results.sarif
+
+  tflint:
+    name: TFLint
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.pull_request.title, 'chore(deps):')"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
+
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@b480b8fcdaa6f2c577f8e4fa799e89e756bb7c93  # v6
+        with:
+          tflint_version: latest
+
+      - name: Init TFLint
+        run: tflint --init
+        working-directory: terraform
+
+      - name: Run TFLint
+        run: tflint --recursive --format compact --minimum-failure-severity error
+        working-directory: terraform
