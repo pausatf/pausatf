@@ -1,12 +1,14 @@
 ---
-- name: Verify
+- name: Verify fail2ban
   hosts: all
   become: true
   tasks:
     - name: Gather service facts
       ansible.builtin.service_facts:
 
-    - name: Assert role applied successfully
+    - name: Assert fail2ban is running
       ansible.builtin.assert:
-        that: true
-        success_msg: "fail2ban role applied successfully"
+        that:
+          - "'fail2ban.service' in ansible_facts.services"
+          - "ansible_facts.services['fail2ban.service'].state == 'running'"
+        fail_msg: "fail2ban is not running"
