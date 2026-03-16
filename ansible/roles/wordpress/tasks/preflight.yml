@@ -1,0 +1,26 @@
+---
+- name: Assert wordpress_installs is configured
+  ansible.builtin.assert:
+    that:
+      - wordpress_installs is defined
+      - wordpress_installs | length > 0
+    fail_msg: "wordpress_installs must be a non-empty list; define it in group_vars or host_vars"
+    quiet: true
+  when: wordpress_enabled | default(true)
+
+- name: Assert vault credentials are present for installs with manage_wp_config
+  ansible.builtin.assert:
+    that:
+      - item.db_password | default('') | length > 0
+      - item.auth_key | default('') | length > 0
+      - item.secure_auth_key | default('') | length > 0
+      - item.logged_in_key | default('') | length > 0
+      - item.nonce_key | default('') | length > 0
+    fail_msg: "wordpress_installs[].db_password and auth keys must be set via vault for {{ item.path | default('unknown') }}"
+    quiet: true
+  loop: "{{ wordpress_installs | default([]) }}"
+  loop_control:
+    label: "{{ item.path | default('unknown') }}"
+  when:
+    - wordpress_enabled | default(true)
+    - item.manage_wp_config | default(false)
