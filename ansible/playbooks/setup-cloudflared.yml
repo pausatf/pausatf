@@ -1,0 +1,68 @@
+---
+# Configure cloudflared tunnel on new production
+# Requires: tunnel credentials from old server or Cloudflare dashboard
+- name: Configure cloudflared tunnel
+  hosts: production_new
+  gather_facts: true
+  become: true
+
+  vars:
+    cloudflared_tunnel_id: "{{ vault_cloudflared_tunnel_id | default('') }}"
+    cloudflared_tunnel_creds: "{{ vault_cloudflared_tunnel_credentials | default('') }}"
+
+  tasks:
+    - name: Assert tunnel credentials are provided
+      ansible.builtin.assert:
+        that:
+          - cloudflared_tunnel_id | length > 0
+          - cloudflared_tunnel_creds | length > 0
+        fail_msg: "Set vault_cloudflared_tunnel_id and vault_cloudflared_tunnel_credentials in vault"
+      when: cloudflared_tunnel_id | length > 0
+
+    - name: Create cloudflared config directory
+      ansible.builtin.file:
+        path: /etc/cloudflared
+        state: directory
+        owner: root
+        group: root
+        mode: '0700'
+
+    - name: Deploy tunnel config
+      ansible.builtin.copy:
+        dest: /etc/cloudflared/config.yml
+        owner: root
+        group: root
+        mode: '0600'
+        content: |
+          tunnel: {{ cloudflared_tunnel_id }}
+          credentials-file: /root/.cloudflared/{{ cloudflared_tunnel_id }}.json
+
+          ingress:
+            - hostname: ssh.pausatf.org
+              service: ssh://localhost:22
+            - service: http_status:404
+      when: cloudflared_tunnel_id | length > 0
+
+    - name: Deploy tunnel credentials
+      ansible.builtin.copy:
+        dest: "/root/.cloudflared/{{ cloudflared_tunnel_id }}.json"
+        content: "{{ cloudflared_tunnel_creds }}"
+        owner: root
+        group: root
+        mode: '0600'
+      no_log: true
+      when: cloudflared_tunnel_creds | length > 0
+
+    - name: Install cloudflared as service
+      ansible.builtin.command: cloudflared service install
+      register: cf_install
+      changed_when: "'already' not in cf_install.stderr"
+      failed_when: false
+      when: cloudflared_tunnel_id | length > 0
+
+    - name: Ensure cloudflared is running
+      ansible.builtin.systemd:
+        name: cloudflared
+        state: started
+        enabled: true
+      when: cloudflared_tunnel_id | length > 0
