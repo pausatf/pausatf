@@ -1,0 +1,66 @@
+---
+# Sync WordPress content from old production to new production
+# Run: ansible-playbook playbooks/sync-content.yml -e source_host=REDACTED_PROD_NEW_IP
+- name: Sync content to new production
+  hosts: production_new
+  gather_facts: true
+  become: true
+
+  vars:
+    source_host: "{{ old_prod_ip | default('REDACTED_PROD_NEW_IP') }}"
+    source_user: "root"
+    sync_paths:
+      - src: /var/www/html/wp-content/uploads/
+        dest: /var/www/html/wp-content/uploads/
+        description: WordPress uploads
+      - src: /var/www/legacy/
+        dest: /var/www/legacy/
+        description: Legacy content
+      - src: /var/www/dev-html/
+        dest: /var/www/dev-html/
+        description: Dev WordPress copy
+      - src: /var/www/html/.htaccess
+        dest: /var/www/html/.htaccess
+        description: WordPress htaccess
+
+  tasks:
+    - name: Ensure SSH key for source server exists
+      ansible.builtin.stat:
+        path: /root/.ssh/migration_key
+      register: migration_key
+
+    - name: Fail if migration key not present
+      ansible.builtin.fail:
+        msg: "Migration SSH key not found at /root/.ssh/migration_key. Generate one and add to source server."
+      when: not migration_key.stat.exists
+
+    - name: Sync content from old production
+      ansible.posix.synchronize:
+        src: "{{ source_user }}@{{ source_host }}:{{ item.src }}"
+        dest: "{{ item.dest }}"
+        mode: pull
+        rsync_opts:
+          - "--archive"
+          - "--compress"
+          - "--partial"
+          - "--progress"
+          - "-e 'ssh -i /root/.ssh/migration_key -o StrictHostKeyChecking=accept-new'"
+      loop: "{{ sync_paths }}"
+      loop_control:
+        label: "{{ item.description }}"
+
+    - name: Set ownership on synced content
+      ansible.builtin.file:
+        path: "{{ item }}"
+        owner: www-data
+        group: www-data
+        recurse: true
+      loop:
+        - /var/www/html/wp-content/uploads
+        - /var/www/legacy
+        - /var/www/dev-html
+      failed_when: false
+
+    - name: Display sync summary
+      ansible.builtin.debug:
+        msg: "Content sync complete. Verify with: curl -I https://www.pausatf.org (after DNS switch)"
