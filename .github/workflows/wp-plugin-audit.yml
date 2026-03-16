@@ -112,12 +112,17 @@ jobs:
             mkdir -p "$MU_DIR"
             printf '%s\n' \
               "<?php" \
-              "add_action('init', function () {" \
+              "function pausatf_remove_jetpack_math_fallback() {" \
               "    if ( ! class_exists('\\Automattic\\Jetpack\\Waf\\Brute_Force_Protection\\Math_Fallback') ) { return; }" \
               "    remove_action('login_form', array('\\Automattic\\Jetpack\\Waf\\Brute_Force_Protection\\Math_Fallback', 'math_form'));" \
               "    remove_filter('authenticate', array('\\Automattic\\Jetpack\\Waf\\Brute_Force_Protection\\Math_Fallback', 'math_authenticate'), 999);" \
               "    remove_action('login_form_login', array('\\Automattic\\Jetpack\\Waf\\Brute_Force_Protection\\Math_Fallback', 'process_generate_math_page'));" \
-              "}, 1000);" \
+              "}" \
+              "add_action('plugins_loaded', 'pausatf_remove_jetpack_math_fallback', 9999);" \
+              "add_action('init', 'pausatf_remove_jetpack_math_fallback', 9999);" \
+              "add_action('login_init', 'pausatf_remove_jetpack_math_fallback', 9999);" \
+              "add_action('login_form', 'pausatf_remove_jetpack_math_fallback', 1);" \
+              "add_action('login_form_login', 'pausatf_remove_jetpack_math_fallback', 1);" \
               > "$MU_FILE"
             chown www-data:www-data "$MU_FILE"
             chmod 0644 "$MU_FILE"
