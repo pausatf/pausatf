@@ -1,12 +1,19 @@
 ---
-- name: Verify
+- name: Verify mysql
   hosts: all
   become: true
   tasks:
     - name: Gather service facts
       ansible.builtin.service_facts:
 
-    - name: Assert role applied successfully
+    - name: Assert mysql is running
       ansible.builtin.assert:
-        that: true
-        success_msg: "mysql role applied successfully"
+        that:
+          - "'mysql.service' in ansible_facts.services"
+          - "ansible_facts.services['mysql.service'].state == 'running'"
+        fail_msg: "mysql is not running"
+
+    - name: Assert mysql is listening on port 3306
+      ansible.builtin.wait_for:
+        port: 3306
+        timeout: 5
