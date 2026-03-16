@@ -937,6 +937,9 @@ jobs:
                 zgrep -ahE 'Access denied with code 403 .*\[uri "/wp-admin/widgets\.php"\]' "${MODSEC_LOGS[@]}" 2>/dev/null \
                   | sed -nE 's/.*\[client ([^]]+)\].*/\1/p' \
                   | sort | uniq -c | sort -nr | head -n 20 || true
+                echo "=== widgets.php 403 ModSecurity entries ==="
+                zgrep -ahE 'Access denied with code 403 .*\[uri "/wp-admin/widgets\.php"\]' "${MODSEC_LOGS[@]}" 2>/dev/null \
+                  | head -n 20 || true
               fi
               echo "=== Widget-related ModSecurity entries (first 80) ==="
               zgrep -ahF '[uri "/wp-admin/widgets.php"]' "${MODSEC_LOGS[@]}" 2>/dev/null \
