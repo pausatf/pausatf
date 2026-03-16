@@ -50,6 +50,11 @@ on:
         required: false
         default: false
         type: boolean
+      probe_modsecurity_logs:
+        description: "Probe production ModSecurity and Apache logs for widget/auth clues"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -842,8 +847,84 @@ jobs:
 
           rm -f ~/.ssh/id_rsa
 
+      - name: Probe production ModSecurity logs
+        if: ${{ inputs.probe_modsecurity_logs == true }}
+        env:
+          PROD_SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+          PROD_HOST: ${{ vars.PROD_HOST }}
+        run: |
+          set -euo pipefail
+          if [ -z "${PROD_SSH_PRIVATE_KEY:-}" ]; then
+            echo "PROD_SSH_PRIVATE_KEY not set" >&2
+            exit 1
+          fi
+
+          TARGET_HOST="${PROD_HOST:-64.225.40.54}"
+          mkdir -p ~/.ssh
+          printf '%s\n' "$PROD_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+          REMOTE_SHELL="bash -s"
+          if ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
+            github-deploy@"$TARGET_HOST" "sudo -n true" >/dev/null 2>&1; then
+            REMOTE_SHELL="sudo -E -n bash -s"
+          fi
+
+          ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
+            github-deploy@"$TARGET_HOST" \
+            "$REMOTE_SHELL" <<'REMOTE'
+          set -euo pipefail
+
+          APACHE_LOG_DIR="/var/log/apache2"
+
+          echo "HOST=$(hostname -f 2>/dev/null || hostname)"
+          echo "UTC_NOW=$(date -u --iso-8601=seconds)"
+
+          mapfile -t MODSEC_LOGS < <(
+            ls -1 \
+              /var/log/apache2/modsec_audit.log* \
+              /var/log/apache2/modsecurity_audit.log* \
+              /var/log/modsecurity/audit.log* \
+              /var/log/modsec_audit.log* \
+              2>/dev/null | sort -V -r || true
+          )
+
+          echo "modsec_log_file_count=${#MODSEC_LOGS[@]}"
+          if [ "${#MODSEC_LOGS[@]}" -gt 0 ]; then
+            printf '%s\n' "${MODSEC_LOGS[@]}" | sed 's/^/modsec_log_file=/'
+          else
+            echo "modsec_logs_found=false"
+          fi
+
+          if [ "${#MODSEC_LOGS[@]}" -gt 0 ]; then
+            echo "=== Recent ModSecurity entries for widgets/auth/jetpack ==="
+            zgrep -hEi 'wp-admin/widgets\.php|wp-login\.php|action=lostpassword|wp-json/wp/v2/(widgets|widget-types)|widget_logic|jetpack|modsecurity|access denied|denied with code 403' \
+              "${MODSEC_LOGS[@]}" 2>/dev/null | tail -n 220 || true
+
+            echo "=== ModSecurity rule IDs (top 30) ==="
+            zgrep -hEo 'id "?[0-9]{3,}"?' "${MODSEC_LOGS[@]}" 2>/dev/null \
+              | tr -cd '0-9\n' | sed '/^$/d' | sort | uniq -c | sort -nr | head -n 30 || true
+
+            echo "=== Potential ModSecurity blocks for widgets/auth (last 120) ==="
+            zgrep -hEi 'wp-admin/widgets\.php|wp-login\.php|action=lostpassword|widget_logic|wp-json/wp/v2/(widgets|widget-types)|jetpack' \
+              "${MODSEC_LOGS[@]}" 2>/dev/null \
+              | grep -Ei 'denied|block|403|intercept|forbidden|modsecurity' \
+              | tail -n 120 || true
+          fi
+
+          echo "=== Apache widgets/auth 403 timeline (last 200) ==="
+          zgrep -hE ' /wp-admin/widgets\.php| /wp-login\.php|action=lostpassword|/wp-json/wp/v2/widgets|/wp-json/wp/v2/widget-types' \
+            "$APACHE_LOG_DIR"/access.log* 2>/dev/null | grep -E '" 403 ' | tail -n 200 || true
+
+          echo "=== Apache error modsecurity/widget/auth clues (last 200) ==="
+          zgrep -hEi 'modsecurity|mod_security|widgets\.php|wp-login\.php|widget_logic|jetpack|denied|forbidden|access denied|security2' \
+            "$APACHE_LOG_DIR"/error.log* 2>/dev/null | tail -n 200 || true
+          REMOTE
+
+          rm -f ~/.ssh/id_rsa
+
       - name: Check for available plugin updates
-        if: ${{ inputs.probe_auth_mail != true && inputs.probe_widget_logic != true }}
+        if: ${{ inputs.probe_auth_mail != true && inputs.probe_widget_logic != true && inputs.probe_modsecurity_logs != true }}
         id: check
         env:
           PROD_SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
@@ -875,7 +956,7 @@ jobs:
           fi
 
       - name: Open issue for available updates
-        if: steps.check.outputs.updates_found == 'true' && inputs.probe_auth_mail != true && inputs.probe_widget_logic != true
+        if: steps.check.outputs.updates_found == 'true' && inputs.probe_auth_mail != true && inputs.probe_widget_logic != true && inputs.probe_modsecurity_logs != true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
