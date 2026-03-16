@@ -115,6 +115,16 @@ jobs:
           sudo -u www-data wp plugin list --path="$WP_PATH" --allow-root --fields=name,status,version,update_version --format=table \
             | (head -n 1 && grep -E '^widget-logic[[:space:]]' || true)
           sudo -u www-data wp option list --path="$WP_PATH" --allow-root --search='widget_logic%' --fields=option_name,size_bytes --format=table || true
+          sudo -u www-data wp eval '
+          $wl = get_option( "widget_logic" );
+          if ( ! is_array( $wl ) ) {
+            echo "widget_logic_settings=missing" . PHP_EOL;
+          } else {
+            echo "widget_logic_option_filter=" . ( $wl["widget_logic-options-filter"] ?? "" ) . PHP_EOL;
+            echo "widget_logic_option_load_point=" . ( $wl["widget_logic-options-load_point"] ?? "" ) . PHP_EOL;
+            echo "widget_logic_option_eval_title=" . ( $wl["widget_logic-options-eval_title"] ?? "" ) . PHP_EOL;
+          }
+          ' --path="$WP_PATH" --allow-root || true
           if [ -f "$WP_PATH/wp-content/plugins/widget-logic/widget_logic.php" ]; then
             echo "=== widget-logic hook declarations ==="
             grep -nE "add_(action|filter)\s*\(|function widget_logic_|in_widget_form|widget_display_callback|widget_update_callback" \
