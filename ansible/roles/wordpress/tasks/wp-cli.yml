@@ -1,0 +1,17 @@
+---
+# Reusable WP-CLI wrapper task
+# Usage: include_tasks: wp-cli.yml
+# Vars: wp_cli_command, wp_cli_check (optional), wp_cli_changed_when (optional)
+
+- name: "WP-CLI: {{ wp_cli_description | default(wp_cli_command) }}"
+  ansible.builtin.command: >
+    {{ wpcli_path | default('/usr/local/bin/wp') }}
+    {{ wp_cli_command }}
+    --path={{ wp_site.path }}
+    --allow-root
+  register: wp_cli_result
+  changed_when: wp_cli_changed_when | default("'Success' in wp_cli_result.stdout")
+  failed_when: >
+    wp_cli_result.rc != 0 and
+    (wp_cli_ignore_errors | default('') not in (wp_cli_result.stderr | default('')))
+  when: wp_cli_check | default(true)
