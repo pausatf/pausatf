@@ -82,11 +82,14 @@ write_files:
       # Set PHP 8.4 as default
       ln -sf /usr/local/lsws/lsphp84/bin/lsphp /usr/local/lsws/fcgi-bin/lsphp
 
-      # Set admin password (change this!)
+      # Generate random admin password at provision time
+      OLS_PASS=$(openssl rand -base64 24)
+      echo "$OLS_PASS" > /root/.ols_admin_password
+      chmod 600 /root/.ols_admin_password
       /usr/local/lsws/admin/misc/admpass.sh <<EOF
       admin
-      pausatf-temp-$(date +%s)
-      pausatf-temp-$(date +%s)
+      $OLS_PASS
+      $OLS_PASS
       EOF
 
       # Configure virtual host for WordPress
