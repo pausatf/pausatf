@@ -110,32 +110,15 @@ jobs:
             MU_DIR="$WP_PATH/wp-content/mu-plugins"
             MU_FILE="$MU_DIR/pausatf-jetpack-login-hotfix.php"
             mkdir -p "$MU_DIR"
-            cat > "$MU_FILE" <<'PHP'
-            <?php
-            add_action(
-            	'init',
-            	function () {
-            		if ( ! class_exists( '\Automattic\Jetpack\Waf\Brute_Force_Protection\Math_Fallback' ) ) {
-            			return;
-            		}
-
-            		remove_action(
-            			'login_form',
-            			array( '\Automattic\Jetpack\Waf\Brute_Force_Protection\Math_Fallback', 'math_form' )
-            		);
-            		remove_filter(
-            			'authenticate',
-            			array( '\Automattic\Jetpack\Waf\Brute_Force_Protection\Math_Fallback', 'math_authenticate' ),
-            			999
-            		);
-            		remove_action(
-            			'login_form_login',
-            			array( '\Automattic\Jetpack\Waf\Brute_Force_Protection\Math_Fallback', 'process_generate_math_page' )
-            		);
-            	},
-            	1000
-            );
-            PHP
+            printf '%s\n' \
+              "<?php" \
+              "add_action('init', function () {" \
+              "    if ( ! class_exists('\\Automattic\\Jetpack\\Waf\\Brute_Force_Protection\\Math_Fallback') ) { return; }" \
+              "    remove_action('login_form', array('\\Automattic\\Jetpack\\Waf\\Brute_Force_Protection\\Math_Fallback', 'math_form'));" \
+              "    remove_filter('authenticate', array('\\Automattic\\Jetpack\\Waf\\Brute_Force_Protection\\Math_Fallback', 'math_authenticate'), 999);" \
+              "    remove_action('login_form_login', array('\\Automattic\\Jetpack\\Waf\\Brute_Force_Protection\\Math_Fallback', 'process_generate_math_page'));" \
+              "}, 1000);" \
+              > "$MU_FILE"
             chown www-data:www-data "$MU_FILE"
             chmod 0644 "$MU_FILE"
             php -l "$MU_FILE"
