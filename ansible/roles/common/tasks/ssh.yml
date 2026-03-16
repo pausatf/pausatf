@@ -17,3 +17,13 @@
     - { regexp: '^#?ClientAliveCountMax', line: 'ClientAliveCountMax 2' }
   notify: restart sshd
   when: ansible_virtualization_type != 'docker'
+
+- name: Restrict SSH access to known users
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?AllowUsers'
+    line: "AllowUsers {{ ssh_allow_users | default('deploy root') }}"
+    state: present
+    validate: '/usr/sbin/sshd -t -f %s'
+  notify: restart sshd
+  when: ansible_virtualization_type != 'docker'
