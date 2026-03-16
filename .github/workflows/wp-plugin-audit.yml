@@ -107,6 +107,19 @@ jobs:
 
           if [ "${INSTALL_LOGIN_HOTFIX}" = "true" ]; then
             echo "=== Emergency action: install MU login hotfix ==="
+            sudo -u www-data wp eval '
+            if ( class_exists( "Jetpack" ) ) {
+              $before = Jetpack::is_module_active( "protect" ) ? "active" : "inactive";
+              if ( Jetpack::is_module_active( "protect" ) ) {
+                Jetpack::deactivate_module( "protect" );
+              }
+              $after = Jetpack::is_module_active( "protect" ) ? "active" : "inactive";
+              echo "jetpack_protect_before=" . $before . PHP_EOL;
+              echo "jetpack_protect_after=" . $after . PHP_EOL;
+            } else {
+              echo "jetpack_class_unavailable" . PHP_EOL;
+            }
+            ' --path="$WP_PATH" || true
             MU_DIR="$WP_PATH/wp-content/mu-plugins"
             MU_FILE="$MU_DIR/pausatf-jetpack-login-hotfix.php"
             mkdir -p "$MU_DIR"
