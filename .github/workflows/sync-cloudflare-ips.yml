@@ -1,0 +1,41 @@
+name: Sync Cloudflare IPs to DO Firewall
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'  # Weekly Monday 6AM UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch current Cloudflare IPv4 ranges
+        id: cf
+        run: |
+          CF_IPS=$(curl -sS https://www.cloudflare.com/ips-v4 | tr '\n' ',' | sed 's/,$//')
+          echo "ips=$CF_IPS" >> "$GITHUB_OUTPUT"
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DO_TOKEN }}
+
+      - name: Update production firewall
+        env:
+          CF_IPS: ${{ steps.cf.outputs.ips }}
+          MY_STATIC_IP: "73.170.36.107"
+          PROD_FW_ID: "a4e42798-ab22-467f-a821-daa290f56655"
+        run: |
+          # Build inbound rules with current Cloudflare IPs
+          CF_HTTP=$(echo "$CF_IPS" | tr ',' '\n' | sed 's/^/address:/' | tr '\n' ',' | sed 's/,$//')
+          
+          doctl compute firewall update "$PROD_FW_ID" \
+            --name pausatf-production-firewall \
+            --droplet-ids 355909945,558515101 \
+            --inbound-rules "protocol:tcp,ports:22,address:100.64.0.0/10,address:${MY_STATIC_IP}/32 protocol:tcp,ports:80,${CF_HTTP} protocol:tcp,ports:443,${CF_HTTP} protocol:tcp,ports:7844,address:0.0.0.0/0 protocol:udp,ports:7844,address:0.0.0.0/0" \
+            --outbound-rules "protocol:tcp,ports:1-65535,address:0.0.0.0/0,address:::/0 protocol:udp,ports:1-65535,address:0.0.0.0/0,address:::/0 protocol:icmp,address:0.0.0.0/0,address:::/0"
+          
+          echo "Production firewall updated with $(echo "$CF_IPS" | tr ',' '\n' | wc -l) Cloudflare ranges"
