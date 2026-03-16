@@ -907,30 +907,42 @@ jobs:
               echo "modsec_uri_count uri=$uri count=$cnt"
             done
             login_403_cnt="$(
-              { zgrep -hE 'Access denied with code 403 .*\\[uri "/wp-login\\.php"\\]' "${MODSEC_LOGS[@]}" 2>/dev/null || true; } \
+              { zgrep -hE 'Access denied with code 403 .*\[uri "/wp-login\.php"\]' "${MODSEC_LOGS[@]}" 2>/dev/null || true; } \
                 | wc -l | tr -d ' '
             )"
             login_403_cnt="${login_403_cnt:-0}"
             echo "modsec_wp_login_403_count=${login_403_cnt}"
             if [ "${login_403_cnt:-0}" -gt 0 ] 2>/dev/null; then
               echo "=== Top wp-login 403 source IPs in ModSecurity logs ==="
-              zgrep -hE 'Access denied with code 403 .*\\[uri "/wp-login\\.php"\\]' "${MODSEC_LOGS[@]}" 2>/dev/null \
+              zgrep -hE 'Access denied with code 403 .*\[uri "/wp-login\.php"\]' "${MODSEC_LOGS[@]}" 2>/dev/null \
                 | sed -nE 's/.*\\[client ([^]]+)\\].*/\1/p' \
                 | sort | uniq -c | sort -nr | head -n 20 || true
             fi
 
             widget_modsec_count="$(
-              { zgrep -hEi '\\[uri "/wp-admin/widgets\\.php"\\]|\\[uri "/wp-json/wp/v2/(widgets|widget-types)' "${MODSEC_LOGS[@]}" 2>/dev/null || true; } \
+              { zgrep -hF '[uri "/wp-admin/widgets.php"]' "${MODSEC_LOGS[@]}" 2>/dev/null || true; } \
                 | wc -l | tr -d ' '
             )"
             widget_modsec_count="${widget_modsec_count:-0}"
             echo "modsec_widget_entry_count=${widget_modsec_count}"
             if [ "${widget_modsec_count:-0}" -gt 0 ] 2>/dev/null; then
+              widget_403_count="$(
+                { zgrep -hE 'Access denied with code 403 .*\[uri "/wp-admin/widgets\.php"\]' "${MODSEC_LOGS[@]}" 2>/dev/null || true; } \
+                  | wc -l | tr -d ' '
+              )"
+              widget_403_count="${widget_403_count:-0}"
+              echo "modsec_widget_403_count=${widget_403_count}"
+              if [ "${widget_403_count:-0}" -gt 0 ] 2>/dev/null; then
+                echo "=== Top widgets.php 403 source IPs in ModSecurity logs ==="
+                zgrep -hE 'Access denied with code 403 .*\[uri "/wp-admin/widgets\.php"\]' "${MODSEC_LOGS[@]}" 2>/dev/null \
+                  | sed -nE 's/.*\\[client ([^]]+)\\].*/\1/p' \
+                  | sort | uniq -c | sort -nr | head -n 20 || true
+              fi
               echo "=== Widget-related ModSecurity entries (first 80) ==="
-              zgrep -hEi '\\[uri "/wp-admin/widgets\\.php"\\]|\\[uri "/wp-json/wp/v2/(widgets|widget-types)' "${MODSEC_LOGS[@]}" 2>/dev/null \
+              zgrep -hF '[uri "/wp-admin/widgets.php"]' "${MODSEC_LOGS[@]}" 2>/dev/null \
                 | head -n 80 || true
               echo "=== Widget-related ModSecurity entries (last 80) ==="
-              zgrep -hEi '\\[uri "/wp-admin/widgets\\.php"\\]|\\[uri "/wp-json/wp/v2/(widgets|widget-types)' "${MODSEC_LOGS[@]}" 2>/dev/null \
+              zgrep -hF '[uri "/wp-admin/widgets.php"]' "${MODSEC_LOGS[@]}" 2>/dev/null \
                 | tail -n 80 || true
             fi
 
