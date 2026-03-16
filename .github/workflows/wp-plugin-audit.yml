@@ -899,12 +899,15 @@ jobs:
           if [ "${#MODSEC_LOGS[@]}" -gt 0 ]; then
             echo "=== Targeted ModSecurity URI counts ==="
             for uri in "/wp-admin/widgets.php" "/wp-json/wp/v2/widgets" "/wp-json/wp/v2/widget-types" "/wp-login.php"; do
-              cnt="$(zgrep -hF "[uri \"$uri\"]" "${MODSEC_LOGS[@]}" 2>/dev/null | wc -l | tr -d ' ')"
+              cnt="$(
+                { zgrep -hF "[uri \"$uri\"]" "${MODSEC_LOGS[@]}" 2>/dev/null || true; } \
+                  | wc -l | tr -d ' '
+              )"
               cnt="${cnt:-0}"
               echo "modsec_uri_count uri=$uri count=$cnt"
             done
             login_403_cnt="$(
-              zgrep -hE 'Access denied with code 403 .*\\[uri "/wp-login\\.php"\\]' "${MODSEC_LOGS[@]}" 2>/dev/null \
+              { zgrep -hE 'Access denied with code 403 .*\\[uri "/wp-login\\.php"\\]' "${MODSEC_LOGS[@]}" 2>/dev/null || true; } \
                 | wc -l | tr -d ' '
             )"
             login_403_cnt="${login_403_cnt:-0}"
@@ -917,7 +920,7 @@ jobs:
             fi
 
             widget_modsec_count="$(
-              zgrep -hEi '\\[uri "/wp-admin/widgets\\.php"\\]|\\[uri "/wp-json/wp/v2/(widgets|widget-types)' "${MODSEC_LOGS[@]}" 2>/dev/null \
+              { zgrep -hEi '\\[uri "/wp-admin/widgets\\.php"\\]|\\[uri "/wp-json/wp/v2/(widgets|widget-types)' "${MODSEC_LOGS[@]}" 2>/dev/null || true; } \
                 | wc -l | tr -d ' '
             )"
             widget_modsec_count="${widget_modsec_count:-0}"
