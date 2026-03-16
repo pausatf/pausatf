@@ -119,6 +119,8 @@ jobs:
             echo "=== widget-logic hook declarations ==="
             grep -nE "add_(action|filter)\s*\(|function widget_logic_|in_widget_form|widget_display_callback|widget_update_callback" \
               "$WP_PATH/wp-content/plugins/widget-logic/widget_logic.php" | sed -n '1,220p' || true
+            echo "=== widget-logic bootstrap excerpt ==="
+            sed -n '1,180p' "$WP_PATH/wp-content/plugins/widget-logic/widget_logic.php" | sed 's/^/  /' || true
           fi
           sudo -u www-data wp eval '
           global $wp_filter;
