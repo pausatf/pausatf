@@ -919,6 +919,41 @@ jobs:
                 | sort | uniq -c | sort -nr | head -n 20 || true
             fi
 
+            echo "=== Update-path ModSecurity URI counts ==="
+            for uri in "/wp-admin/update.php" "/wp-admin/plugins.php" "/wp-admin/update-core.php" "/wp-admin/admin-ajax.php"; do
+              cnt="$(
+                { zgrep -ahF "[uri \"$uri\"]" "${MODSEC_LOGS[@]}" 2>/dev/null || true; } \
+                  | wc -l | tr -d ' '
+              )"
+              cnt="${cnt:-0}"
+              echo "modsec_update_uri_count uri=$uri count=$cnt"
+            done
+
+            echo "=== Update-path ModSecurity 403 counts ==="
+            for uri in "/wp-admin/update.php" "/wp-admin/plugins.php" "/wp-admin/update-core.php" "/wp-admin/admin-ajax.php"; do
+              block_cnt="$(
+                { zgrep -ahE "Access denied with code 403 .*\\[uri \"$uri\"\\]" "${MODSEC_LOGS[@]}" 2>/dev/null || true; } \
+                  | wc -l | tr -d ' '
+              )"
+              block_cnt="${block_cnt:-0}"
+              echo "modsec_update_403_count uri=$uri count=$block_cnt"
+            done
+
+            widget_logic_update_403_count="$(
+              { zgrep -ahEi 'Access denied with code 403 .*((upgrade-plugin|update-plugin|upgrade-selected|plugin-install)|widget-logic|widget_logic\.php)' "${MODSEC_LOGS[@]}" 2>/dev/null || true; } \
+                | wc -l | tr -d ' '
+            )"
+            widget_logic_update_403_count="${widget_logic_update_403_count:-0}"
+            echo "modsec_widget_logic_update_403_count=${widget_logic_update_403_count}"
+            if [ "${widget_logic_update_403_count:-0}" -gt 0 ] 2>/dev/null; then
+              echo "=== Widget Logic update-related 403 entries ==="
+              zgrep -ahEi 'Access denied with code 403 .*((upgrade-plugin|update-plugin|upgrade-selected|plugin-install)|widget-logic|widget_logic\.php)' "${MODSEC_LOGS[@]}" 2>/dev/null \
+                | tail -n 40 || true
+            fi
+            echo "=== Widget Logic update-related ModSecurity entries (last 80) ==="
+            zgrep -ahEi 'widget-logic|widget_logic\.php|upgrade-plugin|update-plugin|upgrade-selected|plugin-install' "${MODSEC_LOGS[@]}" 2>/dev/null \
+              | tail -n 80 || true
+
             widget_modsec_count="$(
               { zgrep -ahF '[uri "/wp-admin/widgets.php"]' "${MODSEC_LOGS[@]}" 2>/dev/null || true; } \
                 | wc -l | tr -d ' '
