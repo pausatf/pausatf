@@ -13,7 +13,7 @@
   file:
     path: "{{ item }}"
     state: directory
-    owner: root
+    owner: www-data
     group: www-data
     mode: '0750'
   loop:
