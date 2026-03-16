@@ -1,0 +1,29 @@
+---
+# DigitalOcean dynamic inventory plugin
+# Usage: ansible-playbook -i inventory/digitalocean.yml site.yml
+# Requires: DIGITALOCEAN_TOKEN environment variable
+plugin: community.digitalocean.digitalocean
+api_token: "{{ lookup('env', 'DIGITALOCEAN_TOKEN') }}"
+attributes:
+  - id
+  - name
+  - memory
+  - vcpus
+  - disk
+  - region
+  - image
+  - networks
+  - tags
+  - status
+keyed_groups:
+  - key: do_tags | default([])
+    prefix: tag
+  - key: do_region.slug
+    prefix: region
+compose:
+  ansible_host: do_networks.v4 | selectattr('type','eq','public') | map(attribute='ip_address') | first
+groups:
+  webservers: "'web' in do_tags"
+  production: "'production' in do_tags"
+  staging: "'staging' in do_tags"
+  dev: "'dev' in do_tags"
