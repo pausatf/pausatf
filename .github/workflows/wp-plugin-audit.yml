@@ -114,6 +114,12 @@ jobs:
               ls -1t "$d" 2>/dev/null | head -n 30 || true
             fi
           done
+          if [ -d "/var/backups/wordpress" ]; then
+            echo "-- /var/backups/wordpress (candidate DB artifacts) --"
+            find /var/backups/wordpress -maxdepth 3 -type f \
+              \( -name '*.sql' -o -name '*.sql.gz' -o -name '*.sql.zst' -o -name '*.wpress' -o -name '*.tar' -o -name '*.tar.gz' \) \
+              -printf '%TY-%Tm-%Td %TH:%TM %p\n' 2>/dev/null | sort -r | head -n 80 || true
+          fi
 
           CUR_OPT_COUNT="$(wpdb_query "SELECT COUNT(*) FROM \`${DB_NAME}\`.\`${CURRENT_OPTIONS_TABLE}\` WHERE option_name LIKE 'widget_%' AND option_value LIKE '%widget_logic%';" | head -n1 || echo 0)"
           CUR_OPT_COUNT="${CUR_OPT_COUNT:-0}"
