@@ -116,9 +116,34 @@ jobs:
             | (head -n 1 && grep -E '^widget-logic[[:space:]]' || true)
           sudo -u www-data wp option list --path="$WP_PATH" --allow-root --search='widget_logic%' --fields=option_name,size_bytes --format=table || true
           sudo -u www-data wp eval '
+          global $wp_filter;
           echo "widget_logic_display_hook_priority=" . ( has_filter( "widget_display_callback", "widget_logic_widget_display_callback" ) ?: 0 ) . PHP_EOL;
           echo "widget_logic_control_hook_priority=" . ( has_filter( "in_widget_form", "widget_logic_widget_control" ) ?: 0 ) . PHP_EOL;
           echo "widget_logic_update_hook_priority=" . ( has_filter( "widget_update_callback", "widget_logic_widget_update_callback" ) ?: 0 ) . PHP_EOL;
+          echo "widget_logic_display_callback_exists=" . ( function_exists( "widget_logic_widget_display_callback" ) ? "yes" : "no" ) . PHP_EOL;
+          echo "widget_logic_control_callback_exists=" . ( function_exists( "widget_logic_widget_control" ) ? "yes" : "no" ) . PHP_EOL;
+          echo "widget_logic_update_callback_exists=" . ( function_exists( "widget_logic_widget_update_callback" ) ? "yes" : "no" ) . PHP_EOL;
+          foreach ( [ "widget_display_callback", "in_widget_form", "widget_update_callback" ] as $hook ) {
+            $callbacks = [];
+            if ( isset( $wp_filter[ $hook ] ) && isset( $wp_filter[ $hook ]->callbacks ) && is_array( $wp_filter[ $hook ]->callbacks ) ) {
+              foreach ( $wp_filter[ $hook ]->callbacks as $priority => $entries ) {
+                foreach ( $entries as $entry ) {
+                  $fn = $entry["function"] ?? null;
+                  $name = "unknown";
+                  if ( is_string( $fn ) ) {
+                    $name = $fn;
+                  } elseif ( is_array( $fn ) && count( $fn ) === 2 ) {
+                    $target = is_object( $fn[0] ) ? get_class( $fn[0] ) : (string) $fn[0];
+                    $name   = $target . "::" . $fn[1];
+                  } elseif ( $fn instanceof Closure ) {
+                    $name = "Closure";
+                  }
+                  $callbacks[] = $priority . ":" . $name;
+                }
+              }
+            }
+            echo "hook_callbacks_{$hook}=" . implode( ",", array_slice( $callbacks, 0, 80 ) ) . PHP_EOL;
+          }
           echo "widgets_block_editor_enabled=" . ( wp_use_widgets_block_editor() ? "yes" : "no" ) . PHP_EOL;
           ' --path="$WP_PATH" --allow-root || true
           if [ -n "$WIDGET_SOURCE_DB" ]; then
