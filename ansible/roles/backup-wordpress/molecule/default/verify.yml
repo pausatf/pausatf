@@ -1,0 +1,12 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  tasks:
+    - name: Gather service facts
+      ansible.builtin.service_facts:
+
+    - name: Assert role applied successfully
+      ansible.builtin.assert:
+        that: true
+        success_msg: "backup-wordpress role applied successfully"
