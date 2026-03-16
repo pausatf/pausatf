@@ -87,18 +87,33 @@ jobs:
           wpdb_query() {
             sudo -u www-data wp db query "$1" --skip-column-names --path="$WP_PATH" --allow-root 2>/dev/null
           }
+          mysql_root_query() {
+            mysql --batch --skip-column-names -e "$1" 2>/dev/null
+          }
 
           DB_NAME="$(sudo -u www-data wp config get DB_NAME --path="$WP_PATH" --allow-root 2>/dev/null | head -n1)"
           TABLE_PREFIX="$(sudo -u www-data wp config get table_prefix --type=variable --path="$WP_PATH" --allow-root 2>/dev/null | head -n1)"
           CURRENT_OPTIONS_TABLE="${TABLE_PREFIX}options"
+          MYSQL_ROOT_OK=false
+          if command -v mysql >/dev/null 2>&1 && mysql_root_query "SELECT 1;" | grep -q '^1$'; then
+            MYSQL_ROOT_OK=true
+          fi
 
           echo "HOST=$(hostname -f 2>/dev/null || hostname)"
           echo "UTC_NOW=$(date -u --iso-8601=seconds)"
           echo "current_db=$DB_NAME"
           echo "current_options_table=$CURRENT_OPTIONS_TABLE"
+          echo "mysql_root_access=$MYSQL_ROOT_OK"
           if [ -n "$WIDGET_SOURCE_DB" ]; then
             echo "widget_source_db_override=$WIDGET_SOURCE_DB"
           fi
+          echo "=== Backup artifacts on host ==="
+          for d in "$WP_PATH/wp-content/ai1wm-backups" "$WP_PATH/wp-content/updraft" "/var/backups"; do
+            if [ -d "$d" ]; then
+              echo "-- $d --"
+              ls -1t "$d" 2>/dev/null | head -n 30 || true
+            fi
+          done
 
           CUR_OPT_COUNT="$(wpdb_query "SELECT COUNT(*) FROM \`${DB_NAME}\`.\`${CURRENT_OPTIONS_TABLE}\` WHERE option_name LIKE 'widget_%' AND option_value LIKE '%widget_logic%';" | head -n1 || echo 0)"
           CUR_OPT_COUNT="${CUR_OPT_COUNT:-0}"
@@ -107,7 +122,7 @@ jobs:
           echo "=== Current widget_logic instance summary ==="
           sudo -u www-data wp eval '
           global $wpdb;
-          $rows      = $wpdb->get_results( "SELECT option_name, option_value FROM {$wpdb->options} WHERE option_name LIKE \"widget_%\"", ARRAY_A );
+          $rows      = $wpdb->get_results( "SELECT option_name, option_value FROM {$wpdb->options} WHERE option_name LIKE '\''widget_%'\''", ARRAY_A );
           $total     = 0;
           $non_empty = 0;
           foreach ( $rows as $row ) {
@@ -135,15 +150,30 @@ jobs:
           ' --path="$WP_PATH" | sed -n '1,220p'
 
           CANDIDATE_FILE="$(mktemp)"
-          trap 'rm -f "$CANDIDATE_FILE"' EXIT
+          DB_LIST_FILE="$(mktemp)"
+          trap 'rm -f "$CANDIDATE_FILE" "$DB_LIST_FILE"' EXIT
 
           echo "=== Databases with widget_logic-bearing options ==="
-          mapfile -t DBS < <(wpdb_query "SHOW DATABASES;" | grep -Ev '^(information_schema|performance_schema|mysql|sys)$' || true)
+          wpdb_query "SHOW DATABASES;" | grep -Ev '^(information_schema|performance_schema|mysql|sys)$' > "$DB_LIST_FILE" || true
+          if [ "$MYSQL_ROOT_OK" = "true" ]; then
+            mysql_root_query "SHOW DATABASES;" | grep -Ev '^(information_schema|performance_schema|mysql|sys)$' >> "$DB_LIST_FILE" || true
+          fi
+          sort -u "$DB_LIST_FILE" -o "$DB_LIST_FILE"
+          mapfile -t DBS < "$DB_LIST_FILE"
           for db in "${DBS[@]}"; do
             mapfile -t OPTION_TABLES < <(wpdb_query "SHOW TABLES FROM \`${db}\` LIKE '%\\_options';" || true)
+            if [ "${#OPTION_TABLES[@]}" -eq 0 ] && [ "$MYSQL_ROOT_OK" = "true" ]; then
+              mapfile -t OPTION_TABLES < <(mysql_root_query "SHOW TABLES FROM \`${db}\` LIKE '%\\_options';" || true)
+            fi
             for tbl in "${OPTION_TABLES[@]}"; do
-              cnt="$(wpdb_query "SELECT COUNT(*) FROM \`${db}\`.\`${tbl}\` WHERE option_name LIKE 'widget_%' AND option_value LIKE '%widget_logic%';" | head -n1 || echo 0)"
+              cnt="$(wpdb_query "SELECT COUNT(*) FROM \`${db}\`.\`${tbl}\` WHERE option_name LIKE 'widget_%' AND option_value LIKE '%widget_logic%';" | head -n1 || true)"
+              if ! printf '%s' "$cnt" | grep -Eq '^[0-9]+$' && [ "$MYSQL_ROOT_OK" = "true" ]; then
+                cnt="$(mysql_root_query "SELECT COUNT(*) FROM \`${db}\`.\`${tbl}\` WHERE option_name LIKE 'widget_%' AND option_value LIKE '%widget_logic%';" | head -n1 || true)"
+              fi
               cnt="${cnt:-0}"
+              if ! printf '%s' "$cnt" | grep -Eq '^[0-9]+$'; then
+                cnt=0
+              fi
               if [ "$cnt" -gt 0 ] 2>/dev/null; then
                 printf '%s\t%s\t%s\n' "$db" "$tbl" "$cnt" >> "$CANDIDATE_FILE"
                 echo "candidate_db=$db options_table=$tbl widget_logic_option_count=$cnt"
@@ -159,7 +189,11 @@ jobs:
           echo "=== Candidate detail preview (top 5 by count) ==="
           sort -t $'\t' -k3,3nr "$CANDIDATE_FILE" | head -n 5 | while IFS=$'\t' read -r db tbl cnt; do
             echo "-- $db.$tbl count=$cnt --"
-            wpdb_query "SELECT option_name, LENGTH(option_value) FROM \`${db}\`.\`${tbl}\` WHERE option_name LIKE 'widget_%' AND option_value LIKE '%widget_logic%' ORDER BY option_name LIMIT 20;" | sed 's/^/  /'
+            preview="$(wpdb_query "SELECT option_name, LENGTH(option_value) FROM \`${db}\`.\`${tbl}\` WHERE option_name LIKE 'widget_%' AND option_value LIKE '%widget_logic%' ORDER BY option_name LIMIT 20;" || true)"
+            if [ -z "$preview" ] && [ "$MYSQL_ROOT_OK" = "true" ]; then
+              preview="$(mysql_root_query "SELECT option_name, LENGTH(option_value) FROM \`${db}\`.\`${tbl}\` WHERE option_name LIKE 'widget_%' AND option_value LIKE '%widget_logic%' ORDER BY option_name LIMIT 20;" || true)"
+            fi
+            printf '%s\n' "$preview" | sed 's/^/  /'
           done
 
           if [ "${APPLY_WIDGET_LOGIC_RECOVERY}" != "true" ]; then
@@ -202,11 +236,20 @@ jobs:
             echo "ERROR: source does not contain more widget_logic data than current (${SRC_COUNT} <= ${CUR_OPT_COUNT})" >&2
             exit 1
           fi
+          if [ "$MYSQL_ROOT_OK" != "true" ] && [ "${SRC_DB}" != "${DB_NAME}" ]; then
+            echo "ERROR: source DB differs from current but mysql root access is unavailable" >&2
+            exit 1
+          fi
 
           TS="$(date -u +%Y%m%d%H%M%S)"
           REC_TABLE="${TABLE_PREFIX}widget_logic_recovery_${TS}"
-          wpdb_query "CREATE TABLE \`${DB_NAME}\`.\`${REC_TABLE}\` AS SELECT * FROM \`${DB_NAME}\`.\`${CURRENT_OPTIONS_TABLE}\` WHERE option_name LIKE 'widget_%' AND option_value LIKE '%widget_logic%';"
-          wpdb_query "REPLACE INTO \`${DB_NAME}\`.\`${CURRENT_OPTIONS_TABLE}\` (option_name, option_value, autoload) SELECT option_name, option_value, autoload FROM \`${SRC_DB}\`.\`${SRC_TABLE}\` WHERE option_name LIKE 'widget_%' AND option_value LIKE '%widget_logic%';"
+          if [ "$MYSQL_ROOT_OK" = "true" ]; then
+            mysql_root_query "CREATE TABLE \`${DB_NAME}\`.\`${REC_TABLE}\` AS SELECT * FROM \`${DB_NAME}\`.\`${CURRENT_OPTIONS_TABLE}\` WHERE option_name LIKE 'widget_%' AND option_value LIKE '%widget_logic%';"
+            mysql_root_query "REPLACE INTO \`${DB_NAME}\`.\`${CURRENT_OPTIONS_TABLE}\` (option_name, option_value, autoload) SELECT option_name, option_value, autoload FROM \`${SRC_DB}\`.\`${SRC_TABLE}\` WHERE option_name LIKE 'widget_%' AND option_value LIKE '%widget_logic%';"
+          else
+            wpdb_query "CREATE TABLE \`${DB_NAME}\`.\`${REC_TABLE}\` AS SELECT * FROM \`${DB_NAME}\`.\`${CURRENT_OPTIONS_TABLE}\` WHERE option_name LIKE 'widget_%' AND option_value LIKE '%widget_logic%';"
+            wpdb_query "REPLACE INTO \`${DB_NAME}\`.\`${CURRENT_OPTIONS_TABLE}\` (option_name, option_value, autoload) SELECT option_name, option_value, autoload FROM \`${SRC_DB}\`.\`${SRC_TABLE}\` WHERE option_name LIKE 'widget_%' AND option_value LIKE '%widget_logic%';"
+          fi
 
           NEW_OPT_COUNT="$(wpdb_query "SELECT COUNT(*) FROM \`${DB_NAME}\`.\`${CURRENT_OPTIONS_TABLE}\` WHERE option_name LIKE 'widget_%' AND option_value LIKE '%widget_logic%';" | head -n1 || echo 0)"
           NEW_OPT_COUNT="${NEW_OPT_COUNT:-0}"
@@ -217,7 +260,7 @@ jobs:
           echo "=== Post-recovery widget_logic instance summary ==="
           sudo -u www-data wp eval '
           global $wpdb;
-          $rows      = $wpdb->get_results( "SELECT option_name, option_value FROM {$wpdb->options} WHERE option_name LIKE \"widget_%\"", ARRAY_A );
+          $rows      = $wpdb->get_results( "SELECT option_name, option_value FROM {$wpdb->options} WHERE option_name LIKE '\''widget_%'\''", ARRAY_A );
           $total     = 0;
           $non_empty = 0;
           foreach ( $rows as $row ) {
