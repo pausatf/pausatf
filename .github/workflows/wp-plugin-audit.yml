@@ -112,11 +112,25 @@ jobs:
             mkdir -p "$MU_DIR"
             printf '%s\n' \
               "<?php" \
+              "function pausatf_remove_jetpack_math_object_callback( \$hook_name, \$method_name ) {" \
+              "    global \$wp_filter;" \
+              "    \$class_name = 'Automattic\\\\Jetpack\\\\Waf\\\\Brute_Force_Protection\\\\Brute_Force_Protection_Math_Authenticate';" \
+              "    if ( empty( \$wp_filter[ \$hook_name ] ) || empty( \$wp_filter[ \$hook_name ]->callbacks ) ) { return; }" \
+              "    foreach ( \$wp_filter[ \$hook_name ]->callbacks as \$priority => \$callbacks ) {" \
+              "        foreach ( \$callbacks as \$callback ) {" \
+              "            if ( empty( \$callback['function'] ) || ! is_array( \$callback['function'] ) ) { continue; }" \
+              "            \$target = \$callback['function'];" \
+              "            if ( ! is_object( \$target[0] ?? null ) || ( \$target[1] ?? '' ) !== \$method_name ) { continue; }" \
+              "            if ( is_a( \$target[0], \$class_name ) ) { remove_action( \$hook_name, array( \$target[0], \$method_name ), (int) \$priority ); }" \
+              "        }" \
+              "    }" \
+              "}" \
               "function pausatf_remove_jetpack_math_fallback() {" \
-              "    if ( ! class_exists('\\Automattic\\Jetpack\\Waf\\Brute_Force_Protection\\Math_Fallback') ) { return; }" \
-              "    remove_action('login_form', array('\\Automattic\\Jetpack\\Waf\\Brute_Force_Protection\\Math_Fallback', 'math_form'));" \
-              "    remove_filter('authenticate', array('\\Automattic\\Jetpack\\Waf\\Brute_Force_Protection\\Math_Fallback', 'math_authenticate'), 999);" \
-              "    remove_action('login_form_login', array('\\Automattic\\Jetpack\\Waf\\Brute_Force_Protection\\Math_Fallback', 'process_generate_math_page'));" \
+              "    pausatf_remove_jetpack_math_object_callback( 'login_form', 'math_form' );" \
+              "    pausatf_remove_jetpack_math_object_callback( 'init', 'process_generate_math_page' );" \
+              "    for ( \$priority = 1; \$priority <= 1000; \$priority++ ) {" \
+              "        remove_filter( 'authenticate', 'Automattic\\\\Jetpack\\\\Waf\\\\Brute_Force_Protection\\\\Brute_Force_Protection_Math_Authenticate::math_authenticate', \$priority );" \
+              "    }" \
               "}" \
               "add_action('plugins_loaded', 'pausatf_remove_jetpack_math_fallback', 9999);" \
               "add_action('init', 'pausatf_remove_jetpack_math_fallback', 9999);" \
