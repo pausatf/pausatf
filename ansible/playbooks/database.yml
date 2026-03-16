@@ -1,0 +1,12 @@
+---
+- name: Configure database and cache
+  hosts: webservers
+  gather_facts: true
+  become: true
+  roles:
+    - role: mysql
+      tags: [database, mysql]
+      when: mysql_enabled | default(true)
+    - role: redis
+      tags: [cache, redis]
+      when: redis_enabled | default(false)
