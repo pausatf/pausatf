@@ -1,0 +1,38 @@
+---
+# WordPress deployment with rollback safety
+# Wraps the manage-install tasks in a block/rescue for automatic rollback
+
+- name: Create pre-deploy backup
+  ansible.builtin.command: >
+    {{ wpcli_path | default('/usr/local/bin/wp') }}
+    db export /tmp/wp-pre-deploy-{{ ansible_date_time.iso8601_basic_short }}.sql
+    --path={{ wp_site.path }}
+    --allow-root
+  register: wp_backup
+  changed_when: false
+  failed_when: false
+
+- name: Run WordPress deployment
+  block:
+    - name: Execute manage-install tasks
+      ansible.builtin.include_tasks: manage-install.yml
+
+  rescue:
+    - name: Deployment failed - restoring database
+      ansible.builtin.command: >
+        {{ wpcli_path | default('/usr/local/bin/wp') }}
+        db import /tmp/wp-pre-deploy-{{ ansible_date_time.iso8601_basic_short }}.sql
+        --path={{ wp_site.path }}
+        --allow-root
+      when: wp_backup.rc == 0
+
+    - name: Notify deployment failure
+      ansible.builtin.debug:
+        msg: >
+          WordPress deployment FAILED on {{ inventory_hostname }}.
+          Database restored from pre-deploy backup.
+          Manual investigation required.
+
+    - name: Fail after rescue
+      ansible.builtin.fail:
+        msg: "WordPress deployment failed. Database rolled back."
