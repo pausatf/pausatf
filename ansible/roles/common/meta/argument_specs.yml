@@ -1,31 +1,14 @@
 ---
 argument_specs:
   main:
-    short_description: Common system configuration role
+    short_description: Common system configuration
     options:
       timezone:
         type: str
         default: America/Los_Angeles
-        description: System timezone applied via community.general.timezone
+        description: System timezone
       allowed_ssh_networks:
         type: list
         elements: str
         default: []
-        description: >
-          CIDR networks explicitly allowed SSH access via UFW. Tailscale
-          (100.64.0.0/10) and the Ansible controller CIDR are always appended
-          automatically.
-      ansible_controller_cidr:
-        type: str
-        required: false
-        description: >
-          CIDR of the Ansible controller host, appended to SSH allow list.
-          Leave unset to rely on Tailscale access only.
-      ufw_reset:
-        type: bool
-        default: false
-        description: Reset UFW to defaults before applying rules; use with caution in production
-      ssh_allow_users:
-        type: str
-        default: "deploy root"
-        description: Space-separated list of users permitted SSH login via AllowUsers
+        description: CIDR networks allowed SSH access
