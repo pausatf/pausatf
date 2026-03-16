@@ -1,0 +1,23 @@
+---
+argument_specs:
+  main:
+    short_description: ModSecurity WAF configuration
+    options:
+      modsecurity_enabled:
+        type: bool
+        default: true
+        description: Enable/disable ModSecurity
+      modsecurity_rule_engine:
+        type: str
+        default: DetectionOnly
+        choices: ["On", "DetectionOnly", "Off"]
+        description: "Rule engine mode: On (block), DetectionOnly (audit), Off"
+      modsecurity_crs_enabled:
+        type: bool
+        default: true
+        description: Enable OWASP Core Rule Set
+      modsecurity_crs_paranoia_level:
+        type: int
+        default: 1
+        choices: [1, 2, 3, 4]
+        description: CRS paranoia level (1=low FP, 4=paranoid)
