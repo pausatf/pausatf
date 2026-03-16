@@ -160,6 +160,58 @@
       args:
         warn: false
 
+
+    # ========================================
+    # Phase 7b: Dev-html directory archive
+    # ========================================
+    - name: Archive dev-html directory
+      shell: |
+        tar czf {{ backup_root }}/dev-html.tar.gz \
+          --exclude='wp-content/cache' \
+          -C /var/www dev-html
+      args:
+        warn: false
+
+    # ========================================
+    # Phase 7c: Transit directory archive
+    # ========================================
+    - name: Archive transit directory
+      shell: |
+        tar czf {{ backup_root }}/transit.tar.gz \
+          -C /var/www transit
+      args:
+        warn: false
+      ignore_errors: true
+
+    # ========================================
+    # Phase 7d: Cloudflared tunnel config
+    # ========================================
+    - name: Archive cloudflared config
+      shell: |
+        tar czf {{ backup_root }}/cloudflared.tar.gz \
+          /etc/cloudflared/ /root/.cloudflared/ 2>/dev/null || true
+      args:
+        warn: false
+
+    # ========================================
+    # Phase 7e: SSL certificates
+    # ========================================
+    - name: Archive Let\'s Encrypt certificates
+      shell: |
+        tar czf {{ backup_root }}/letsencrypt.tar.gz \
+          /etc/letsencrypt/ 2>/dev/null || true
+      args:
+        warn: false
+
+    # ========================================
+    # Phase 7f: All .htaccess files inventory
+    # ========================================
+    - name: Capture all .htaccess file locations and contents
+      shell: |
+        find /var/www -name .htaccess -exec echo "=== {} ===" \; -exec cat {} \; > {{ backup_root }}/all-htaccess.txt
+      args:
+        warn: false
+
     # ========================================
     # Phase 8: System information capture
     # ========================================
@@ -218,7 +270,23 @@
           5. Legacy Site:
              - legacy.tar.gz (full legacy directory with hidden files)
 
-          6. System Information:
+          6. Dev-html:
+             - dev-html.tar.gz (dev WordPress copy, 22G)
+
+          7. Transit:
+             - transit.tar.gz
+
+          8. Cloudflared:
+             - cloudflared.tar.gz (tunnel config and credentials)
+
+          9. SSL Certificates:
+             - letsencrypt.tar.gz (Let's Encrypt certs)
+
+          10. All .htaccess files:
+             - all-htaccess.txt (inventory of all .htaccess files and contents)
+
+          11.
+          11. System Information:
              - installed-packages.txt
              - php-version.txt
              - php-modules.txt
