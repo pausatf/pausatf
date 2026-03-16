@@ -20,6 +20,11 @@ on:
         required: false
         default: false
         type: boolean
+      install_login_hotfix:
+        description: "Emergency: install MU plugin to disable Jetpack math login fallback"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -37,6 +42,7 @@ jobs:
           PROD_HOST: ${{ vars.PROD_HOST }}
           DISABLE_JETPACK_PROTECT: ${{ inputs.disable_jetpack_protect }}
           SKIP_SYNTHETIC_LOGIN: ${{ inputs.skip_synthetic_login }}
+          INSTALL_LOGIN_HOTFIX: ${{ inputs.install_login_hotfix }}
         run: |
           set -euo pipefail
           if [ -z "${PROD_SSH_PRIVATE_KEY:-}" ]; then
@@ -57,13 +63,14 @@ jobs:
 
           ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
             github-deploy@"$TARGET_HOST" \
-            "DISABLE_JETPACK_PROTECT='${DISABLE_JETPACK_PROTECT:-false}' SKIP_SYNTHETIC_LOGIN='${SKIP_SYNTHETIC_LOGIN:-false}' $REMOTE_SHELL" <<'REMOTE'
+            "DISABLE_JETPACK_PROTECT='${DISABLE_JETPACK_PROTECT:-false}' SKIP_SYNTHETIC_LOGIN='${SKIP_SYNTHETIC_LOGIN:-false}' INSTALL_LOGIN_HOTFIX='${INSTALL_LOGIN_HOTFIX:-false}' $REMOTE_SHELL" <<'REMOTE'
           set -euo pipefail
 
           WP_PATH="/var/www/html"
           APACHE_LOG_DIR="/var/log/apache2"
           DISABLE_JETPACK_PROTECT="${DISABLE_JETPACK_PROTECT:-false}"
           SKIP_SYNTHETIC_LOGIN="${SKIP_SYNTHETIC_LOGIN:-false}"
+          INSTALL_LOGIN_HOTFIX="${INSTALL_LOGIN_HOTFIX:-false}"
 
           echo "HOST=$(hostname -f 2>/dev/null || hostname)"
           echo "UTC_NOW=$(date -u --iso-8601=seconds)"
@@ -96,6 +103,43 @@ jobs:
             fi
           else
             echo "jetpack_cli_unavailable"
+          fi
+
+          if [ "${INSTALL_LOGIN_HOTFIX}" = "true" ]; then
+            echo "=== Emergency action: install MU login hotfix ==="
+            MU_DIR="$WP_PATH/wp-content/mu-plugins"
+            MU_FILE="$MU_DIR/pausatf-jetpack-login-hotfix.php"
+            mkdir -p "$MU_DIR"
+            cat > "$MU_FILE" <<'PHP'
+            <?php
+            add_action(
+            	'init',
+            	function () {
+            		if ( ! class_exists( '\Automattic\Jetpack\Waf\Brute_Force_Protection\Math_Fallback' ) ) {
+            			return;
+            		}
+
+            		remove_action(
+            			'login_form',
+            			array( '\Automattic\Jetpack\Waf\Brute_Force_Protection\Math_Fallback', 'math_form' )
+            		);
+            		remove_filter(
+            			'authenticate',
+            			array( '\Automattic\Jetpack\Waf\Brute_Force_Protection\Math_Fallback', 'math_authenticate' ),
+            			999
+            		);
+            		remove_action(
+            			'login_form_login',
+            			array( '\Automattic\Jetpack\Waf\Brute_Force_Protection\Math_Fallback', 'process_generate_math_page' )
+            		);
+            	},
+            	1000
+            );
+            PHP
+            chown www-data:www-data "$MU_FILE"
+            chmod 0644 "$MU_FILE"
+            php -l "$MU_FILE"
+            echo "mu_hotfix_path=$MU_FILE"
           fi
 
           echo "=== Locate login challenge source ==="
