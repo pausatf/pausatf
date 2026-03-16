@@ -2,7 +2,7 @@
 # Used by Dependabot to track Python dependency updates
 
 # Ansible and related tools
-ansible>=8.0.0,<9.0.0
+ansible>=12.2.0,<9.0.0
 ansible-lint>=6.22.0
 ansible-core>=2.15.0
 
@@ -27,7 +27,7 @@ bandit>=1.7.5
 pytest>=7.4.3
 pytest-cov>=4.1.0
 pytest-xdist>=3.5.0
-pytest-ansible>=4.1.1
+pytest-ansible>=12.2.0
 pytest-timeout>=2.2.0
 
 # Molecule for Ansible testing
