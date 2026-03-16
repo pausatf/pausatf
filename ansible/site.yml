@@ -3,10 +3,6 @@
 - name: Configure all servers
   hosts: all
   gather_facts: true
-  gather_subset:
-    - '!all'
-    - 'distribution'
-    - 'network'
   become: true
 
   pre_tasks:
@@ -24,11 +20,35 @@
 - name: Configure web servers
   hosts: webservers
   gather_facts: true
-  gather_subset:
-    - '!all'
-    - 'distribution'
-    - 'network'
   become: true
+
+  pre_tasks:
+    - name: Assert MySQL is running before WordPress role
+      ansible.builtin.service_facts:
+
+    - name: Fail if MySQL is not active
+      ansible.builtin.assert:
+        that:
+          - "'mysql.service' in ansible_facts.services or 'mariadb.service' in ansible_facts.services"
+          - >
+            (ansible_facts.services['mysql.service'] is defined and
+             ansible_facts.services['mysql.service'].state == 'running') or
+            (ansible_facts.services['mariadb.service'] is defined and
+             ansible_facts.services['mariadb.service'].state == 'running')
+        fail_msg: "MySQL/MariaDB must be running before the WordPress role executes"
+      when: wordpress_enabled | default(true) and mysql_enabled | default(true)
+
+    - name: Fail if Redis is not active
+      ansible.builtin.assert:
+        that:
+          - "'redis.service' in ansible_facts.services or 'redis-server.service' in ansible_facts.services"
+          - >
+            (ansible_facts.services['redis.service'] is defined and
+             ansible_facts.services['redis.service'].state == 'running') or
+            (ansible_facts.services['redis-server.service'] is defined and
+             ansible_facts.services['redis-server.service'].state == 'running')
+        fail_msg: "Redis must be running before the WordPress role executes"
+      when: wordpress_enabled | default(true) and redis_enabled | default(false)
 
   tasks:
     - name: Deploy web stack
@@ -143,10 +163,6 @@
 - name: Configure monitoring
   hosts: all
   gather_facts: true
-  gather_subset:
-    - '!all'
-    - 'distribution'
-    - 'network'
   become: true
 
   roles:
