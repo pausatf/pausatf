@@ -1,0 +1,105 @@
+---
+# Post-migration verification for new production
+# Run: ansible-playbook playbooks/verify-migration.yml
+- name: Verify new production server
+  hosts: production_new
+  gather_facts: true
+  become: true
+
+  tasks:
+    - name: Gather service facts
+      ansible.builtin.service_facts:
+
+    - name: Verify critical services are running
+      ansible.builtin.assert:
+        that:
+          - "'apache2.service' in ansible_facts.services"
+          - "ansible_facts.services['apache2.service'].state == 'running'"
+          - "'mysql.service' in ansible_facts.services"
+          - "ansible_facts.services['mysql.service'].state == 'running'"
+          - "'redis-server.service' in ansible_facts.services"
+          - "ansible_facts.services['redis-server.service'].state == 'running'"
+          - "'fail2ban.service' in ansible_facts.services"
+          - "ansible_facts.services['fail2ban.service'].state == 'running'"
+        fail_msg: "One or more critical services are not running"
+
+    - name: Verify PHP version
+      ansible.builtin.command: php -v
+      register: php_version
+      changed_when: false
+
+    - name: Assert PHP 8.4+
+      ansible.builtin.assert:
+        that: "'8.4' in php_version.stdout or '8.5' in php_version.stdout"
+        fail_msg: "Expected PHP 8.4+, got: {{ php_version.stdout_lines[0] }}"
+
+    - name: Verify WordPress is installed
+      ansible.builtin.command: wp core is-installed --path=/var/www/html --allow-root
+      register: wp_check
+      changed_when: false
+      failed_when: false
+
+    - name: Verify wp-config.php exists
+      ansible.builtin.stat:
+        path: /var/www/html/wp-config.php
+      register: wp_config
+
+    - name: Verify legacy content exists
+      ansible.builtin.stat:
+        path: /var/www/legacy/public_html
+      register: legacy_content
+
+    - name: Verify uploads directory has content
+      ansible.builtin.find:
+        paths: /var/www/html/wp-content/uploads
+        file_type: any
+      register: uploads
+
+    - name: Verify Apache responds on port 80
+      ansible.builtin.uri:
+        url: "http://localhost/"
+        return_content: false
+        status_code: [200, 301, 302, 403]
+      register: http_check
+
+    - name: Verify Apache responds on port 443
+      ansible.builtin.uri:
+        url: "https://localhost/"
+        return_content: false
+        validate_certs: false
+        status_code: [200, 301, 302, 403]
+      register: https_check
+
+    - name: Verify UFW is active
+      ansible.builtin.command: ufw status
+      register: ufw_status
+      changed_when: false
+
+    - name: Assert UFW is active
+      ansible.builtin.assert:
+        that: "'Status: active' in ufw_status.stdout"
+
+    - name: Verify SSH uses post-quantum KEX
+      ansible.builtin.command: sshd -T
+      register: sshd_config
+      changed_when: false
+
+    - name: Assert sntrup761 KEX is configured
+      ansible.builtin.assert:
+        that: "'sntrup761' in sshd_config.stdout"
+        fail_msg: "Post-quantum KEX not configured in sshd"
+
+    - name: Print verification summary
+      ansible.builtin.debug:
+        msg: |
+          === Migration Verification Summary ===
+          PHP: {{ php_version.stdout_lines[0] }}
+          WordPress installed: {{ 'YES' if wp_check.rc == 0 else 'NO - needs wp-config.php' }}
+          wp-config.php: {{ 'EXISTS' if wp_config.stat.exists else 'MISSING' }}
+          Legacy content: {{ 'EXISTS' if legacy_content.stat.exists else 'MISSING - run sync-content.yml' }}
+          Uploads count: {{ uploads.matched }} files
+          HTTP: {{ http_check.status }}
+          HTTPS: {{ https_check.status }}
+          UFW: active
+          Post-quantum SSH: configured
+          ==========================================
