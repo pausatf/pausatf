@@ -2,6 +2,9 @@
 # Managed by Ansible
 # Requires wp-fail2ban MU plugin (writes to /var/log/auth.log via syslog)
 
+[INCLUDES]
+before = common.conf
+
 [Definition]
 failregex = ^%(__prefix_line)sAuthentication failure for .* from <HOST>$
             ^%(__prefix_line)sXML-RPC authentication failure from <HOST>$
