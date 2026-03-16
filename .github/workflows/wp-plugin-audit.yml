@@ -40,6 +40,11 @@ on:
         required: false
         default: ""
         type: string
+      repair_active_widget_logic:
+        description: "Repair active widgets with empty logic by matching duplicate widget instance content"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -57,6 +62,7 @@ jobs:
           PROD_HOST: ${{ vars.PROD_HOST }}
           APPLY_WIDGET_LOGIC_RECOVERY: ${{ inputs.apply_widget_logic_recovery }}
           WIDGET_SOURCE_DB: ${{ inputs.widget_source_db }}
+          REPAIR_ACTIVE_WIDGET_LOGIC: ${{ inputs.repair_active_widget_logic }}
         run: |
           set -euo pipefail
           if [ -z "${PROD_SSH_PRIVATE_KEY:-}" ]; then
@@ -77,12 +83,13 @@ jobs:
 
           ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
             github-deploy@"$TARGET_HOST" \
-            "APPLY_WIDGET_LOGIC_RECOVERY='${APPLY_WIDGET_LOGIC_RECOVERY:-false}' WIDGET_SOURCE_DB='${WIDGET_SOURCE_DB:-}' $REMOTE_SHELL" <<'REMOTE'
+            "APPLY_WIDGET_LOGIC_RECOVERY='${APPLY_WIDGET_LOGIC_RECOVERY:-false}' WIDGET_SOURCE_DB='${WIDGET_SOURCE_DB:-}' REPAIR_ACTIVE_WIDGET_LOGIC='${REPAIR_ACTIVE_WIDGET_LOGIC:-false}' $REMOTE_SHELL" <<'REMOTE'
           set -euo pipefail
 
           WP_PATH="/var/www/html"
           APPLY_WIDGET_LOGIC_RECOVERY="$(printf '%s' "${APPLY_WIDGET_LOGIC_RECOVERY:-false}" | tr '[:upper:]' '[:lower:]')"
           WIDGET_SOURCE_DB="${WIDGET_SOURCE_DB:-}"
+          REPAIR_ACTIVE_WIDGET_LOGIC="$(printf '%s' "${REPAIR_ACTIVE_WIDGET_LOGIC:-false}" | tr '[:upper:]' '[:lower:]')"
 
           wpdb_query() {
             sudo -u www-data wp db query "$1" --skip-column-names --path="$WP_PATH" --allow-root 2>/dev/null
@@ -243,6 +250,125 @@ jobs:
             echo $line . PHP_EOL;
           }
           ' --path="$WP_PATH" | sed -n '1,260p'
+
+          if [ "${REPAIR_ACTIVE_WIDGET_LOGIC}" = "true" ]; then
+            echo "=== Repair active empty widget_logic instances (content match) ==="
+            TS="$(date -u +%Y%m%d%H%M%S)"
+            REPAIR_TABLE="${TABLE_PREFIX}widget_logic_active_repair_${TS}"
+            wpdb_query "CREATE TABLE \`${DB_NAME}\`.\`${REPAIR_TABLE}\` AS SELECT * FROM \`${DB_NAME}\`.\`${CURRENT_OPTIONS_TABLE}\` WHERE option_name LIKE 'widget_%';"
+            echo "active_widget_logic_repair_backup_table=${REPAIR_TABLE}"
+          fi
+
+          REPAIR_OUTPUT="$(sudo -u www-data REPAIR_ACTIVE_WIDGET_LOGIC="${REPAIR_ACTIVE_WIDGET_LOGIC}" wp eval '
+          $apply = getenv( "REPAIR_ACTIVE_WIDGET_LOGIC" ) === "true";
+          global $wpdb;
+
+          $sidebars   = wp_get_sidebars_widgets();
+          $active_map = [];
+          foreach ( $sidebars as $sidebar => $widgets ) {
+            if ( ! is_array( $widgets ) || $sidebar === "wp_inactive_widgets" || strpos( $sidebar, "orphaned_widgets" ) === 0 ) {
+              continue;
+            }
+            foreach ( $widgets as $widget_id ) {
+              if ( ! is_string( $widget_id ) || ! preg_match( "/^(.+)-(\\d+)$/", $widget_id, $m ) ) {
+                continue;
+              }
+              $base = $m[1];
+              $idx  = (int) $m[2];
+              if ( ! isset( $active_map[ $base ] ) ) {
+                $active_map[ $base ] = [];
+              }
+              $active_map[ $base ][ $idx ] = $widget_id;
+            }
+          }
+
+          $candidates = 0;
+          $applied    = 0;
+          $ambiguous  = 0;
+          $no_source  = 0;
+          $notes      = [];
+          $rows       = $wpdb->get_results( "SELECT option_name, option_value FROM {$wpdb->options} WHERE option_name LIKE '\''widget_%'\''", ARRAY_A );
+
+          foreach ( $rows as $row ) {
+            $option_name = $row["option_name"];
+            $base = str_replace( "_", "-", substr( $option_name, 7 ) );
+            if ( ! isset( $active_map[ $base ] ) ) {
+              continue;
+            }
+
+            $opt = maybe_unserialize( $row["option_value"] );
+            if ( ! is_array( $opt ) ) {
+              continue;
+            }
+
+            $sources = [];
+            foreach ( $opt as $idx => $instance ) {
+              if ( ! is_array( $instance ) || ! array_key_exists( "widget_logic", $instance ) ) {
+                continue;
+              }
+              $expr = trim( (string) $instance["widget_logic"] );
+              if ( $expr === "" ) {
+                continue;
+              }
+              $canon = $instance;
+              unset( $canon["widget_logic"] );
+              $fp = md5( wp_json_encode( $canon ) );
+              if ( ! isset( $sources[ $fp ] ) ) {
+                $sources[ $fp ] = [];
+              }
+              $sources[ $fp ][] = [ "idx" => (int) $idx, "expr" => $expr ];
+            }
+
+            $changed = false;
+            foreach ( $active_map[ $base ] as $idx => $widget_id ) {
+              if ( ! isset( $opt[ $idx ] ) || ! is_array( $opt[ $idx ] ) ) {
+                continue;
+              }
+              $current = "";
+              if ( array_key_exists( "widget_logic", $opt[ $idx ] ) ) {
+                $current = trim( (string) $opt[ $idx ]["widget_logic"] );
+              }
+              if ( $current !== "" ) {
+                continue;
+              }
+
+              $canon = $opt[ $idx ];
+              unset( $canon["widget_logic"] );
+              $fp = md5( wp_json_encode( $canon ) );
+              $matches = $sources[ $fp ] ?? [];
+              if ( count( $matches ) === 1 ) {
+                $candidates++;
+                $src_idx = $matches[0]["idx"];
+                $src_expr = $matches[0]["expr"];
+                if ( count( $notes ) < 60 ) {
+                  $notes[] = "active_widget_logic_repair_candidate widget_id={$widget_id} option={$option_name} target_instance={$idx} source_instance={$src_idx}";
+                }
+                if ( $apply ) {
+                  $opt[ $idx ]["widget_logic"] = $src_expr;
+                  $applied++;
+                  $changed = true;
+                }
+              } elseif ( count( $matches ) > 1 ) {
+                $ambiguous++;
+              } else {
+                $no_source++;
+              }
+            }
+
+            if ( $apply && $changed ) {
+              update_option( $option_name, $opt );
+            }
+          }
+
+          echo "active_widget_logic_repair_candidates=" . $candidates . PHP_EOL;
+          echo "active_widget_logic_repair_applied=" . ( $apply ? $applied : 0 ) . PHP_EOL;
+          echo "active_widget_logic_repair_ambiguous=" . $ambiguous . PHP_EOL;
+          echo "active_widget_logic_repair_no_source=" . $no_source . PHP_EOL;
+          foreach ( $notes as $line ) {
+            echo $line . PHP_EOL;
+          }
+          ' --path="$WP_PATH" --allow-root || true)"
+          printf '%s\n' "$REPAIR_OUTPUT" | sed -n '1,260p'
 
           CANDIDATE_FILE="$(mktemp)"
           DB_LIST_FILE="$(mktemp)"
