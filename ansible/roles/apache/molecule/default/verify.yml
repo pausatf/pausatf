@@ -1,12 +1,19 @@
 ---
-- name: Verify
+- name: Verify apache
   hosts: all
   become: true
   tasks:
     - name: Gather service facts
       ansible.builtin.service_facts:
 
-    - name: Assert role applied successfully
+    - name: Assert apache2 is running
       ansible.builtin.assert:
-        that: true
-        success_msg: "apache role applied successfully"
+        that:
+          - "'apache2.service' in ansible_facts.services"
+          - "ansible_facts.services['apache2.service'].state == 'running'"
+        fail_msg: "apache2 is not running"
+
+    - name: Assert apache is listening on port 80
+      ansible.builtin.wait_for:
+        port: 80
+        timeout: 5
