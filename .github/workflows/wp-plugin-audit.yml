@@ -68,9 +68,9 @@ jobs:
 
           WP_PATH="/var/www/html"
           APACHE_LOG_DIR="/var/log/apache2"
-          DISABLE_JETPACK_PROTECT="${DISABLE_JETPACK_PROTECT:-false}"
-          SKIP_SYNTHETIC_LOGIN="${SKIP_SYNTHETIC_LOGIN:-false}"
-          INSTALL_LOGIN_HOTFIX="${INSTALL_LOGIN_HOTFIX:-false}"
+          DISABLE_JETPACK_PROTECT="$(printf '%s' "${DISABLE_JETPACK_PROTECT:-false}" | tr '[:upper:]' '[:lower:]')"
+          SKIP_SYNTHETIC_LOGIN="$(printf '%s' "${SKIP_SYNTHETIC_LOGIN:-false}" | tr '[:upper:]' '[:lower:]')"
+          INSTALL_LOGIN_HOTFIX="$(printf '%s' "${INSTALL_LOGIN_HOTFIX:-false}" | tr '[:upper:]' '[:lower:]')"
 
           echo "HOST=$(hostname -f 2>/dev/null || hostname)"
           echo "UTC_NOW=$(date -u --iso-8601=seconds)"
