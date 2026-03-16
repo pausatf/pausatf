@@ -940,6 +940,16 @@ jobs:
                 echo "=== widgets.php 403 ModSecurity entries ==="
                 zgrep -ahE 'Access denied with code 403 .*\[uri "/wp-admin/widgets\.php"\]' "${MODSEC_LOGS[@]}" 2>/dev/null \
                   | head -n 20 || true
+                echo "=== widgets.php 403 full transaction excerpts ==="
+                while IFS= read -r uid; do
+                  [ -z "$uid" ] && continue
+                  echo "-- unique_id=$uid --"
+                  zgrep -ahF "$uid" "${MODSEC_LOGS[@]}" 2>/dev/null | tail -n 120 || true
+                done < <(
+                  zgrep -ahE 'Access denied with code 403 .*\[uri "/wp-admin/widgets\.php"\]' "${MODSEC_LOGS[@]}" 2>/dev/null \
+                    | sed -nE 's/.*\[unique_id "([^"]+)"\].*/\1/p' \
+                    | sort -u | head -n 10
+                )
               fi
               echo "=== Widget-related ModSecurity entries (first 80) ==="
               zgrep -ahF '[uri "/wp-admin/widgets.php"]' "${MODSEC_LOGS[@]}" 2>/dev/null \
