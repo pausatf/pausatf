@@ -58,7 +58,7 @@ jobs:
           REMOTE_SHELL="bash -s"
           if ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
             github-deploy@"$TARGET_HOST" "sudo -n true" >/dev/null 2>&1; then
-            REMOTE_SHELL="sudo -n bash -s"
+            REMOTE_SHELL="sudo -E -n bash -s"
           fi
 
           ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
