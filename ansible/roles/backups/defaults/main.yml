@@ -1,7 +1,7 @@
 ---
-backup_dir: "/var/backups/pausatf"
+backup_dir: "/var/backups/wordpress"
 backup_retention_days: 7
 backup_wp_docroot: "/var/www/html"
-backup_cron_hour: "3"
+backup_cron_hour: "*/8"
 backup_cron_minute: "0"
-backup_script_path: "/usr/local/bin/backup-pausatf.sh"
+backup_script_path: "/usr/local/sbin/backup-wordpress.sh"
