@@ -1,0 +1,74 @@
+# AppArmor role — enforce MAC policy on Apache for PAUSATF
+# Deploys a local override granting ModSecurity read/write to its paths
+
+- name: Install AppArmor packages
+  ansible.builtin.apt:
+    name:
+      - apparmor
+      - apparmor-utils
+    state: present
+  tags:
+    - apparmor
+
+- name: Ensure AppArmor service is enabled and started
+  ansible.builtin.service:
+    name: apparmor
+    state: started
+    enabled: true
+  tags:
+    - apparmor
+
+- name: Check if apache2 AppArmor profile exists
+  ansible.builtin.stat:
+    path: /etc/apparmor.d/usr.sbin.apache2
+  register: _apparmor_apache_profile
+  tags:
+    - apparmor
+
+- name: Ensure local override directory exists
+  ansible.builtin.file:
+    path: /etc/apparmor.d/local
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  tags:
+    - apparmor
+
+- name: Deploy local AppArmor override for ModSecurity paths
+  ansible.builtin.template:
+    src: local/usr.sbin.apache2.j2
+    dest: /etc/apparmor.d/local/usr.sbin.apache2
+    owner: root
+    group: root
+    mode: '0644'
+  when: _apparmor_apache_profile.stat.exists
+  notify: Reload AppArmor
+  tags:
+    - apparmor
+
+- name: Set apache2 profile to enforce mode
+  ansible.builtin.command: aa-enforce usr.sbin.apache2
+  register: _aa_enforce
+  changed_when: "'Setting' in _aa_enforce.stdout"
+  failed_when:
+    - _aa_enforce.rc != 0
+    - "'already set to enforce' not in _aa_enforce.stderr"
+  when:
+    - _apparmor_apache_profile.stat.exists
+    - apparmor_apache_enforce | bool
+  tags:
+    - apparmor
+
+- name: Set apache2 profile to complain mode (when enforce disabled)
+  ansible.builtin.command: aa-complain usr.sbin.apache2
+  register: _aa_complain
+  changed_when: "'Setting' in _aa_complain.stdout"
+  failed_when:
+    - _aa_complain.rc != 0
+    - "'already set to complain' not in _aa_complain.stderr"
+  when:
+    - _apparmor_apache_profile.stat.exists
+    - not (apparmor_apache_enforce | bool)
+  tags:
+    - apparmor

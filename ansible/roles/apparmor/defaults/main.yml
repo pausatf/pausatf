@@ -1,0 +1,2 @@
+---
+apparmor_apache_enforce: true

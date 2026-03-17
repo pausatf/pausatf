@@ -1,0 +1,13 @@
+---
+hardening_ssh_permit_root_login: "prohibit-password"
+hardening_ssh_max_auth_tries: 3
+hardening_wp_docroot: "/var/www/html"
+hardening_disable_services:
+  - cups
+  - avahi-daemon
+  - bluetooth
+hardening_remove_packages:
+  - snapd
+hardening_sysctl:
+  net.ipv4.conf.all.rp_filter: 1
+  net.ipv4.tcp_syncookies: 1
