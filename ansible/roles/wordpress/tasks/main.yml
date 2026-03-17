@@ -89,6 +89,52 @@
   loop: "{{ wordpress_installs }}"
   tags: security
 
+- name: Install WordPress plugins from wp_main_plugins
+  ansible.builtin.command:
+    cmd: >
+      wp plugin install {{ item.slug }}
+      --version={{ item.version | default('latest') }}
+      --path={{ (wordpress_installs[0].path | default('/var/www/html')) }}
+      --allow-root
+  register: _plugin_install
+  changed_when: "'Installing' in _plugin_install.stdout or 'Updating' in _plugin_install.stdout"
+  failed_when: _plugin_install.rc != 0 and 'already installed' not in _plugin_install.stderr
+  loop: "{{ wp_main_plugins | default([]) | selectattr('slug', 'defined') | list }}"
+  when:
+    - wp_main_plugins is defined
+    - item.status | default('active') != 'inactive'
+  tags: wp_plugins
+
+- name: Activate WordPress plugins
+  ansible.builtin.command:
+    cmd: >
+      wp plugin activate {{ item.slug }}
+      --path={{ (wordpress_installs[0].path | default('/var/www/html')) }}
+      --allow-root
+  register: _plugin_activate
+  changed_when: "'Plugin' in _plugin_activate.stdout and 'activated' in _plugin_activate.stdout"
+  failed_when: false
+  loop: "{{ wp_main_plugins | default([]) | selectattr('slug', 'defined') | list }}"
+  when:
+    - wp_main_plugins is defined
+    - item.status | default('active') == 'active'
+  tags: wp_plugins
+
+- name: Deactivate inactive plugins
+  ansible.builtin.command:
+    cmd: >
+      wp plugin deactivate {{ item.slug }}
+      --path={{ (wordpress_installs[0].path | default('/var/www/html')) }}
+      --allow-root
+  register: _plugin_deactivate
+  changed_when: "'deactivated' in _plugin_deactivate.stdout"
+  failed_when: false
+  loop: "{{ wp_main_plugins | default([]) | selectattr('slug', 'defined') | list }}"
+  when:
+    - wp_main_plugins is defined
+    - item.status | default('active') == 'inactive'
+  tags: wp_plugins
+
 - name: Remove default index.html that conflicts with WordPress
   file:
     path: "{{ item.path | default('/var/www/html') }}/index.html"
