@@ -27,10 +27,11 @@ function thesource_child_enqueue_scripts() {
     // Enqueue red theme overrides
     wp_enqueue_style( 'red-style', get_stylesheet_directory_uri() . '/style-Red.css', array( 'child-dropdown' ), $version );
 
-    // Add browser-specific CSS
-    $user_agent = filter_input( INPUT_SERVER, 'HTTP_USER_AGENT', FILTER_SANITIZE_STRING );
+    // Add browser-specific CSS (avoid deprecated FILTER_SANITIZE_STRING)
+    $ua_raw     = isset( $_SERVER['HTTP_USER_AGENT'] ) ? wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) : '';
+    $user_agent = is_string( $ua_raw ) ? sanitize_text_field( $ua_raw ) : '';
 
-    if ( $user_agent && false !== strpos( $user_agent, 'Chrome' ) ) {
+    if ( $user_agent && false !== stripos( $user_agent, 'Chrome' ) ) {
         wp_enqueue_style( 'chrome-fixes', get_stylesheet_directory_uri() . '/chrome-fixes.css', array( 'child-dropdown' ), $version );
     }
 
@@ -40,30 +41,32 @@ function thesource_child_enqueue_scripts() {
     // Enqueue superfish.js
     wp_enqueue_script( 'superfish', get_template_directory_uri() . '/js/superfish.js', array( 'jquery' ), $version, true );
 
-    // Initialize superfish
-    wp_add_inline_script(
-        'superfish',
-        'jQuery(document).ready(function($) {
-            setTimeout(function() {
-                try {
-                    $("ul.superfish, ul.nav").superfish({
-                        delay: 200,
-                        animation: {opacity:"show",height:"show"},
-                        speed: "fast",
-                        autoArrows: true,
-                        dropShadows: false,
-                        disableHI: false,
-                        onBeforeShow: function() {
-                            $(this).css("display", "none").show();
-                        }
-                    });
-                    console.log("Superfish initialized successfully");
-                } catch(e) {
-                    console.error("Error initializing superfish: " + e.message);
-                }
-            }, 500);
-        });'
-    );
+    // Initialize superfish (guard to ensure handle is enqueued)
+    if ( wp_script_is( 'superfish', 'enqueued' ) ) {
+        wp_add_inline_script(
+            'superfish',
+            'jQuery(document).ready(function($) {
+                setTimeout(function() {
+                    try {
+                        $("ul.superfish, ul.nav").superfish({
+                            delay: 200,
+                            animation: {opacity:"show",height:"show"},
+                            speed: "fast",
+                            autoArrows: true,
+                            dropShadows: false,
+                            disableHI: false,
+                            onBeforeShow: function() {
+                                $(this).css("display", "none").show();
+                            }
+                        });
+                        console.log("Superfish initialized successfully");
+                    } catch(e) {
+                        console.error("Error initializing superfish: " + e.message);
+                    }
+                }, 500);
+            });'
+        );
+    }
 }
 add_action( 'wp_enqueue_scripts', 'thesource_child_enqueue_scripts', 999 );
 
@@ -74,21 +77,22 @@ add_action( 'wp_enqueue_scripts', 'thesource_child_enqueue_scripts', 999 );
  * @return array Modified body classes
  */
 function thesource_child_browser_body_class( $classes ) {
-    $user_agent = filter_input( INPUT_SERVER, 'HTTP_USER_AGENT', FILTER_SANITIZE_STRING );
+    $ua_raw     = isset( $_SERVER['HTTP_USER_AGENT'] ) ? wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) : '';
+    $user_agent = is_string( $ua_raw ) ? sanitize_text_field( $ua_raw ) : '';
 
-    if ( ! $user_agent ) {
+    if ( '' === $user_agent ) {
         return $classes;
     }
 
-    if ( false !== strpos( $user_agent, 'Chrome' ) ) {
+    if ( false !== stripos( $user_agent, 'Chrome' ) ) {
         $classes[] = 'browser-chrome';
-    } elseif ( false !== strpos( $user_agent, 'Safari' ) ) {
+    } elseif ( false !== stripos( $user_agent, 'Safari' ) ) {
         $classes[] = 'browser-safari';
-    } elseif ( false !== strpos( $user_agent, 'Firefox' ) ) {
+    } elseif ( false !== stripos( $user_agent, 'Firefox' ) ) {
         $classes[] = 'browser-firefox';
-    } elseif ( false !== strpos( $user_agent, 'MSIE' ) || false !== strpos( $user_agent, 'Trident' ) ) {
+    } elseif ( false !== stripos( $user_agent, 'MSIE' ) || false !== stripos( $user_agent, 'Trident' ) ) {
         $classes[] = 'browser-ie';
-    } elseif ( false !== strpos( $user_agent, 'Edge' ) ) {
+    } elseif ( false !== stripos( $user_agent, 'Edge' ) ) {
         $classes[] = 'browser-edge';
     }
 
