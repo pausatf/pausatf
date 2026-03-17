@@ -64,6 +64,18 @@
   when: apache_mpm | default('prefork') == 'prefork'
   notify: Restart Apache
 
+- name: Prioritize index.php over index.html in DirectoryIndex
+  copy:
+    dest: /etc/apache2/mods-available/dir.conf
+    content: |
+      <IfModule mod_dir.c>
+          DirectoryIndex index.php index.html index.cgi index.pl index.xhtml index.htm
+      </IfModule>
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart Apache
+
 - name: Enable required Apache modules
   command: "a2enmod {{ item }}"
   register: _en_mod

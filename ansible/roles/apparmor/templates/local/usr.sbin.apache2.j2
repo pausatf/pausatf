@@ -1,0 +1,6 @@
+# AppArmor local override for Apache2 — ModSecurity paths
+# Managed by Ansible — do not edit manually
+
+/etc/modsecurity/** r,
+/var/lib/modsecurity/** rw,
+/var/log/apache2/modsec_audit.log rw,

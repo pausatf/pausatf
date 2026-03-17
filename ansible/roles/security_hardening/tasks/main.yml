@@ -1,0 +1,140 @@
+# Security hardening role — baseline OS hardening for PAUSATF servers
+# SSH lockdown, unattended-upgrades, file permissions, sysctl, service cleanup
+
+- name: Set PermitRootLogin to {{ hardening_ssh_permit_root_login }}
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^\s*#?\s*PermitRootLogin\b'
+    line: "PermitRootLogin {{ hardening_ssh_permit_root_login }}"
+    validate: 'sshd -t -f %s'
+  notify: Reload sshd
+  tags:
+    - security_hardening
+
+- name: Set SSH MaxAuthTries to {{ hardening_ssh_max_auth_tries }}
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^\s*#?\s*MaxAuthTries\b'
+    line: "MaxAuthTries {{ hardening_ssh_max_auth_tries }}"
+    validate: 'sshd -t -f %s'
+  notify: Reload sshd
+  tags:
+    - security_hardening
+
+- name: Install unattended-upgrades
+  ansible.builtin.apt:
+    name:
+      - unattended-upgrades
+      - apt-listchanges
+    state: present
+  tags:
+    - security_hardening
+
+- name: Enable unattended-upgrades for security updates only
+  ansible.builtin.copy:
+    dest: /etc/apt/apt.conf.d/50unattended-upgrades
+    content: |
+      Unattended-Upgrade::Allowed-Origins {
+          "${distro_id}:${distro_codename}-security";
+      };
+      Unattended-Upgrade::AutoFixInterruptedDpkg "true";
+      Unattended-Upgrade::Remove-Unused-Kernel-Packages "true";
+      Unattended-Upgrade::Remove-Unused-Dependencies "true";
+    owner: root
+    group: root
+    mode: '0644'
+  tags:
+    - security_hardening
+
+- name: Enable automatic unattended-upgrades
+  ansible.builtin.copy:
+    dest: /etc/apt/apt.conf.d/20auto-upgrades
+    content: |
+      APT::Periodic::Update-Package-Lists "1";
+      APT::Periodic::Unattended-Upgrade "1";
+    owner: root
+    group: root
+    mode: '0644'
+  tags:
+    - security_hardening
+
+- name: Check if wp-config.php exists
+  ansible.builtin.stat:
+    path: "{{ hardening_wp_docroot }}/wp-config.php"
+  register: _wp_config_stat
+  tags:
+    - security_hardening
+
+- name: Set wp-config.php permissions to 640
+  ansible.builtin.file:
+    path: "{{ hardening_wp_docroot }}/wp-config.php"
+    owner: root
+    group: www-data
+    mode: '0640'
+  when: _wp_config_stat.stat.exists
+  tags:
+    - security_hardening
+
+- name: Set wp-content directory permissions to 755
+  ansible.builtin.file:
+    path: "{{ hardening_wp_docroot }}/wp-content"
+    owner: www-data
+    group: www-data
+    mode: '0755'
+    state: directory
+  tags:
+    - security_hardening
+
+- name: Set uploads directory permissions to 755
+  ansible.builtin.file:
+    path: "{{ hardening_wp_docroot }}/wp-content/uploads"
+    owner: www-data
+    group: www-data
+    mode: '0755'
+    state: directory
+  tags:
+    - security_hardening
+
+- name: Remove default unwanted packages
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: absent
+    purge: true
+  loop: "{{ hardening_remove_packages }}"
+  failed_when: false
+  tags:
+    - security_hardening
+
+- name: Check for unused services to disable
+  ansible.builtin.command: "systemctl is-enabled {{ item }}"
+  register: _svc_check
+  changed_when: false
+  failed_when: false
+  loop: "{{ hardening_disable_services }}"
+  tags:
+    - security_hardening
+
+- name: Disable unused services
+  ansible.builtin.service:
+    name: "{{ item.item }}"
+    state: stopped
+    enabled: false
+  loop: "{{ _svc_check.results }}"
+  loop_control:
+    label: "{{ item.item }}"
+  when: item.rc == 0 and item.stdout == 'enabled'
+  tags:
+    - security_hardening
+
+- name: Apply sysctl hardening parameters
+  ansible.posix.sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    sysctl_set: true
+    state: present
+    reload: true
+  loop: "{{ hardening_sysctl | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}={{ item.value }}"
+  tags:
+    - security_hardening

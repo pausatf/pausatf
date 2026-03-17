@@ -1,0 +1,163 @@
+# Migration prep role — pre-cutover validation for PAUSATF
+# Confirms DB, Redis, Apache, PHP-FPM, WordPress, and disk space before go-live
+
+- name: Test MySQL connectivity to managed database
+  ansible.builtin.command: >-
+    mysql
+    -h {{ managed_db_host }}
+    -P {{ managed_db_port }}
+    -u {{ managed_wp_db_user }}
+    -p{{ managed_wp_db_password }}
+    -e 'SELECT 1'
+  register: _migration_mysql
+  changed_when: false
+  no_log: true
+  tags:
+    - migration_prep
+
+- name: Verify MySQL connectivity succeeded
+  ansible.builtin.assert:
+    that:
+      - _migration_mysql.rc == 0
+    fail_msg: "Cannot connect to managed DB at {{ managed_db_host }}:{{ managed_db_port }}"
+  tags:
+    - migration_prep
+
+- name: Test Redis connectivity
+  ansible.builtin.command: redis-cli ping
+  register: _migration_redis
+  changed_when: false
+  tags:
+    - migration_prep
+
+- name: Verify Redis responded with PONG
+  ansible.builtin.assert:
+    that:
+      - "'PONG' in _migration_redis.stdout"
+    fail_msg: "Redis did not respond to ping"
+  tags:
+    - migration_prep
+
+- name: Verify Apache configuration syntax
+  ansible.builtin.command: apache2ctl configtest
+  register: _migration_apache
+  changed_when: false
+  failed_when: "'Syntax OK' not in _migration_apache.stderr"
+  tags:
+    - migration_prep
+
+- name: Check PHP-FPM service is running
+  ansible.builtin.shell: |
+    set -o pipefail
+    systemctl is-active php*-fpm
+  args:
+    executable: /bin/bash
+  register: _migration_fpm_active
+  changed_when: false
+  tags:
+    - migration_prep
+
+- name: Verify PHP-FPM is active
+  ansible.builtin.assert:
+    that:
+      - _migration_fpm_active.stdout | trim == 'active'
+    fail_msg: "PHP-FPM is not active: {{ _migration_fpm_active.stdout }}"
+  tags:
+    - migration_prep
+
+- name: Find PHP-FPM socket
+  ansible.builtin.shell: |
+    set -o pipefail
+    find /run/php -name '*.sock' -type s 2>/dev/null | head -1
+  args:
+    executable: /bin/bash
+  register: _migration_fpm_socket
+  changed_when: false
+  tags:
+    - migration_prep
+
+- name: Verify PHP-FPM socket exists
+  ansible.builtin.assert:
+    that:
+      - _migration_fpm_socket.stdout | trim | length > 0
+    fail_msg: "No PHP-FPM socket found in /run/php/"
+  tags:
+    - migration_prep
+
+- name: Verify WordPress responds on localhost
+  ansible.builtin.command: >-
+    curl -sk -o /dev/null -w '%{http_code}'
+    https://127.0.0.1/
+    -H 'Host: {{ wordpress_domain }}'
+  register: _migration_wp_curl
+  changed_when: false
+  tags:
+    - migration_prep
+
+- name: Assert WordPress returned a valid HTTP response
+  ansible.builtin.assert:
+    that:
+      - _migration_wp_curl.stdout in ['200', '301', '302', '403']
+    fail_msg: "WordPress returned HTTP {{ _migration_wp_curl.stdout }} (expected 200/301/302/403)"
+  tags:
+    - migration_prep
+
+- name: Gather disk space facts
+  ansible.builtin.shell: |
+    set -o pipefail
+    df --output=avail -BG / | tail -1 | tr -d ' G'
+  args:
+    executable: /bin/bash
+  register: _migration_disk_free
+  changed_when: false
+  tags:
+    - migration_prep
+
+- name: Assert minimum free disk space ({{ migration_min_free_disk_gb }}GB)
+  ansible.builtin.assert:
+    that:
+      - (_migration_disk_free.stdout | int) >= (migration_min_free_disk_gb | int)
+    fail_msg: "Only {{ _migration_disk_free.stdout }}GB free, need {{ migration_min_free_disk_gb }}GB"
+  tags:
+    - migration_prep
+
+- name: Check for stale index.html in docroot
+  ansible.builtin.stat:
+    path: "{{ migration_wp_docroot }}/index.html"
+  register: _migration_index_html
+  tags:
+    - migration_prep
+
+- name: Assert no index.html in docroot
+  ansible.builtin.assert:
+    that:
+      - not _migration_index_html.stat.exists
+    fail_msg: "{{ migration_wp_docroot }}/index.html exists and will shadow WordPress"
+  tags:
+    - migration_prep
+
+- name: Rsync uploads delta from source
+  ansible.builtin.command: >-
+    rsync -avz --delete
+    {{ migration_rsync_uploads_src }}
+    {{ migration_rsync_uploads_dest }}
+  register: _migration_rsync
+  changed_when: "'total size' in _migration_rsync.stdout"
+  when: migration_rsync_uploads | bool
+  tags:
+    - migration_prep
+
+- name: Display migration readiness summary
+  ansible.builtin.debug:
+    msg: |
+      === Migration Pre-flight Summary ===
+      MySQL: OK ({{ managed_db_host }}:{{ managed_db_port }})
+      Redis: OK (PONG)
+      Apache: Syntax OK
+      PHP-FPM: active, socket {{ _migration_fpm_socket.stdout | trim }}
+      WordPress: HTTP {{ _migration_wp_curl.stdout }}
+      Disk free: {{ _migration_disk_free.stdout }}GB
+      index.html: absent
+      Uploads rsync: {{ 'completed' if migration_rsync_uploads | bool else 'skipped' }}
+  tags:
+    - migration_prep

@@ -1,0 +1,55 @@
+---
+# UFW firewall configuration
+# Complements the DigitalOcean cloud firewall managed by Terraform.
+# DO firewall: restricts HTTP/S to Cloudflare IPs, SSH to allowed IPs.
+# UFW (this): defense-in-depth on the host itself.
+
+- name: Reset UFW to defaults
+  community.general.ufw:
+    state: reset
+  tags: firewall
+
+- name: Set UFW default deny incoming
+  community.general.ufw:
+    direction: incoming
+    default: deny
+  tags: firewall
+
+- name: Set UFW default allow outgoing
+  community.general.ufw:
+    direction: outgoing
+    default: allow
+  tags: firewall
+
+- name: Allow SSH (port 22)
+  community.general.ufw:
+    rule: allow
+    port: '22'
+    proto: tcp
+    comment: SSH
+  tags: firewall
+
+- name: Allow HTTP from Cloudflare IPv4 ranges
+  community.general.ufw:
+    rule: allow
+    port: '80'
+    proto: tcp
+    from_ip: "{{ item }}"
+    comment: CF-HTTP
+  loop: "{{ cloudflare_ipv4_ranges | default(ufw_cloudflare_ipv4) }}"
+  tags: firewall
+
+- name: Allow HTTPS from Cloudflare IPv4 ranges
+  community.general.ufw:
+    rule: allow
+    port: '443'
+    proto: tcp
+    from_ip: "{{ item }}"
+    comment: CF-HTTPS
+  loop: "{{ cloudflare_ipv4_ranges | default(ufw_cloudflare_ipv4) }}"
+  tags: firewall
+
+- name: Enable UFW
+  community.general.ufw:
+    state: enabled
+  tags: firewall

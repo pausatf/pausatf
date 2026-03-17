@@ -5,7 +5,7 @@
 SecRuleEngine {{ modsecurity_rule_engine }}
 
 # Request body handling
-SecRequestBodyAccess {{ 'On' if modsecurity_request_body_access else 'Off' }}
+SecRequestBodyAccess On
 
 SecRule REQUEST_HEADERS:Content-Type "(?:application(?:/soap\+|/)|text/)xml" \
      "id:'200000',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=XML"
@@ -16,7 +16,7 @@ SecRule REQUEST_HEADERS:Content-Type "application/json" \
 SecRequestBodyLimit {{ modsecurity_request_body_limit }}
 SecRequestBodyNoFilesLimit {{ modsecurity_request_body_nofiles_limit }}
 SecRequestBodyInMemoryLimit {{ modsecurity_request_body_inmemory_limit }}
-SecRequestBodyLimitAction {{ modsecurity_request_body_limit_action }}
+SecRequestBodyLimitAction Reject
 
 SecRule REQBODY_ERROR "!@eq 0" \
 "id:'200002', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
@@ -40,7 +40,7 @@ FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
 SecRule MULTIPART_UNMATCHED_BOUNDARY "!@eq 0" \
 "id:'200004',phase:2,t:none,log,deny,msg:'Multipart parser detected a possible unmatched boundary.'"
 
-# PCRE tuning
+# PCRE tuning - increased to prevent false 403s on large WordPress admin pages
 SecPcreMatchLimit {{ modsecurity_pcre_match_limit }}
 SecPcreMatchLimitRecursion {{ modsecurity_pcre_match_limit_recursion }}
 
@@ -48,10 +48,10 @@ SecRule TX:/^MSC_/ "!@streq 0" \
         "id:'200005',phase:2,t:none,deny,msg:'ModSecurity internal error flagged: %{MATCHED_VAR_NAME}'"
 
 # Response body handling
-SecResponseBodyAccess {{ 'On' if modsecurity_response_body_access else 'Off' }}
-SecResponseBodyMimeType {{ modsecurity_response_body_mime_types }}
+SecResponseBodyAccess On
+SecResponseBodyMimeType text/plain text/html text/xml
 SecResponseBodyLimit {{ modsecurity_response_body_limit }}
-SecResponseBodyLimitAction {{ modsecurity_response_body_limit_action }}
+SecResponseBodyLimitAction ProcessPartial
 
 # Filesystem
 SecTmpDir {{ modsecurity_tmp_dir }}
@@ -59,13 +59,17 @@ SecDataDir {{ modsecurity_data_dir }}
 
 # Audit logging
 SecAuditEngine {{ modsecurity_audit_engine }}
-SecAuditLogRelevantStatus {{ modsecurity_audit_log_relevant_status }}
-SecAuditLogParts {{ modsecurity_audit_log_parts }}
-SecAuditLogType {{ modsecurity_audit_log_type }}
+SecAuditLogRelevantStatus "^(?:5|4(?!04))"
+SecAuditLogParts ABDEFHIJZ
+SecAuditLogType Serial
 SecAuditLog {{ modsecurity_audit_log }}
 
 # Misc
-SecArgumentSeparator {{ modsecurity_argument_separator }}
-SecCookieFormat {{ modsecurity_cookie_format }}
+SecArgumentSeparator &
+SecCookieFormat 0
 SecUnicodeMapFile {{ modsecurity_unicode_map_file }}
-SecStatusEngine {{ 'On' if modsecurity_status_engine else 'Off' }}
+SecStatusEngine On
+
+# Exclude wp-admin response bodies from SQL leakage inspection (CRS 951xxx rules)
+# These rules cause PCRE limit errors on large WordPress admin pages (widgets, TablePress)
+SecRule REQUEST_URI "^/wp-admin/" "id:1000,phase:4,nolog,pass,ctl:ruleRemoveById=951100-951999"

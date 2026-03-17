@@ -1,0 +1,92 @@
+name: Prod Widgets Log Probe
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect widgets log evidence from production
+        env:
+          PROD_SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+          PROD_HOST: ${{ vars.PROD_HOST }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${PROD_SSH_PRIVATE_KEY:-}" ] || [ -z "${PROD_HOST:-}" ]; then
+            echo "ERROR: PROD_SSH_PRIVATE_KEY or PROD_HOST is missing" >&2
+            exit 1
+          fi
+
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$PROD_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+          REMOTE_SHELL="bash -s"
+          if ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
+            github-deploy@"$PROD_HOST" "sudo -n true" >/dev/null 2>&1; then
+            REMOTE_SHELL="sudo -n bash -s"
+          fi
+
+          ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
+            github-deploy@"$PROD_HOST" "$REMOTE_SHELL" <<'REMOTE'
+          set -euo pipefail
+
+          list_logs() {
+            ls -1 "$1" 2>/dev/null | sort -V -r || true
+          }
+
+          mapfile -t ACCESS_LOGS < <(list_logs "/var/log/apache2/access.log*")
+          mapfile -t ERROR_LOGS < <(list_logs "/var/log/apache2/error.log*")
+
+          echo "HOST=$(hostname -f 2>/dev/null || hostname)"
+          echo "UTC_NOW=$(date -u --iso-8601=seconds)"
+          echo "ACCESS_LOG_FILES=${#ACCESS_LOGS[@]}"
+          echo "ERROR_LOG_FILES=${#ERROR_LOGS[@]}"
+
+          if [ "${#ACCESS_LOGS[@]}" -eq 0 ]; then
+            echo "ERROR: no Apache access logs found" >&2
+            exit 1
+          fi
+
+          WIDGET_LINES="$(zgrep -h ' /wp-admin/widgets\.php' "${ACCESS_LOGS[@]}" 2>/dev/null || true)"
+          WIDGET_ERR_LINES="$(printf '%s\n' "$WIDGET_LINES" | grep -E '" [45][0-9][0-9] ' || true)"
+          REST_ERR_LINES="$(
+            zgrep -hE '/wp-json/wp/v2/(widgets|widget-types)' "${ACCESS_LOGS[@]}" 2>/dev/null \
+            | grep -E '" [45][0-9][0-9] ' || true
+          )"
+          APACHE_WIDGET_ERR_LINES="$(zgrep -hiE 'widgets\.php|/wp-json/wp/v2/(widgets|widget-types)|widget' "${ERROR_LOGS[@]}" 2>/dev/null || true)"
+
+          FIRST_WIDGET_REQ_LINE="$(printf '%s\n' "$WIDGET_LINES" | head -n 1 || true)"
+          FIRST_WIDGET_HTTP_ERROR_LINE="$(printf '%s\n' "$WIDGET_ERR_LINES" | head -n 1 || true)"
+          FIRST_WIDGET_REST_HTTP_ERROR_LINE="$(printf '%s\n' "$REST_ERR_LINES" | head -n 1 || true)"
+          FIRST_APACHE_WIDGET_ERROR_LINE="$(printf '%s\n' "$APACHE_WIDGET_ERR_LINES" | head -n 1 || true)"
+
+          echo "FIRST_WIDGET_REQ_LINE=$FIRST_WIDGET_REQ_LINE"
+          echo "FIRST_WIDGET_HTTP_ERROR_LINE=$FIRST_WIDGET_HTTP_ERROR_LINE"
+          echo "FIRST_WIDGET_REST_HTTP_ERROR_LINE=$FIRST_WIDGET_REST_HTTP_ERROR_LINE"
+          echo "FIRST_APACHE_WIDGET_ERROR_LINE=$FIRST_APACHE_WIDGET_ERROR_LINE"
+
+          echo "=== OLDEST widgets.php requests (first 20) ==="
+          printf '%s\n' "$WIDGET_LINES" | head -n 20 || true
+          echo "=== OLDEST widgets.php 4xx/5xx (first 20) ==="
+          printf '%s\n' "$WIDGET_ERR_LINES" | head -n 20 || true
+          echo "=== OLDEST widget REST 4xx/5xx (first 20) ==="
+          printf '%s\n' "$REST_ERR_LINES" | head -n 20 || true
+          echo "=== OLDEST Apache error lines mentioning widgets (first 40) ==="
+          printf '%s\n' "$APACHE_WIDGET_ERR_LINES" | head -n 40 || true
+
+          if [ -f /var/www/html/wp-content/debug.log ]; then
+            echo "=== OLDEST wp-content/debug.log lines mentioning widgets (first 40) ==="
+            grep -iE 'widget|widgets\.php|/wp-json/wp/v2/(widgets|widget-types)|rest' \
+              /var/www/html/wp-content/debug.log | head -n 40 || true
+          else
+            echo "debug.log not found at /var/www/html/wp-content/debug.log"
+          fi
+          REMOTE
+
+          rm -f ~/.ssh/id_rsa

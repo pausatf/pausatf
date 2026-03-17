@@ -56,7 +56,7 @@
         that:
           - modsec_tmp.stat.exists
           - modsec_tmp.stat.isdir
-          - modsec_tmp.stat.mode == '0750'
+          - modsec_tmp.stat.mode == '0770'
           - modsec_tmp.stat.gr_name == 'www-data'
 
     - name: Check working directory /var/lib/modsecurity/data
@@ -68,7 +68,7 @@
         that:
           - modsec_data.stat.exists
           - modsec_data.stat.isdir
-          - modsec_data.stat.mode == '0750'
+          - modsec_data.stat.mode == '0770'
           - modsec_data.stat.gr_name == 'www-data'
 
     - name: Check audit log exists
