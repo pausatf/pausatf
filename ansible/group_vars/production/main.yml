@@ -38,23 +38,23 @@ digitalocean_tags:
 cloudflare_dns_records:
   - name: "@"
     type: "A"
-    content: "REDACTED_PROD_NEW_IP"
+    content: "REDACTED_PROD_IP"
     proxied: true
   - name: "www"
     type: "A"
-    content: "REDACTED_PROD_NEW_IP"
+    content: "REDACTED_PROD_IP"
     proxied: true
   - name: "ftp"
     type: "A"
-    content: "REDACTED_PROD_NEW_IP"
+    content: "REDACTED_PROD_IP"
     proxied: false
   - name: "mail"
     type: "A"
-    content: "REDACTED_PROD_NEW_IP"
+    content: "REDACTED_PROD_IP"
     proxied: false
   - name: "monitor"
     type: "A"
-    content: "REDACTED_PROD_NEW_IP"
+    content: "REDACTED_PROD_IP"
     proxied: false
 
 # =============================================================================

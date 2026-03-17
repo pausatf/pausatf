@@ -47,6 +47,48 @@
   loop: "{{ wordpress_installs }}"
   tags: wp_cron
 
+- name: Ensure mu-plugins directory exists
+  ansible.builtin.file:
+    path: "{{ item.path | default('/var/www/html') }}/wp-content/mu-plugins"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+  loop: "{{ wordpress_installs }}"
+  tags: mu_plugins
+
+- name: Deploy security mu-plugins
+  ansible.builtin.copy:
+    src: "mu-plugins/{{ item.1 }}"
+    dest: "{{ item.0.path | default('/var/www/html') }}/wp-content/mu-plugins/{{ item.1 }}"
+    owner: www-data
+    group: www-data
+    mode: '0644'
+  loop: "{{ wordpress_installs | product(['disable-user-enum.php', 'noindex-non-prod.php']) | list }}"
+  tags: mu_plugins
+
+- name: Set WP_ENVIRONMENT_TYPE for non-production
+  ansible.builtin.lineinfile:
+    path: "{{ item.path | default('/var/www/html') }}/wp-config.php"
+    regexp: "WP_ENVIRONMENT_TYPE"
+    line: "define( 'WP_ENVIRONMENT_TYPE', '{{ wp_environment_type | default('production') }}' );"
+    insertbefore: "That's all, stop editing"
+  loop: "{{ wordpress_installs }}"
+  when: item.manage_wp_config | default(false)
+  tags: mu_plugins
+
+- name: Protect debug.log from web access
+  ansible.builtin.blockinfile:
+    path: "{{ item.path | default('/var/www/html') }}/.htaccess"
+    marker: "# {mark} ANSIBLE MANAGED - debug.log protection"
+    block: |
+      <Files debug.log>
+          Require all denied
+      </Files>
+    insertafter: "# END WordPress"
+  loop: "{{ wordpress_installs }}"
+  tags: security
+
 - name: Remove default index.html that conflicts with WordPress
   file:
     path: "{{ item.path | default('/var/www/html') }}/index.html"
