@@ -86,6 +86,9 @@ apparmor_apache_enforce: true
 # Certbot
 certbot_enabled: true
 
+# This server is the active web server (controls wp-cron)
+is_active_web: true
+
 # =============================================================================
 # WORDPRESS — PRODUCTION INSTALL
 # =============================================================================
