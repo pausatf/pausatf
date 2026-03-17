@@ -3,6 +3,50 @@
 # - uses WP-CLI to manage core, plugins, and themes
 # - honors per-install settings in group_vars
 
+- name: Create pausatf config directory
+  ansible.builtin.file:
+    path: /etc/pausatf
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  tags: wp_cron
+
+- name: Set active-web marker on production server
+  ansible.builtin.copy:
+    content: "{{ inventory_hostname }}\n"
+    dest: /etc/pausatf/is-active-web
+    owner: root
+    group: root
+    mode: '0644'
+  when: is_active_web | default(false)
+  tags: wp_cron
+
+- name: Remove active-web marker on non-production servers
+  ansible.builtin.file:
+    path: /etc/pausatf/is-active-web
+    state: absent
+  when: not (is_active_web | default(false))
+  tags: wp_cron
+
+- name: Deploy wp-cron guard script
+  ansible.builtin.copy:
+    src: wp-cron-if-active.sh
+    dest: /usr/local/sbin/wp-cron-if-active.sh
+    owner: root
+    group: root
+    mode: '0750'
+  tags: wp_cron
+
+- name: Configure wp-cron via guard script (replaces direct wp-cron.php call)
+  ansible.builtin.cron:
+    name: "WordPress cron for {{ item.domain | default('www.pausatf.org') }}"
+    minute: "*"
+    job: "/usr/local/sbin/wp-cron-if-active.sh"
+    user: root
+  loop: "{{ wordpress_installs }}"
+  tags: wp_cron
+
 - name: Remove default index.html that conflicts with WordPress
   file:
     path: "{{ item.path | default('/var/www/html') }}/index.html"
