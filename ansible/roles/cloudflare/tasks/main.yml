@@ -2,11 +2,10 @@
 # Cloudflare Configuration Tasks
 # Manages DNS, SSL, and CDN settings via Cloudflare API
 
-- name: Install required Python packages
-  pip:
+- name: Install required Python packages via apt
+  ansible.builtin.apt:
     name:
-      - cloudflare
-      - requests
+      - python3-requests
     state: present
   tags: cloudflare
 
