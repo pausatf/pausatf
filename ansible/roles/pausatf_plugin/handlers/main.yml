@@ -1,0 +1,4 @@
+---
+- name: Clear WordPress object cache
+  ansible.builtin.command: wp cache flush --path={{ pausatf_wp_docroot }} --allow-root
+  changed_when: true

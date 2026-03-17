@@ -3,6 +3,144 @@
 # - uses WP-CLI to manage core, plugins, and themes
 # - honors per-install settings in group_vars
 
+- name: Create pausatf config directory
+  ansible.builtin.file:
+    path: /etc/pausatf
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  tags: wp_cron
+
+- name: Set active-web marker on production server
+  ansible.builtin.copy:
+    content: "{{ inventory_hostname }}\n"
+    dest: /etc/pausatf/is-active-web
+    owner: root
+    group: root
+    mode: '0644'
+  when: is_active_web | default(false)
+  tags: wp_cron
+
+- name: Remove active-web marker on non-production servers
+  ansible.builtin.file:
+    path: /etc/pausatf/is-active-web
+    state: absent
+  when: not (is_active_web | default(false))
+  tags: wp_cron
+
+- name: Deploy wp-cron guard script
+  ansible.builtin.copy:
+    src: wp-cron-if-active.sh
+    dest: /usr/local/sbin/wp-cron-if-active.sh
+    owner: root
+    group: root
+    mode: '0750'
+  tags: wp_cron
+
+- name: Configure wp-cron via guard script (replaces direct wp-cron.php call)
+  ansible.builtin.cron:
+    name: "WordPress cron for {{ item.domain | default('www.pausatf.org') }}"
+    minute: "*"
+    job: "/usr/local/sbin/wp-cron-if-active.sh"
+    user: root
+  loop: "{{ wordpress_installs }}"
+  tags: wp_cron
+
+- name: Ensure mu-plugins directory exists
+  ansible.builtin.file:
+    path: "{{ item.path | default('/var/www/html') }}/wp-content/mu-plugins"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+  loop: "{{ wordpress_installs }}"
+  tags: mu_plugins
+
+- name: Deploy security mu-plugins
+  ansible.builtin.copy:
+    src: "mu-plugins/{{ item.1 }}"
+    dest: "{{ item.0.path | default('/var/www/html') }}/wp-content/mu-plugins/{{ item.1 }}"
+    owner: www-data
+    group: www-data
+    mode: '0644'
+  loop: "{{ wordpress_installs | product(['disable-user-enum.php', 'noindex-non-prod.php']) | list }}"
+  tags: mu_plugins
+
+- name: Set WP_ENVIRONMENT_TYPE for non-production
+  ansible.builtin.lineinfile:
+    path: "{{ item.path | default('/var/www/html') }}/wp-config.php"
+    regexp: "WP_ENVIRONMENT_TYPE"
+    line: "define( 'WP_ENVIRONMENT_TYPE', '{{ wp_environment_type | default('production') }}' );"
+    insertbefore: "That's all, stop editing"
+  loop: "{{ wordpress_installs }}"
+  when: item.manage_wp_config | default(false)
+  tags: mu_plugins
+
+- name: Protect debug.log from web access
+  ansible.builtin.blockinfile:
+    path: "{{ item.path | default('/var/www/html') }}/.htaccess"
+    marker: "# {mark} ANSIBLE MANAGED - debug.log protection"
+    block: |
+      <Files debug.log>
+          Require all denied
+      </Files>
+    insertafter: "# END WordPress"
+  loop: "{{ wordpress_installs }}"
+  tags: security
+
+- name: Install WordPress plugins from wp_main_plugins
+  ansible.builtin.command:
+    cmd: >
+      wp plugin install {{ item.slug }}
+      --version={{ item.version | default('latest') }}
+      --path={{ (wordpress_installs[0].path | default('/var/www/html')) }}
+      --allow-root
+  register: _plugin_install
+  changed_when: "'Installing' in _plugin_install.stdout or 'Updating' in _plugin_install.stdout"
+  failed_when: _plugin_install.rc != 0 and 'already installed' not in _plugin_install.stderr
+  loop: "{{ wp_main_plugins | default([]) | selectattr('slug', 'defined') | list }}"
+  when:
+    - wp_main_plugins is defined
+    - item.status | default('active') != 'inactive'
+  tags: wp_plugins
+
+- name: Activate WordPress plugins
+  ansible.builtin.command:
+    cmd: >
+      wp plugin activate {{ item.slug }}
+      --path={{ (wordpress_installs[0].path | default('/var/www/html')) }}
+      --allow-root
+  register: _plugin_activate
+  changed_when: "'Plugin' in _plugin_activate.stdout and 'activated' in _plugin_activate.stdout"
+  failed_when: false
+  loop: "{{ wp_main_plugins | default([]) | selectattr('slug', 'defined') | list }}"
+  when:
+    - wp_main_plugins is defined
+    - item.status | default('active') == 'active'
+  tags: wp_plugins
+
+- name: Deactivate inactive plugins
+  ansible.builtin.command:
+    cmd: >
+      wp plugin deactivate {{ item.slug }}
+      --path={{ (wordpress_installs[0].path | default('/var/www/html')) }}
+      --allow-root
+  register: _plugin_deactivate
+  changed_when: "'deactivated' in _plugin_deactivate.stdout"
+  failed_when: false
+  loop: "{{ wp_main_plugins | default([]) | selectattr('slug', 'defined') | list }}"
+  when:
+    - wp_main_plugins is defined
+    - item.status | default('active') == 'inactive'
+  tags: wp_plugins
+
+- name: Remove default index.html that conflicts with WordPress
+  file:
+    path: "{{ item.path | default('/var/www/html') }}/index.html"
+    state: absent
+  loop: "{{ wordpress_installs }}"
+
 - name: Assert WordPress credentials are configured
   assert:
     that:

@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# PAUSATF backup script — managed by Ansible, do not edit manually
+# Dumps WordPress DB via WP-CLI and rsyncs uploads directory
+set -euo pipefail
+
+BACKUP_DIR="{{ backup_dir }}"
+WP_PATH="{{ backup_wp_docroot }}"
+RETENTION_DAYS="{{ backup_retention_days }}"
+DATE="$(date +%Y%m%d)"
+
+# Ensure backup directory exists
+mkdir -p "${BACKUP_DIR}/uploads"
+
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting PAUSATF backup"
+
+# Database dump via WP-CLI, compressed
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Dumping database..."
+wp db export - --path="${WP_PATH}" --allow-root \
+  | gzip > "${BACKUP_DIR}/db-${DATE}.sql.gz"
+
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Database dump complete: db-${DATE}.sql.gz"
+
+# Rsync uploads directory (local mirror for fast restore)
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Syncing uploads directory..."
+rsync -a --delete \
+  "${WP_PATH}/wp-content/uploads/" \
+  "${BACKUP_DIR}/uploads/"
+
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Uploads sync complete"
+
+# Prune old database dumps beyond retention window
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Pruning backups older than ${RETENTION_DAYS} days..."
+find "${BACKUP_DIR}" -maxdepth 1 -name 'db-*.sql.gz' -type f -mtime "+${RETENTION_DAYS}" -delete
+
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Backup complete"

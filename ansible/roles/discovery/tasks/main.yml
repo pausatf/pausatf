@@ -1,0 +1,306 @@
+# Discovery role — gather infrastructure facts from a PAUSATF server
+# Detects Apache, PHP-FPM, Redis, ModSecurity, AppArmor, fail2ban, WordPress
+
+- name: Detect Apache version
+  ansible.builtin.command: apache2ctl -v
+  register: discovery_apache_version
+  changed_when: false
+  failed_when: false
+  tags:
+    - discovery
+
+- name: Detect Apache MPM
+  ansible.builtin.shell: |
+    set -o pipefail
+    apache2ctl -V 2>/dev/null | grep -i 'server mpm'
+  args:
+    executable: /bin/bash
+  register: discovery_apache_mpm
+  changed_when: false
+  failed_when: false
+  tags:
+    - discovery
+
+- name: Detect Apache enabled modules
+  ansible.builtin.command: apache2ctl -M
+  register: discovery_apache_modules
+  changed_when: false
+  failed_when: false
+  tags:
+    - discovery
+
+- name: Detect Apache enabled vhosts
+  ansible.builtin.command: apache2ctl -S
+  register: discovery_apache_vhosts
+  changed_when: false
+  failed_when: false
+  tags:
+    - discovery
+
+- name: Detect PHP version
+  ansible.builtin.command: php -v
+  register: discovery_php_version
+  changed_when: false
+  failed_when: false
+  tags:
+    - discovery
+
+- name: Detect PHP-FPM service status
+  ansible.builtin.shell: |
+    set -o pipefail
+    systemctl is-active php*-fpm 2>/dev/null || echo inactive
+  args:
+    executable: /bin/bash
+  register: discovery_php_fpm_status
+  changed_when: false
+  failed_when: false
+  tags:
+    - discovery
+
+- name: Detect PHP loaded extensions
+  ansible.builtin.command: php -m
+  register: discovery_php_extensions
+  changed_when: false
+  failed_when: false
+  tags:
+    - discovery
+
+- name: Detect PHP-FPM pool configuration files
+  ansible.builtin.shell: |
+    set -o pipefail
+    find /etc/php -name 'www.conf' -path '*/fpm/pool.d/*' 2>/dev/null | head -5
+  args:
+    executable: /bin/bash
+  register: discovery_php_fpm_pools
+  changed_when: false
+  failed_when: false
+  tags:
+    - discovery
+
+- name: Detect Redis service status
+  ansible.builtin.command: systemctl is-active redis-server
+  register: discovery_redis_status
+  changed_when: false
+  failed_when: false
+  tags:
+    - discovery
+
+- name: Detect Redis memory usage
+  ansible.builtin.shell: |
+    set -o pipefail
+    redis-cli info memory 2>/dev/null | grep -E '^(used_memory_human|maxmemory_human|maxmemory_policy)'
+  args:
+    executable: /bin/bash
+  register: discovery_redis_memory
+  changed_when: false
+  failed_when: false
+  tags:
+    - discovery
+
+- name: Detect ModSecurity SecRuleEngine mode
+  ansible.builtin.shell: |
+    set -o pipefail
+    grep -i '^SecRuleEngine' /etc/modsecurity/modsecurity.conf 2>/dev/null || echo 'not configured'
+  args:
+    executable: /bin/bash
+  register: discovery_modsec_engine
+  changed_when: false
+  failed_when: false
+  tags:
+    - discovery
+
+- name: Detect ModSecurity CRS version
+  ansible.builtin.shell: |
+    set -o pipefail
+    dpkg-query -W -f='${Version}' modsecurity-crs 2>/dev/null || echo 'not installed'
+  args:
+    executable: /bin/bash
+  register: discovery_modsec_crs_version
+  changed_when: false
+  failed_when: false
+  tags:
+    - discovery
+
+- name: Detect ModSecurity paranoia level
+  ansible.builtin.shell: |
+    set -o pipefail
+    grep -r 'tx.paranoia_level' /etc/modsecurity/ 2>/dev/null | head -3 || echo 'default (1)'
+  args:
+    executable: /bin/bash
+  register: discovery_modsec_paranoia
+  changed_when: false
+  failed_when: false
+  tags:
+    - discovery
+
+- name: Detect ModSecurity custom exclusion files
+  ansible.builtin.shell: |
+    set -o pipefail
+    find /etc/modsecurity -name '*EXCLUSION*' -o -name '*exclusion*' 2>/dev/null | head -10
+  args:
+    executable: /bin/bash
+  register: discovery_modsec_exclusions
+  changed_when: false
+  failed_when: false
+  tags:
+    - discovery
+
+- name: Detect ModSecurity audit log path
+  ansible.builtin.shell: |
+    set -o pipefail
+    grep -i '^SecAuditLog ' /etc/modsecurity/modsecurity.conf 2>/dev/null || echo 'not configured'
+  args:
+    executable: /bin/bash
+  register: discovery_modsec_audit_log
+  changed_when: false
+  failed_when: false
+  tags:
+    - discovery
+
+- name: Check if AppArmor is installed
+  ansible.builtin.command: dpkg -l apparmor
+  register: discovery_apparmor_installed
+  changed_when: false
+  failed_when: false
+  tags:
+    - discovery
+
+- name: Detect AppArmor loaded profiles
+  ansible.builtin.command: aa-status --json
+  register: discovery_apparmor_status
+  changed_when: false
+  failed_when: false
+  become: true
+  tags:
+    - discovery
+
+- name: Detect AppArmor apache2 profile mode
+  ansible.builtin.shell: |
+    set -o pipefail
+    aa-status 2>/dev/null | grep -A1 'apache2' || echo 'no apache2 profile loaded'
+  args:
+    executable: /bin/bash
+  register: discovery_apparmor_apache
+  changed_when: false
+  failed_when: false
+  become: true
+  tags:
+    - discovery
+
+- name: Detect fail2ban active jails
+  ansible.builtin.command: fail2ban-client status
+  register: discovery_fail2ban_jails
+  changed_when: false
+  failed_when: false
+  tags:
+    - discovery
+
+- name: Detect fail2ban banned IPs (all jails)
+  ansible.builtin.shell: |
+    set -o pipefail
+    fail2ban-client status 2>/dev/null \
+      | grep 'Jail list' \
+      | sed 's/.*:\s*//' \
+      | tr ',' '\n' \
+      | while read -r jail; do
+          jail=$(echo "$jail" | xargs)
+          [ -z "$jail" ] && continue
+          echo "=== $jail ==="
+          fail2ban-client status "$jail" 2>/dev/null | grep 'Banned IP'
+        done
+  args:
+    executable: /bin/bash
+  register: discovery_fail2ban_banned
+  changed_when: false
+  failed_when: false
+  tags:
+    - discovery
+
+- name: Detect WordPress version via WP-CLI
+  ansible.builtin.command: wp core version --path=/var/www/html --allow-root
+  register: discovery_wp_version
+  changed_when: false
+  failed_when: false
+  tags:
+    - discovery
+
+- name: Detect WordPress active plugins
+  ansible.builtin.command: wp plugin list --status=active --format=table --path=/var/www/html --allow-root
+  register: discovery_wp_plugins
+  changed_when: false
+  failed_when: false
+  tags:
+    - discovery
+
+- name: Detect WordPress active theme
+  ansible.builtin.command: wp theme list --status=active --format=table --path=/var/www/html --allow-root
+  register: discovery_wp_theme
+  changed_when: false
+  failed_when: false
+  tags:
+    - discovery
+
+- name: Detect WordPress DB host
+  ansible.builtin.command: wp config get DB_HOST --path=/var/www/html --allow-root
+  register: discovery_wp_db_host
+  changed_when: false
+  failed_when: false
+  tags:
+    - discovery
+
+- name: Detect WordPress uploads directory size
+  ansible.builtin.shell: |
+    set -o pipefail
+    du -sh /var/www/html/wp-content/uploads 2>/dev/null || echo '0 (not found)'
+  args:
+    executable: /bin/bash
+  register: discovery_wp_uploads_size
+  changed_when: false
+  failed_when: false
+  tags:
+    - discovery
+
+- name: Display discovery summary
+  ansible.builtin.debug:
+    msg: |
+      === PAUSATF Infrastructure Discovery ===
+
+      --- Apache ---
+      Version: {{ discovery_apache_version.stdout_lines | default(['unknown']) | first }}
+      MPM: {{ discovery_apache_mpm.stdout | default('unknown') | trim }}
+      Modules: {{ (discovery_apache_modules.stdout_lines | default([])) | length }} loaded
+      VHosts: {{ discovery_apache_vhosts.stdout | default('none') | trim }}
+
+      --- PHP ---
+      Version: {{ discovery_php_version.stdout_lines | default(['unknown']) | first }}
+      FPM status: {{ discovery_php_fpm_status.stdout | default('unknown') | trim }}
+      Extensions: {{ (discovery_php_extensions.stdout_lines | default([])) | length }} loaded
+      Pool configs: {{ discovery_php_fpm_pools.stdout | default('none found') | trim }}
+
+      --- Redis ---
+      Status: {{ discovery_redis_status.stdout | default('unknown') | trim }}
+      Memory: {{ discovery_redis_memory.stdout | default('unknown') | trim }}
+
+      --- ModSecurity ---
+      Engine: {{ discovery_modsec_engine.stdout | default('unknown') | trim }}
+      CRS version: {{ discovery_modsec_crs_version.stdout | default('unknown') | trim }}
+      Paranoia: {{ discovery_modsec_paranoia.stdout | default('unknown') | trim }}
+      Exclusions: {{ discovery_modsec_exclusions.stdout | default('none') | trim }}
+      Audit log: {{ discovery_modsec_audit_log.stdout | default('unknown') | trim }}
+
+      --- AppArmor ---
+      Installed: {{ 'yes' if discovery_apparmor_installed.rc == 0 else 'no' }}
+      Apache2 profile: {{ discovery_apparmor_apache.stdout | default('unknown') | trim }}
+
+      --- fail2ban ---
+      Jails: {{ discovery_fail2ban_jails.stdout | default('unknown') | trim }}
+      Banned IPs: {{ discovery_fail2ban_banned.stdout | default('none') | trim }}
+
+      --- WordPress ---
+      Version: {{ discovery_wp_version.stdout | default('unknown') | trim }}
+      Active plugins: {{ discovery_wp_plugins.stdout | default('unknown') | trim }}
+      Active theme: {{ discovery_wp_theme.stdout | default('unknown') | trim }}
+      DB host: {{ discovery_wp_db_host.stdout | default('unknown') | trim }}
+      Uploads size: {{ discovery_wp_uploads_size.stdout | default('unknown') | trim }}
+  tags:
+    - discovery

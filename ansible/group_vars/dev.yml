@@ -7,6 +7,8 @@ php_version: "8.4"
 mysql_version: "8"
 mysql_enabled: false   # skip standalone MySQL role in site.yml
 mysql_managed: true    # DO Managed MySQL; skip mysql dependency in wordpress role
+wp_environment_type: "development"
+is_active_web: false
 
 # WordPress — dev overrides merged with defaults from all.yml
 wordpress_installs:

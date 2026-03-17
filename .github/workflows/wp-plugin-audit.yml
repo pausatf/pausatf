@@ -4,6 +4,57 @@ on:
   schedule:
     - cron: '0 9 * * 1'  # Monday 09:00 UTC
   workflow_dispatch:
+    inputs:
+      probe_auth_mail:
+        description: "Run auth/mail diagnostics on production instead of plugin update audit"
+        required: false
+        default: false
+        type: boolean
+      disable_jetpack_protect:
+        description: "Emergency: disable Jetpack Protect module before login probe"
+        required: false
+        default: false
+        type: boolean
+      skip_synthetic_login:
+        description: "Diagnostics only: skip synthetic login transaction"
+        required: false
+        default: false
+        type: boolean
+      install_login_hotfix:
+        description: "Emergency: install MU plugin to disable Jetpack math login fallback"
+        required: false
+        default: false
+        type: boolean
+      probe_widget_logic:
+        description: "Probe widget_logic data in current/backup databases on production"
+        required: false
+        default: false
+        type: boolean
+      apply_widget_logic_recovery:
+        description: "Apply targeted widget_logic option recovery from detected source DB"
+        required: false
+        default: false
+        type: boolean
+      widget_source_db:
+        description: "Optional source DB override for widget_logic recovery (e.g. wordpress_old)"
+        required: false
+        default: ""
+        type: string
+      repair_active_widget_logic:
+        description: "Repair active widgets with empty logic by matching duplicate widget instance content"
+        required: false
+        default: false
+        type: boolean
+      enable_widget_logic_filter:
+        description: "Enable Widget Logic runtime filter option when it is blank"
+        required: false
+        default: false
+        type: boolean
+      probe_modsecurity_logs:
+        description: "Probe production ModSecurity and Apache logs for widget/auth clues"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -14,7 +65,963 @@ jobs:
     name: Check for plugin updates
     runs-on: ubuntu-latest
     steps:
+      - name: Probe widget logic recovery sources
+        if: ${{ inputs.probe_widget_logic == true }}
+        env:
+          PROD_SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+          PROD_HOST: ${{ vars.PROD_HOST }}
+          APPLY_WIDGET_LOGIC_RECOVERY: ${{ inputs.apply_widget_logic_recovery }}
+          WIDGET_SOURCE_DB: ${{ inputs.widget_source_db }}
+          REPAIR_ACTIVE_WIDGET_LOGIC: ${{ inputs.repair_active_widget_logic }}
+          ENABLE_WIDGET_LOGIC_FILTER: ${{ inputs.enable_widget_logic_filter }}
+        run: |
+          set -euo pipefail
+          if [ -z "${PROD_SSH_PRIVATE_KEY:-}" ]; then
+            echo "PROD_SSH_PRIVATE_KEY not set" >&2
+            exit 1
+          fi
+
+          TARGET_HOST="${PROD_HOST:-REDACTED_PROD_NEW_IP}"
+          mkdir -p ~/.ssh
+          printf '%s\n' "$PROD_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+          REMOTE_SHELL="bash -s"
+          if ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
+            github-deploy@"$TARGET_HOST" "sudo -n true" >/dev/null 2>&1; then
+            REMOTE_SHELL="sudo -E -n bash -s"
+          fi
+
+          ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
+            github-deploy@"$TARGET_HOST" \
+            "APPLY_WIDGET_LOGIC_RECOVERY='${APPLY_WIDGET_LOGIC_RECOVERY:-false}' WIDGET_SOURCE_DB='${WIDGET_SOURCE_DB:-}' REPAIR_ACTIVE_WIDGET_LOGIC='${REPAIR_ACTIVE_WIDGET_LOGIC:-false}' ENABLE_WIDGET_LOGIC_FILTER='${ENABLE_WIDGET_LOGIC_FILTER:-false}' $REMOTE_SHELL" <<'REMOTE'
+          set -euo pipefail
+
+          WP_PATH="/var/www/html"
+          APPLY_WIDGET_LOGIC_RECOVERY="$(printf '%s' "${APPLY_WIDGET_LOGIC_RECOVERY:-false}" | tr '[:upper:]' '[:lower:]')"
+          WIDGET_SOURCE_DB="${WIDGET_SOURCE_DB:-}"
+          REPAIR_ACTIVE_WIDGET_LOGIC="$(printf '%s' "${REPAIR_ACTIVE_WIDGET_LOGIC:-false}" | tr '[:upper:]' '[:lower:]')"
+          ENABLE_WIDGET_LOGIC_FILTER="$(printf '%s' "${ENABLE_WIDGET_LOGIC_FILTER:-false}" | tr '[:upper:]' '[:lower:]')"
+
+          wpdb_query() {
+            sudo -u www-data wp db query "$1" --skip-column-names --path="$WP_PATH" --allow-root 2>/dev/null
+          }
+          mysql_root_query() {
+            mysql --batch --skip-column-names -e "$1" 2>/dev/null
+          }
+
+          DB_NAME="$(sudo -u www-data wp config get DB_NAME --path="$WP_PATH" --allow-root 2>/dev/null | head -n1)"
+          TABLE_PREFIX="$(sudo -u www-data wp config get table_prefix --type=variable --path="$WP_PATH" --allow-root 2>/dev/null | head -n1)"
+          CURRENT_OPTIONS_TABLE="${TABLE_PREFIX}options"
+          MYSQL_ROOT_OK=false
+          if command -v mysql >/dev/null 2>&1 && mysql_root_query "SELECT 1;" | grep -q '^1$'; then
+            MYSQL_ROOT_OK=true
+          fi
+
+          echo "HOST=$(hostname -f 2>/dev/null || hostname)"
+          echo "UTC_NOW=$(date -u --iso-8601=seconds)"
+          echo "current_db=$DB_NAME"
+          echo "current_options_table=$CURRENT_OPTIONS_TABLE"
+          echo "mysql_root_access=$MYSQL_ROOT_OK"
+          echo "=== Widget Logic plugin/runtime status ==="
+          sudo -u www-data wp plugin list --path="$WP_PATH" --allow-root --fields=name,status,version,update_version --format=table \
+            | (head -n 1 && grep -E '^widget-logic[[:space:]]' || true)
+          sudo -u www-data wp option list --path="$WP_PATH" --allow-root --search='widget_logic%' --fields=option_name,size_bytes --format=table || true
+          sudo -u www-data wp eval '
+          $wl = get_option( "widget_logic" );
+          if ( ! is_array( $wl ) ) {
+            echo "widget_logic_settings=missing" . PHP_EOL;
+          } else {
+            echo "widget_logic_option_filter=" . ( $wl["widget_logic-options-filter"] ?? "" ) . PHP_EOL;
+            echo "widget_logic_option_load_point=" . ( $wl["widget_logic-options-load_point"] ?? "" ) . PHP_EOL;
+            echo "widget_logic_option_eval_title=" . ( $wl["widget_logic-options-eval_title"] ?? "" ) . PHP_EOL;
+          }
+          ' --path="$WP_PATH" --allow-root || true
+          if [ "${ENABLE_WIDGET_LOGIC_FILTER}" = "true" ]; then
+            sudo -u www-data wp eval '
+            $wl = get_option( "widget_logic" );
+            if ( ! is_array( $wl ) ) {
+              $wl = [];
+            }
+            $before_filter = (string) ( $wl["widget_logic-options-filter"] ?? "" );
+            $before_load   = (string) ( $wl["widget_logic-options-load_point"] ?? "" );
+            if ( $before_filter === "" ) {
+              $wl["widget_logic-options-filter"] = "1";
+            }
+            if ( $before_load === "" ) {
+              $wl["widget_logic-options-load_point"] = "parse_query";
+            }
+            update_option( "widget_logic", $wl );
+            echo "widget_logic_filter_fix_applied=true" . PHP_EOL;
+            echo "widget_logic_filter_fix_before_filter={$before_filter}" . PHP_EOL;
+            echo "widget_logic_filter_fix_before_load_point={$before_load}" . PHP_EOL;
+            echo "widget_logic_filter_fix_after_filter=" . ( $wl["widget_logic-options-filter"] ?? "" ) . PHP_EOL;
+            echo "widget_logic_filter_fix_after_load_point=" . ( $wl["widget_logic-options-load_point"] ?? "" ) . PHP_EOL;
+            ' --path="$WP_PATH" --allow-root
+          else
+            echo "widget_logic_filter_fix_applied=false"
+          fi
+          if [ -f "$WP_PATH/wp-content/plugins/widget-logic/widget_logic.php" ]; then
+            echo "=== widget-logic hook declarations ==="
+            grep -nE "add_(action|filter)\s*\(|function widget_logic_|in_widget_form|widget_display_callback|widget_update_callback" \
+              "$WP_PATH/wp-content/plugins/widget-logic/widget_logic.php" | sed -n '1,220p' || true
+            echo "=== widget-logic bootstrap excerpt ==="
+            sed -n '1,180p' "$WP_PATH/wp-content/plugins/widget-logic/widget_logic.php" | sed 's/^/  /' || true
+          fi
+          sudo -u www-data wp eval '
+          global $wp_filter;
+          echo "widget_logic_display_hook_priority=" . ( has_filter( "dynamic_sidebar_params", "widget_logic_widget_display_callback" ) ?: 0 ) . PHP_EOL;
+          echo "widget_logic_control_hook_priority=" . ( has_filter( "in_widget_form", "widget_logic_in_widget_form" ) ?: 0 ) . PHP_EOL;
+          echo "widget_logic_update_hook_priority=" . ( has_filter( "widget_update_callback", "widget_logic_update_callback" ) ?: 0 ) . PHP_EOL;
+          echo "widget_logic_display_callback_exists=" . ( function_exists( "widget_logic_widget_display_callback" ) ? "yes" : "no" ) . PHP_EOL;
+          echo "widget_logic_control_callback_exists=" . ( function_exists( "widget_logic_in_widget_form" ) ? "yes" : "no" ) . PHP_EOL;
+          echo "widget_logic_update_callback_exists=" . ( function_exists( "widget_logic_update_callback" ) ? "yes" : "no" ) . PHP_EOL;
+          foreach ( [ "dynamic_sidebar_params", "in_widget_form", "widget_update_callback" ] as $hook ) {
+            $callbacks = [];
+            if ( isset( $wp_filter[ $hook ] ) && isset( $wp_filter[ $hook ]->callbacks ) && is_array( $wp_filter[ $hook ]->callbacks ) ) {
+              foreach ( $wp_filter[ $hook ]->callbacks as $priority => $entries ) {
+                foreach ( $entries as $entry ) {
+                  $fn = $entry["function"] ?? null;
+                  $name = "unknown";
+                  if ( is_string( $fn ) ) {
+                    $name = $fn;
+                  } elseif ( is_array( $fn ) && count( $fn ) === 2 ) {
+                    $target = is_object( $fn[0] ) ? get_class( $fn[0] ) : (string) $fn[0];
+                    $name   = $target . "::" . $fn[1];
+                  } elseif ( $fn instanceof Closure ) {
+                    $name = "Closure";
+                  }
+                  $callbacks[] = $priority . ":" . $name;
+                }
+              }
+            }
+            echo "hook_callbacks_{$hook}=" . implode( ",", array_slice( $callbacks, 0, 80 ) ) . PHP_EOL;
+          }
+          echo "widgets_block_editor_enabled=" . ( wp_use_widgets_block_editor() ? "yes" : "no" ) . PHP_EOL;
+          ' --path="$WP_PATH" --allow-root || true
+          if [ -n "$WIDGET_SOURCE_DB" ]; then
+            echo "widget_source_db_override=$WIDGET_SOURCE_DB"
+          fi
+          echo "=== Backup artifacts on host ==="
+          for d in "$WP_PATH/wp-content/ai1wm-backups" "$WP_PATH/wp-content/updraft" "/var/backups"; do
+            if [ -d "$d" ]; then
+              echo "-- $d --"
+              ls -1t "$d" 2>/dev/null | head -n 30 || true
+            fi
+          done
+          if [ -d "/var/backups/wordpress" ]; then
+            echo "-- /var/backups/wordpress (candidate DB artifacts) --"
+            find /var/backups/wordpress -maxdepth 3 -type f \
+              \( -name '*.sql' -o -name '*.sql.gz' -o -name '*.sql.zst' -o -name '*.wpress' -o -name '*.tar' -o -name '*.tar.gz' \) \
+              -printf '%TY-%Tm-%Td %TH:%TM %p\n' 2>/dev/null | sort -r | head -n 80 || true
+          fi
+          LATEST_DB_BACKUP="$(
+            find /var/backups/wordpress -maxdepth 2 -type f -name '*main-db*.sql.gz' 2>/dev/null \
+              | sort -r | head -n 1
+          )"
+          if [ -n "$LATEST_DB_BACKUP" ]; then
+            echo "latest_db_backup=$LATEST_DB_BACKUP"
+            BACKUP_WIDGET_LOGIC_TOKEN_COUNT="$(
+              gzip -cd "$LATEST_DB_BACKUP" 2>/dev/null | grep -ao 'widget_logic' | wc -l | tr -d ' ' || true
+            )"
+            BACKUP_WIDGET_LOGIC_TOKEN_COUNT="${BACKUP_WIDGET_LOGIC_TOKEN_COUNT:-0}"
+            echo "backup_widget_logic_token_count=${BACKUP_WIDGET_LOGIC_TOKEN_COUNT}"
+          fi
+
+          CUR_OPT_COUNT="$(wpdb_query "SELECT COUNT(*) FROM \`${DB_NAME}\`.\`${CURRENT_OPTIONS_TABLE}\` WHERE option_name LIKE 'widget_%' AND option_value LIKE '%widget_logic%';" | head -n1 || echo 0)"
+          CUR_OPT_COUNT="${CUR_OPT_COUNT:-0}"
+          echo "current_widget_logic_option_count=${CUR_OPT_COUNT}"
+
+          echo "=== Current widget_logic instance summary ==="
+          sudo -u www-data wp eval '
+          global $wpdb;
+          $rows      = $wpdb->get_results( "SELECT option_name, option_value FROM {$wpdb->options} WHERE option_name LIKE '\''widget_%'\''", ARRAY_A );
+          $total     = 0;
+          $non_empty = 0;
+          foreach ( $rows as $row ) {
+            $value = maybe_unserialize( $row["option_value"] );
+            if ( ! is_array( $value ) ) {
+              continue;
+            }
+            foreach ( $value as $instance_id => $instance ) {
+              if ( ! is_array( $instance ) || ! array_key_exists( "widget_logic", $instance ) ) {
+                continue;
+              }
+              $total++;
+              $expr = trim( (string) $instance["widget_logic"] );
+              if ( $expr !== "" ) {
+                $non_empty++;
+                $expr = preg_replace( "/\\s+/", " ", $expr );
+                echo "widget_logic_non_empty option=" . $row["option_name"] . " instance=" . $instance_id . " expr=" . substr( $expr, 0, 180 ) . PHP_EOL;
+              } else {
+                echo "widget_logic_empty option=" . $row["option_name"] . " instance=" . $instance_id . PHP_EOL;
+              }
+            }
+          }
+          echo "widget_logic_instances_total=" . $total . PHP_EOL;
+          echo "widget_logic_instances_non_empty=" . $non_empty . PHP_EOL;
+          ' --path="$WP_PATH" | sed -n '1,220p'
+
+          echo "=== Active sidebar widget_logic summary ==="
+          sudo -u www-data wp eval '
+          $sidebars = wp_get_sidebars_widgets();
+          $active_ids = [];
+          foreach ( $sidebars as $sidebar => $widgets ) {
+            if ( ! is_array( $widgets ) || $sidebar === "wp_inactive_widgets" || strpos( $sidebar, "orphaned_widgets" ) === 0 ) {
+              continue;
+            }
+            foreach ( $widgets as $widget_id ) {
+              if ( is_string( $widget_id ) && $widget_id !== "" ) {
+                $active_ids[ $widget_id ] = $sidebar;
+              }
+            }
+          }
+
+          $active_total       = 0;
+          $active_non_empty   = 0;
+          $active_empty       = 0;
+          $active_missing_key = 0;
+          $sidebar_totals     = [];
+          $sidebar_non_empty  = [];
+          $empty_examples     = [];
+
+          foreach ( $active_ids as $widget_id => $sidebar ) {
+            if ( ! preg_match( "/^(.+)-(\\d+)$/", $widget_id, $m ) ) {
+              continue;
+            }
+            $base = "widget_" . str_replace( "-", "_", $m[1] );
+            $idx  = (int) $m[2];
+            $opt  = get_option( $base );
+            $expr = null;
+            if ( is_array( $opt ) && isset( $opt[ $idx ] ) && is_array( $opt[ $idx ] ) && array_key_exists( "widget_logic", $opt[ $idx ] ) ) {
+              $expr = trim( (string) $opt[ $idx ]["widget_logic"] );
+            }
+
+            $active_total++;
+            if ( ! isset( $sidebar_totals[ $sidebar ] ) ) {
+              $sidebar_totals[ $sidebar ] = 0;
+              $sidebar_non_empty[ $sidebar ] = 0;
+            }
+            $sidebar_totals[ $sidebar ]++;
+
+            if ( $expr === null ) {
+              $active_missing_key++;
+              if ( count( $empty_examples ) < 30 ) {
+                $empty_examples[] = "active_widget_missing_logic_key widget_id={$widget_id} sidebar={$sidebar} option={$base} instance={$idx}";
+              }
+              continue;
+            }
+
+            if ( $expr === "" ) {
+              $active_empty++;
+              if ( count( $empty_examples ) < 30 ) {
+                $empty_examples[] = "active_widget_empty_logic widget_id={$widget_id} sidebar={$sidebar} option={$base} instance={$idx}";
+              }
+            } else {
+              $active_non_empty++;
+              $sidebar_non_empty[ $sidebar ]++;
+            }
+          }
+
+          echo "active_widgets_total=" . $active_total . PHP_EOL;
+          echo "active_widgets_non_empty_logic=" . $active_non_empty . PHP_EOL;
+          echo "active_widgets_empty_logic=" . $active_empty . PHP_EOL;
+          echo "active_widgets_missing_logic_key=" . $active_missing_key . PHP_EOL;
+
+          ksort( $sidebar_totals );
+          foreach ( $sidebar_totals as $sidebar => $total ) {
+            $non_empty = $sidebar_non_empty[ $sidebar ] ?? 0;
+            echo "sidebar_widget_logic_summary sidebar={$sidebar} total={$total} non_empty_logic={$non_empty}" . PHP_EOL;
+          }
+
+          foreach ( $empty_examples as $line ) {
+            echo $line . PHP_EOL;
+          }
+          ' --path="$WP_PATH" | sed -n '1,260p'
+
+          if [ "${REPAIR_ACTIVE_WIDGET_LOGIC}" = "true" ]; then
+            echo "=== Repair active empty widget_logic instances (content match) ==="
+            TS="$(date -u +%Y%m%d%H%M%S)"
+            REPAIR_TABLE="${TABLE_PREFIX}widget_logic_active_repair_${TS}"
+            wpdb_query "CREATE TABLE \`${DB_NAME}\`.\`${REPAIR_TABLE}\` AS SELECT * FROM \`${DB_NAME}\`.\`${CURRENT_OPTIONS_TABLE}\` WHERE option_name LIKE 'widget_%';"
+            echo "active_widget_logic_repair_backup_table=${REPAIR_TABLE}"
+          fi
+
+          REPAIR_OUTPUT="$(sudo -u www-data REPAIR_ACTIVE_WIDGET_LOGIC="${REPAIR_ACTIVE_WIDGET_LOGIC}" wp eval '
+          $apply = getenv( "REPAIR_ACTIVE_WIDGET_LOGIC" ) === "true";
+          global $wpdb;
+
+          $sidebars   = wp_get_sidebars_widgets();
+          $active_map = [];
+          foreach ( $sidebars as $sidebar => $widgets ) {
+            if ( ! is_array( $widgets ) || $sidebar === "wp_inactive_widgets" || strpos( $sidebar, "orphaned_widgets" ) === 0 ) {
+              continue;
+            }
+            foreach ( $widgets as $widget_id ) {
+              if ( ! is_string( $widget_id ) || ! preg_match( "/^(.+)-(\\d+)$/", $widget_id, $m ) ) {
+                continue;
+              }
+              $base = $m[1];
+              $idx  = (int) $m[2];
+              if ( ! isset( $active_map[ $base ] ) ) {
+                $active_map[ $base ] = [];
+              }
+              $active_map[ $base ][ $idx ] = $widget_id;
+            }
+          }
+
+          $candidates = 0;
+          $applied    = 0;
+          $ambiguous  = 0;
+          $no_source  = 0;
+          $notes      = [];
+          $rows       = $wpdb->get_results( "SELECT option_name, option_value FROM {$wpdb->options} WHERE option_name LIKE '\''widget_%'\''", ARRAY_A );
+
+          foreach ( $rows as $row ) {
+            $option_name = $row["option_name"];
+            $base = str_replace( "_", "-", substr( $option_name, 7 ) );
+            if ( ! isset( $active_map[ $base ] ) ) {
+              continue;
+            }
+
+            $opt = maybe_unserialize( $row["option_value"] );
+            if ( ! is_array( $opt ) ) {
+              continue;
+            }
+
+            $sources = [];
+            foreach ( $opt as $idx => $instance ) {
+              if ( ! is_array( $instance ) || ! array_key_exists( "widget_logic", $instance ) ) {
+                continue;
+              }
+              $expr = trim( (string) $instance["widget_logic"] );
+              if ( $expr === "" ) {
+                continue;
+              }
+              $canon = $instance;
+              unset( $canon["widget_logic"] );
+              $fp = md5( wp_json_encode( $canon ) );
+              if ( ! isset( $sources[ $fp ] ) ) {
+                $sources[ $fp ] = [];
+              }
+              $sources[ $fp ][] = [ "idx" => (int) $idx, "expr" => $expr ];
+            }
+
+            $changed = false;
+            foreach ( $active_map[ $base ] as $idx => $widget_id ) {
+              if ( ! isset( $opt[ $idx ] ) || ! is_array( $opt[ $idx ] ) ) {
+                continue;
+              }
+              $current = "";
+              if ( array_key_exists( "widget_logic", $opt[ $idx ] ) ) {
+                $current = trim( (string) $opt[ $idx ]["widget_logic"] );
+              }
+              if ( $current !== "" ) {
+                continue;
+              }
+
+              $canon = $opt[ $idx ];
+              unset( $canon["widget_logic"] );
+              $fp = md5( wp_json_encode( $canon ) );
+              $matches = $sources[ $fp ] ?? [];
+              if ( count( $matches ) === 1 ) {
+                $candidates++;
+                $src_idx = $matches[0]["idx"];
+                $src_expr = $matches[0]["expr"];
+                if ( count( $notes ) < 60 ) {
+                  $notes[] = "active_widget_logic_repair_candidate widget_id={$widget_id} option={$option_name} target_instance={$idx} source_instance={$src_idx}";
+                }
+                if ( $apply ) {
+                  $opt[ $idx ]["widget_logic"] = $src_expr;
+                  $applied++;
+                  $changed = true;
+                }
+              } elseif ( count( $matches ) > 1 ) {
+                $ambiguous++;
+              } else {
+                $no_source++;
+              }
+            }
+
+            if ( $apply && $changed ) {
+              update_option( $option_name, $opt );
+            }
+          }
+
+          echo "active_widget_logic_repair_candidates=" . $candidates . PHP_EOL;
+          echo "active_widget_logic_repair_applied=" . ( $apply ? $applied : 0 ) . PHP_EOL;
+          echo "active_widget_logic_repair_ambiguous=" . $ambiguous . PHP_EOL;
+          echo "active_widget_logic_repair_no_source=" . $no_source . PHP_EOL;
+          foreach ( $notes as $line ) {
+            echo $line . PHP_EOL;
+          }
+          ' --path="$WP_PATH" --allow-root || true)"
+          printf '%s\n' "$REPAIR_OUTPUT" | sed -n '1,260p'
+
+          CANDIDATE_FILE="$(mktemp)"
+          DB_LIST_FILE="$(mktemp)"
+          trap 'rm -f "$CANDIDATE_FILE" "$DB_LIST_FILE"' EXIT
+
+          echo "=== Databases with widget_logic-bearing options ==="
+          wpdb_query "SHOW DATABASES;" | grep -Ev '^(information_schema|performance_schema|mysql|sys)$' > "$DB_LIST_FILE" || true
+          if [ "$MYSQL_ROOT_OK" = "true" ]; then
+            mysql_root_query "SHOW DATABASES;" | grep -Ev '^(information_schema|performance_schema|mysql|sys)$' >> "$DB_LIST_FILE" || true
+          fi
+          sort -u "$DB_LIST_FILE" -o "$DB_LIST_FILE"
+          mapfile -t DBS < "$DB_LIST_FILE"
+          for db in "${DBS[@]}"; do
+            mapfile -t OPTION_TABLES < <(wpdb_query "SHOW TABLES FROM \`${db}\` LIKE '%\\_options';" || true)
+            if [ "${#OPTION_TABLES[@]}" -eq 0 ] && [ "$MYSQL_ROOT_OK" = "true" ]; then
+              mapfile -t OPTION_TABLES < <(mysql_root_query "SHOW TABLES FROM \`${db}\` LIKE '%\\_options';" || true)
+            fi
+            for tbl in "${OPTION_TABLES[@]}"; do
+              cnt="$(wpdb_query "SELECT COUNT(*) FROM \`${db}\`.\`${tbl}\` WHERE option_name LIKE 'widget_%' AND option_value LIKE '%widget_logic%';" | head -n1 || true)"
+              if ! printf '%s' "$cnt" | grep -Eq '^[0-9]+$' && [ "$MYSQL_ROOT_OK" = "true" ]; then
+                cnt="$(mysql_root_query "SELECT COUNT(*) FROM \`${db}\`.\`${tbl}\` WHERE option_name LIKE 'widget_%' AND option_value LIKE '%widget_logic%';" | head -n1 || true)"
+              fi
+              cnt="${cnt:-0}"
+              if ! printf '%s' "$cnt" | grep -Eq '^[0-9]+$'; then
+                cnt=0
+              fi
+              if [ "$cnt" -gt 0 ] 2>/dev/null; then
+                printf '%s\t%s\t%s\n' "$db" "$tbl" "$cnt" >> "$CANDIDATE_FILE"
+                echo "candidate_db=$db options_table=$tbl widget_logic_option_count=$cnt"
+              fi
+            done
+          done
+
+          if [ ! -s "$CANDIDATE_FILE" ]; then
+            echo "no_widget_logic_candidates_found=true"
+            exit 0
+          fi
+
+          echo "=== Candidate detail preview (top 5 by count) ==="
+          sort -t $'\t' -k3,3nr "$CANDIDATE_FILE" | head -n 5 | while IFS=$'\t' read -r db tbl cnt; do
+            echo "-- $db.$tbl count=$cnt --"
+            preview="$(wpdb_query "SELECT option_name, LENGTH(option_value) FROM \`${db}\`.\`${tbl}\` WHERE option_name LIKE 'widget_%' AND option_value LIKE '%widget_logic%' ORDER BY option_name LIMIT 20;" || true)"
+            if [ -z "$preview" ] && [ "$MYSQL_ROOT_OK" = "true" ]; then
+              preview="$(mysql_root_query "SELECT option_name, LENGTH(option_value) FROM \`${db}\`.\`${tbl}\` WHERE option_name LIKE 'widget_%' AND option_value LIKE '%widget_logic%' ORDER BY option_name LIMIT 20;" || true)"
+            fi
+            printf '%s\n' "$preview" | sed 's/^/  /'
+          done
+
+          if [ "${APPLY_WIDGET_LOGIC_RECOVERY}" != "true" ]; then
+            echo "widget_logic_recovery_applied=false"
+            exit 0
+          fi
+
+          SOURCE_LINE=""
+          if [ -n "$WIDGET_SOURCE_DB" ]; then
+            SOURCE_LINE="$(awk -F $'\t' -v db="$WIDGET_SOURCE_DB" '$1==db {print $0}' "$CANDIDATE_FILE" | sort -t $'\t' -k3,3nr | head -n1)"
+            if [ -z "$SOURCE_LINE" ]; then
+              echo "ERROR: widget_source_db override not found or has no widget_logic data ($WIDGET_SOURCE_DB)" >&2
+              exit 1
+            fi
+          else
+            SOURCE_LINE="$(sort -t $'\t' -k3,3nr "$CANDIDATE_FILE" | head -n1)"
+            BEST_COUNT="$(printf '%s\n' "$SOURCE_LINE" | cut -f3)"
+            TOP_TIES="$(awk -F $'\t' -v c="$BEST_COUNT" '$3==c {n++} END {print n+0}' "$CANDIDATE_FILE")"
+            if [ "${TOP_TIES:-0}" -gt 1 ]; then
+              echo "ERROR: multiple top candidates found; rerun with widget_source_db override" >&2
+              sort -t $'\t' -k3,3nr "$CANDIDATE_FILE" | head -n 10
+              exit 1
+            fi
+          fi
+
+          SRC_DB="$(printf '%s\n' "$SOURCE_LINE" | cut -f1)"
+          SRC_TABLE="$(printf '%s\n' "$SOURCE_LINE" | cut -f2)"
+          SRC_COUNT="$(printf '%s\n' "$SOURCE_LINE" | cut -f3)"
+          SRC_COUNT="${SRC_COUNT:-0}"
+
+          echo "selected_source_db=$SRC_DB"
+          echo "selected_source_table=$SRC_TABLE"
+          echo "selected_source_count=$SRC_COUNT"
+
+          if [ "${SRC_DB}" = "${DB_NAME}" ] && [ "${SRC_TABLE}" = "${CURRENT_OPTIONS_TABLE}" ]; then
+            echo "ERROR: selected source is current options table; nothing to recover" >&2
+            exit 1
+          fi
+          if [ "$SRC_COUNT" -le "$CUR_OPT_COUNT" ]; then
+            echo "ERROR: source does not contain more widget_logic data than current (${SRC_COUNT} <= ${CUR_OPT_COUNT})" >&2
+            exit 1
+          fi
+          if [ "$MYSQL_ROOT_OK" != "true" ] && [ "${SRC_DB}" != "${DB_NAME}" ]; then
+            echo "ERROR: source DB differs from current but mysql root access is unavailable" >&2
+            exit 1
+          fi
+
+          TS="$(date -u +%Y%m%d%H%M%S)"
+          REC_TABLE="${TABLE_PREFIX}widget_logic_recovery_${TS}"
+          if [ "$MYSQL_ROOT_OK" = "true" ]; then
+            mysql_root_query "CREATE TABLE \`${DB_NAME}\`.\`${REC_TABLE}\` AS SELECT * FROM \`${DB_NAME}\`.\`${CURRENT_OPTIONS_TABLE}\` WHERE option_name LIKE 'widget_%' AND option_value LIKE '%widget_logic%';"
+            mysql_root_query "REPLACE INTO \`${DB_NAME}\`.\`${CURRENT_OPTIONS_TABLE}\` (option_name, option_value, autoload) SELECT option_name, option_value, autoload FROM \`${SRC_DB}\`.\`${SRC_TABLE}\` WHERE option_name LIKE 'widget_%' AND option_value LIKE '%widget_logic%';"
+          else
+            wpdb_query "CREATE TABLE \`${DB_NAME}\`.\`${REC_TABLE}\` AS SELECT * FROM \`${DB_NAME}\`.\`${CURRENT_OPTIONS_TABLE}\` WHERE option_name LIKE 'widget_%' AND option_value LIKE '%widget_logic%';"
+            wpdb_query "REPLACE INTO \`${DB_NAME}\`.\`${CURRENT_OPTIONS_TABLE}\` (option_name, option_value, autoload) SELECT option_name, option_value, autoload FROM \`${SRC_DB}\`.\`${SRC_TABLE}\` WHERE option_name LIKE 'widget_%' AND option_value LIKE '%widget_logic%';"
+          fi
+
+          NEW_OPT_COUNT="$(wpdb_query "SELECT COUNT(*) FROM \`${DB_NAME}\`.\`${CURRENT_OPTIONS_TABLE}\` WHERE option_name LIKE 'widget_%' AND option_value LIKE '%widget_logic%';" | head -n1 || echo 0)"
+          NEW_OPT_COUNT="${NEW_OPT_COUNT:-0}"
+          echo "widget_logic_recovery_applied=true"
+          echo "recovery_backup_table=${DB_NAME}.${REC_TABLE}"
+          echo "current_widget_logic_option_count_after=${NEW_OPT_COUNT}"
+
+          echo "=== Post-recovery widget_logic instance summary ==="
+          sudo -u www-data wp eval '
+          global $wpdb;
+          $rows      = $wpdb->get_results( "SELECT option_name, option_value FROM {$wpdb->options} WHERE option_name LIKE '\''widget_%'\''", ARRAY_A );
+          $total     = 0;
+          $non_empty = 0;
+          foreach ( $rows as $row ) {
+            $value = maybe_unserialize( $row["option_value"] );
+            if ( ! is_array( $value ) ) {
+              continue;
+            }
+            foreach ( $value as $instance ) {
+              if ( ! is_array( $instance ) || ! array_key_exists( "widget_logic", $instance ) ) {
+                continue;
+              }
+              $total++;
+              if ( trim( (string) $instance["widget_logic"] ) !== "" ) {
+                $non_empty++;
+              }
+            }
+          }
+          echo "widget_logic_instances_total_after=" . $total . PHP_EOL;
+          echo "widget_logic_instances_non_empty_after=" . $non_empty . PHP_EOL;
+          ' --path="$WP_PATH"
+          REMOTE
+
+          rm -f ~/.ssh/id_rsa
+
+      - name: Probe production auth and mail health
+        if: ${{ inputs.probe_auth_mail == true }}
+        env:
+          PROD_SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+          PROD_HOST: ${{ vars.PROD_HOST }}
+          DISABLE_JETPACK_PROTECT: ${{ inputs.disable_jetpack_protect }}
+          SKIP_SYNTHETIC_LOGIN: ${{ inputs.skip_synthetic_login }}
+          INSTALL_LOGIN_HOTFIX: ${{ inputs.install_login_hotfix }}
+        run: |
+          set -euo pipefail
+          if [ -z "${PROD_SSH_PRIVATE_KEY:-}" ]; then
+            echo "PROD_SSH_PRIVATE_KEY not set" >&2
+            exit 1
+          fi
+
+          TARGET_HOST="${PROD_HOST:-REDACTED_PROD_NEW_IP}"
+          mkdir -p ~/.ssh
+          printf '%s\n' "$PROD_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+          REMOTE_SHELL="bash -s"
+          if ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
+            github-deploy@"$TARGET_HOST" "sudo -n true" >/dev/null 2>&1; then
+            REMOTE_SHELL="sudo -E -n bash -s"
+          fi
+
+          ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
+            github-deploy@"$TARGET_HOST" \
+            "DISABLE_JETPACK_PROTECT='${DISABLE_JETPACK_PROTECT:-false}' SKIP_SYNTHETIC_LOGIN='${SKIP_SYNTHETIC_LOGIN:-false}' INSTALL_LOGIN_HOTFIX='${INSTALL_LOGIN_HOTFIX:-false}' $REMOTE_SHELL" <<'REMOTE'
+          set -euo pipefail
+
+          WP_PATH="/var/www/html"
+          APACHE_LOG_DIR="/var/log/apache2"
+          DISABLE_JETPACK_PROTECT="$(printf '%s' "${DISABLE_JETPACK_PROTECT:-false}" | tr '[:upper:]' '[:lower:]')"
+          SKIP_SYNTHETIC_LOGIN="$(printf '%s' "${SKIP_SYNTHETIC_LOGIN:-false}" | tr '[:upper:]' '[:lower:]')"
+          INSTALL_LOGIN_HOTFIX="$(printf '%s' "${INSTALL_LOGIN_HOTFIX:-false}" | tr '[:upper:]' '[:lower:]')"
+
+          echo "HOST=$(hostname -f 2>/dev/null || hostname)"
+          echo "UTC_NOW=$(date -u --iso-8601=seconds)"
+
+          echo "=== WordPress auth/mail configuration ==="
+          sudo -u www-data wp core version --path="$WP_PATH"
+          sudo -u www-data wp plugin list --status=active --field=name --path="$WP_PATH" | sed -n '1,200p'
+          sudo -u www-data wp plugin is-active wp-mail-smtp --path="$WP_PATH" \
+            && echo "wp-mail-smtp=active" || echo "wp-mail-smtp=inactive"
+          sudo -u www-data wp option get admin_email --path="$WP_PATH" || true
+          sudo -u www-data wp eval '
+          $o = get_option("wp_mail_smtp");
+          if (is_array($o)) {
+            echo "wp-mail-smtp-mailer=" . ($o["mail"]["mailer"] ?? "unknown") . PHP_EOL;
+            echo "wp-mail-smtp-from-email=" . ($o["mail"]["from_email"] ?? "unknown") . PHP_EOL;
+          } else {
+            echo "wp-mail-smtp-config=missing";
+          }
+          ' --path="$WP_PATH" || true
+
+          if sudo -u www-data wp help jetpack >/dev/null 2>&1; then
+            if [ "${DISABLE_JETPACK_PROTECT}" = "true" ]; then
+              echo "=== Emergency action: disabling Jetpack Protect ==="
+              sudo -u www-data wp jetpack module deactivate protect --path="$WP_PATH" || true
+            fi
+            if sudo -u www-data wp jetpack module is-active protect --path="$WP_PATH" >/dev/null 2>&1; then
+              echo "jetpack_protect_active=yes"
+            else
+              echo "jetpack_protect_active=no"
+            fi
+          else
+            echo "jetpack_cli_unavailable"
+          fi
+
+          if [ "${INSTALL_LOGIN_HOTFIX}" = "true" ]; then
+            echo "=== Emergency action: install MU login hotfix ==="
+            sudo -u www-data wp eval '
+            if ( class_exists( "Jetpack" ) ) {
+              $before = Jetpack::is_module_active( "protect" ) ? "active" : "inactive";
+              if ( Jetpack::is_module_active( "protect" ) ) {
+                Jetpack::deactivate_module( "protect" );
+              }
+              $after = Jetpack::is_module_active( "protect" ) ? "active" : "inactive";
+              echo "jetpack_protect_before=" . $before . PHP_EOL;
+              echo "jetpack_protect_after=" . $after . PHP_EOL;
+            } else {
+              echo "jetpack_class_unavailable" . PHP_EOL;
+            }
+            ' --path="$WP_PATH" || true
+            MU_DIR="$WP_PATH/wp-content/mu-plugins"
+            MU_FILE="$MU_DIR/pausatf-jetpack-login-hotfix.php"
+            mkdir -p "$MU_DIR"
+            printf '%s\n' \
+              "<?php" \
+              "function pausatf_remove_jetpack_math_object_callback( \$hook_name, \$method_name ) {" \
+              "    global \$wp_filter;" \
+              "    \$class_name = 'Automattic\\\\Jetpack\\\\Waf\\\\Brute_Force_Protection\\\\Brute_Force_Protection_Math_Authenticate';" \
+              "    if ( empty( \$wp_filter[ \$hook_name ] ) || empty( \$wp_filter[ \$hook_name ]->callbacks ) ) { return; }" \
+              "    foreach ( \$wp_filter[ \$hook_name ]->callbacks as \$priority => \$callbacks ) {" \
+              "        foreach ( \$callbacks as \$callback ) {" \
+              "            if ( empty( \$callback['function'] ) || ! is_array( \$callback['function'] ) ) { continue; }" \
+              "            \$target = \$callback['function'];" \
+              "            if ( ! is_object( \$target[0] ?? null ) || ( \$target[1] ?? '' ) !== \$method_name ) { continue; }" \
+              "            if ( is_a( \$target[0], \$class_name ) ) { remove_action( \$hook_name, array( \$target[0], \$method_name ), (int) \$priority ); }" \
+              "        }" \
+              "    }" \
+              "}" \
+              "function pausatf_remove_jetpack_math_fallback() {" \
+              "    pausatf_remove_jetpack_math_object_callback( 'login_form', 'math_form' );" \
+              "    pausatf_remove_jetpack_math_object_callback( 'init', 'process_generate_math_page' );" \
+              "    for ( \$priority = 1; \$priority <= 1000; \$priority++ ) {" \
+              "        remove_filter( 'authenticate', 'Automattic\\\\Jetpack\\\\Waf\\\\Brute_Force_Protection\\\\Brute_Force_Protection_Math_Authenticate::math_authenticate', \$priority );" \
+              "    }" \
+              "}" \
+              "add_action('login_head', function () { echo '<!-- pausatf-mu-hotfix -->'; }, 1);" \
+              "add_action('plugins_loaded', 'pausatf_remove_jetpack_math_fallback', 9999);" \
+              "add_action('init', 'pausatf_remove_jetpack_math_fallback', 9999);" \
+              "add_action('login_init', 'pausatf_remove_jetpack_math_fallback', 9999);" \
+              "add_action('login_form', 'pausatf_remove_jetpack_math_fallback', 1);" \
+              "add_action('login_form_login', 'pausatf_remove_jetpack_math_fallback', 1);" \
+              > "$MU_FILE"
+            chown www-data:www-data "$MU_FILE"
+            chmod 0644 "$MU_FILE"
+            php -l "$MU_FILE"
+            echo "mu_hotfix_path=$MU_FILE"
+          fi
+
+          echo "=== Locate login challenge source ==="
+          grep -R --line-number --fixed-strings \
+            "Please solve this math problem to prove that you are not a bot" \
+            "$WP_PATH/wp-content" 2>/dev/null | head -n 20 || true
+          grep -R --line-number --fixed-strings \
+            "IP_ALLOW_LIST_OPTION_NAME" \
+            "$WP_PATH/wp-content/plugins/jetpack/jetpack_vendor/automattic/jetpack-waf/src" \
+            2>/dev/null | head -n 20 || true
+          grep -R --line-number -E 'https?://|api\\.wordpress\\.com|public-api\\.wordpress\\.com|jetpack\\.wordpress\\.com' \
+            "$WP_PATH/wp-content/plugins/jetpack/jetpack_vendor/automattic/jetpack-waf/src" \
+            2>/dev/null | head -n 80 || true
+
+          echo "=== Jetpack WAF brute-force internals ==="
+          JETPACK_MATH_FILE="$WP_PATH/wp-content/plugins/jetpack/jetpack_vendor/automattic/jetpack-waf/src/brute-force-protection/class-math-fallback.php"
+          if [ -f "$JETPACK_MATH_FILE" ]; then
+            sed -n '1,220p' "$JETPACK_MATH_FILE" | sed -n '1,220p'
+            grep -R --line-number -E 'get_option|update_option|apply_filters|do_action|brute|protect|math|ip' \
+              "$WP_PATH/wp-content/plugins/jetpack/jetpack_vendor/automattic/jetpack-waf/src/brute-force-protection" \
+              2>/dev/null | head -n 200 || true
+          else
+            echo "jetpack_math_fallback_file_missing"
+          fi
+
+          echo "=== Jetpack Protect API reachability ==="
+          for URL in "https://public-api.wordpress.com/rest/v1.1/" "https://jetpack.wordpress.com/"; do
+            HOST="$(printf '%s' "$URL" | awk -F/ '{print $3}')"
+            echo "-- DNS $HOST --"
+            getent ahostsv4 "$HOST" | head -n 3 || true
+            echo "-- curl $HOST --"
+            curl -sS --max-time 20 -o /dev/null \
+              -w "$HOST http=%{http_code} ip=%{remote_ip} connect=%{time_connect} total=%{time_total}\n" \
+              "$URL" || true
+          done
+          sudo -u www-data wp eval '
+          $urls = array(
+            "https://public-api.wordpress.com/rest/v1.1/",
+            "https://jetpack.wordpress.com/",
+          );
+          foreach ( $urls as $url ) {
+            $response = wp_remote_get( $url, array( "timeout" => 20 ) );
+            if ( is_wp_error( $response ) ) {
+              echo "wp_http_error[" . $url . "]=" . $response->get_error_code() . ":" . $response->get_error_message() . PHP_EOL;
+              continue;
+            }
+            echo "wp_http_status[" . $url . "]=" . wp_remote_retrieve_response_code( $response ) . PHP_EOL;
+          }
+          ' --path="$WP_PATH" || true
+
+          if [ "${SKIP_SYNTHETIC_LOGIN}" != "true" ]; then
+            echo "=== Synthetic login transaction ==="
+            TEST_USER="copilot-login-probe-$(date +%s)"
+            TEST_EMAIL="${TEST_USER}@pausatf.org"
+            TEST_PASS="$(openssl rand -hex 16)"
+            COOKIE_FILE="$(mktemp)"
+            HEADER_FILE="$(mktemp)"
+            BODY_FILE="$(mktemp)"
+
+            cleanup_probe_user() {
+              sudo -u www-data wp user delete "$TEST_USER" --yes --path="$WP_PATH" >/dev/null 2>&1 || true
+              rm -f "$COOKIE_FILE" "$HEADER_FILE" "$BODY_FILE"
+            }
+            trap cleanup_probe_user EXIT
+
+            sudo -u www-data wp user create "$TEST_USER" "$TEST_EMAIL" \
+              --user_pass="$TEST_PASS" --role=subscriber --path="$WP_PATH" >/dev/null
+
+            curl -sS -D "$HEADER_FILE" -o "$BODY_FILE" \
+              -c "$COOKIE_FILE" -b "$COOKIE_FILE" \
+              --data-urlencode "log=$TEST_USER" \
+              --data-urlencode "pwd=$TEST_PASS" \
+              --data 'wp-submit=Log In&redirect_to=http%3A%2F%2Fwww.pausatf.org%2Fwp-admin%2F&testcookie=1' \
+              https://www.pausatf.org/wp-login.php
+
+            if ! grep -qi '^Set-Cookie: wordpress_logged_in_' "$HEADER_FILE"; then
+              echo "ERROR: synthetic login failed to set wordpress_logged_in cookie" >&2
+              sed -n '1,120p' "$BODY_FILE" >&2 || true
+              exit 1
+            fi
+
+            ADMIN_STATUS="$(
+              curl -sS -o /dev/null -w '%{http_code}' \
+                -b "$COOKIE_FILE" \
+                https://www.pausatf.org/wp-admin/
+            )"
+            echo "synthetic_wp_admin_http_status=$ADMIN_STATUS"
+            if [ "$ADMIN_STATUS" != "200" ] && [ "$ADMIN_STATUS" != "302" ]; then
+              echo "ERROR: synthetic login reached unexpected wp-admin status ($ADMIN_STATUS)" >&2
+              exit 1
+            fi
+            echo "synthetic_login_result=PASS"
+          else
+            echo "synthetic_login_skipped=true"
+          fi
+
+          echo "=== Synthetic wp_mail transaction ==="
+          MAIL_RESULT="$(
+            sudo -u www-data wp eval '
+            add_action("wp_mail_failed", function($error) {
+              fwrite(STDERR, "wp_mail_failed: " . $error->get_error_message() . PHP_EOL);
+            });
+            $to = get_option("admin_email");
+            $subject = "PAUSATF mail probe " . gmdate("c");
+            $body = "Automated diagnostics mail probe.";
+            $ok = wp_mail($to, $subject, $body);
+            echo $ok ? "accepted_by_wp_mail" : "wp_mail_returned_false";
+            ' --path="$WP_PATH" 2>&1 || true
+          )"
+          echo "synthetic_wp_mail_result=$MAIL_RESULT"
+
+          echo "=== Mail transport status ==="
+          systemctl is-active postfix || true
+          (mailq || true) | head -n 40
+          journalctl -u postfix --since '2 days ago' --no-pager | tail -n 120 || true
+
+          echo "=== Recent wp-login/lostpassword access entries ==="
+          grep -hE 'wp-login\\.php|action=lostpassword' "$APACHE_LOG_DIR"/access.log* 2>/dev/null | tail -n 120 || true
+
+          echo "=== Recent Apache/PHP errors for auth/mail ==="
+          grep -hiE 'wp-login|lostpassword|phpmailer|wp_mail|mail\\(|SMTP|postfix' "$APACHE_LOG_DIR"/error.log* 2>/dev/null | tail -n 120 || true
+
+          if [ -f "$WP_PATH/wp-content/debug.log" ]; then
+            echo "=== Recent WordPress debug.log auth/mail lines ==="
+            grep -iE 'wp-login|lostpassword|phpmailer|wp_mail|SMTP|mail' "$WP_PATH/wp-content/debug.log" | tail -n 120 || true
+          else
+            echo "wp-content/debug.log not present"
+          fi
+          REMOTE
+
+          rm -f ~/.ssh/id_rsa
+
+      - name: Probe production ModSecurity logs
+        if: ${{ inputs.probe_modsecurity_logs == true }}
+        env:
+          PROD_SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+          PROD_HOST: ${{ vars.PROD_HOST }}
+        run: |
+          set -euo pipefail
+          if [ -z "${PROD_SSH_PRIVATE_KEY:-}" ]; then
+            echo "PROD_SSH_PRIVATE_KEY not set" >&2
+            exit 1
+          fi
+
+          TARGET_HOST="${PROD_HOST:-REDACTED_PROD_NEW_IP}"
+          mkdir -p ~/.ssh
+          printf '%s\n' "$PROD_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+          REMOTE_SHELL="bash -s"
+          if ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
+            github-deploy@"$TARGET_HOST" "sudo -n true" >/dev/null 2>&1; then
+            REMOTE_SHELL="sudo -E -n bash -s"
+          fi
+
+          ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
+            github-deploy@"$TARGET_HOST" \
+            "$REMOTE_SHELL" <<'REMOTE'
+          set -euo pipefail
+
+          APACHE_LOG_DIR="/var/log/apache2"
+
+          echo "HOST=$(hostname -f 2>/dev/null || hostname)"
+          echo "UTC_NOW=$(date -u --iso-8601=seconds)"
+
+          mapfile -t MODSEC_LOGS < <(
+            ls -1 \
+              /var/log/apache2/modsec_audit.log* \
+              /var/log/apache2/modsecurity_audit.log* \
+              /var/log/modsecurity/audit.log* \
+              /var/log/modsec_audit.log* \
+              2>/dev/null | sort -V -r || true
+          )
+
+          echo "modsec_log_file_count=${#MODSEC_LOGS[@]}"
+          if [ "${#MODSEC_LOGS[@]}" -gt 0 ]; then
+            printf '%s\n' "${MODSEC_LOGS[@]}" | sed 's/^/modsec_log_file=/'
+          else
+            echo "modsec_logs_found=false"
+          fi
+
+          if [ "${#MODSEC_LOGS[@]}" -gt 0 ]; then
+            echo "=== Targeted ModSecurity URI counts ==="
+            for uri in "/wp-admin/widgets.php" "/wp-json/wp/v2/widgets" "/wp-json/wp/v2/widget-types" "/wp-login.php"; do
+              cnt="$(
+                { zgrep -ahF "[uri \"$uri\"]" "${MODSEC_LOGS[@]}" 2>/dev/null || true; } \
+                  | wc -l | tr -d ' '
+              )"
+              cnt="${cnt:-0}"
+              echo "modsec_uri_count uri=$uri count=$cnt"
+            done
+            login_403_cnt="$(
+              { zgrep -ahE 'Access denied with code 403 .*\[uri "/wp-login\.php"\]' "${MODSEC_LOGS[@]}" 2>/dev/null || true; } \
+                | wc -l | tr -d ' '
+            )"
+            login_403_cnt="${login_403_cnt:-0}"
+            echo "modsec_wp_login_403_count=${login_403_cnt}"
+            if [ "${login_403_cnt:-0}" -gt 0 ] 2>/dev/null; then
+              echo "=== Top wp-login 403 source IPs in ModSecurity logs ==="
+              zgrep -ahE 'Access denied with code 403 .*\[uri "/wp-login\.php"\]' "${MODSEC_LOGS[@]}" 2>/dev/null \
+                | sed -nE 's/.*\[client ([^]]+)\].*/\1/p' \
+                | sort | uniq -c | sort -nr | head -n 20 || true
+            fi
+
+            echo "=== Update-path ModSecurity URI counts ==="
+            for uri in "/wp-admin/update.php" "/wp-admin/plugins.php" "/wp-admin/update-core.php" "/wp-admin/admin-ajax.php"; do
+              cnt="$(
+                { zgrep -ahF "[uri \"$uri\"]" "${MODSEC_LOGS[@]}" 2>/dev/null || true; } \
+                  | wc -l | tr -d ' '
+              )"
+              cnt="${cnt:-0}"
+              echo "modsec_update_uri_count uri=$uri count=$cnt"
+            done
+
+            echo "=== Update-path ModSecurity 403 counts ==="
+            for uri in "/wp-admin/update.php" "/wp-admin/plugins.php" "/wp-admin/update-core.php" "/wp-admin/admin-ajax.php"; do
+              block_cnt="$(
+                { zgrep -ahE "Access denied with code 403 .*\\[uri \"$uri\"\\]" "${MODSEC_LOGS[@]}" 2>/dev/null || true; } \
+                  | wc -l | tr -d ' '
+              )"
+              block_cnt="${block_cnt:-0}"
+              echo "modsec_update_403_count uri=$uri count=$block_cnt"
+            done
+
+            widget_logic_update_403_count="$(
+              { zgrep -ahEi 'Access denied with code 403 .*((upgrade-plugin|update-plugin|upgrade-selected|plugin-install)|widget-logic|widget_logic\.php)' "${MODSEC_LOGS[@]}" 2>/dev/null || true; } \
+                | wc -l | tr -d ' '
+            )"
+            widget_logic_update_403_count="${widget_logic_update_403_count:-0}"
+            echo "modsec_widget_logic_update_403_count=${widget_logic_update_403_count}"
+            if [ "${widget_logic_update_403_count:-0}" -gt 0 ] 2>/dev/null; then
+              echo "=== Widget Logic update-related 403 entries ==="
+              zgrep -ahEi 'Access denied with code 403 .*((upgrade-plugin|update-plugin|upgrade-selected|plugin-install)|widget-logic|widget_logic\.php)' "${MODSEC_LOGS[@]}" 2>/dev/null \
+                | tail -n 40 || true
+            fi
+            echo "=== Widget Logic update-related ModSecurity entries (last 80) ==="
+            zgrep -ahEi 'widget-logic|widget_logic\.php|upgrade-plugin|update-plugin|upgrade-selected|plugin-install' "${MODSEC_LOGS[@]}" 2>/dev/null \
+              | tail -n 80 || true
+
+            widget_modsec_count="$(
+              { zgrep -ahF '[uri "/wp-admin/widgets.php"]' "${MODSEC_LOGS[@]}" 2>/dev/null || true; } \
+                | wc -l | tr -d ' '
+            )"
+            widget_modsec_count="${widget_modsec_count:-0}"
+            echo "modsec_widget_entry_count=${widget_modsec_count}"
+            if [ "${widget_modsec_count:-0}" -gt 0 ] 2>/dev/null; then
+              widget_403_count="$(
+                { zgrep -ahE 'Access denied with code 403 .*\[uri "/wp-admin/widgets\.php"\]' "${MODSEC_LOGS[@]}" 2>/dev/null || true; } \
+                  | wc -l | tr -d ' '
+              )"
+              widget_403_count="${widget_403_count:-0}"
+              echo "modsec_widget_403_count=${widget_403_count}"
+              if [ "${widget_403_count:-0}" -gt 0 ] 2>/dev/null; then
+                echo "=== Top widgets.php 403 source IPs in ModSecurity logs ==="
+                zgrep -ahE 'Access denied with code 403 .*\[uri "/wp-admin/widgets\.php"\]' "${MODSEC_LOGS[@]}" 2>/dev/null \
+                  | sed -nE 's/.*\[client ([^]]+)\].*/\1/p' \
+                  | sort | uniq -c | sort -nr | head -n 20 || true
+                echo "=== widgets.php 403 ModSecurity entries ==="
+                zgrep -ahE 'Access denied with code 403 .*\[uri "/wp-admin/widgets\.php"\]' "${MODSEC_LOGS[@]}" 2>/dev/null \
+                  | head -n 20 || true
+                echo "=== widgets.php 403 full transaction excerpts ==="
+                while IFS= read -r uid; do
+                  [ -z "$uid" ] && continue
+                  echo "-- unique_id=$uid --"
+                  zgrep -ahF "$uid" "${MODSEC_LOGS[@]}" 2>/dev/null | tail -n 120 || true
+                done < <(
+                  zgrep -ahE 'Access denied with code 403 .*\[uri "/wp-admin/widgets\.php"\]' "${MODSEC_LOGS[@]}" 2>/dev/null \
+                    | sed -nE 's/.*\[unique_id "([^"]+)"\].*/\1/p' \
+                    | sort -u | head -n 10
+                )
+              fi
+              echo "=== Widget-related ModSecurity entries (first 80) ==="
+              zgrep -ahF '[uri "/wp-admin/widgets.php"]' "${MODSEC_LOGS[@]}" 2>/dev/null \
+                | head -n 80 || true
+              echo "=== Widget-related ModSecurity entries (last 80) ==="
+              zgrep -ahF '[uri "/wp-admin/widgets.php"]' "${MODSEC_LOGS[@]}" 2>/dev/null \
+                | tail -n 80 || true
+            fi
+
+            echo "=== Recent ModSecurity entries for widgets/auth/jetpack ==="
+            zgrep -hEi 'wp-admin/widgets\.php|wp-login\.php|action=lostpassword|wp-json/wp/v2/(widgets|widget-types)|widget_logic|jetpack|modsecurity|access denied|denied with code 403' \
+              "${MODSEC_LOGS[@]}" 2>/dev/null | tail -n 220 || true
+
+            echo "=== ModSecurity rule IDs (top 30) ==="
+            zgrep -hEo 'id "?[0-9]{3,}"?' "${MODSEC_LOGS[@]}" 2>/dev/null \
+              | tr -cd '0-9\n' | sed '/^$/d' | sort | uniq -c | sort -nr | head -n 30 || true
+
+            echo "=== Potential ModSecurity blocks for widgets/auth (last 120) ==="
+            zgrep -hEi 'wp-admin/widgets\.php|wp-login\.php|action=lostpassword|widget_logic|wp-json/wp/v2/(widgets|widget-types)|jetpack' \
+              "${MODSEC_LOGS[@]}" 2>/dev/null \
+              | grep -Ei 'denied|block|403|intercept|forbidden|modsecurity' \
+              | tail -n 120 || true
+          fi
+
+          echo "=== Apache widgets/auth 403 timeline (last 200) ==="
+          zgrep -hE ' /wp-admin/widgets\.php| /wp-login\.php|action=lostpassword|/wp-json/wp/v2/widgets|/wp-json/wp/v2/widget-types' \
+            "$APACHE_LOG_DIR"/access.log* 2>/dev/null | grep -E '" 403 ' | tail -n 200 || true
+
+          echo "=== Apache error modsecurity/widget/auth clues (last 200) ==="
+          zgrep -hEi 'modsecurity|mod_security|widgets\.php|wp-login\.php|widget_logic|jetpack|denied|forbidden|access denied|security2' \
+            "$APACHE_LOG_DIR"/error.log* 2>/dev/null | tail -n 200 || true
+          REMOTE
+
+          rm -f ~/.ssh/id_rsa
+
       - name: Check for available plugin updates
+        if: ${{ inputs.probe_auth_mail != true && inputs.probe_widget_logic != true && inputs.probe_modsecurity_logs != true }}
         id: check
         env:
           PROD_SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
@@ -46,7 +1053,7 @@ jobs:
           fi
 
       - name: Open issue for available updates
-        if: steps.check.outputs.updates_found == 'true'
+        if: steps.check.outputs.updates_found == 'true' && inputs.probe_auth_mail != true && inputs.probe_widget_logic != true && inputs.probe_modsecurity_logs != true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
