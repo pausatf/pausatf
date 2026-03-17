@@ -1,0 +1,11 @@
+---
+managed_db_host: "127.0.0.1"
+managed_db_port: 3306
+managed_wp_db_user: "wordpress"
+managed_wp_db_password: ""
+wordpress_domain: "pausatf.org"
+migration_rsync_uploads: false
+migration_rsync_uploads_src: "/var/www/html/wp-content/uploads/"
+migration_rsync_uploads_dest: "/var/www/html/wp-content/uploads/"
+migration_min_free_disk_gb: 10
+migration_wp_docroot: "/var/www/html"
