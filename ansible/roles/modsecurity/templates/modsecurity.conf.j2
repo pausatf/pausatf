@@ -40,9 +40,9 @@ FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
 SecRule MULTIPART_UNMATCHED_BOUNDARY "!@eq 0" \
 "id:'200004',phase:2,t:none,log,deny,msg:'Multipart parser detected a possible unmatched boundary.'"
 
-# PCRE tuning
-SecPcreMatchLimit 100000
-SecPcreMatchLimitRecursion 100000
+# PCRE tuning - increased to prevent false 403s on large WordPress admin pages
+SecPcreMatchLimit {{ modsecurity_pcre_match_limit }}
+SecPcreMatchLimitRecursion {{ modsecurity_pcre_match_limit_recursion }}
 
 SecRule TX:/^MSC_/ "!@streq 0" \
         "id:'200005',phase:2,t:none,deny,msg:'ModSecurity internal error flagged: %{MATCHED_VAR_NAME}'"
@@ -69,3 +69,7 @@ SecArgumentSeparator &
 SecCookieFormat 0
 SecUnicodeMapFile {{ modsecurity_unicode_map_file }}
 SecStatusEngine On
+
+# Exclude wp-admin response bodies from SQL leakage inspection (CRS 951xxx rules)
+# These rules cause PCRE limit errors on large WordPress admin pages (widgets, TablePress)
+SecRule REQUEST_URI "^/wp-admin/" "id:1000,phase:4,nolog,pass,ctl:ruleRemoveById=951100-951999"
