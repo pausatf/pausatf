@@ -129,6 +129,18 @@ repos:
         files: \.md$
 
   # ===========================================================================
+  # PHP (optional local hook; requires phpcs in PATH)
+  # ===========================================================================
+  - repo: local
+    hooks:
+      - id: phpcs
+        name: phpcs (WordPress)
+        entry: phpcs --standard=phpcs.xml.dist
+        language: system
+        types: [php]
+        files: ^(themes/|wp-content/plugins/).+\.php$
+
+  # ===========================================================================
   # GitHub Actions Workflow Linting
   # ===========================================================================
   - repo: https://github.com/rhysd/actionlint
