@@ -199,6 +199,24 @@ ansible-playbook --syntax-check playbooks/your-playbook.yml
 
 ### Shell Script Standards
 
+### PHP Standards (themes/ and custom plugins)
+
+- Coding standard: WordPress-Core/Extra/Docs via PHPCS
+- PHP versions: 8.0–8.3 (project target)
+- Install PHPCS + WPCS locally (optional, CI enforces it):
+
+```bash
+composer global require squizlabs/php_codesniffer:^3 wp-coding-standards/wpcs:^3 phpcompatibility/php-compatibility:^9
+phpcs --config-set installed_paths ~/.composer/vendor/wp-coding-standards/wpcs,~/.composer/vendor/phpcompatibility/php-compatibility
+```
+
+- Run checks locally:
+
+```bash
+php -l themes/thesource-child/functions.php
+phpcs --standard=phpcs.xml.dist themes wp-content/plugins
+```
+
 - **ShellCheck**: All scripts must pass ShellCheck
 - **Shebang**: Use `#!/usr/bin/env bash` for portability
 - **Error handling**: Use `set -euo pipefail` for robust scripts
