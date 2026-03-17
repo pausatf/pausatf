@@ -10,7 +10,7 @@
 # These values describe the live production droplet and must not bleed into
 # dev/staging, which use different (or no) DigitalOcean resources.
 digitalocean_droplet_id: "{{ vault_digitalocean_droplet_id }}"
-digitalocean_droplet_name: "pausatf-prod"
+digitalocean_droplet_name: "pausatf-prod-new"
 digitalocean_region: "sfo2"
 digitalocean_region_name: "San Francisco 2"
 digitalocean_size: "s-4vcpu-8gb"
@@ -18,7 +18,7 @@ digitalocean_vcpus: 4
 digitalocean_memory_mb: 8192
 digitalocean_disk_gb: 160
 digitalocean_image: "pausatf.org 2023-05-16"
-digitalocean_public_ip: "64.225.40.54"
+digitalocean_public_ip: "167.71.117.226"
 digitalocean_private_ip: "10.138.0.2"
 digitalocean_vpc_uuid: "4ee39499-dc85-11e8-9f23-3cfdfea9fff1"
 digitalocean_features:
@@ -63,14 +63,28 @@ cloudflare_dns_records:
 hostname: "pausatf-prod"
 web_server: apache
 
-# Production is currently Ubuntu 20.04; keep Apache on prefork + mod_php until OS uplift.
-apache_mpm: "prefork"
-use_php_fpm: false
+# Ubuntu 24.04: event MPM + PHP-FPM
+apache_mpm: "event"
+use_php_fpm: true
 php_version: "8.4"
+
+# Temporary incident mode: keep ModSecurity in audit-only operation while rules are tuned.
+modsecurity_rule_engine: "DetectionOnly"
+modsecurity_audit_engine: "On"
 
 # Production WordPress runs on DigitalOcean Managed MySQL, not local MySQL.
 mysql_managed: true
 mysql_enabled: false
+
+# Redis object cache
+redis_enabled: true
+redis_maxmemory: "128mb"
+
+# AppArmor
+apparmor_apache_enforce: true
+
+# Certbot
+certbot_enabled: true
 
 # =============================================================================
 # WORDPRESS — PRODUCTION INSTALL

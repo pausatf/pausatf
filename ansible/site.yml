@@ -80,10 +80,34 @@
           include_role:
             name: fail2ban
 
+        - name: Include AppArmor role
+          include_role:
+            name: apparmor
+          when: apparmor_apache_enforce | default(false)
+          tags: apparmor
+
         - name: Include WordPress role
           include_role:
             name: wordpress
           when: wordpress_enabled | default(true)
+
+        - name: Include PAUSATF plugin role
+          include_role:
+            name: pausatf_plugin
+          when: pausatf_plugin_enabled | default(false)
+          tags: pausatf_plugin
+
+        - name: Include Backups role
+          include_role:
+            name: backups
+          when: backups_enabled | default(false)
+          tags: backups
+
+        - name: Include Security Hardening role
+          include_role:
+            name: security_hardening
+          when: security_hardening_enabled | default(true)
+          tags: security_hardening
 
         - name: Include Cloudflare role
           include_role:
@@ -131,6 +155,26 @@
         - name: Fail the play after rescue
           fail:
             msg: "Deployment failed. Web server recovery attempted. Review errors above."
+
+- name: Run discovery
+  hosts: webservers
+  gather_facts: true
+  become: true
+  tags: discovery
+
+  roles:
+    - role: discovery
+      when: run_discovery | default(false)
+
+- name: Pre-cutover validation
+  hosts: webservers
+  gather_facts: true
+  become: true
+  tags: migration_prep
+
+  roles:
+    - role: migration_prep
+      when: run_migration_prep | default(false)
 
 - name: Configure monitoring
   hosts: all
