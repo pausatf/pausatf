@@ -38,23 +38,23 @@ digitalocean_tags:
 cloudflare_dns_records:
   - name: "@"
     type: "A"
-    content: "64.225.40.54"
+    content: "167.71.117.226"
     proxied: true
   - name: "www"
     type: "A"
-    content: "64.225.40.54"
+    content: "167.71.117.226"
     proxied: true
   - name: "ftp"
     type: "A"
-    content: "64.225.40.54"
+    content: "167.71.117.226"
     proxied: false
   - name: "mail"
     type: "A"
-    content: "64.225.40.54"
+    content: "167.71.117.226"
     proxied: false
   - name: "monitor"
     type: "A"
-    content: "64.225.40.54"
+    content: "167.71.117.226"
     proxied: false
 
 # =============================================================================
