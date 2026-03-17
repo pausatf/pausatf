@@ -3,6 +3,12 @@
 # - uses WP-CLI to manage core, plugins, and themes
 # - honors per-install settings in group_vars
 
+- name: Remove default index.html that conflicts with WordPress
+  file:
+    path: "{{ item.path | default('/var/www/html') }}/index.html"
+    state: absent
+  loop: "{{ wordpress_installs }}"
+
 - name: Assert WordPress credentials are configured
   assert:
     that:
