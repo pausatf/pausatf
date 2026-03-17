@@ -11,7 +11,7 @@ ignoreip = 127.0.0.1/8 ::1
 destemail = {{ fail2ban_destemail }}
 sendername = {{ fail2ban_sendername }}
 mta = {{ fail2ban_mta }}
-action = {{ fail2ban_action }}
+action = %(action_)s
 
 [sshd]
 enabled = true
@@ -67,6 +67,22 @@ bantime = 3600
 enabled = true
 port = http,https
 filter = wordpress-enum
-logpath = /var/log/auth.log
+logpath = /var/log/apache2/pausatf-main-ssl-access.log
 maxretry = 1
 bantime = 86400
+
+[wordpress-hard]
+enabled = true
+port = http,https
+filter = wordpress-auth
+logpath = /var/log/auth.log
+maxretry = 2
+bantime = 86400
+
+[wordpress-soft]
+enabled = true
+port = http,https
+filter = wordpress-auth
+logpath = /var/log/auth.log
+maxretry = 5
+bantime = 3600
