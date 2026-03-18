@@ -11,6 +11,17 @@
   tags:
     - security_hardening
 
+- name: Set SSH AllowUsers
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^\s*#?\s*AllowUsers\b'
+    line: "AllowUsers {{ hardening_ssh_allow_users | join(' ') }}"
+    validate: 'sshd -t -f %s'
+  when: hardening_ssh_allow_users | default([]) | length > 0
+  notify: Reload sshd
+  tags:
+    - security_hardening
+
 - name: Set SSH MaxAuthTries to {{ hardening_ssh_max_auth_tries }}
   ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
