@@ -9,8 +9,8 @@
 
   tasks:
     - name: Create local capture directory
-      local_action:
-        module: file
+      delegate_to: localhost
+      ansible.builtin.file:
         path: "{{ capture_dir }}"
         state: directory
         mode: "0755"
@@ -33,8 +33,8 @@
       changed_when: false
 
     - name: Save package list
-      local_action:
-        module: copy
+      delegate_to: localhost
+      ansible.builtin.copy:
         dest: "{{ capture_dir }}/packages.txt"
         content: "{{ lsphp_pkgs.stdout }}\n"
 
@@ -48,8 +48,8 @@
       changed_when: false
 
     - name: Save service status
-      local_action:
-        module: copy
+      delegate_to: localhost
+      ansible.builtin.copy:
         dest: "{{ capture_dir }}/services.txt"
         content: "{{ svc_status.stdout }}\n"
 
@@ -61,7 +61,7 @@
       changed_when: false
 
     - name: Save certbot info
-      local_action:
-        module: copy
+      delegate_to: localhost
+      ansible.builtin.copy:
         dest: "{{ capture_dir }}/certbot.txt"
         content: "{{ certbot_info.stdout }}\n"

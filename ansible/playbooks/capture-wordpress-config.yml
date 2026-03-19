@@ -29,8 +29,8 @@
 
   tasks:
     - name: Create local output directory
-      local_action:
-        module: file
+      delegate_to: localhost
+      ansible.builtin.file:
         path: "{{ output_dir }}/{{ inventory_hostname }}"
         state: directory
         mode: "0755"
@@ -465,8 +465,8 @@
       failed_when: false
 
     - name: Create configuration summary
-      local_action:
-        module: copy
+      delegate_to: localhost
+      ansible.builtin.copy:
         content: |
           # WordPress Configuration - {{ inventory_hostname }}
           # Captured: {{ timestamp }}
@@ -621,30 +621,30 @@
       become: false
 
     - name: Save plugins list as JSON
-      local_action:
-        module: copy
+      delegate_to: localhost
+      ansible.builtin.copy:
         content: "{{ wp_plugins.stdout }}"
         dest: "{{ output_dir }}/{{ inventory_hostname }}/plugins-{{ timestamp }}.json"
       become: false
 
     - name: Save themes list as JSON
-      local_action:
-        module: copy
+      delegate_to: localhost
+      ansible.builtin.copy:
         content: "{{ wp_themes.stdout }}"
         dest: "{{ output_dir }}/{{ inventory_hostname }}/themes-{{ timestamp }}.json"
       become: false
 
     - name: Save WordPress constants as JSON
-      local_action:
-        module: copy
+      delegate_to: localhost
+      ansible.builtin.copy:
         content: "{{ wp_constants.stdout | default('[]') }}"
         dest: "{{ output_dir }}/{{ inventory_hostname }}/constants-{{ timestamp }}.json"
       become: false
       when: wp_constants.stdout is defined
 
     - name: Save cron configuration
-      local_action:
-        module: copy
+      delegate_to: localhost
+      ansible.builtin.copy:
         content: |
           # Cron Configuration - {{ inventory_hostname }}
           # Captured: {{ timestamp }}
@@ -667,45 +667,45 @@
       become: false
 
     - name: Save cron scripts inventory
-      local_action:
-        module: copy
+      delegate_to: localhost
+      ansible.builtin.copy:
         content: "{{ cron_scripts_content.stdout }}"
         dest: "{{ output_dir }}/{{ inventory_hostname }}/cron-scripts-inventory-{{ timestamp }}.txt"
       become: false
 
     - name: Save .htaccess files
-      local_action:
-        module: copy
+      delegate_to: localhost
+      ansible.builtin.copy:
         content: "{{ htaccess_contents.stdout }}"
         dest: "{{ output_dir }}/{{ inventory_hostname }}/htaccess-files-{{ timestamp }}.txt"
       become: false
 
     - name: Save Apache configuration
-      local_action:
-        module: copy
+      delegate_to: localhost
+      ansible.builtin.copy:
         content: "{{ apache_config.stdout }}"
         dest: "{{ output_dir }}/{{ inventory_hostname }}/apache-config-{{ timestamp }}.txt"
       become: false
       when: web_server == "apache" and apache_config.stdout is defined
 
     - name: Save OpenLiteSpeed configuration
-      local_action:
-        module: copy
+      delegate_to: localhost
+      ansible.builtin.copy:
         content: "{{ ols_config.stdout }}"
         dest: "{{ output_dir }}/{{ inventory_hostname }}/openlitespeed-config-{{ timestamp }}.txt"
       become: false
       when: web_server == "openlitespeed" and ols_config.stdout is defined
 
     - name: Save PHP configuration
-      local_action:
-        module: copy
+      delegate_to: localhost
+      ansible.builtin.copy:
         content: "{{ php_config.stdout }}"
         dest: "{{ output_dir }}/{{ inventory_hostname }}/php-config-{{ timestamp }}.txt"
       become: false
 
     - name: Save SSL certificates info
-      local_action:
-        module: copy
+      delegate_to: localhost
+      ansible.builtin.copy:
         content: "{{ ssl_certs.stdout }}"
         dest: "{{ output_dir }}/{{ inventory_hostname }}/ssl-certs-{{ timestamp }}.txt"
       become: false
