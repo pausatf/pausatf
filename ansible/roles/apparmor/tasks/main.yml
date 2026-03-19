@@ -1,3 +1,4 @@
+---
 # AppArmor role — enforce MAC policy on Apache for PAUSATF
 # Deploys a local override granting ModSecurity read/write to its paths
 
@@ -31,7 +32,7 @@
     state: directory
     owner: root
     group: root
-    mode: '0755'
+    mode: "0755"
   tags:
     - apparmor
 
@@ -41,7 +42,7 @@
     dest: /etc/apparmor.d/local/usr.sbin.apache2
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   when: _apparmor_apache_profile.stat.exists
   notify: Reload AppArmor
   tags:

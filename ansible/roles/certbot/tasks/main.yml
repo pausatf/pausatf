@@ -10,43 +10,43 @@
   when: certbot_enabled | default(true)
 
 - name: Install certbot and Cloudflare DNS plugin
-  apt:
+  ansible.builtin.apt:
     name:
       - certbot
       - python3-certbot-dns-cloudflare
     state: present
 
 - name: Ensure letsencrypt directory exists
-  file:
+  ansible.builtin.file:
     path: /etc/letsencrypt
     state: directory
     owner: root
     group: root
-    mode: '0700'
+    mode: "0700"
 
 - name: Ensure certbot renewal-hooks directory exists
-  file:
+  ansible.builtin.file:
     path: /etc/letsencrypt/renewal-hooks/deploy
     state: directory
     owner: root
     group: root
-    mode: '0755'
+    mode: "0755"
 
 - name: Deploy Cloudflare credentials for certbot
-  template:
+  ansible.builtin.template:
     src: cloudflare.ini.j2
     dest: /etc/letsencrypt/cloudflare.ini
     owner: root
     group: root
-    mode: '0600'
+    mode: "0600"
 
 - name: Check if certificate already exists
-  stat:
+  ansible.builtin.stat:
     path: "/etc/letsencrypt/live/{{ certbot_domains[0] }}/fullchain.pem"
   register: certbot_cert_exists
 
 - name: Obtain SSL certificate via DNS-01 challenge
-  command: >
+  ansible.builtin.command: >
     certbot certonly
     --dns-cloudflare
     --dns-cloudflare-credentials /etc/letsencrypt/cloudflare.ini
@@ -60,18 +60,18 @@
   when: (certbot_enabled | default(true)) and not certbot_cert_exists.stat.exists
 
 - name: Ensure certbot systemd timer is enabled
-  systemd:
+  ansible.builtin.systemd:
     name: certbot.timer
     state: started
-    enabled: yes
+    enabled: true
   when: certbot_enabled | default(true)
 
 - name: Deploy post-renewal hook to reload web server
-  copy:
+  ansible.builtin.copy:
     dest: /etc/letsencrypt/renewal-hooks/deploy/reload-webserver.sh
     content: |
       #!/bin/bash
       systemctl reload {{ 'apache2' if web_server | default('apache') == 'apache' else 'lsws' }}
     owner: root
     group: root
-    mode: '0755'
+    mode: "0755"

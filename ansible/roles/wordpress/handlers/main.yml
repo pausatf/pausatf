@@ -1,16 +1,16 @@
 ---
 - name: Restart web server
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ 'apache2' if web_server | default('apache') == 'apache' else 'lsws' }}"
     state: restarted
 
 - name: Reload web server
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ 'apache2' if web_server | default('apache') == 'apache' else 'lsws' }}"
     state: reloaded
 
 - name: Restart PHP-FPM
-  systemd:
+  ansible.builtin.systemd:
     name: "php{{ php_version }}-fpm"
     state: restarted
   when: use_php_fpm | default(false)

@@ -2,16 +2,16 @@
 # New Relic handlers
 
 - name: Restart New Relic infrastructure
-  service:
+  ansible.builtin.service:
     name: newrelic-infra
     state: restarted
 
 - name: Restart Apache
-  service:
+  ansible.builtin.service:
     name: apache2
     state: restarted
 
 - name: Restart PHP-FPM
-  service:
+  ansible.builtin.service:
     name: "php{{ php_version }}-fpm"
     state: restarted

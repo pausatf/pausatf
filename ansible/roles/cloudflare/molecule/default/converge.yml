@@ -6,7 +6,7 @@
     web_server: apache
     cloudflare_zone: "example.com"
     cloudflare_zone_id: "test-zone-id-molecule"
-    cloudflare_api_token: "test-api-token-molecule"  # pragma: allowlist secret
+    cloudflare_api_token: "test-api-token-molecule" # pragma: allowlist secret
     cloudflare_email: "test@example.com"
     cloudflare_manage_dns: false
     cloudflare_purge_cache: false
@@ -31,6 +31,6 @@
         state: directory
         owner: www-data
         group: www-data
-        mode: '0755'
+        mode: "0755"
   roles:
     - role: cloudflare

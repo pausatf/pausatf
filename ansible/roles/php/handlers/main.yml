@@ -2,12 +2,12 @@
 # PHP handlers
 
 - name: Restart Apache
-  service:
+  ansible.builtin.service:
     name: apache2
     state: restarted
 
 - name: Restart PHP-FPM
-  service:
+  ansible.builtin.service:
     name: "php{{ php_version }}-fpm"
     state: restarted
-  ignore_errors: yes
+  ignore_errors: true

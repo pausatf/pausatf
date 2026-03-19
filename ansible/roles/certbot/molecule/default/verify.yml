@@ -1,3 +1,4 @@
+---
 - name: Verify
   hosts: all
   gather_facts: true
@@ -6,7 +7,7 @@
       package:
         name: certbot
         state: present
-      check_mode: yes
+      check_mode: true
       register: certbot_pkg
       failed_when: certbot_pkg is changed
 
@@ -14,7 +15,7 @@
       package:
         name: python3-certbot-dns-cloudflare
         state: present
-      check_mode: yes
+      check_mode: true
       register: certbot_cf_pkg
       failed_when: certbot_cf_pkg is changed
 

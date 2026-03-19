@@ -2,18 +2,18 @@
 # Apache handlers
 
 - name: Restart Apache
-  service:
+  ansible.builtin.service:
     name: apache2
     state: restarted
   listen: "apache changed"
 
 - name: Reload Apache
-  service:
+  ansible.builtin.service:
     name: apache2
     state: reloaded
   listen: "apache changed"
 
 - name: Start Apache
-  service:
+  ansible.builtin.service:
     name: apache2
     state: started

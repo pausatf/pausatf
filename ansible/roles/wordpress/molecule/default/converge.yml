@@ -7,7 +7,7 @@
   pre_tasks:
     - name: Update apt cache
       apt:
-        update_cache: yes
+        update_cache: true
         cache_valid_time: 3600
 
     - name: Install PHP and dependencies for WP-CLI
@@ -29,7 +29,12 @@
         state: directory
         owner: www-data
         group: www-data
-        mode: '0755'
+        mode: "0755"
+
+  vars:
+    wp_site:
+      path: /var/www/html
+      manage_wp_config: false
 
   roles:
     - role: wordpress
