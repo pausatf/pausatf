@@ -16,19 +16,19 @@
         mode: "0755"
 
     - name: Capture OLS main config
-      fetch:
+      ansible.builtin.fetch:
         src: /usr/local/lsws/conf/httpd_config.conf
         dest: "{{ capture_dir }}/httpd_config.conf"
         flat: true
 
     - name: Capture OLS vhost configs
-      fetch:
+      ansible.builtin.fetch:
         src: /usr/local/lsws/conf/vhosts
         dest: "{{ capture_dir }}/vhosts"
         flat: false
 
     - name: List installed lsphp packages
-      command: dpkg -l | grep -E "^ii\s+lsphp|^ii\s+openlitespeed"
+      ansible.builtin.command: dpkg -l | grep -E "^ii\s+lsphp|^ii\s+openlitespeed"
       register: lsphp_pkgs
       changed_when: false
 
@@ -39,7 +39,7 @@
         content: "{{ lsphp_pkgs.stdout }}\n"
 
     - name: Capture service status
-      shell: |
+      ansible.builtin.shell: |
         systemctl status lshttpd --no-pager || true
         systemctl status memcached --no-pager || true
         systemctl status redis-server --no-pager || true
@@ -54,7 +54,7 @@
         content: "{{ svc_status.stdout }}\n"
 
     - name: Capture Certbot renewal timers/units
-      shell: |
+      ansible.builtin.shell: |
         systemctl list-timers | grep -i certbot || true
         crontab -l || true
       register: certbot_info
