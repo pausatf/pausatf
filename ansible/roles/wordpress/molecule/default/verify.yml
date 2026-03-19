@@ -4,31 +4,31 @@
   gather_facts: false
   tasks:
     - name: Check WP-CLI is installed
-      stat:
+      ansible.builtin.stat:
         path: /usr/local/bin/wp
       register: wpcli_stat
       failed_when: not wpcli_stat.stat.exists
 
     - name: Check WordPress path exists
-      stat:
+      ansible.builtin.stat:
         path: /var/www/html
       register: wp_dir
       failed_when: not wp_dir.stat.isdir
 
-    - name: Check WordPress .htaccess was deployed
-      stat:
+    - name: Check WordPress .htaccess exists
+      ansible.builtin.stat:
         path: /var/www/html/.htaccess
       register: htaccess_stat
       failed_when: not htaccess_stat.stat.exists
 
     - name: Check uploads directory exists
-      stat:
+      ansible.builtin.stat:
         path: /var/www/html/wp-content/uploads
       register: uploads_dir
       failed_when: not uploads_dir.stat.isdir
 
     - name: Check uploads .htaccess blocks PHP execution
-      stat:
+      ansible.builtin.stat:
         path: /var/www/html/wp-content/uploads/.htaccess
       register: uploads_htaccess
       failed_when: not uploads_htaccess.stat.exists
