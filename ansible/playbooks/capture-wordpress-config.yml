@@ -161,7 +161,8 @@
       failed_when: false
 
     - name: List cron.d jobs
-      ansible.builtin.shell: ls -la /etc/cron.d/ && echo "---" && for f in /etc/cron.d/*; do echo "=== $f ==="; cat "$f" 2>/dev/null || echo "Unable to read"; echo ""; done
+      ansible.builtin.shell: ls -la /etc/cron.d/ && echo "---" && for f in /etc/cron.d/*; do echo "=== $f ==="; cat "$f" 2>/dev/null || echo "Unable to read";
+        echo ""; done
       register: crond_jobs
       changed_when: false
       failed_when: false
