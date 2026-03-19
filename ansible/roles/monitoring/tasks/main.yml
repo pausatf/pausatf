@@ -16,7 +16,7 @@
     regexp: "^ENABLED="
     line: 'ENABLED="true"'
     state: present
-  notify: restart sysstat
+  notify: Restart sysstat
 
 - name: Start and enable vnstat
   ansible.builtin.systemd:
