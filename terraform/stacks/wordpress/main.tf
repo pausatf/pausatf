@@ -34,6 +34,19 @@ locals {
     data.cloudflare_ip_ranges.current.ipv4_cidrs,
     data.cloudflare_ip_ranges.current.ipv6_cidrs
   )
+
+  # SSH allowlist (port 22). Explicit IPs only; no broad ISP ranges.
+  # Last reviewed: 2026-03-18.
+  ssh_cidrs = [
+    # DigitalOcean internal / VPC
+    "100.128.0.0/9",
+    # Tailscale CGNAT range
+    "100.64.0.0/10",
+    # Admin static IP
+    "73.170.36.107/32",
+    # Jeff Teeters (UC Berkeley campus)
+    "136.152.0.0/16",
+  ]
 }
 
 # Reserved IP — survives droplet rebuilds
@@ -136,13 +149,12 @@ resource "digitalocean_firewall" "this" {
     source_addresses = local.http_source_cidrs
   }
 
-  dynamic "inbound_rule" {
-    for_each = length(var.ssh_allowed_ips) > 0 ? [1] : []
-    content {
-      protocol         = "tcp"
-      port_range       = "22"
-      source_addresses = var.ssh_allowed_ips
-    }
+  inbound_rule {
+    protocol   = "tcp"
+    port_range = "22"
+    # Explicit allowlist takes precedence; default is ssh_cidrs.
+    # Set var.ssh_allowed_ips to ["0.0.0.0/0"] only for emergency break-glass.
+    source_addresses = length(var.ssh_allowed_ips) > 0 ? var.ssh_allowed_ips : local.ssh_cidrs
   }
 
   dynamic "inbound_rule" {
