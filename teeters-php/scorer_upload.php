@@ -15,6 +15,11 @@ declare(strict_types=1);
  *   Fields: year (4-digit), hash (client-computed), files[] (multipart)
  *   Success: 200 "success. Destination directory is '2026'.  Results are:\n..."
  *   Failure: 4xx with plain-text reason
+ *
+ * Known limitation: concurrent uploads to the same year directory can
+ * race between snapshotExisting() and moveFiles(), producing incorrect
+ * "New file" / "No change" reports. The files themselves are written
+ * correctly; only the per-file status text may be wrong.
  */
 
 final class UploadException extends RuntimeException {}
@@ -56,6 +61,11 @@ final class ScorerUpload
 
     public function process(): string
     {
+        if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+            header('Allow: POST');
+            throw new UploadException('Method not allowed', 405);
+        }
+
         $this->authenticate();
         $this->year = $this->parseYear();
         $this->verifyHash();
@@ -88,6 +98,9 @@ final class ScorerUpload
         if (!is_string($provided) || $provided === '' || strlen($provided) > 256) {
             throw new UploadException('Invalid upload token', 403);
         }
+        if (!preg_match('/^[\w\-._~+\/=]+$/D', $provided)) {
+            throw new UploadException('Invalid upload token', 403);
+        }
         if (!hash_equals($expected, $provided)) {
             throw new UploadException('Invalid upload token', 403);
         }
@@ -109,7 +122,7 @@ final class ScorerUpload
 
     private function parseYear(): string
     {
-        $year = $_REQUEST['year'] ?? '';
+        $year = $_POST['year'] ?? '';
         if (!is_string($year) || !preg_match('/^\d{4}$/', $year)) {
             throw new UploadException('Year not specified or invalid', 400);
         }
@@ -119,7 +132,7 @@ final class ScorerUpload
             throw new UploadException('Destination directory not found', 404);
         }
 
-        if ((int) $year < (int) date('Y')) {
+        if ((int) $year < (int) gmdate('Y')) {
             throw new UploadException('Destination year is earlier than current year', 400);
         }
 
@@ -128,6 +141,9 @@ final class ScorerUpload
 
     private function computeHash(string $content): string
     {
+        if (!function_exists('md5')) {
+            throw new UploadException('md5 unavailable (FIPS mode)', 500);
+        }
         return substr(md5($content . $this->salt), 3, 11);
     }
 
@@ -137,6 +153,9 @@ final class ScorerUpload
             throw new UploadException('Invalid filename', 400);
         }
         $name = basename($name);
+        if (str_contains($name, '..')) {
+            throw new UploadException('Invalid filename', 400);
+        }
         if ($name === '' || $name[0] === '.') {
             throw new UploadException("Invalid filename: '$name'", 400);
         }
@@ -157,7 +176,7 @@ final class ScorerUpload
      */
     private function verifyHash(): void
     {
-        $clientHash = $_REQUEST['hash'] ?? '';
+        $clientHash = $_POST['hash'] ?? '';
         if (!is_string($clientHash) || $clientHash === '') {
             throw new UploadException('Hash not specified', 400);
         }
@@ -165,22 +184,37 @@ final class ScorerUpload
             throw new UploadException('Invalid hash format', 400);
         }
 
-        if (!isset($_FILES['files']['error']) || !is_array($_FILES['files']['error'])) {
+        if (!isset($_FILES['files']['error'], $_FILES['files']['name'], $_FILES['files']['tmp_name'])
+            || !is_array($_FILES['files']['error'])
+            || !is_array($_FILES['files']['name'])
+            || !is_array($_FILES['files']['tmp_name'])) {
             throw new UploadException('No files uploaded', 400);
         }
 
         foreach ($_FILES['files']['error'] as $key => $error) {
+            $error = (int) $error;
             if ($error !== UPLOAD_ERR_OK) {
                 continue;
             }
 
+            if (!is_string($_FILES['files']['name'][$key] ?? null)) {
+                throw new UploadException('Invalid file entry', 400);
+            }
             $name = $this->validateFilename($_FILES['files']['name'][$key]);
-            $tmpPath = $_FILES['files']['tmp_name'][$key];
+
+            $tmpPath = $_FILES['files']['tmp_name'][$key] ?? null;
+            if (!is_string($tmpPath) || !is_uploaded_file($tmpPath)) {
+                throw new UploadException('Invalid upload', 400);
+            }
+
             $size = filesize($tmpPath);
             if ($size === false || $size > self::MAX_FILE_SIZE) {
                 throw new UploadException("File too large: $name", 400);
             }
-            $content = (string) file_get_contents($tmpPath);
+            $content = file_get_contents($tmpPath);
+            if ($content === false) {
+                throw new UploadException("Failed to read uploaded file: $name", 500);
+            }
             $this->uploadedHashes[$name] = $this->computeHash($content);
         }
 
@@ -202,7 +236,10 @@ final class ScorerUpload
         foreach (array_keys($this->uploadedHashes) as $name) {
             $path = self::DATA_DIR . '/' . $this->year . '/' . $name;
             if (is_file($path)) {
-                $content = (string) file_get_contents($path);
+                $content = file_get_contents($path);
+                if ($content === false) {
+                    throw new UploadException("Failed to read existing file: $name", 500);
+                }
                 $this->existingHashes[$name] = $this->computeHash($content);
             }
         }
@@ -211,13 +248,22 @@ final class ScorerUpload
     private function moveFiles(): void
     {
         foreach ($_FILES['files']['error'] as $key => $error) {
+            $error = (int) $error;
             if ($error !== UPLOAD_ERR_OK) {
                 continue;
             }
 
+            if (!is_string($_FILES['files']['name'][$key] ?? null)) {
+                throw new UploadException('Invalid file entry', 400);
+            }
             $name = $this->validateFilename($_FILES['files']['name'][$key]);
             if (!isset($this->uploadedHashes[$name])) {
                 continue;
+            }
+
+            $tmpPath = $_FILES['files']['tmp_name'][$key] ?? null;
+            if (!is_string($tmpPath) || !is_uploaded_file($tmpPath)) {
+                throw new UploadException("Invalid upload: $name", 400);
             }
 
             if (isset($this->existingHashes[$name])) {
@@ -231,7 +277,7 @@ final class ScorerUpload
             }
 
             $dest = self::DATA_DIR . '/' . $this->year . '/' . $name;
-            if (!move_uploaded_file($_FILES['files']['tmp_name'][$key], $dest)) {
+            if (!move_uploaded_file($tmpPath, $dest)) {
                 $lastError = error_get_last();
                 throw new UploadException("Failed to write $name: " . ($lastError['message'] ?? 'unknown error'), 500);
             }
@@ -252,7 +298,13 @@ final class ScorerUpload
     private function log(): void
     {
         $rawIp = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-        $ip = substr((string) preg_replace('/[^\da-fA-F.:, ]/', '', (string) $rawIp), 0, 256);
+        if (!is_string($rawIp)) {
+            $rawIp = 'unknown';
+        }
+        $sanitized = (string) preg_replace('/[^\da-fA-F.:, ]/', '', $rawIp);
+        $firstIp = trim(explode(',', $sanitized)[0]);
+        $ip = filter_var($firstIp, FILTER_VALIDATE_IP) !== false ? $firstIp : 'invalid';
+
         $count = count($this->results);
         $names = (string) preg_replace('/[^\x20-\x7E]/', '', implode(', ', array_keys($this->results)));
         $entry = sprintf(
@@ -264,7 +316,9 @@ final class ScorerUpload
             $names,
         );
 
-        file_put_contents(self::LOG_FILE, $entry, FILE_APPEND | LOCK_EX);
+        if (file_put_contents(self::LOG_FILE, $entry, FILE_APPEND | LOCK_EX) === false) {
+            error_log('scorer_upload: failed to write audit log');
+        }
     }
 }
 
@@ -280,9 +334,8 @@ try {
 } catch (\Throwable $e) {
     http_response_code(500);
     echo 'Internal server error';
-    @file_put_contents(
-        '/var/log/scorer-upload.log',
-        sprintf("[%s] UNCAUGHT: %s in %s:%d\n", gmdate('Y-m-d\TH:i:s\Z'), $e->getMessage(), $e->getFile(), $e->getLine()),
-        FILE_APPEND | LOCK_EX,
-    );
+    $logMsg = sprintf("[%s] UNCAUGHT: %s in %s:%d\n", gmdate('Y-m-d\TH:i:s\Z'), $e->getMessage(), $e->getFile(), $e->getLine());
+    if (file_put_contents('/var/log/scorer-upload.log', $logMsg, FILE_APPEND | LOCK_EX) === false) {
+        error_log('scorer_upload: ' . $logMsg);
+    }
 }
