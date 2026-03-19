@@ -22,7 +22,7 @@
     state: directory
     owner: root
     group: root
-    mode: '0700'
+    mode: "0700"
 
 - name: Ensure certbot renewal-hooks directory exists
   file:
@@ -30,7 +30,7 @@
     state: directory
     owner: root
     group: root
-    mode: '0755'
+    mode: "0755"
 
 - name: Deploy Cloudflare credentials for certbot
   template:
@@ -38,7 +38,7 @@
     dest: /etc/letsencrypt/cloudflare.ini
     owner: root
     group: root
-    mode: '0600'
+    mode: "0600"
 
 - name: Check if certificate already exists
   stat:
@@ -63,7 +63,7 @@
   systemd:
     name: certbot.timer
     state: started
-    enabled: yes
+    enabled: true
   when: certbot_enabled | default(true)
 
 - name: Deploy post-renewal hook to reload web server
@@ -74,4 +74,4 @@
       systemctl reload {{ 'apache2' if web_server | default('apache') == 'apache' else 'lsws' }}
     owner: root
     group: root
-    mode: '0755'
+    mode: "0755"

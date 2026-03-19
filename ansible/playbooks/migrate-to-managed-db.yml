@@ -1,7 +1,7 @@
 ---
 - name: Migrate WordPress database to DigitalOcean Managed MySQL
   hosts: production
-  gather_facts: no
+  gather_facts: false
   become: true
 
   vars:
@@ -12,7 +12,8 @@
     tmp_mycnf: "/tmp/.managed-db-{{ migration_timestamp }}.cnf"
     tmp_wp_mycnf: "/tmp/.managed-wp-db-{{ migration_timestamp }}.cnf"
     spaces_backup_prefix: "db-migration/{{ migration_timestamp }}"
-    web_service_name: "{{ 'apache2' if (web_server | default('apache')) == 'apache' else ('lsws' if (web_server | default('apache')) == 'openlitespeed' else (web_server | default('apache2'))) }}"
+    web_service_name: "{{ 'apache2' if (web_server | default('apache')) == 'apache' else ('lsws' if (web_server | default('apache')) == 'openlitespeed' else (web_server
+      | default('apache2'))) }}"
     critical_wp_tables:
       - posts
       - postmeta
@@ -93,7 +94,7 @@
     - name: Create temporary credentials file for managed DB
       copy:
         dest: "{{ tmp_mycnf }}"
-        mode: '0600'
+        mode: "0600"
         content: |
           [client]
           host={{ managed_db_host }}
@@ -111,7 +112,7 @@
     - name: Create temporary credentials file for managed WP runtime user
       copy:
         dest: "{{ tmp_wp_mycnf }}"
-        mode: '0600'
+        mode: "0600"
         content: |
           [client]
           host={{ managed_db_host }}
@@ -435,7 +436,7 @@
             src: "{{ wp_path }}/wp-config.php"
             dest: "{{ wp_path }}/wp-config.php.local-mysql.bak"
             remote_src: true
-            mode: '0640'
+            mode: "0640"
             owner: "{{ apache_user | default('www-data') }}"
             group: "{{ apache_group | default('www-data') }}"
           when: not ansible_check_mode

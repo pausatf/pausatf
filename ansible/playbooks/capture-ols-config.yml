@@ -1,8 +1,8 @@
 ---
 - name: Capture OpenLiteSpeed marketplace configuration from target
   hosts: staging
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
 
   vars:
     capture_dir: "artifacts/capture/{{ inventory_hostname }}"
@@ -13,19 +13,19 @@
         module: file
         path: "{{ capture_dir }}"
         state: directory
-        mode: '0755'
+        mode: "0755"
 
     - name: Capture OLS main config
       fetch:
         src: /usr/local/lsws/conf/httpd_config.conf
         dest: "{{ capture_dir }}/httpd_config.conf"
-        flat: yes
+        flat: true
 
     - name: Capture OLS vhost configs
       fetch:
         src: /usr/local/lsws/conf/vhosts
         dest: "{{ capture_dir }}/vhosts"
-        flat: no
+        flat: false
 
     - name: List installed lsphp packages
       command: dpkg -l | grep -E "^ii\s+lsphp|^ii\s+openlitespeed"

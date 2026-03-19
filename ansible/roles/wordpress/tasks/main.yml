@@ -9,7 +9,7 @@
     state: directory
     owner: root
     group: root
-    mode: '0755'
+    mode: "0755"
   tags: wp_cron
 
 - name: Set active-web marker on production server
@@ -18,7 +18,7 @@
     dest: /etc/pausatf/is-active-web
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   when: is_active_web | default(false)
   tags: wp_cron
 
@@ -35,7 +35,7 @@
     dest: /usr/local/sbin/wp-cron-if-active.sh
     owner: root
     group: root
-    mode: '0750'
+    mode: "0750"
   tags: wp_cron
 
 - name: Configure wp-cron via guard script (replaces direct wp-cron.php call)
@@ -53,7 +53,7 @@
     state: directory
     owner: www-data
     group: www-data
-    mode: '0755'
+    mode: "0755"
   loop: "{{ wordpress_installs }}"
   tags: mu_plugins
 
@@ -63,7 +63,7 @@
     dest: "{{ item.0.path | default('/var/www/html') }}/wp-content/mu-plugins/{{ item.1 }}"
     owner: www-data
     group: www-data
-    mode: '0644'
+    mode: "0644"
   loop: "{{ wordpress_installs | product(['disable-user-enum.php', 'noindex-non-prod.php']) | list }}"
   tags: mu_plugins
 
@@ -167,7 +167,7 @@
   get_url:
     url: https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
     dest: /usr/local/bin/wp
-    mode: '0755'
+    mode: "0755"
   when: wpcli_enabled | default(true)
 
 - name: Iterate configured WordPress installs
@@ -190,13 +190,13 @@
     state: directory
     owner: www-data
     group: www-data
-    mode: '0755'
+    mode: "0755"
 
 - name: Find existing legacy data year directories
   find:
     paths: /var/www/legacy/public_html/data
     file_type: directory
-    patterns: '20[0-9][0-9]'
+    patterns: "20[0-9][0-9]"
   register: legacy_year_dirs
 
 - name: Deploy legacy data directory .htaccess
@@ -205,7 +205,7 @@
     dest: "{{ item.path }}/.htaccess"
     owner: www-data
     group: www-data
-    mode: '0644'
+    mode: "0644"
   loop: "{{ legacy_year_dirs.files }}"
   loop_control:
     label: "{{ item.path }}"

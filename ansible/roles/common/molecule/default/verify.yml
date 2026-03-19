@@ -7,7 +7,7 @@
       package:
         name: "{{ item }}"
         state: present
-      check_mode: yes
+      check_mode: true
       register: package_check
       failed_when: package_check is changed
       loop:
@@ -29,13 +29,13 @@
         regexp: "{{ item.regexp }}"
         line: "{{ item.line }}"
         state: present
-      check_mode: yes
+      check_mode: true
       register: ssh_config_check
       failed_when: ssh_config_check is changed
       loop:
-        - { regexp: '^PermitRootLogin', line: 'PermitRootLogin prohibit-password' }
-        - { regexp: '^PasswordAuthentication', line: 'PasswordAuthentication no' }
-        - { regexp: '^PubkeyAuthentication', line: 'PubkeyAuthentication yes' }
+        - { regexp: "^PermitRootLogin", line: "PermitRootLogin prohibit-password" }
+        - { regexp: "^PasswordAuthentication", line: "PasswordAuthentication no" }
+        - { regexp: "^PubkeyAuthentication", line: "PubkeyAuthentication yes" }
       when: ansible_virtualization_type != 'docker'
 
     - name: Check timezone is UTC
@@ -49,7 +49,7 @@
       user:
         name: deploy
         state: present
-      check_mode: yes
+      check_mode: true
       register: deploy_user_check
       failed_when: deploy_user_check is changed
 
@@ -64,11 +64,11 @@
         name: "{{ item.name }}"
         value: "{{ item.value }}"
         state: present
-      check_mode: yes
+      check_mode: true
       register: sysctl_check
       failed_when: sysctl_check is changed
       loop:
-        - { name: 'net.ipv4.conf.all.rp_filter', value: '1' }
-        - { name: 'net.ipv4.tcp_syncookies', value: '1' }
-        - { name: 'net.ipv4.icmp_echo_ignore_broadcasts', value: '1' }
+        - { name: "net.ipv4.conf.all.rp_filter", value: "1" }
+        - { name: "net.ipv4.tcp_syncookies", value: "1" }
+        - { name: "net.ipv4.icmp_echo_ignore_broadcasts", value: "1" }
       when: ansible_virtualization_type != 'docker'

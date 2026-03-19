@@ -1,3 +1,4 @@
+---
 # Per-site management via WP-CLI
 # expects loop var wp_site
 
@@ -7,7 +8,7 @@
     state: directory
     owner: www-data
     group: www-data
-    mode: '0755'
+    mode: "0755"
 
 - name: Deploy WordPress .htaccess
   # This task is authoritative: Ansible manages .htaccess for all WordPress sites.
@@ -17,7 +18,7 @@
     dest: "{{ wp_site.path }}/.htaccess"
     owner: www-data
     group: www-data
-    mode: '0644'
+    mode: "0644"
     force: true
 
 - name: Check if WordPress is already installed
@@ -27,7 +28,8 @@
   failed_when: false
 
 - name: Download WordPress core (if not installed)
-  command: "{{ wpcli_path | default('/usr/local/bin/wp') }} core download --path={{ wp_site.path }} --version={{ wp_site.wp_version | default('latest') }} --skip-content --allow-root"
+  command: "{{ wpcli_path | default('/usr/local/bin/wp') }} core download --path={{ wp_site.path }} --version={{ wp_site.wp_version | default('latest') }} --skip-content
+    --allow-root"
   register: wp_download
   when: wp_installed.rc != 0
   failed_when: wp_download.rc != 0 and 'already' not in (wp_download.stderr | default(''))
@@ -39,7 +41,8 @@
   failed_when: false
 
 - name: Update core to requested version (if installed)
-  command: "{{ wpcli_path | default('/usr/local/bin/wp') }} core update {{ (wp_site.wp_version is defined and wp_site.wp_version != 'latest') | ternary('--version=' + wp_site.wp_version, '') }} --path={{ wp_site.path }} --allow-root"  # yamllint disable-line rule:line-length
+  command: "{{ wpcli_path | default('/usr/local/bin/wp') }} core update {{ (wp_site.wp_version is defined and wp_site.wp_version != 'latest') | ternary('--version='
+    + wp_site.wp_version, '') }} --path={{ wp_site.path }} --allow-root" # yamllint disable-line rule:line-length
   when: wp_installed.rc == 0
   register: wp_core_update
   changed_when: "'Updating' in wp_core_update.stdout or 'Success' in wp_core_update.stdout"
@@ -56,7 +59,7 @@
     dest: "{{ wp_site.path }}/wp-config.php"
     owner: www-data
     group: www-data
-    mode: '0640'
+    mode: "0640"
   when: wp_site.manage_wp_config | default(false)
 
 - name: Check pending plugin updates
@@ -135,7 +138,7 @@
     state: directory
     owner: www-data
     group: www-data
-    recurse: yes
+    recurse: true
   changed_when: false
 
 - name: Set WordPress directory permissions
@@ -154,14 +157,14 @@
     state: directory
     owner: www-data
     group: www-data
-    mode: '0755'
+    mode: "0755"
 
 - name: Block PHP execution in uploads directory
   copy:
     dest: "{{ wp_site.path }}/wp-content/uploads/.htaccess"
     owner: www-data
     group: www-data
-    mode: '0644'
+    mode: "0644"
     content: |
       # Block PHP execution in uploads — managed by Ansible
       <FilesMatch "\.php$">
@@ -174,8 +177,8 @@
     dest: "{{ wp_site.path }}/wp-content/themes/TheSource/"
     owner: www-data
     group: www-data
-    mode: '0644'
-    directory_mode: '0755'
+    mode: "0644"
+    directory_mode: "0755"
   when: wp_site.active_theme | default('') == 'TheSource-child'
 
 - name: Deploy TheSource child theme
@@ -184,8 +187,8 @@
     dest: "{{ wp_site.path }}/wp-content/themes/TheSource-child/"
     owner: www-data
     group: www-data
-    mode: '0644'
-    directory_mode: '0755'
+    mode: "0644"
+    directory_mode: "0755"
   when: wp_site.active_theme | default('') == 'TheSource-child'
 
 - name: Ensure fallback theme is installed

@@ -11,7 +11,7 @@
   get_url:
     url: https://pkgs.tailscale.com/stable/ubuntu/noble.noarmor.gpg
     dest: /usr/share/keyrings/tailscale-archive-keyring.gpg
-    mode: '0644'
+    mode: "0644"
 
 - name: Add Tailscale apt repository
   copy:
@@ -22,12 +22,12 @@
     # yamllint enable rule:line-length
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   register: tailscale_repo
 
 - name: Update apt cache after adding Tailscale repo
   apt:
-    update_cache: yes
+    update_cache: true
   when: tailscale_repo.changed
 
 - name: Install tailscale
@@ -39,7 +39,7 @@
   service:
     name: tailscaled
     state: started
-    enabled: yes
+    enabled: true
 
 # UFW rules — allow all traffic on the Tailscale interface.
 # Tailscale assigns 100.x.x.x addresses; the tailscale0 interface

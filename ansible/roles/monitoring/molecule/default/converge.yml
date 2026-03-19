@@ -17,7 +17,7 @@
         path: /var/www/html
         db_name: wordpress
         db_user: wordpress
-        db_password: "molecule-test-password"  # pragma: allowlist secret
+        db_password: "molecule-test-password" # pragma: allowlist secret
         db_host: localhost
     backup_items:
       - path: /var/www/html
@@ -36,6 +36,6 @@
         state: directory
         owner: www-data
         group: www-data
-        mode: '0755'
+        mode: "0755"
   roles:
     - role: monitoring

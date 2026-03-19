@@ -13,7 +13,7 @@
 - name: Enable sysstat
   lineinfile:
     path: /etc/default/sysstat
-    regexp: '^ENABLED='
+    regexp: "^ENABLED="
     line: 'ENABLED="true"'
     state: present
   notify: restart sysstat
@@ -22,13 +22,13 @@
   systemd:
     name: vnstat
     state: started
-    enabled: yes
+    enabled: true
 
 - name: Start and enable sysstat
   systemd:
     name: sysstat
     state: started
-    enabled: yes
+    enabled: true
 
 - name: Deploy WordPress backup script
   template:
@@ -36,7 +36,7 @@
     dest: /usr/local/sbin/backup-wordpress.sh
     owner: root
     group: root
-    mode: '0700'
+    mode: "0700"
 
 - name: Ensure .well-known directory exists
   file:
@@ -44,7 +44,7 @@
     state: directory
     owner: www-data
     group: www-data
-    mode: '0755'
+    mode: "0755"
   when:
     - healthcheck_enabled | default(false)
     - wordpress_installs is defined
@@ -56,7 +56,7 @@
     dest: "{{ wordpress_installs[0].path | default('/var/www/html') }}/.well-known/health-check.php"
     owner: www-data
     group: www-data
-    mode: '0640'
+    mode: "0640"
   when:
     - healthcheck_enabled | default(false)
     - wordpress_installs is defined
@@ -79,7 +79,7 @@
     dest: /usr/local/sbin/httpd-check.sh
     owner: root
     group: root
-    mode: '0755'
+    mode: "0755"
 
 - name: Schedule Apache health check every 30 minutes
   cron:

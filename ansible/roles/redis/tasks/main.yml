@@ -12,15 +12,15 @@
     dest: /etc/redis/redis.conf
     owner: redis
     group: redis
-    mode: '0640'
-    backup: yes
+    mode: "0640"
+    backup: true
   notify: Restart redis-server
 
 - name: Ensure redis group includes www-data (for unix socket access)
   user:
     name: www-data
     groups: redis
-    append: yes
+    append: true
   notify: Restart redis-server
 
 - name: Detect Docker environment
@@ -33,7 +33,7 @@
   service:
     name: redis-server
     state: started
-    enabled: yes
+    enabled: true
   when: not _dockerenv.stat.exists
 
 - name: Verify Redis is listening on 127.0.0.1 only
