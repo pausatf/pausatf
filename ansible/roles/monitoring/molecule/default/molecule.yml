@@ -10,14 +10,6 @@ platforms:
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     cgroupns_mode: host
-  - name: debian12
-    image: geerlingguy/docker-debian12-ansible:latest
-    pre_build_image: true
-    privileged: true
-    command: /lib/systemd/systemd
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:rw
-    cgroupns_mode: host
 provisioner:
   name: ansible
   playbooks:
@@ -26,8 +18,6 @@ provisioner:
   inventory:
     host_vars:
       ubuntu2404:
-        ansible_python_interpreter: /usr/bin/python3
-      debian12:
         ansible_python_interpreter: /usr/bin/python3
 verifier:
   name: ansible

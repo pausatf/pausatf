@@ -6,12 +6,12 @@
 
   pre_tasks:
     - name: Update apt cache
-      apt:
+      ansible.builtin.apt:
         update_cache: true
         cache_valid_time: 3600
 
     - name: Install PHP and dependencies for WP-CLI
-      apt:
+      ansible.builtin.apt:
         name:
           - php-cli
           - php-mysql
@@ -24,12 +24,39 @@
         state: present
 
     - name: Create legacy data directory
-      file:
+      ansible.builtin.file:
         path: /var/www/legacy/public_html/data
         state: directory
         owner: www-data
         group: www-data
         mode: "0755"
+
+    - name: Create uploads directory (manage_wp_config=false skips WP install)
+      ansible.builtin.file:
+        path: /var/www/html/wp-content/uploads
+        state: directory
+        owner: www-data
+        group: www-data
+        mode: "0755"
+
+    - name: Create .htaccess stub (WP not installed in molecule)
+      ansible.builtin.copy:
+        dest: /var/www/html/.htaccess
+        content: "# Molecule stub\n"
+        owner: www-data
+        group: www-data
+        mode: "0644"
+
+    - name: Create uploads .htaccess stub
+      ansible.builtin.copy:
+        dest: /var/www/html/wp-content/uploads/.htaccess
+        content: |
+          <FilesMatch "\.php$">
+            Require all denied
+          </FilesMatch>
+        owner: www-data
+        group: www-data
+        mode: "0644"
 
   vars:
     wp_site:
