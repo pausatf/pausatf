@@ -55,14 +55,14 @@
         file_type: any
       register: uploads
 
-    - name: Verify Apache responds on port 80  # checkov:skip=CKV2_ANSIBLE_1:localhost health check
+    - name: Verify Apache responds on port 80 # checkov:skip=CKV2_ANSIBLE_1:localhost health check
       ansible.builtin.uri:
         url: "http://localhost/"
         return_content: false
         status_code: [200, 301, 302, 403]
       register: http_check
 
-    - name: Verify Apache responds on port 443  # checkov:skip=CKV_ANSIBLE_1:localhost self-signed cert
+    - name: Verify Apache responds on port 443 # checkov:skip=CKV_ANSIBLE_1:localhost self-signed cert
       ansible.builtin.uri:
         url: "https://localhost/"
         return_content: false
