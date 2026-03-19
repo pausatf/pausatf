@@ -26,7 +26,7 @@
 
   tasks:
     - name: Install required packages
-      apt:
+      ansible.builtin.apt:
         name:
           - git
           - rsync
@@ -36,7 +36,7 @@
       tags: [always]
 
     - name: Ensure git repository directory exists
-      file:
+      ansible.builtin.file:
         path: "{{ git_repo_path }}"
         state: directory
         owner: root
@@ -45,7 +45,7 @@
       tags: [always]
 
     - name: Clone legacy content repository
-      git:
+      ansible.builtin.git:
         repo: "{{ git_repo_url }}"
         dest: "{{ git_repo_path }}"
         version: main
@@ -55,7 +55,7 @@
       tags: [always]
 
     - name: Configure git user for repository
-      git_config:
+      community.general.git_config:
         scope: local
         repo: "{{ git_repo_path }}"
         name: "{{ item.name }}"
@@ -66,7 +66,7 @@
       tags: [always]
 
     - name: Download watcher script # checkov:skip=CKV2_ANSIBLE_2:template variable URL
-      get_url:
+      ansible.builtin.get_url:
         url: "{{ scripts_source }}/sync-legacy-content-watcher.sh"
         dest: /usr/local/bin/sync-legacy-content-watcher.sh
         mode: "0700"
@@ -76,7 +76,7 @@
       tags: [watcher, both]
 
     - name: Download watcher systemd service # checkov:skip=CKV2_ANSIBLE_2:template variable URL
-      get_url:
+      ansible.builtin.get_url:
         url: "{{ scripts_source }}/sync-legacy-content-watcher.service"
         dest: /etc/systemd/system/sync-legacy-content-watcher.service
         mode: "0644"
@@ -86,13 +86,13 @@
       tags: [watcher, both]
 
     - name: Reload systemd daemon
-      systemd:
+      ansible.builtin.systemd:
         daemon_reload: true
       when: sync_method in ['watcher', 'both']
       tags: [watcher, both]
 
     - name: Enable and start watcher service
-      systemd:
+      ansible.builtin.systemd:
         name: sync-legacy-content-watcher
         enabled: true
         state: started
@@ -100,7 +100,7 @@
       tags: [watcher, both]
 
     - name: Download cron script # checkov:skip=CKV2_ANSIBLE_2:template variable URL
-      get_url:
+      ansible.builtin.get_url:
         url: "{{ scripts_source }}/sync-legacy-content-cron.sh"
         dest: /usr/local/bin/sync-legacy-content-cron.sh
         mode: "0700"
@@ -110,7 +110,7 @@
       tags: [cron, both]
 
     - name: Create cron job for legacy content sync
-      cron:
+      ansible.builtin.cron:
         name: "Sync legacy content to GitHub"
         minute: "{{ cron_schedule.split()[0] }}"
         hour: "{{ cron_schedule.split()[1] }}"
@@ -124,7 +124,7 @@
       tags: [cron, both]
 
     - name: Create log files
-      file:
+      ansible.builtin.file:
         path: "{{ item }}"
         state: touch
         owner: root
@@ -136,7 +136,7 @@
       tags: [always]
 
     - name: Setup logrotate for sync logs
-      copy:
+      ansible.builtin.copy:
         dest: /etc/logrotate.d/legacy-content-sync
         content: |
           /var/log/legacy-content-sync.log
@@ -153,7 +153,7 @@
       tags: [always]
 
     - name: Display deployment summary
-      debug:
+      ansible.builtin.debug:
         msg:
           - "Legacy Content Sync Deployment Complete"
           - "========================================"

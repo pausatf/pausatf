@@ -4,7 +4,7 @@
 # - Audits administrator accounts against the wp_users authoritative list
 
 - name: Remove unauthorized WordPress users
-  command: >
+  ansible.builtin.command: >
     {{ wpcli_path | default('/usr/local/bin/wp') }} user delete {{ item.id }}
     --reassign=1 --yes --path={{ wp_site.path }} --allow-root
   loop: "{{ wp_users_remove | default([]) }}"
@@ -15,7 +15,7 @@
   failed_when: false
 
 - name: Get current WordPress administrator list
-  shell: >
+  ansible.builtin.shell: >
     php -d error_reporting=0
     {{ wpcli_path | default('/usr/local/bin/wp') }} user list
     --role=administrator --field=user_login --path={{ wp_site.path }} --allow-root
@@ -24,17 +24,18 @@
   failed_when: false
 
 - name: Build authorized administrator logins
-  set_fact:
+  ansible.builtin.set_fact:
     wp_authorized_admins: >-
       {{ wp_users | default([]) | selectattr('roles', 'search', 'administrator') | map(attribute='username') | list }}
 
 - name: Identify unauthorized administrator accounts
-  set_fact:
-    wp_unauthorized_admins: "{{ wp_current_admins.stdout_lines | default([]) | reject('equalto', '') | list | difference(wp_authorized_admins) }}"
+  ansible.builtin.set_fact:
+    wp_unauthorized_admins: "{{ wp_current_admins.stdout_lines | default([]) | reject('equalto', '') | list | difference(wp_authorized_admins)
+      }}"
   when: wp_current_admins.rc == 0
 
 - name: Fail if unexpected administrator accounts exist
-  fail:
+  ansible.builtin.fail:
     msg: >
       Unauthorized administrator account(s) detected: {{ wp_unauthorized_admins | join(', ') }}.
       Investigate immediately and add to wp_users_remove if confirmed illegitimate.

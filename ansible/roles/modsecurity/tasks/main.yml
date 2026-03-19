@@ -3,14 +3,14 @@
 # CRS is installed via the modsecurity-crs Debian package.
 
 - name: Install ModSecurity CRS package
-  apt:
+  ansible.builtin.apt:
     name:
       - libapache2-mod-security2
       - modsecurity-crs
     state: present
 
 - name: Create ModSecurity working directories
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     owner: www-data
@@ -21,7 +21,7 @@
     - "{{ modsecurity_data_dir }}"
 
 - name: Deploy ModSecurity configuration
-  template:
+  ansible.builtin.template:
     src: modsecurity.conf.j2
     dest: /etc/modsecurity/modsecurity.conf
     owner: root
@@ -31,7 +31,7 @@
   notify: Reload Apache
 
 - name: Ensure CRS setup directory exists
-  file:
+  ansible.builtin.file:
     path: /etc/modsecurity/crs
     state: directory
     owner: root
@@ -39,7 +39,7 @@
     mode: "0755"
 
 - name: Deploy CRS pre-rules exclusion file
-  copy:
+  ansible.builtin.copy:
     src: REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf
     dest: /etc/modsecurity/crs/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf
     owner: root
@@ -48,7 +48,7 @@
   notify: Reload Apache
 
 - name: Deploy CRS post-rules exclusion file
-  copy:
+  ansible.builtin.copy:
     src: RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf
     dest: /etc/modsecurity/crs/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf
     owner: root
@@ -57,7 +57,7 @@
   notify: Reload Apache
 
 - name: Ensure ModSecurity audit log exists
-  file:
+  ansible.builtin.file:
     path: "{{ modsecurity_audit_log }}"
     state: touch
     owner: root
@@ -67,7 +67,7 @@
     access_time: preserve
 
 - name: Deploy ModSecurity audit log rotation
-  copy:
+  ansible.builtin.copy:
     dest: /etc/logrotate.d/modsecurity
     content: |
       {{ modsecurity_audit_log }} {

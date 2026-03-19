@@ -2,12 +2,12 @@
 # Fail2ban role - Intrusion prevention for PAUSATF
 
 - name: Install fail2ban
-  apt:
+  ansible.builtin.apt:
     name: fail2ban
     state: present
 
 - name: Deploy fail2ban configuration
-  template:
+  ansible.builtin.template:
     src: jail.local.j2
     dest: /etc/fail2ban/jail.local
     owner: root
@@ -16,7 +16,7 @@
   notify: Restart fail2ban
 
 - name: Deploy WordPress authentication fail2ban filter
-  template:
+  ansible.builtin.template:
     src: wordpress-auth.conf.j2
     dest: /etc/fail2ban/filter.d/wordpress-auth.conf
     owner: root
@@ -25,7 +25,7 @@
   notify: Restart fail2ban
 
 - name: Deploy WordPress user enumeration fail2ban filter
-  template:
+  ansible.builtin.template:
     src: wordpress-enum.conf.j2
     dest: /etc/fail2ban/filter.d/wordpress-enum.conf
     owner: root
@@ -34,7 +34,7 @@
   notify: Restart fail2ban
 
 - name: Deploy OpenLiteSpeed fail2ban filter
-  template:
+  ansible.builtin.template:
     src: openlitespeed-auth.conf.j2
     dest: /etc/fail2ban/filter.d/openlitespeed-auth.conf
     owner: root
@@ -44,7 +44,7 @@
   notify: Restart fail2ban
 
 - name: Ensure fail2ban is started and enabled
-  service:
+  ansible.builtin.service:
     name: fail2ban
     state: started
     enabled: true

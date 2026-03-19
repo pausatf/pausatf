@@ -2,40 +2,40 @@
 # Install and configure OpenLiteSpeed for WordPress
 
 - name: Create keyrings directory
-  file:
+  ansible.builtin.file:
     path: /etc/apt/keyrings
     state: directory
     mode: "0755"
 
 - name: Download LiteSpeed repository key
-  get_url:
+  ansible.builtin.get_url:
     url: https://repo.litespeed.sh/ls.key
     dest: /etc/apt/keyrings/litespeed.gpg
     mode: "0644"
 
 - name: Add LiteSpeed repository
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/litespeed.gpg] http://rpms.litespeedtech.com/debian/ stable main"
     state: present
     filename: litespeed
 
 - name: Update apt cache
-  apt:
+  ansible.builtin.apt:
     update_cache: true
 
 - name: Install OpenLiteSpeed
-  apt:
+  ansible.builtin.apt:
     name: openlitespeed
     state: present
 
 - name: Ensure lsws service enabled and started
-  systemd:
+  ansible.builtin.systemd:
     name: lshttpd
     state: started
     enabled: true
 
 - name: Set OLS admin password (idempotent)
-  shell: |
+  ansible.builtin.shell: |
     /usr/local/lsws/admin/misc/admpass.sh << EOF
     admin
     {{ ols_admin_password }}
@@ -46,7 +46,7 @@
   no_log: true
 
 - name: Create vhost directory
-  file:
+  ansible.builtin.file:
     path: /usr/local/lsws/conf/vhosts/wordpress
     state: directory
     owner: root
@@ -54,7 +54,7 @@
     mode: "0755"
 
 - name: Deploy OLS main config
-  template:
+  ansible.builtin.template:
     src: httpd_config.conf.j2
     dest: /usr/local/lsws/conf/httpd_config.conf
     owner: root
@@ -63,7 +63,7 @@
   notify: restart ols
 
 - name: Deploy OLS vhost config
-  template:
+  ansible.builtin.template:
     src: vhconf.conf.j2
     dest: /usr/local/lsws/conf/vhosts/wordpress/vhconf.conf
     owner: root
@@ -72,7 +72,7 @@
   notify: restart ols
 
 - name: Ensure document root exists
-  file:
+  ansible.builtin.file:
     path: "{{ wordpress_installs[0].path | default('/var/www/html') }}"
     state: directory
     owner: www-data
@@ -80,7 +80,7 @@
     mode: "0755"
 
 - name: Open firewall for HTTP/HTTPS (if UFW enabled)
-  ufw:
+  community.general.ufw:
     rule: allow
     port: "{{ item }}"
     proto: tcp

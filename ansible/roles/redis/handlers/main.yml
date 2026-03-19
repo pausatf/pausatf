@@ -1,6 +1,6 @@
 ---
 - name: Restart redis-server
-  service:
+  ansible.builtin.service:
     name: redis-server
     state: restarted
   when: not (_dockerenv.stat.exists | default(false))

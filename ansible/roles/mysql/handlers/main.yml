@@ -2,11 +2,11 @@
 # MySQL handlers
 
 - name: Restart MySQL
-  service:
+  ansible.builtin.service:
     name: mysql
     state: restarted
 
 - name: Reload MySQL
-  service:
+  ansible.builtin.service:
     name: mysql
     state: reloaded

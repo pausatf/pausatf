@@ -31,7 +31,7 @@
     # 1. Remove unauthorized accounts (wp_users_remove list)
     # -------------------------------------------------------------------------
     - name: Remove unauthorized WordPress user accounts
-      command: >
+      ansible.builtin.command: >
         {{ wp_bin }} user delete {{ item.id }}
         --reassign=1 --yes --path={{ wp_site.path }} --allow-root
       loop: "{{ wp_users_remove | default([]) }}"
@@ -47,7 +47,7 @@
     # 2. Rotate WordPress authentication keys and salts
     # -------------------------------------------------------------------------
     - name: Rotate WordPress auth keys and salts
-      command: >
+      ansible.builtin.command: >
         {{ wp_bin }} config shuffle-salts
         --path={{ wp_site.path }} --allow-root
       vars:
@@ -59,7 +59,7 @@
     # 3. Audit admin accounts for additional persistence
     # -------------------------------------------------------------------------
     - name: List current administrator accounts
-      command: >
+      ansible.builtin.command: >
         {{ wp_bin }} user list --role=administrator
         --fields=ID,user_login,user_email,user_registered
         --format=table --path={{ wp_site.path }} --allow-root
@@ -69,11 +69,11 @@
       changed_when: false
 
     - name: Display current administrators (review for unexpected accounts)
-      debug:
+      ansible.builtin.debug:
         var: admin_list.stdout_lines
 
     - name: Get administrator login names
-      command: >
+      ansible.builtin.command: >
         {{ wp_bin }} user list --role=administrator
         --field=user_login --path={{ wp_site.path }} --allow-root
       vars:
@@ -82,24 +82,24 @@
       changed_when: false
 
     - name: Build authorized administrator logins
-      set_fact:
+      ansible.builtin.set_fact:
         wp_authorized_admins: >-
           {{ wp_users | default([]) | selectattr('roles', 'search', 'administrator') | map(attribute='username') | list }}
 
     - name: Identify unexpected administrator accounts
-      set_fact:
+      ansible.builtin.set_fact:
         wp_unexpected_admins: >-
           {{ admin_logins.stdout_lines | default([]) | difference(wp_authorized_admins) }}
 
     - name: Warn about unexpected administrator accounts
-      debug:
+      ansible.builtin.debug:
         msg: >
           WARNING: Unexpected administrator account(s) found: {{ wp_unexpected_admins | join(', ') }}.
           Investigate and add to wp_users_remove if confirmed illegitimate.
       when: wp_unexpected_admins | length > 0
 
     - name: Confirm no unexpected administrators remain
-      assert:
+      ansible.builtin.assert:
         that: wp_unexpected_admins | length == 0
         fail_msg: >
           Unexpected administrator account(s) remain: {{ wp_unexpected_admins | join(', ') }}.
@@ -110,7 +110,7 @@
     # 4. Remove wp-file-manager-pro (active RCE vector — CVE-2020-25213)
     # -------------------------------------------------------------------------
     - name: Deactivate wp-file-manager-pro
-      command: >
+      ansible.builtin.command: >
         {{ wp_bin }} plugin deactivate wp-file-manager-pro
         --path={{ wp_site.path }} --allow-root
       vars:
@@ -120,7 +120,7 @@
       failed_when: false
 
     - name: Delete wp-file-manager-pro
-      command: >
+      ansible.builtin.command: >
         {{ wp_bin }} plugin delete wp-file-manager-pro
         --path={{ wp_site.path }} --allow-root
       vars:
@@ -130,14 +130,14 @@
       failed_when: false
 
     - name: Confirm wp-file-manager-pro plugin directory is gone
-      stat:
+      ansible.builtin.stat:
         path: "{{ wp_site.path }}/wp-content/plugins/wp-file-manager-pro"
       vars:
         wp_site: "{{ wordpress_installs | selectattr('name', 'equalto', 'pausatf-main') | first }}"
       register: fmgr_dir
 
     - name: Warn if wp-file-manager-pro directory still exists
-      debug:
+      ansible.builtin.debug:
         msg: >
           WARNING: wp-file-manager-pro plugin directory still exists at
           {{ wp_site.path }}/wp-content/plugins/wp-file-manager-pro.
@@ -151,7 +151,7 @@
     # 6. Enable Jetpack login notifications for admins
     # -------------------------------------------------------------------------
     - name: Check if Jetpack is active
-      command: >
+      ansible.builtin.command: >
         {{ wp_bin }} plugin is-active jetpack
         --path={{ wp_site.path }} --allow-root
       vars:
@@ -163,7 +163,7 @@
     - name: Enable Jetpack master user login notification
       # Use option patch insert to avoid overwriting the full jetpack_options blob.
       # wp option update would replace the entire serialized object.
-      command: >
+      ansible.builtin.command: >
         {{ wp_bin }} option patch insert jetpack_options master_user_login_notification true
         --path={{ wp_site.path }} --allow-root
       vars:
@@ -176,7 +176,7 @@
     # 5. Webshell scan — PHP files in uploads directories
     # -------------------------------------------------------------------------
     - name: Find PHP files in uploads directories (potential webshells)
-      find:
+      ansible.builtin.find:
         paths: "{{ item.path }}/wp-content/uploads"
         patterns: "*.php,*.phtml,*.php7,*.phar"
         recurse: true
@@ -188,7 +188,7 @@
       changed_when: false
 
     - name: Fail if PHP files found in any uploads directory
-      fail:
+      ansible.builtin.fail:
         msg: >
           WEBSHELL DETECTED in {{ item.item.name }} ({{ item.item.path }}):
           {{ item.files | map(attribute='path') | list | join(', ') }}
@@ -202,7 +202,7 @@
     # 6. WordPress core integrity check
     # -------------------------------------------------------------------------
     - name: Verify WordPress core checksums
-      command: >
+      ansible.builtin.command: >
         {{ wp_bin }} core verify-checksums
         --path={{ item.path }} --allow-root
       loop: "{{ wordpress_installs }}"
@@ -213,7 +213,7 @@
       failed_when: false
 
     - name: Fail if core checksums do not match
-      fail:
+      ansible.builtin.fail:
         msg: >
           WordPress core checksum mismatch in {{ item.item.name }} ({{ item.item.path }}):
           {{ item.stderr_lines | join(' ') }}
@@ -227,7 +227,7 @@
     # 7. SSH authorized_keys audit
     # -------------------------------------------------------------------------
     - name: Find all authorized_keys files
-      find:
+      ansible.builtin.find:
         paths:
           - /root/.ssh
           - /home
@@ -237,7 +237,7 @@
       changed_when: false
 
     - name: Read authorized_keys contents
-      command: cat {{ item.path }}
+      ansible.builtin.command: cat {{ item.path }}
       loop: "{{ auth_keys_files.files }}"
       loop_control:
         label: "{{ item.path }}"
@@ -245,7 +245,7 @@
       register: auth_keys_content
 
     - name: Display authorized_keys for manual review
-      debug:
+      ansible.builtin.debug:
         msg: "{{ item.item.path }}:\n{{ item.stdout }}"
       loop: "{{ auth_keys_content.results }}"
       loop_control:
@@ -255,7 +255,7 @@
     # 8. Cron job audit
     # -------------------------------------------------------------------------
     - name: Enumerate all user cron jobs
-      shell: |
+      ansible.builtin.shell: |
         set -o pipefail
         for user in $(cut -f1 -d: /etc/passwd); do
           crontab -u "$user" -l 2>/dev/null \
@@ -266,7 +266,7 @@
       register: all_crontabs
 
     - name: Display cron jobs for manual review
-      debug:
+      ansible.builtin.debug:
         msg: "{{ all_crontabs.stdout_lines | default(['(no cron jobs found)']) }}"
 
     # -------------------------------------------------------------------------
@@ -274,7 +274,7 @@
     # -------------------------------------------------------------------------
     - name: Remediation summary
       # yamllint disable rule:line-length
-      debug:
+      ansible.builtin.debug:
         msg: |
           ============================================================
           Security Remediation Complete
