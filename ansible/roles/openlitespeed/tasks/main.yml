@@ -5,13 +5,13 @@
   file:
     path: /etc/apt/keyrings
     state: directory
-    mode: '0755'
+    mode: "0755"
 
 - name: Download LiteSpeed repository key
   get_url:
     url: https://repo.litespeed.sh/ls.key
     dest: /etc/apt/keyrings/litespeed.gpg
-    mode: '0644'
+    mode: "0644"
 
 - name: Add LiteSpeed repository
   apt_repository:
@@ -21,7 +21,7 @@
 
 - name: Update apt cache
   apt:
-    update_cache: yes
+    update_cache: true
 
 - name: Install OpenLiteSpeed
   apt:
@@ -32,7 +32,7 @@
   systemd:
     name: lshttpd
     state: started
-    enabled: yes
+    enabled: true
 
 - name: Set OLS admin password (idempotent)
   shell: |
@@ -51,7 +51,7 @@
     state: directory
     owner: root
     group: root
-    mode: '0755'
+    mode: "0755"
 
 - name: Deploy OLS main config
   template:
@@ -59,7 +59,7 @@
     dest: /usr/local/lsws/conf/httpd_config.conf
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   notify: restart ols
 
 - name: Deploy OLS vhost config
@@ -68,7 +68,7 @@
     dest: /usr/local/lsws/conf/vhosts/wordpress/vhconf.conf
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   notify: restart ols
 
 - name: Ensure document root exists
@@ -77,7 +77,7 @@
     state: directory
     owner: www-data
     group: www-data
-    mode: '0755'
+    mode: "0755"
 
 - name: Open firewall for HTTP/HTTPS (if UFW enabled)
   ufw:
@@ -85,6 +85,6 @@
     port: "{{ item }}"
     proto: tcp
   with_items:
-    - '80'
-    - '443'
+    - "80"
+    - "443"
   when: ufw_enabled | default(false)

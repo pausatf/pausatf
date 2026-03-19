@@ -1,16 +1,17 @@
+---
 # Install LiteSpeed PHP (lsphp) and common extensions
 
 - name: Create keyrings directory
   file:
     path: /etc/apt/keyrings
     state: directory
-    mode: '0755'
+    mode: "0755"
 
 - name: Download LiteSpeed repository key
   get_url:
     url: https://repo.litespeed.sh/ls.key
     dest: /etc/apt/keyrings/litespeed.gpg
-    mode: '0644'
+    mode: "0644"
 
 - name: Add LiteSpeed repository
   apt_repository:
@@ -20,7 +21,7 @@
 
 - name: Update apt cache
   apt:
-    update_cache: yes
+    update_cache: true
 
 - name: Compute lsphp package suffix
   set_fact:
@@ -49,7 +50,7 @@
   file:
     path: "/usr/local/lsws/lsphp{{ lsphp_suffix }}/etc/php/{{ php_version }}/mods-available"
     state: directory
-    mode: '0755'
+    mode: "0755"
 
 - name: Deploy CLI PHP settings (opcache/uploads)
   copy:
@@ -65,7 +66,7 @@
       max_execution_time=300
       max_input_time=300
       memory_limit=256M
-    mode: '0644'
+    mode: "0644"
 
 - name: Ensure lshttpd picks up new PHP version (graceful)
   service:

@@ -5,14 +5,15 @@
   apt_repository:
     repo: "ppa:ondrej/php"
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Install PHP {{ php_version }}-FPM and extensions
   apt:
     name: "{{ _php_packages }}"
     state: present
   vars:
-    _php_module_packages: "{{ php_modules | map('regex_replace', '^(redis)$', 'php-redis') | map('regex_replace', '^(?!php-redis$)(.*)$', 'php' + (php_version | string) + '-\\1') | list }}"
+    _php_module_packages: "{{ php_modules | map('regex_replace', '^(redis)$', 'php-redis') | map('regex_replace', '^(?!php-redis$)(.*)$', 'php' + (php_version | string)
+      + '-\\1') | list }}"
     _php_extra_packages: "{{ ['php' + (php_version | string) + '-fpm', 'php-memcached'] }}"
     _php_packages: "{{ _php_module_packages + _php_extra_packages }}"
 
@@ -29,8 +30,8 @@
     dest: /etc/php/{{ php_version }}/fpm/pool.d/www.conf
     owner: root
     group: root
-    mode: '0644'
-    backup: yes
+    mode: "0644"
+    backup: true
   notify: Restart php-fpm
 
 - name: Deploy php.ini for FPM
@@ -39,7 +40,7 @@
     dest: /etc/php/{{ php_version }}/fpm/conf.d/99-pausatf.ini
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   notify: Restart php-fpm
 
 - name: Set default PHP CLI version
@@ -55,7 +56,7 @@
     state: directory
     owner: www-data
     group: www-data
-    mode: '0770'
+    mode: "0770"
 
 - name: Detect Docker environment
   stat:
@@ -67,5 +68,5 @@
   service:
     name: php{{ php_version }}-fpm
     state: started
-    enabled: yes
+    enabled: true
   when: not _dockerenv.stat.exists

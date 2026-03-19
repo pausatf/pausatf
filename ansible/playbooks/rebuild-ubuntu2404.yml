@@ -12,8 +12,8 @@
 
 - name: Deploy PAUSATF WordPress Server
   hosts: webservers
-  become: yes
-  gather_facts: yes
+  become: true
+  gather_facts: true
 
   vars_files:
     - group_vars/all.yml
@@ -29,7 +29,7 @@
 
     - name: Update apt cache
       apt:
-        update_cache: yes
+        update_cache: true
         cache_valid_time: 3600
 
     - name: Display infrastructure info
@@ -89,7 +89,7 @@
       service:
         name: "{{ item }}"
         state: started
-        enabled: yes
+        enabled: true
       loop:
         - apache2
         - "php{{ php_version }}-fpm"

@@ -6,14 +6,14 @@
   set_fact:
     cf_records: "{{ (cloudflare_dns_records | default([])) + (cloudflare_dns_records_extra | default([])) }}"
 
-- name: Ensure DNS records exist and are up to date  # checkov:skip=CKV2_ANSIBLE_3:errors propagate to caller
+- name: Ensure DNS records exist and are up to date # checkov:skip=CKV2_ANSIBLE_3:errors propagate to caller
   vars:
     rec_name: "{{ item.name }}"
     rec_type: "{{ item.type | default('A') }}"
   block:
     - name: Look up existing record
       uri:
-        url: "https://api.cloudflare.com/client/v4/zones/{{ cloudflare_zone_id }}/dns_records?type={{ rec_type }}&name={{ rec_name }}.{{ cloudflare_zone }}"  # yamllint disable-line rule:line-length
+        url: "https://api.cloudflare.com/client/v4/zones/{{ cloudflare_zone_id }}/dns_records?type={{ rec_type }}&name={{ rec_name }}.{{ cloudflare_zone }}" # yamllint disable-line rule:line-length
         method: GET
         headers:
           Authorization: "Bearer {{ cloudflare_api_token }}"
@@ -23,7 +23,8 @@
 
     - name: Create or update record
       uri:
-        url: "https://api.cloudflare.com/client/v4/zones/{{ cloudflare_zone_id }}/dns_records{{ (cf_lookup.json.result | length) > 0 | ternary('/' + cf_lookup.json.result[0].id, '') }}"  # yamllint disable-line rule:line-length
+        url: "https://api.cloudflare.com/client/v4/zones/{{ cloudflare_zone_id }}/dns_records{{ (cf_lookup.json.result | length) > 0 | ternary('/' + cf_lookup.json.result[0].id,
+          '') }}" # yamllint disable-line rule:line-length
         method: "{{ (cf_lookup.json.result | length) > 0 | ternary('PUT', 'POST') }}"
         headers:
           Authorization: "Bearer {{ cloudflare_api_token }}"

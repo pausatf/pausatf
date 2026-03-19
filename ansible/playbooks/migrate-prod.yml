@@ -1,7 +1,7 @@
 ---
 - name: Migrate PAUSATF production to new droplet
   hosts: production
-  gather_facts: no
+  gather_facts: false
   become: true
 
   vars:
@@ -19,14 +19,14 @@
       file:
         path: "{{ backup_root }}"
         state: directory
-        mode: '0700'
+        mode: "0700"
 
     - name: Create local backup directory
       delegate_to: localhost
       file:
         path: "{{ local_backup_dir }}"
         state: directory
-        mode: '0755'
+        mode: "0755"
 
     # ========================================
     # Phase 2: Capture cron jobs
@@ -159,7 +159,6 @@
           -C $(dirname {{ legacy_path }}) $(basename {{ legacy_path }})
       args:
         warn: false
-
 
     # ========================================
     # Phase 7b: Dev-html directory archive

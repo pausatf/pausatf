@@ -23,7 +23,7 @@
     state: directory
     owner: root
     group: root
-    mode: '0700'
+    mode: "0700"
   tags: cloudflare
 
 - name: Deploy Cloudflare API token file (root-only)
@@ -32,7 +32,7 @@
     content: "{{ cloudflare_api_token }}"
     owner: root
     group: root
-    mode: '0600'
+    mode: "0600"
   no_log: true
   tags: cloudflare
 
@@ -42,7 +42,7 @@
     dest: /etc/apache2/conf-available/cloudflare-ips.conf
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   notify: Reload Apache
   when: (web_server | default('apache')) == 'apache'
   tags: cloudflare
@@ -59,7 +59,7 @@
   get_url:
     url: "https://www.cloudflare.com/ips-v4"
     dest: /etc/apache2/cloudflare-ips-v4.txt
-    mode: '0644'
+    mode: "0644"
   register: cf_ips_v4
   when: (web_server | default('apache')) == 'apache'
   tags: cloudflare
@@ -68,7 +68,7 @@
   get_url:
     url: "https://www.cloudflare.com/ips-v6"
     dest: /etc/apache2/cloudflare-ips-v6.txt
-    mode: '0644'
+    mode: "0644"
   register: cf_ips_v6
   when: (web_server | default('apache')) == 'apache'
   tags: cloudflare
@@ -80,7 +80,7 @@
     headers:
       Authorization: "Bearer {{ cloudflare_api_token }}"
       Content-Type: "application/json"
-    return_content: yes
+    return_content: true
   register: cf_zone_status
   no_log: true
   when: cloudflare_verify_zone | default(true)
@@ -162,7 +162,7 @@
     dest: /usr/local/bin/update-cloudflare-ips.sh
     owner: root
     group: root
-    mode: '0755'
+    mode: "0755"
   tags: cloudflare
 
 - name: Create log file for Cloudflare IP updates
@@ -171,7 +171,7 @@
     state: touch
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   changed_when: false
   tags: cloudflare
 
@@ -196,7 +196,7 @@
     dest: /usr/local/bin/purge_cloudflare_cache.sh
     owner: root
     group: root
-    mode: '0700'
+    mode: "0700"
   tags: cloudflare
 
 - name: Deploy cache change monitor script
@@ -205,7 +205,7 @@
     dest: /usr/local/bin/monitor_and_purge.sh
     owner: root
     group: root
-    mode: '0755'
+    mode: "0755"
   tags: cloudflare
 
 - name: Create log file for Cloudflare cache purges
@@ -214,7 +214,7 @@
     state: touch
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   changed_when: false
   tags: cloudflare
 
@@ -224,7 +224,7 @@
     state: touch
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   changed_when: false
   tags: cloudflare
 

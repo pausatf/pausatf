@@ -12,17 +12,18 @@
   file:
     path: /etc/apt/keyrings
     state: directory
-    mode: '0755'
+    mode: "0755"
 
 - name: Download New Relic repository key
   get_url:
     url: https://download.newrelic.com/infrastructure_agent/gpg/newrelic-infra.gpg
     dest: /etc/apt/keyrings/newrelic-infra.gpg
-    mode: '0644'
+    mode: "0644"
 
 - name: Add New Relic repository
   apt_repository:
-    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/newrelic-infra.gpg] https://download.newrelic.com/infrastructure_agent/linux/apt {{ ansible_distribution_release }} main"
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/newrelic-infra.gpg] https://download.newrelic.com/infrastructure_agent/linux/apt {{ ansible_distribution_release
+      }} main"
     state: present
     filename: newrelic-infra
 
@@ -30,7 +31,7 @@
   apt:
     name: newrelic-infra
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Deploy New Relic infrastructure configuration
   template:
@@ -38,7 +39,7 @@
     dest: /etc/newrelic-infra.yml
     owner: root
     group: root
-    mode: '0600'
+    mode: "0600"
   notify: Restart New Relic infrastructure
 
 - name: Install New Relic PHP agent
@@ -56,7 +57,7 @@
     dest: "/etc/php/{{ php_version }}/mods-available/newrelic.ini"
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   notify: "{{ 'Restart PHP-FPM' if (use_php_fpm | default(false)) else 'Restart Apache' }}"
 
 - name: Check if New Relic PHP module is enabled
@@ -75,6 +76,6 @@
   service:
     name: "{{ item }}"
     state: started
-    enabled: yes
+    enabled: true
   loop:
     - newrelic-infra

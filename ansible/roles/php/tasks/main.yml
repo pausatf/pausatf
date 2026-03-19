@@ -5,7 +5,7 @@
   apt_repository:
     repo: "ppa:ondrej/php"
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Install PHP {{ php_version }} packages
   apt:
@@ -13,7 +13,8 @@
     state: present
   notify: Restart Apache
   vars:
-    _php_module_packages: "{{ php_modules | map('regex_replace', '^(redis)$', 'php-redis') | map('regex_replace', '^(?!php-redis$)(.*)$', 'php' + (php_version | string) + '-\\1') | list }}"
+    _php_module_packages: "{{ php_modules | map('regex_replace', '^(redis)$', 'php-redis') | map('regex_replace', '^(?!php-redis$)(.*)$', 'php' + (php_version | string)
+      + '-\\1') | list }}"
     _php_extra_packages: "{{ ['libapache2-mod-php' + (php_version | string)] }}"
     _php_legacy_packages: "{{ ['php' + (php_version | string) + '-json'] if php_version is version('8.0', '<') else [] }}"
     _php_packages: "{{ _php_module_packages + _php_extra_packages + _php_legacy_packages }}"
@@ -24,8 +25,8 @@
     dest: "/etc/php/{{ php_version }}/apache2/php.ini"
     owner: root
     group: root
-    mode: '0644'
-    backup: yes
+    mode: "0644"
+    backup: true
   notify: Restart Apache
 
 - name: Deploy CLI PHP configuration
@@ -34,7 +35,7 @@
     dest: "/etc/php/{{ php_version }}/cli/php.ini"
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
 
 - name: Deploy PHP security hardening
   template:
@@ -42,7 +43,7 @@
     dest: "/etc/php/{{ php_version }}/apache2/conf.d/99-security.ini"
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   notify: Restart Apache
 
 - name: Deploy PHP apache2 security hardening baseline ini
@@ -50,7 +51,7 @@
     dest: "/etc/php/{{ php_version }}/apache2/conf.d/99-security-hardening.ini"
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
     content: |
       ; Security hardening baseline (web/apache2 context)
       ; Managed by Ansible - Do not edit manually
@@ -68,7 +69,7 @@
     dest: "/etc/php/{{ php_version }}/cli/conf.d/99-security-hardening.ini"
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
     content: |
       ; Security hardening baseline (CLI context)
       ; Managed by Ansible - Do not edit manually
@@ -84,7 +85,7 @@
     dest: "/etc/php/{{ php_version }}/mods-available/opcache.ini"
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   notify: Restart Apache
 
 - name: Check if OPcache is enabled
@@ -102,7 +103,7 @@
   alternatives:
     name: php
     path: "/usr/bin/php{{ php_version }}"
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Create PHP session directory
   file:
@@ -110,4 +111,4 @@
     state: directory
     owner: www-data
     group: www-data
-    mode: '0770'
+    mode: "0770"

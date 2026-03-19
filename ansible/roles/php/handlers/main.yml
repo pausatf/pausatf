@@ -10,4 +10,4 @@
   service:
     name: "php{{ php_version }}-fpm"
     state: restarted
-  ignore_errors: yes
+  ignore_errors: true

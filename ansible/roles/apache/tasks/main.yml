@@ -1,3 +1,4 @@
+---
 # Apache role — Web server configuration for PAUSATF
 # Supports both mod_php (legacy) and PHP-FPM (Ubuntu 24.04+) via apache_mpm var
 
@@ -73,7 +74,7 @@
       </IfModule>
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   notify: Restart Apache
 
 - name: Enable required Apache modules
@@ -90,8 +91,8 @@
     dest: /etc/apache2/apache2.conf
     owner: root
     group: root
-    mode: '0644'
-    backup: yes
+    mode: "0644"
+    backup: true
   notify: Reload Apache
 
 - name: Deploy ports configuration
@@ -100,7 +101,7 @@
     dest: /etc/apache2/ports.conf
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   notify: Reload Apache
 
 - name: Deploy MPM prefork configuration
@@ -109,7 +110,7 @@
     dest: /etc/apache2/mods-available/mpm_prefork.conf
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   when: apache_mpm | default('prefork') == 'prefork'
   notify: Restart Apache
 
@@ -119,7 +120,7 @@
     dest: /etc/apache2/mods-available/mpm_event.conf
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   when: apache_mpm | default('prefork') == 'event'
   notify: Restart Apache
 
@@ -129,7 +130,7 @@
     dest: /etc/apache2/conf-available/security.conf
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   notify: Reload Apache
 
 - name: Enable security configuration
@@ -146,7 +147,7 @@
     dest: /etc/apache2/mods-available/ssl.conf
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   notify: Reload Apache
 
 - name: Remove default virtual host
@@ -161,7 +162,7 @@
     dest: "/etc/apache2/sites-available/{{ item.name }}.conf"
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   loop: "{{ wordpress_installs }}"
   notify: Reload Apache
 
@@ -171,7 +172,7 @@
     dest: "/etc/apache2/sites-available/{{ item.name }}-ssl.conf"
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   loop: "{{ wordpress_installs }}"
   when:
     - item.ssl_enabled | default(false)
@@ -215,7 +216,7 @@
     dest: "/etc/apache2/sites-available/{{ item.name }}.conf"
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   loop: "{{ additional_vhosts | default([]) }}"
   notify: Reload Apache
 
@@ -238,7 +239,7 @@
       <FilesMatch "\.(bak[^.]*|backup[^.]*|log|old|orig|sql|swp|tmp|zip)$">
           Require all denied
       </FilesMatch>
-    mode: '0644'
+    mode: "0644"
   notify: Reload Apache
 
 - name: Enable block-backups configuration
@@ -257,7 +258,7 @@
       <Files xmlrpc.php>
           Require all denied
       </Files>
-    mode: '0644'
+    mode: "0644"
   notify: Reload Apache
 
 - name: Enable block-xmlrpc configuration
@@ -287,7 +288,7 @@
       </Location>
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   notify: Reload Apache
 
 - name: Enable phpMyAdmin localhost restriction
@@ -304,7 +305,7 @@
     state: directory
     owner: www-data
     group: www-data
-    mode: '0750'
+    mode: "0750"
   when: wordpress_installs | selectattr('path', 'equalto', '/var/www/html') | list | length > 0
 
 - name: Deploy ai1wm-backups deny-all .htaccess
@@ -319,7 +320,7 @@
       </IfModule>
     owner: www-data
     group: www-data
-    mode: '0644'
+    mode: "0644"
   when: wordpress_installs | selectattr('path', 'equalto', '/var/www/html') | list | length > 0
 
 - name: Create teeters-php directory for scorer upload script
@@ -328,7 +329,7 @@
     state: directory
     owner: root
     group: root
-    mode: '0755'
+    mode: "0755"
 
 - name: Create scorer credentials directory
   file:
@@ -336,7 +337,7 @@
     state: directory
     owner: root
     group: www-data
-    mode: '0750'
+    mode: "0750"
 
 - name: Deploy scorer upload token
   copy:
@@ -344,7 +345,7 @@
     dest: /etc/pausatf/scorer-upload-token
     owner: root
     group: www-data
-    mode: '0640'
+    mode: "0640"
 
 - name: Deploy scorer salt
   copy:
@@ -352,7 +353,7 @@
     dest: /etc/pausatf/scorer-salt
     owner: root
     group: www-data
-    mode: '0640'
+    mode: "0640"
 
 - name: Deploy scorer_upload.php
   copy:
@@ -360,7 +361,7 @@
     dest: /var/www/html/teeters-php/scorer_upload.php
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
 
 - name: Deploy teeters-php open_basedir configuration
   template:
@@ -368,7 +369,7 @@
     dest: /etc/apache2/conf-available/teeters-php.conf
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   notify: Reload Apache
 
 - name: Enable teeters-php configuration
@@ -385,7 +386,7 @@
     dest: /etc/apache2/conf-available/legacy-data.conf
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   notify: Reload Apache
 
 - name: Enable legacy /data/ alias
@@ -400,7 +401,7 @@
   service:
     name: apache2
     state: started
-    enabled: yes
+    enabled: true
 
 - name: Verify Apache configuration
   command: apache2ctl configtest

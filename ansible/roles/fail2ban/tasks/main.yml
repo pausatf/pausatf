@@ -12,7 +12,7 @@
     dest: /etc/fail2ban/jail.local
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   notify: Restart fail2ban
 
 - name: Deploy WordPress authentication fail2ban filter
@@ -21,7 +21,7 @@
     dest: /etc/fail2ban/filter.d/wordpress-auth.conf
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   notify: Restart fail2ban
 
 - name: Deploy WordPress user enumeration fail2ban filter
@@ -30,7 +30,7 @@
     dest: /etc/fail2ban/filter.d/wordpress-enum.conf
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   notify: Restart fail2ban
 
 - name: Deploy OpenLiteSpeed fail2ban filter
@@ -39,7 +39,7 @@
     dest: /etc/fail2ban/filter.d/openlitespeed-auth.conf
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   when: web_server | default('apache') == 'openlitespeed'
   notify: Restart fail2ban
 
@@ -47,4 +47,4 @@
   service:
     name: fail2ban
     state: started
-    enabled: yes
+    enabled: true

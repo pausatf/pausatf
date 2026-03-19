@@ -1,12 +1,13 @@
+---
 # Security hardening role — baseline OS hardening for PAUSATF servers
 # SSH lockdown, unattended-upgrades, file permissions, sysctl, service cleanup
 
 - name: Set PermitRootLogin to {{ hardening_ssh_permit_root_login }}
   ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
-    regexp: '^\s*#?\s*PermitRootLogin\b'
+    regexp: "^\\s*#?\\s*PermitRootLogin\\b"
     line: "PermitRootLogin {{ hardening_ssh_permit_root_login }}"
-    validate: 'sshd -t -f %s'
+    validate: "sshd -t -f %s"
   notify: Reload sshd
   tags:
     - security_hardening
@@ -14,9 +15,9 @@
 - name: Set SSH AllowUsers
   ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
-    regexp: '^\s*#?\s*AllowUsers\b'
+    regexp: "^\\s*#?\\s*AllowUsers\\b"
     line: "AllowUsers {{ hardening_ssh_allow_users | join(' ') }}"
-    validate: 'sshd -t -f %s'
+    validate: "sshd -t -f %s"
   when: hardening_ssh_allow_users | default([]) | length > 0
   notify: Reload sshd
   tags:
@@ -25,9 +26,9 @@
 - name: Set SSH MaxAuthTries to {{ hardening_ssh_max_auth_tries }}
   ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
-    regexp: '^\s*#?\s*MaxAuthTries\b'
+    regexp: "^\\s*#?\\s*MaxAuthTries\\b"
     line: "MaxAuthTries {{ hardening_ssh_max_auth_tries }}"
-    validate: 'sshd -t -f %s'
+    validate: "sshd -t -f %s"
   notify: Reload sshd
   tags:
     - security_hardening
@@ -53,7 +54,7 @@
       Unattended-Upgrade::Remove-Unused-Dependencies "true";
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   tags:
     - security_hardening
 
@@ -65,7 +66,7 @@
       APT::Periodic::Unattended-Upgrade "1";
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   tags:
     - security_hardening
 
@@ -81,7 +82,7 @@
     path: "{{ hardening_wp_docroot }}/wp-config.php"
     owner: root
     group: www-data
-    mode: '0640'
+    mode: "0640"
   when: _wp_config_stat.stat.exists
   tags:
     - security_hardening
@@ -91,7 +92,7 @@
     path: "{{ hardening_wp_docroot }}/wp-content"
     owner: www-data
     group: www-data
-    mode: '0755'
+    mode: "0755"
     state: directory
   tags:
     - security_hardening
@@ -101,7 +102,7 @@
     path: "{{ hardening_wp_docroot }}/wp-content/uploads"
     owner: www-data
     group: www-data
-    mode: '0755'
+    mode: "0755"
     state: directory
   tags:
     - security_hardening
