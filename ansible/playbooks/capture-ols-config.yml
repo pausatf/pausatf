@@ -1,45 +1,45 @@
 ---
 - name: Capture OpenLiteSpeed marketplace configuration from target
   hosts: staging
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
 
   vars:
     capture_dir: "artifacts/capture/{{ inventory_hostname }}"
 
   tasks:
     - name: Create local capture directory
-      local_action:
-        module: file
+      delegate_to: localhost
+      ansible.builtin.file:
         path: "{{ capture_dir }}"
         state: directory
-        mode: '0755'
+        mode: "0755"
 
     - name: Capture OLS main config
-      fetch:
+      ansible.builtin.fetch:
         src: /usr/local/lsws/conf/httpd_config.conf
         dest: "{{ capture_dir }}/httpd_config.conf"
-        flat: yes
+        flat: true
 
     - name: Capture OLS vhost configs
-      fetch:
+      ansible.builtin.fetch:
         src: /usr/local/lsws/conf/vhosts
         dest: "{{ capture_dir }}/vhosts"
-        flat: no
+        flat: false
 
     - name: List installed lsphp packages
-      command: dpkg -l | grep -E "^ii\s+lsphp|^ii\s+openlitespeed"
+      ansible.builtin.command: dpkg -l | grep -E "^ii\s+lsphp|^ii\s+openlitespeed"
       register: lsphp_pkgs
       changed_when: false
 
     - name: Save package list
-      local_action:
-        module: copy
+      delegate_to: localhost
+      ansible.builtin.copy:
         dest: "{{ capture_dir }}/packages.txt"
         content: "{{ lsphp_pkgs.stdout }}\n"
 
     - name: Capture service status
-      shell: |
+      ansible.builtin.shell: |
         systemctl status lshttpd --no-pager || true
         systemctl status memcached --no-pager || true
         systemctl status redis-server --no-pager || true
@@ -48,20 +48,20 @@
       changed_when: false
 
     - name: Save service status
-      local_action:
-        module: copy
+      delegate_to: localhost
+      ansible.builtin.copy:
         dest: "{{ capture_dir }}/services.txt"
         content: "{{ svc_status.stdout }}\n"
 
     - name: Capture Certbot renewal timers/units
-      shell: |
+      ansible.builtin.shell: |
         systemctl list-timers | grep -i certbot || true
         crontab -l || true
       register: certbot_info
       changed_when: false
 
     - name: Save certbot info
-      local_action:
-        module: copy
+      delegate_to: localhost
+      ansible.builtin.copy:
         dest: "{{ capture_dir }}/certbot.txt"
         content: "{{ certbot_info.stdout }}\n"

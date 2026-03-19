@@ -3,71 +3,71 @@
 # CRS is installed via the modsecurity-crs Debian package.
 
 - name: Install ModSecurity CRS package
-  apt:
+  ansible.builtin.apt:
     name:
       - libapache2-mod-security2
       - modsecurity-crs
     state: present
 
 - name: Create ModSecurity working directories
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     owner: www-data
     group: www-data
-    mode: '0750'
+    mode: "0750"
   loop:
     - "{{ modsecurity_tmp_dir }}"
     - "{{ modsecurity_data_dir }}"
 
 - name: Deploy ModSecurity configuration
-  template:
+  ansible.builtin.template:
     src: modsecurity.conf.j2
     dest: /etc/modsecurity/modsecurity.conf
     owner: root
     group: root
-    mode: '0644'
-    backup: yes
+    mode: "0644"
+    backup: true
   notify: Reload Apache
 
 - name: Ensure CRS setup directory exists
-  file:
+  ansible.builtin.file:
     path: /etc/modsecurity/crs
     state: directory
     owner: root
     group: root
-    mode: '0755'
+    mode: "0755"
 
 - name: Deploy CRS pre-rules exclusion file
-  copy:
+  ansible.builtin.copy:
     src: REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf
     dest: /etc/modsecurity/crs/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   notify: Reload Apache
 
 - name: Deploy CRS post-rules exclusion file
-  copy:
+  ansible.builtin.copy:
     src: RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf
     dest: /etc/modsecurity/crs/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   notify: Reload Apache
 
 - name: Ensure ModSecurity audit log exists
-  file:
+  ansible.builtin.file:
     path: "{{ modsecurity_audit_log }}"
     state: touch
     owner: root
     group: adm
-    mode: '0640'
+    mode: "0640"
     modification_time: preserve
     access_time: preserve
 
 - name: Deploy ModSecurity audit log rotation
-  copy:
+  ansible.builtin.copy:
     dest: /etc/logrotate.d/modsecurity
     content: |
       {{ modsecurity_audit_log }} {
@@ -83,4 +83,4 @@
       }
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"

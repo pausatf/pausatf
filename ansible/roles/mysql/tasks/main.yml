@@ -1,8 +1,9 @@
+---
 # MySQL role - Database configuration for PAUSATF
 # Skipped entirely when using a managed database (mysql_managed: true).
 
 - name: Assert MySQL root password is configured
-  assert:
+  ansible.builtin.assert:
     that:
       - mysql_root_password | length > 0
     fail_msg: "mysql_root_password must be set via vault for local MySQL installations"
@@ -12,7 +13,7 @@
   when: not (mysql_managed | default(false))
   block:
     - name: Install MySQL packages
-      apt:
+      ansible.builtin.apt:
         name:
           - mysql-server
           - mysql-client
@@ -21,31 +22,31 @@
         state: present
 
     - name: Ensure MySQL is started and enabled
-      service:
+      ansible.builtin.service:
         name: mysql
         state: started
-        enabled: yes
+        enabled: true
 
     - name: Deploy MySQL configuration
-      template:
+      ansible.builtin.template:
         src: mysqld.cnf.j2
         dest: /etc/mysql/mysql.conf.d/mysqld.cnf
         owner: root
         group: root
-        mode: '0644'
-        backup: yes
+        mode: "0644"
+        backup: true
       notify: Restart MySQL
 
     - name: Create MySQL log directory
-      file:
+      ansible.builtin.file:
         path: /var/log/mysql
         state: directory
         owner: mysql
         group: adm
-        mode: '0750'
+        mode: "0750"
 
     - name: Set MySQL root password
-      mysql_user:
+      community.mysql.mysql_user:
         name: root
         password: "{{ mysql_root_password }}"
         host: localhost
@@ -58,28 +59,28 @@
       failed_when: root_pwd_result.failed and 'Access denied' not in (root_pwd_result.msg | default(''))
 
     - name: Create .my.cnf for root
-      template:
+      ansible.builtin.template:
         src: root-my.cnf.j2
         dest: /root/.my.cnf
         owner: root
         group: root
-        mode: '0600'
+        mode: "0600"
 
     - name: Remove anonymous MySQL users
-      mysql_user:
-        name: ''
-        host_all: yes
+      community.mysql.mysql_user:
+        name: ""
+        host_all: true
         state: absent
         login_unix_socket: "{{ mysql_socket }}"
 
     - name: Remove test database
-      mysql_db:
+      community.mysql.mysql_db:
         name: test
         state: absent
         login_unix_socket: "{{ mysql_socket }}"
 
     - name: Create WordPress databases
-      mysql_db:
+      community.mysql.mysql_db:
         name: "{{ item.db_name }}"
         state: present
         encoding: utf8mb4
@@ -92,7 +93,7 @@
       when: item.db_name is defined
 
     - name: Create WordPress database users
-      mysql_user:
+      community.mysql.mysql_user:
         name: "{{ item.db_user }}"
         password: "{{ item.db_password }}"
         priv: "{{ item.db_name }}.*:SELECT,INSERT,UPDATE,DELETE,CREATE,DROP,INDEX,ALTER,CREATE TEMPORARY TABLES,LOCK TABLES"
@@ -106,21 +107,21 @@
       no_log: true
 
     - name: Configure MySQL slow query log
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/mysql/mysql.conf.d/mysqld.cnf
         regexp: "^#?slow_query_log"
         line: "slow_query_log = 1"
       notify: Restart MySQL
 
     - name: Configure MySQL slow query log file
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/mysql/mysql.conf.d/mysqld.cnf
         regexp: "^#?slow_query_log_file"
         line: "slow_query_log_file = /var/log/mysql/mysql-slow.log"
       notify: Restart MySQL
 
     - name: Configure MySQL long query time
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/mysql/mysql.conf.d/mysqld.cnf
         regexp: "^#?long_query_time"
         line: "long_query_time = 2"
@@ -128,5 +129,5 @@
 
   rescue:
     - name: MySQL setup failed
-      fail:
+      ansible.builtin.fail:
         msg: "MySQL setup failed. Review the task output above for details."

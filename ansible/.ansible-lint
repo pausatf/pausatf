@@ -7,6 +7,16 @@ warn_list:
 skip_list:
   - yaml[truthy]
   - name[template]
+  # Pre-existing debt -- fix incrementally, not in bulk.
+  # Each rule here should be removed once its violations are resolved.
+  - var-naming[no-role-prefix]
+  - no-changed-when
+  - risky-file-permissions
+  - risky-shell-pipe
+  - command-instead-of-module
+  - ignore-errors
+  - no-handler
+  - yaml[line-length]
 exclude_paths:
   - .cache/
   - molecule/

@@ -26,7 +26,7 @@ provisioner:
         wordpress_enabled: true
         environment: staging
         mysql_managed: true
-        web_server: 'nginx'
+        web_server: "nginx"
         wpcli_update_plugins: false
         wpcli_update_themes: false
         wordpress_installs:
@@ -34,7 +34,7 @@ provisioner:
             domain: localhost
             db_name: wordpress
             db_user: wordpress
-            db_password: molecule_test_pass  # pragma: allowlist secret
+            db_password: molecule_test_pass # pragma: allowlist secret
             db_host: localhost
             manage_wp_config: false
 verifier:

@@ -8,7 +8,7 @@
 - name: Update /etc/hosts for {{ inventory_hostname }}
   ansible.builtin.lineinfile:
     path: /etc/hosts
-    regexp: '^127\.0\.1\.1'
+    regexp: "^127\\.0\\.1\\.1"
     line: "127.0.1.1 {{ inventory_hostname }}"
     state: present
   when: ansible_virtualization_type != 'docker'
@@ -35,7 +35,7 @@
       - python3-setuptools
       - inotify-tools
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Configure UFW firewall
   ansible.builtin.include_tasks: firewall.yml
@@ -45,8 +45,8 @@
     name: deploy
     shell: /bin/bash
     groups: sudo
-    append: yes
-    create_home: yes
+    append: true
+    create_home: true
 
 - name: Configure SSH
   ansible.builtin.include_tasks: ssh.yml
@@ -71,28 +71,28 @@
       APT::Periodic::Download-Upgradeable-Packages "1";
       APT::Periodic::AutocleanInterval "7";
       APT::Periodic::Unattended-Upgrade "1";
-    mode: '0644'
+    mode: "0644"
 
 - name: Configure sysctl for security
   ansible.posix.sysctl:
     name: "{{ item.name }}"
     value: "{{ item.value }}"
     state: present
-    sysctl_set: yes
-    reload: yes
+    sysctl_set: true
+    reload: true
   loop:
-    - { name: 'net.ipv4.conf.all.rp_filter', value: '1' }
-    - { name: 'net.ipv4.conf.default.rp_filter', value: '1' }
-    - { name: 'net.ipv4.icmp_echo_ignore_broadcasts', value: '1' }
-    - { name: 'net.ipv4.conf.all.accept_source_route', value: '0' }
-    - { name: 'net.ipv6.conf.all.accept_source_route', value: '0' }
-    - { name: 'net.ipv4.conf.default.accept_source_route', value: '0' }
-    - { name: 'net.ipv6.conf.default.accept_source_route', value: '0' }
-    - { name: 'net.ipv4.conf.all.send_redirects', value: '0' }
-    - { name: 'net.ipv4.conf.default.send_redirects', value: '0' }
-    - { name: 'net.ipv4.tcp_syncookies', value: '1' }
-    - { name: 'net.ipv4.tcp_max_syn_backlog', value: '2048' }
-    - { name: 'net.ipv4.tcp_synack_retries', value: '2' }
-    - { name: 'net.ipv4.tcp_syn_retries', value: '5' }
-    - { name: 'net.ipv4.ip_forward', value: '0' }
+    - { name: "net.ipv4.conf.all.rp_filter", value: "1" }
+    - { name: "net.ipv4.conf.default.rp_filter", value: "1" }
+    - { name: "net.ipv4.icmp_echo_ignore_broadcasts", value: "1" }
+    - { name: "net.ipv4.conf.all.accept_source_route", value: "0" }
+    - { name: "net.ipv6.conf.all.accept_source_route", value: "0" }
+    - { name: "net.ipv4.conf.default.accept_source_route", value: "0" }
+    - { name: "net.ipv6.conf.default.accept_source_route", value: "0" }
+    - { name: "net.ipv4.conf.all.send_redirects", value: "0" }
+    - { name: "net.ipv4.conf.default.send_redirects", value: "0" }
+    - { name: "net.ipv4.tcp_syncookies", value: "1" }
+    - { name: "net.ipv4.tcp_max_syn_backlog", value: "2048" }
+    - { name: "net.ipv4.tcp_synack_retries", value: "2" }
+    - { name: "net.ipv4.tcp_syn_retries", value: "5" }
+    - { name: "net.ipv4.ip_forward", value: "0" }
   when: ansible_virtualization_type != 'docker'

@@ -1,33 +1,34 @@
+---
 # Install LiteSpeed PHP (lsphp) and common extensions
 
 - name: Create keyrings directory
-  file:
+  ansible.builtin.file:
     path: /etc/apt/keyrings
     state: directory
-    mode: '0755'
+    mode: "0755"
 
 - name: Download LiteSpeed repository key
-  get_url:
+  ansible.builtin.get_url:
     url: https://repo.litespeed.sh/ls.key
     dest: /etc/apt/keyrings/litespeed.gpg
-    mode: '0644'
+    mode: "0644"
 
 - name: Add LiteSpeed repository
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/litespeed.gpg] http://rpms.litespeedtech.com/debian/ stable main"
     state: present
     filename: litespeed
 
 - name: Update apt cache
-  apt:
-    update_cache: yes
+  ansible.builtin.apt:
+    update_cache: true
 
 - name: Compute lsphp package suffix
-  set_fact:
+  ansible.builtin.set_fact:
     lsphp_suffix: "{{ php_version | trim | replace('.', '') }}"
 
 - name: Install lsphp packages
-  apt:
+  ansible.builtin.apt:
     name:
       - "lsphp{{ lsphp_suffix }}"
       - "lsphp{{ lsphp_suffix }}-common"
@@ -46,13 +47,13 @@
     state: present
 
 - name: Create PHP config directory
-  file:
+  ansible.builtin.file:
     path: "/usr/local/lsws/lsphp{{ lsphp_suffix }}/etc/php/{{ php_version }}/mods-available"
     state: directory
-    mode: '0755'
+    mode: "0755"
 
 - name: Deploy CLI PHP settings (opcache/uploads)
-  copy:
+  ansible.builtin.copy:
     dest: "/usr/local/lsws/lsphp{{ lsphp_suffix }}/etc/php/{{ php_version }}/conf.d/99-ansible.ini"
     content: |
       opcache.memory_consumption=192
@@ -65,9 +66,9 @@
       max_execution_time=300
       max_input_time=300
       memory_limit=256M
-    mode: '0644'
+    mode: "0644"
 
 - name: Ensure lshttpd picks up new PHP version (graceful)
-  service:
+  ansible.builtin.service:
     name: lshttpd
     state: restarted

@@ -7,8 +7,8 @@
 
   pre_tasks:
     - name: Update apt cache
-      apt:
-        update_cache: yes
+      ansible.builtin.apt:
+        update_cache: true
         cache_valid_time: 3600
       when: ansible_os_family == "Debian"
 
@@ -26,91 +26,91 @@
     - name: Deploy web stack
       block:
         - name: Include PHP role (mod_php)
-          include_role:
+          ansible.builtin.include_role:
             name: php
           when:
             - web_server | default('apache') == 'apache'
             - not (use_php_fpm | default(false))
 
         - name: Include PHP-FPM role
-          include_role:
+          ansible.builtin.include_role:
             name: php-fpm
           when:
             - web_server | default('apache') == 'apache'
             - use_php_fpm | default(false)
 
         - name: Include ModSecurity role
-          include_role:
+          ansible.builtin.include_role:
             name: modsecurity
           when:
             - web_server | default('apache') == 'apache'
             - modsecurity_enabled | default(true)
 
         - name: Include Apache role
-          include_role:
+          ansible.builtin.include_role:
             name: apache
           when: web_server | default('apache') == 'apache'
 
         - name: Include OpenLiteSpeed PHP role
-          include_role:
+          ansible.builtin.include_role:
             name: lsphp
           when: web_server | default('apache') == 'openlitespeed'
 
         - name: Include OpenLiteSpeed role
-          include_role:
+          ansible.builtin.include_role:
             name: openlitespeed
           when: web_server | default('apache') == 'openlitespeed'
 
         - name: Include Certbot role
-          include_role:
+          ansible.builtin.include_role:
             name: certbot
           when: certbot_enabled | default(false)
 
         - name: Include MySQL role
-          include_role:
+          ansible.builtin.include_role:
             name: mysql
           when: mysql_enabled | default(true)
 
         - name: Include Redis role
-          include_role:
+          ansible.builtin.include_role:
             name: redis
           when: redis_enabled | default(false)
 
         - name: Include Fail2ban role
-          include_role:
+          ansible.builtin.include_role:
             name: fail2ban
 
         - name: Include AppArmor role
-          include_role:
+          ansible.builtin.include_role:
             name: apparmor
           when: apparmor_apache_enforce | default(false)
           tags: apparmor
 
         - name: Include WordPress role
-          include_role:
+          ansible.builtin.include_role:
             name: wordpress
           when: wordpress_enabled | default(true)
 
         - name: Include PAUSATF plugin role
-          include_role:
+          ansible.builtin.include_role:
             name: pausatf_plugin
           when: pausatf_plugin_enabled | default(false)
           tags: pausatf_plugin
 
         - name: Include Backups role
-          include_role:
+          ansible.builtin.include_role:
             name: backups
           when: backups_enabled | default(false)
           tags: backups
 
         - name: Include Security Hardening role
-          include_role:
+          ansible.builtin.include_role:
             name: security_hardening
           when: security_hardening_enabled | default(true)
           tags: security_hardening
 
         - name: Include Cloudflare role
-          include_role:
+          ansible.builtin.include_role:
             name: cloudflare
           when:
             - cloudflare_enabled | default(false)
@@ -118,21 +118,21 @@
             - cloudflare_api_token | default('') | length > 0
 
         - name: Warn when Cloudflare role is skipped due missing credentials
-          debug:
+          ansible.builtin.debug:
             msg: "Skipping Cloudflare role because cloudflare_zone_id/cloudflare_api_token are not set"
           when:
             - cloudflare_enabled | default(false)
             - (cloudflare_zone_id | default('') | length == 0) or (cloudflare_api_token | default('') | length == 0)
 
         - name: Include New Relic role
-          include_role:
+          ansible.builtin.include_role:
             name: newrelic
           when:
             - newrelic_enabled | default(false)
             - newrelic_license_key | default('') | length > 0
 
         - name: Warn when New Relic role is skipped due missing license key
-          debug:
+          ansible.builtin.debug:
             msg: "Skipping New Relic role because newrelic_license_key is not set"
           when:
             - newrelic_enabled | default(false)
@@ -140,7 +140,7 @@
 
       rescue:
         - name: Web stack deployment failed
-          debug:
+          ansible.builtin.debug:
             msg: >
               DEPLOYMENT FAILED on {{ inventory_hostname }}.
               Role: {{ ansible_failed_task.name | default('unknown') }}.
@@ -148,12 +148,12 @@
               Manual intervention required. Check service status and logs.
 
         - name: Verify web server is still running
-          service:
+          ansible.builtin.service:
             name: "{{ 'apache2' if web_server | default('apache') == 'apache' else 'lsws' }}"
             state: started
 
         - name: Fail the play after rescue
-          fail:
+          ansible.builtin.fail:
             msg: "Deployment failed. Web server recovery attempted. Review errors above."
 
 - name: Run discovery

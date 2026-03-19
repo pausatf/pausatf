@@ -1,3 +1,4 @@
+---
 - name: Verify
   hosts: all
   gather_facts: true
@@ -12,7 +13,7 @@
       package:
         name: "php8.3-fpm"
         state: present
-      check_mode: yes
+      check_mode: true
       register: php_fpm_pkg
       failed_when: php_fpm_pkg is changed
 
@@ -20,7 +21,7 @@
       package:
         name: "php8.3-cli"
         state: present
-      check_mode: yes
+      check_mode: true
       register: php_cli_pkg
       failed_when: php_cli_pkg is changed
 
