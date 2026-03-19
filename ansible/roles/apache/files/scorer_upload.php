@@ -49,11 +49,16 @@ class Scorer_upload {
 			// No token file deployed; auth disabled (first-run compatibility)
 			return;
 		}
-		$expected = trim(file_get_contents($token_file));
-		if (empty($expected)) {
+		$raw = file_get_contents($token_file);
+		if ($raw === false) {
+			http_response_code(500);
+			die('Token file unreadable');
+		}
+		$expected = trim($raw);
+		if ($expected === '') {
 			return;
 		}
-		$provided = $_SERVER['HTTP_X_UPLOAD_TOKEN'] ?? $_REQUEST['token'] ?? '';
+		$provided = $_SERVER['HTTP_X_UPLOAD_TOKEN'] ?? $_POST['token'] ?? '';
 		if (!hash_equals($expected, $provided)) {
 			http_response_code(403);
 			die('Forbidden: invalid upload token');
