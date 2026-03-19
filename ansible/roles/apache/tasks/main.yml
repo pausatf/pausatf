@@ -3,14 +3,14 @@
 # Supports both mod_php (legacy) and PHP-FPM (Ubuntu 24.04+) via apache_mpm var
 
 - name: Install Apache packages
-  apt:
+  ansible.builtin.apt:
     name:
       - apache2
       - apache2-utils
     state: present
 
 - name: Ensure Apache modules directory exists
-  file:
+  ansible.builtin.file:
     path: /etc/apache2/mods-available
     state: directory
 
@@ -20,7 +20,7 @@
 
 # MPM selection — event for FPM, prefork for mod_php
 - name: Disable mpm_prefork (when using event MPM)
-  command: a2dismod mpm_prefork
+  ansible.builtin.command: a2dismod mpm_prefork
   register: _dis_prefork
   changed_when: "'Module mpm_prefork disabled' in _dis_prefork.stdout"
   failed_when: false
@@ -28,7 +28,7 @@
   notify: Restart Apache
 
 - name: Disable mod_php (when using FPM)
-  command: "a2dismod php{{ php_version | default('7.4') }}"
+  ansible.builtin.command: "a2dismod php{{ php_version | default('7.4') }}"
   register: _dis_php
   changed_when: "'Module' in _dis_php.stdout and 'disabled' in _dis_php.stdout"
   failed_when: false
@@ -36,7 +36,7 @@
   notify: Restart Apache
 
 - name: Enable mpm_event (when using event MPM)
-  command: a2enmod mpm_event
+  ansible.builtin.command: a2enmod mpm_event
   register: _en_event
   changed_when: "'Enabling module' in _en_event.stdout"
   failed_when: "_en_event.rc != 0 and 'already enabled' not in _en_event.stdout"
@@ -44,7 +44,7 @@
   notify: Restart Apache
 
 - name: Enable proxy and proxy_fcgi for PHP-FPM
-  command: "a2enmod {{ item }}"
+  ansible.builtin.command: "a2enmod {{ item }}"
   register: _en_proxy
   changed_when: "'Enabling module' in _en_proxy.stdout"
   failed_when: "_en_proxy.rc != 0 and 'already enabled' not in _en_proxy.stdout"
@@ -55,7 +55,7 @@
   notify: Restart Apache
 
 - name: Disable conflicting MPM modules (when using prefork)
-  command: "a2dismod {{ item }}"
+  ansible.builtin.command: "a2dismod {{ item }}"
   register: _dis_mpm
   changed_when: "'disabled' in _dis_mpm.stdout"
   failed_when: false
@@ -66,7 +66,7 @@
   notify: Restart Apache
 
 - name: Prioritize index.php over index.html in DirectoryIndex
-  copy:
+  ansible.builtin.copy:
     dest: /etc/apache2/mods-available/dir.conf
     content: |
       <IfModule mod_dir.c>
@@ -78,7 +78,7 @@
   notify: Restart Apache
 
 - name: Enable required Apache modules
-  command: "a2enmod {{ item }}"
+  ansible.builtin.command: "a2enmod {{ item }}"
   register: _en_mod
   changed_when: "'Enabling module' in _en_mod.stdout"
   failed_when: "_en_mod.rc != 0 and 'already enabled' not in _en_mod.stdout"
@@ -86,7 +86,7 @@
   notify: Restart Apache
 
 - name: Deploy Apache main configuration
-  template:
+  ansible.builtin.template:
     src: apache2.conf.j2
     dest: /etc/apache2/apache2.conf
     owner: root
@@ -96,7 +96,7 @@
   notify: Reload Apache
 
 - name: Deploy ports configuration
-  template:
+  ansible.builtin.template:
     src: ports.conf.j2
     dest: /etc/apache2/ports.conf
     owner: root
@@ -105,7 +105,7 @@
   notify: Reload Apache
 
 - name: Deploy MPM prefork configuration
-  template:
+  ansible.builtin.template:
     src: mpm_prefork.conf.j2
     dest: /etc/apache2/mods-available/mpm_prefork.conf
     owner: root
@@ -115,7 +115,7 @@
   notify: Restart Apache
 
 - name: Deploy MPM event configuration
-  template:
+  ansible.builtin.template:
     src: mpm_event.conf.j2
     dest: /etc/apache2/mods-available/mpm_event.conf
     owner: root
@@ -125,7 +125,7 @@
   notify: Restart Apache
 
 - name: Deploy security configuration
-  template:
+  ansible.builtin.template:
     src: security.conf.j2
     dest: /etc/apache2/conf-available/security.conf
     owner: root
@@ -134,7 +134,7 @@
   notify: Reload Apache
 
 - name: Enable security configuration
-  file:
+  ansible.builtin.file:
     src: /etc/apache2/conf-available/security.conf
     dest: /etc/apache2/conf-enabled/security.conf
     state: link
@@ -142,7 +142,7 @@
   notify: Reload Apache
 
 - name: Deploy SSL configuration
-  template:
+  ansible.builtin.template:
     src: ssl.conf.j2
     dest: /etc/apache2/mods-available/ssl.conf
     owner: root
@@ -151,13 +151,13 @@
   notify: Reload Apache
 
 - name: Remove default virtual host
-  file:
+  ansible.builtin.file:
     path: /etc/apache2/sites-enabled/000-default.conf
     state: absent
   notify: Reload Apache
 
 - name: Deploy virtual host configurations
-  template:
+  ansible.builtin.template:
     src: vhost.conf.j2
     dest: "/etc/apache2/sites-available/{{ item.name }}.conf"
     owner: root
@@ -167,7 +167,7 @@
   notify: Reload Apache
 
 - name: Deploy SSL virtual host configurations
-  template:
+  ansible.builtin.template:
     src: vhost-ssl.conf.j2
     dest: "/etc/apache2/sites-available/{{ item.name }}-ssl.conf"
     owner: root
@@ -180,7 +180,7 @@
   notify: Reload Apache
 
 - name: Enable virtual hosts
-  file:
+  ansible.builtin.file:
     src: "/etc/apache2/sites-available/{{ item.name }}.conf"
     dest: "/etc/apache2/sites-enabled/{{ item.name }}.conf"
     state: link
@@ -189,7 +189,7 @@
   notify: Reload Apache
 
 - name: Disable SSL virtual hosts during bootstrap mode
-  file:
+  ansible.builtin.file:
     path: "/etc/apache2/sites-enabled/{{ item.name }}-ssl.conf"
     state: absent
   loop: "{{ wordpress_installs }}"
@@ -199,7 +199,7 @@
   notify: Reload Apache
 
 - name: Enable SSL virtual hosts
-  file:
+  ansible.builtin.file:
     src: "/etc/apache2/sites-available/{{ item.name }}-ssl.conf"
     dest: "/etc/apache2/sites-enabled/{{ item.name }}-ssl.conf"
     state: link
@@ -211,7 +211,7 @@
   notify: Reload Apache
 
 - name: Deploy additional (non-WordPress) virtual hosts
-  template:
+  ansible.builtin.template:
     src: vhost.conf.j2
     dest: "/etc/apache2/sites-available/{{ item.name }}.conf"
     owner: root
@@ -221,7 +221,7 @@
   notify: Reload Apache
 
 - name: Enable additional virtual hosts
-  file:
+  ansible.builtin.file:
     src: "/etc/apache2/sites-available/{{ item.name }}.conf"
     dest: "/etc/apache2/sites-enabled/{{ item.name }}.conf"
     state: link
@@ -230,7 +230,7 @@
   notify: Reload Apache
 
 - name: Deploy block-backups configuration
-  copy:
+  ansible.builtin.copy:
     dest: /etc/apache2/conf-available/block-backups.conf
     content: |
       # Block access to backup and archive files at the server level.
@@ -243,7 +243,7 @@
   notify: Reload Apache
 
 - name: Enable block-backups configuration
-  file:
+  ansible.builtin.file:
     src: /etc/apache2/conf-available/block-backups.conf
     dest: /etc/apache2/conf-enabled/block-backups.conf
     state: link
@@ -251,7 +251,7 @@
   notify: Reload Apache
 
 - name: Deploy block-xmlrpc configuration
-  copy:
+  ansible.builtin.copy:
     dest: /etc/apache2/conf-available/block-xmlrpc.conf
     content: |
       # Block WordPress XML-RPC attacks
@@ -262,7 +262,7 @@
   notify: Reload Apache
 
 - name: Enable block-xmlrpc configuration
-  file:
+  ansible.builtin.file:
     src: /etc/apache2/conf-available/block-xmlrpc.conf
     dest: /etc/apache2/conf-enabled/block-xmlrpc.conf
     state: link
@@ -270,13 +270,13 @@
   notify: Reload Apache
 
 - name: Disable default-ssl virtual host (conflicts with pausatf-main-ssl)
-  file:
+  ansible.builtin.file:
     path: /etc/apache2/sites-enabled/default-ssl.conf
     state: absent
   notify: Reload Apache
 
 - name: Deploy phpMyAdmin access restriction
-  copy:
+  ansible.builtin.copy:
     dest: /etc/apache2/conf-available/phpmyadmin-restrict.conf
     content: |
       # Restrict phpMyAdmin to authenticated users only
@@ -292,7 +292,7 @@
   notify: Reload Apache
 
 - name: Enable phpMyAdmin localhost restriction
-  file:
+  ansible.builtin.file:
     src: /etc/apache2/conf-available/phpmyadmin-restrict.conf
     dest: /etc/apache2/conf-enabled/phpmyadmin-restrict.conf
     state: link
@@ -300,7 +300,7 @@
   notify: Reload Apache
 
 - name: Block HTTP access to ai1wm-backups directory
-  file:
+  ansible.builtin.file:
     path: /var/www/html/wp-content/ai1wm-backups
     state: directory
     owner: www-data
@@ -309,7 +309,7 @@
   when: wordpress_installs | selectattr('path', 'equalto', '/var/www/html') | list | length > 0
 
 - name: Deploy ai1wm-backups deny-all .htaccess
-  copy:
+  ansible.builtin.copy:
     dest: /var/www/html/wp-content/ai1wm-backups/.htaccess
     content: |
       <IfModule mod_authz_core.c>
@@ -324,7 +324,7 @@
   when: wordpress_installs | selectattr('path', 'equalto', '/var/www/html') | list | length > 0
 
 - name: Create teeters-php directory for scorer upload script
-  file:
+  ansible.builtin.file:
     path: /var/www/html/teeters-php
     state: directory
     owner: root
@@ -332,7 +332,7 @@
     mode: "0755"
 
 - name: Create scorer credentials directory
-  file:
+  ansible.builtin.file:
     path: /etc/pausatf
     state: directory
     owner: root
@@ -340,7 +340,7 @@
     mode: "0750"
 
 - name: Deploy scorer upload token
-  copy:
+  ansible.builtin.copy:
     content: "{{ vault_scorer_upload_token | default('') }}"
     dest: /etc/pausatf/scorer-upload-token
     owner: root
@@ -348,7 +348,7 @@
     mode: "0640"
 
 - name: Deploy scorer salt
-  copy:
+  ansible.builtin.copy:
     content: "{{ vault_scorer_salt | default('') }}"
     dest: /etc/pausatf/scorer-salt
     owner: root
@@ -356,7 +356,7 @@
     mode: "0640"
 
 - name: Deploy scorer_upload.php
-  copy:
+  ansible.builtin.copy:
     src: scorer_upload.php
     dest: /var/www/html/teeters-php/scorer_upload.php
     owner: root
@@ -364,7 +364,7 @@
     mode: "0644"
 
 - name: Deploy teeters-php open_basedir configuration
-  template:
+  ansible.builtin.template:
     src: teeters-php.conf.j2
     dest: /etc/apache2/conf-available/teeters-php.conf
     owner: root
@@ -373,7 +373,7 @@
   notify: Reload Apache
 
 - name: Enable teeters-php configuration
-  file:
+  ansible.builtin.file:
     src: /etc/apache2/conf-available/teeters-php.conf
     dest: /etc/apache2/conf-enabled/teeters-php.conf
     state: link
@@ -381,7 +381,7 @@
   notify: Reload Apache
 
 - name: Deploy legacy /data/ alias configuration
-  template:
+  ansible.builtin.template:
     src: legacy-data.conf.j2
     dest: /etc/apache2/conf-available/legacy-data.conf
     owner: root
@@ -390,7 +390,7 @@
   notify: Reload Apache
 
 - name: Enable legacy /data/ alias
-  file:
+  ansible.builtin.file:
     src: /etc/apache2/conf-available/legacy-data.conf
     dest: /etc/apache2/conf-enabled/legacy-data.conf
     state: link
@@ -398,13 +398,13 @@
   notify: Reload Apache
 
 - name: Ensure Apache is started and enabled
-  service:
+  ansible.builtin.service:
     name: apache2
     state: started
     enabled: true
 
 - name: Verify Apache configuration
-  command: apache2ctl configtest
+  ansible.builtin.command: apache2ctl configtest
   register: apache_configtest
   changed_when: false
   failed_when: "'Syntax OK' not in apache_configtest.stderr"

@@ -143,7 +143,7 @@
       changed_when: false
 
     - name: Get database size
-      ansible.builtin.shell: wp db size --path={{ wordpress_path }} --allow-root --format=json
+      ansible.builtin.command: wp db size --path={{ wordpress_path }} --allow-root --format=json
       register: wp_db_size
       changed_when: false
       ignore_errors: true
@@ -161,32 +161,32 @@
       failed_when: false
 
     - name: List cron.d jobs
-      ansible.builtin.shell: ls -la /etc/cron.d/ && echo "---" && for f in /etc/cron.d/*; do echo "=== $f ==="; cat "$f" 2>/dev/null || echo "Unable to read";
-        echo ""; done
+      ansible.builtin.shell: ls -la /etc/cron.d/ && echo "---" && for f in /etc/cron.d/*; do echo "=== $f ==="; cat "$f"
+        2>/dev/null || echo "Unable to read"; echo ""; done
       register: crond_jobs
       changed_when: false
       failed_when: false
 
     - name: List cron.hourly scripts
-      ansible.builtin.shell: ls -la /etc/cron.hourly/
+      ansible.builtin.command: ls -la /etc/cron.hourly/
       register: cron_hourly
       changed_when: false
       failed_when: false
 
     - name: List cron.daily scripts
-      ansible.builtin.shell: ls -la /etc/cron.daily/
+      ansible.builtin.command: ls -la /etc/cron.daily/
       register: cron_daily
       changed_when: false
       failed_when: false
 
     - name: List cron.weekly scripts
-      ansible.builtin.shell: ls -la /etc/cron.weekly/
+      ansible.builtin.command: ls -la /etc/cron.weekly/
       register: cron_weekly
       changed_when: false
       failed_when: false
 
     - name: List cron.monthly scripts
-      ansible.builtin.shell: ls -la /etc/cron.monthly/
+      ansible.builtin.command: ls -la /etc/cron.monthly/
       register: cron_monthly
       changed_when: false
       failed_when: false
@@ -202,7 +202,7 @@
       failed_when: false
 
     - name: Get systemd timers
-      ansible.builtin.shell: systemctl list-timers --all --no-pager
+      ansible.builtin.command: systemctl list-timers --all --no-pager
       register: systemd_timers
       changed_when: false
       failed_when: false
@@ -346,7 +346,7 @@
       failed_when: false
 
     - name: Find all .htaccess files
-      ansible.builtin.shell: find {{ wordpress_path }} -name ".htaccess" -type f
+      ansible.builtin.command: find {{ wordpress_path }} -name ".htaccess" -type f
       register: htaccess_files
       changed_when: false
       failed_when: false
@@ -716,12 +716,14 @@
         msg:
           - "WordPress Configuration Captured Successfully"
           - "============================================="
-          - "Environment: {% if 'production' in group_names %}PRODUCTION{% elif 'staging' in group_names %}STAGING{% else %}{{ inventory_hostname }}{% endif %}"
+          - "Environment: {% if 'production' in group_names %}PRODUCTION{% elif 'staging' in group_names %}STAGING{% else
+            %}{{ inventory_hostname }}{% endif %}"
           - "Server: {{ inventory_hostname }}"
           - "Web Server: {{ web_server | upper }}"
           - "WordPress Version: {{ wp_version.stdout }}"
           - "Active Theme: {{ wp_active_theme.stdout }}"
-          - "Active Plugins: {{ (wp_plugins.stdout | from_json | selectattr('status', 'equalto', 'active') | list | length) }}"
+          - "Active Plugins: {{ (wp_plugins.stdout | from_json | selectattr('status', 'equalto', 'active') | list | length)
+            }}"
           - "Total Plugins: {{ (wp_plugins.stdout | from_json) | length }}"
           - ".htaccess Files: {{ htaccess_files.stdout_lines | length }}"
           - ""

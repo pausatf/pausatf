@@ -16,14 +16,14 @@
     # Phase 1: Pre-flight checks
     # ========================================
     - name: Create remote backup directory
-      file:
+      ansible.builtin.file:
         path: "{{ backup_root }}"
         state: directory
         mode: "0700"
 
     - name: Create local backup directory
       delegate_to: localhost
-      file:
+      ansible.builtin.file:
         path: "{{ local_backup_dir }}"
         state: directory
         mode: "0755"
@@ -32,31 +32,29 @@
     # Phase 2: Capture cron jobs
     # ========================================
     - name: Capture root crontab
-      shell: crontab -l > {{ backup_root }}/crontab-root.txt 2>&1 || echo "No root crontab"
+      ansible.builtin.shell: crontab -l > {{ backup_root }}/crontab-root.txt 2>&1 || echo "No root crontab"
       args:
         creates: "{{ backup_root }}/crontab-root.txt"
       ignore_errors: true
 
     - name: Capture www-data crontab
-      shell: crontab -u www-data -l > {{ backup_root }}/crontab-www-data.txt 2>&1 || echo "No www-data crontab"
+      ansible.builtin.shell: crontab -u www-data -l > {{ backup_root }}/crontab-www-data.txt 2>&1 || echo "No www-data
+        crontab"
       args:
         creates: "{{ backup_root }}/crontab-www-data.txt"
       ignore_errors: true
 
     - name: Capture deploy crontab
-      shell: crontab -u deploy -l > {{ backup_root }}/crontab-deploy.txt 2>&1 || echo "No deploy crontab"
+      ansible.builtin.shell: crontab -u deploy -l > {{ backup_root }}/crontab-deploy.txt 2>&1 || echo "No deploy
+        crontab"
       args:
         creates: "{{ backup_root }}/crontab-deploy.txt"
       ignore_errors: true
 
     - name: Capture system-wide cron.d
-      shell: tar czf {{ backup_root }}/cron.d.tar.gz /etc/cron.d/ 2>/dev/null || true
-
-    # ========================================
-    # Phase 3: Capture custom scripts
-    # ========================================
+      ansible.builtin.shell: tar czf {{ backup_root }}/cron.d.tar.gz /etc/cron.d/ 2>/dev/null || true
     - name: Capture custom scripts from /usr/local/bin
-      shell: |
+      ansible.builtin.shell: |
         if [ -f /usr/local/bin/monitor_and_purge.sh ]; then
           cp /usr/local/bin/monitor_and_purge.sh {{ backup_root }}/
         fi
@@ -70,25 +68,24 @@
     # Phase 4: Capture Apache configuration
     # ========================================
     - name: Archive Apache sites-available
-      archive:
+      community.general.archive:
         path: /etc/apache2/sites-available/
         dest: "{{ backup_root }}/apache-sites-available.tar.gz"
 
     - name: Archive Apache sites-enabled
-      archive:
+      community.general.archive:
         path: /etc/apache2/sites-enabled/
         dest: "{{ backup_root }}/apache-sites-enabled.tar.gz"
 
     - name: Archive Apache conf-enabled
-      archive:
+      community.general.archive:
         path: /etc/apache2/conf-enabled/
         dest: "{{ backup_root }}/apache-conf-enabled.tar.gz"
 
     - name: Capture Apache modules list
-      shell: apache2ctl -M > {{ backup_root }}/apache-modules.txt 2>&1
-
+      ansible.builtin.shell: apache2ctl -M > {{ backup_root }}/apache-modules.txt 2>&1
     - name: Archive Apache custom config (if exists)
-      archive:
+      community.general.archive:
         path: /etc/apache2/conf-available/
         dest: "{{ backup_root }}/apache-conf-available.tar.gz"
       ignore_errors: true
@@ -97,32 +94,32 @@
     # Phase 5: Database export
     # ========================================
     - name: Get WordPress database credentials
-      shell: |
+      ansible.builtin.shell: |
         grep DB_NAME {{ wp_path }}/wp-config.php | cut -d "'" -f 4
       register: wp_db_name
       changed_when: false
 
     - name: Get WordPress database user
-      shell: |
+      ansible.builtin.shell: |
         grep DB_USER {{ wp_path }}/wp-config.php | cut -d "'" -f 4
       register: wp_db_user
       changed_when: false
 
     - name: Get WordPress database password
-      shell: |
+      ansible.builtin.shell: |
         grep DB_PASSWORD {{ wp_path }}/wp-config.php | cut -d "'" -f 4
       register: wp_db_pass
       changed_when: false
       no_log: true
 
     - name: Get WordPress database host
-      shell: |
+      ansible.builtin.shell: |
         grep DB_HOST {{ wp_path }}/wp-config.php | cut -d "'" -f 4
       register: wp_db_host
       changed_when: false
 
     - name: Export WordPress database
-      mysql_db:
+      community.mysql.mysql_db:
         name: "{{ wp_db_name.stdout }}"
         state: dump
         target: "{{ backup_root }}/wordpress-db.sql"
@@ -132,7 +129,7 @@
       no_log: true
 
     - name: Compress database dump
-      archive:
+      community.general.archive:
         path: "{{ backup_root }}/wordpress-db.sql"
         dest: "{{ backup_root }}/wordpress-db.sql.gz"
         format: gz
@@ -142,7 +139,7 @@
     # Phase 6: WordPress directory archive
     # ========================================
     - name: Archive WordPress directory (excluding cache)
-      shell: |
+      ansible.builtin.shell: |
         tar czf {{ backup_root }}/wordpress.tar.gz \
           --exclude='{{ wp_path }}/wp-content/cache' \
           --exclude='{{ wp_path }}/wp-content/uploads/cache' \
@@ -154,7 +151,7 @@
     # Phase 7: Legacy directory archive
     # ========================================
     - name: Archive legacy directory (including hidden files)
-      shell: |
+      ansible.builtin.shell: |
         tar czf {{ backup_root }}/legacy.tar.gz \
           -C $(dirname {{ legacy_path }}) $(basename {{ legacy_path }})
       args:
@@ -164,7 +161,7 @@
     # Phase 7b: Dev-html directory archive
     # ========================================
     - name: Archive dev-html directory
-      shell: |
+      ansible.builtin.shell: |
         tar czf {{ backup_root }}/dev-html.tar.gz \
           --exclude='wp-content/cache' \
           -C /var/www dev-html
@@ -175,7 +172,7 @@
     # Phase 7c: Transit directory archive
     # ========================================
     - name: Archive transit directory
-      shell: |
+      ansible.builtin.shell: |
         tar czf {{ backup_root }}/transit.tar.gz \
           -C /var/www transit
       args:
@@ -186,7 +183,7 @@
     # Phase 7d: Cloudflared tunnel config
     # ========================================
     - name: Archive cloudflared config
-      shell: |
+      ansible.builtin.shell: |
         tar czf {{ backup_root }}/cloudflared.tar.gz \
           /etc/cloudflared/ /root/.cloudflared/ 2>/dev/null || true
       args:
@@ -196,7 +193,7 @@
     # Phase 7e: SSL certificates
     # ========================================
     - name: Archive Let\'s Encrypt certificates
-      shell: |
+      ansible.builtin.shell: |
         tar czf {{ backup_root }}/letsencrypt.tar.gz \
           /etc/letsencrypt/ 2>/dev/null || true
       args:
@@ -206,7 +203,7 @@
     # Phase 7f: All .htaccess files inventory
     # ========================================
     - name: Capture all .htaccess file locations and contents
-      shell: |
+      ansible.builtin.shell: |
         find /var/www -name .htaccess -exec echo "=== {} ===" \; -exec cat {} \; > {{ backup_root }}/all-htaccess.txt
       args:
         warn: false
@@ -215,27 +212,21 @@
     # Phase 8: System information capture
     # ========================================
     - name: Capture installed packages
-      shell: dpkg -l > {{ backup_root }}/installed-packages.txt
-
+      ansible.builtin.shell: dpkg -l > {{ backup_root }}/installed-packages.txt
     - name: Capture PHP version and modules
-      shell: |
+      ansible.builtin.shell: |
         php -v > {{ backup_root }}/php-version.txt
         php -m > {{ backup_root }}/php-modules.txt
-
     - name: Capture WordPress CLI version
-      shell: wp --version > {{ backup_root }}/wp-cli-version.txt 2>&1 || echo "WP-CLI not found"
+      ansible.builtin.shell: wp --version > {{ backup_root }}/wp-cli-version.txt 2>&1 || echo "WP-CLI not found"
       ignore_errors: true
 
     - name: Capture system info
-      shell: |
+      ansible.builtin.shell: |
         uname -a > {{ backup_root }}/system-info.txt
         cat /etc/os-release >> {{ backup_root }}/system-info.txt
-
-    # ========================================
-    # Phase 9: Create migration manifest
-    # ========================================
     - name: Create migration manifest
-      copy:
+      ansible.builtin.copy:
         dest: "{{ backup_root }}/MANIFEST.txt"
         content: |
           PAUSATF Production Migration Archive
@@ -310,14 +301,14 @@
     # Phase 10: Download to local
     # ========================================
     - name: Download migration archive to local machine
-      synchronize:
+      ansible.posix.synchronize:
         mode: pull
         src: "{{ backup_root }}/"
         dest: "{{ local_backup_dir }}/"
 
     - name: Create local README
       delegate_to: localhost
-      copy:
+      ansible.builtin.copy:
         dest: "{{ local_backup_dir }}/README.txt"
         content: |
           PAUSATF Production Migration {{ backup_timestamp }}
@@ -335,7 +326,7 @@
           Or manually follow the steps in MANIFEST.txt
 
     - name: Display summary
-      debug:
+      ansible.builtin.debug:
         msg: |
           Migration backup complete!
 

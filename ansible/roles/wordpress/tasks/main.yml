@@ -136,22 +136,23 @@
   tags: wp_plugins
 
 - name: Remove default index.html that conflicts with WordPress
-  file:
+  ansible.builtin.file:
     path: "{{ item.path | default('/var/www/html') }}/index.html"
     state: absent
   loop: "{{ wordpress_installs }}"
 
 - name: Assert WordPress credentials are configured
-  assert:
+  ansible.builtin.assert:
     that:
       - wordpress_installs is defined
       - wordpress_installs | length > 0
-      - not (wordpress_installs[0].manage_wp_config | default(false)) or (wordpress_installs[0].db_password | default('') | length > 0)
+      - not (wordpress_installs[0].manage_wp_config | default(false)) or (wordpress_installs[0].db_password |
+        default('') | length > 0)
     fail_msg: "wordpress_installs[].db_password must be set when manage_wp_config=true"
   when: wordpress_enabled | default(true)
 
 - name: Assert WordPress auth keys are wired through wordpress_installs
-  assert:
+  ansible.builtin.assert:
     that:
       - wordpress_installs[0].auth_key | default('') | length > 0
       - wordpress_installs[0].secure_auth_key | default('') | length > 0
@@ -164,20 +165,20 @@
     - wordpress_installs[0].manage_wp_config | default(false)
 
 - name: Ensure WP-CLI is installed
-  get_url:
+  ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
     dest: /usr/local/bin/wp
     mode: "0755"
   when: wpcli_enabled | default(true)
 
 - name: Iterate configured WordPress installs
-  include_tasks: manage-install.yml
+  ansible.builtin.include_tasks: manage-install.yml
   loop: "{{ wordpress_installs | default([]) }}"
   loop_control:
     loop_var: wp_site
 
 - name: Schedule WordPress cron via system cron
-  cron:
+  ansible.builtin.cron:
     name: "WordPress cron for {{ item.domain }}"
     job: "wget -q -O - https://{{ item.domain }}/wp-cron.php?doing_wp_cron > /dev/null 2>&1"
     user: root
@@ -185,7 +186,7 @@
   when: item.wp_cron_system | default(true)
 
 - name: Ensure legacy data year directory exists for current year
-  file:
+  ansible.builtin.file:
     path: "/var/www/legacy/public_html/data/{{ ansible_date_time.year }}"
     state: directory
     owner: www-data
@@ -193,14 +194,14 @@
     mode: "0755"
 
 - name: Find existing legacy data year directories
-  find:
+  ansible.builtin.find:
     paths: /var/www/legacy/public_html/data
     file_type: directory
     patterns: "20[0-9][0-9]"
   register: legacy_year_dirs
 
 - name: Deploy legacy data directory .htaccess
-  template:
+  ansible.builtin.template:
     src: legacy-data-htaccess.j2
     dest: "{{ item.path }}/.htaccess"
     owner: www-data

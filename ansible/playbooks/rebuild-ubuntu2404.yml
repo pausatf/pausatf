@@ -21,19 +21,19 @@
 
   pre_tasks:
     - name: Validate target is Ubuntu 24.04+
-      assert:
+      ansible.builtin.assert:
         that:
           - ansible_distribution == "Ubuntu"
           - ansible_distribution_major_version | int >= 24
         fail_msg: "This playbook targets Ubuntu 24.04+"
 
     - name: Update apt cache
-      apt:
+      ansible.builtin.apt:
         update_cache: true
         cache_valid_time: 3600
 
     - name: Display infrastructure info
-      debug:
+      ansible.builtin.debug:
         msg: |
           Infrastructure Details:
           =======================
@@ -86,7 +86,7 @@
 
   post_tasks:
     - name: Verify core services are running
-      service:
+      ansible.builtin.service:
         name: "{{ item }}"
         state: started
         enabled: true
@@ -100,7 +100,7 @@
       tags: verify
 
     - name: Display deployment summary
-      debug:
+      ansible.builtin.debug:
         msg: |
           Deployment Complete!
           ====================

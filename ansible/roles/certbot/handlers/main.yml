@@ -1,5 +1,5 @@
 ---
 - name: Restart web server
-  service:
+  ansible.builtin.service:
     name: "{{ 'apache2' if web_server | default('apache') == 'apache' else 'lsws' }}"
     state: restarted

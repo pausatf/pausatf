@@ -10,7 +10,7 @@
   tags: cloudflare
 
 - name: Assert Cloudflare API credentials are configured
-  assert:
+  ansible.builtin.assert:
     that:
       - cloudflare_zone_id | default('') | length > 0
       - cloudflare_api_token | default('') | length > 0
@@ -18,7 +18,7 @@
   tags: cloudflare
 
 - name: Ensure Cloudflare credential directory exists
-  file:
+  ansible.builtin.file:
     path: /etc/pausatf
     state: directory
     owner: root
@@ -27,7 +27,7 @@
   tags: cloudflare
 
 - name: Deploy Cloudflare API token file (root-only)
-  copy:
+  ansible.builtin.copy:
     dest: /etc/pausatf/cloudflare-api-token
     content: "{{ cloudflare_api_token }}"
     owner: root
@@ -37,7 +37,7 @@
   tags: cloudflare
 
 - name: Configure Apache to trust Cloudflare IPs
-  template:
+  ansible.builtin.template:
     src: cloudflare-ips.conf.j2
     dest: /etc/apache2/conf-available/cloudflare-ips.conf
     owner: root
@@ -48,7 +48,7 @@
   tags: cloudflare
 
 - name: Enable Cloudflare IP configuration
-  command: a2enconf cloudflare-ips
+  ansible.builtin.command: a2enconf cloudflare-ips
   args:
     creates: /etc/apache2/conf-enabled/cloudflare-ips.conf
   notify: Reload Apache
@@ -56,7 +56,7 @@
   tags: cloudflare
 
 - name: Update Cloudflare IP ranges
-  get_url:
+  ansible.builtin.get_url:
     url: "https://www.cloudflare.com/ips-v4"
     dest: /etc/apache2/cloudflare-ips-v4.txt
     mode: "0644"
@@ -65,7 +65,7 @@
   tags: cloudflare
 
 - name: Update Cloudflare IPv6 ranges
-  get_url:
+  ansible.builtin.get_url:
     url: "https://www.cloudflare.com/ips-v6"
     dest: /etc/apache2/cloudflare-ips-v6.txt
     mode: "0644"
@@ -74,7 +74,7 @@
   tags: cloudflare
 
 - name: Verify Cloudflare zone is active
-  uri:
+  ansible.builtin.uri:
     url: "https://api.cloudflare.com/client/v4/zones/{{ cloudflare_zone_id }}"
     method: GET
     headers:
@@ -87,13 +87,13 @@
   tags: cloudflare
 
 - name: Display Cloudflare zone status
-  debug:
+  ansible.builtin.debug:
     msg: "Zone {{ cloudflare_zone }} is {{ cf_zone_status.json.result.status }}"
   when: cloudflare_verify_zone | default(true)
   tags: cloudflare
 
 - name: Ensure SSL mode is set correctly
-  uri:
+  ansible.builtin.uri:
     url: "https://api.cloudflare.com/client/v4/zones/{{ cloudflare_zone_id }}/settings/ssl"
     method: PATCH
     headers:
@@ -109,7 +109,7 @@
   tags: cloudflare
 
 - name: Ensure minimum TLS version
-  uri:
+  ansible.builtin.uri:
     url: "https://api.cloudflare.com/client/v4/zones/{{ cloudflare_zone_id }}/settings/min_tls_version"
     method: PATCH
     headers:
@@ -125,7 +125,7 @@
   tags: cloudflare
 
 - name: Ensure Always Use HTTPS is enabled
-  uri:
+  ansible.builtin.uri:
     url: "https://api.cloudflare.com/client/v4/zones/{{ cloudflare_zone_id }}/settings/always_use_https"
     method: PATCH
     headers:
@@ -141,7 +141,7 @@
   tags: cloudflare
 
 - name: Set security level
-  uri:
+  ansible.builtin.uri:
     url: "https://api.cloudflare.com/client/v4/zones/{{ cloudflare_zone_id }}/settings/security_level"
     method: PATCH
     headers:
@@ -157,7 +157,7 @@
   tags: cloudflare
 
 - name: Deploy Cloudflare IP update script
-  template:
+  ansible.builtin.template:
     src: update-cloudflare-ips.sh.j2
     dest: /usr/local/bin/update-cloudflare-ips.sh
     owner: root
@@ -166,7 +166,7 @@
   tags: cloudflare
 
 - name: Create log file for Cloudflare IP updates
-  file:
+  ansible.builtin.file:
     path: /var/log/cloudflare-ip-update.log
     state: touch
     owner: root
@@ -176,7 +176,7 @@
   tags: cloudflare
 
 - name: Schedule weekly Cloudflare IP update
-  cron:
+  ansible.builtin.cron:
     name: "Update Cloudflare IP ranges"
     special_time: weekly
     job: "/usr/local/bin/update-cloudflare-ips.sh"
@@ -184,14 +184,14 @@
   tags: cloudflare
 
 - name: Run initial Cloudflare IP update
-  command: /usr/local/bin/update-cloudflare-ips.sh
+  ansible.builtin.command: /usr/local/bin/update-cloudflare-ips.sh
   register: cf_ip_update
   changed_when: "'IP ranges changed' in cf_ip_update.stdout"
   failed_when: false
   tags: cloudflare
 
 - name: Deploy Cloudflare cache purge script
-  template:
+  ansible.builtin.template:
     src: purge-cloudflare-cache.sh.j2
     dest: /usr/local/bin/purge_cloudflare_cache.sh
     owner: root
@@ -200,7 +200,7 @@
   tags: cloudflare
 
 - name: Deploy cache change monitor script
-  template:
+  ansible.builtin.template:
     src: monitor-and-purge.sh.j2
     dest: /usr/local/bin/monitor_and_purge.sh
     owner: root
@@ -209,7 +209,7 @@
   tags: cloudflare
 
 - name: Create log file for Cloudflare cache purges
-  file:
+  ansible.builtin.file:
     path: /var/log/cloudflare_purge.log
     state: touch
     owner: root
@@ -219,7 +219,7 @@
   tags: cloudflare
 
 - name: Create state file for cache monitor
-  file:
+  ansible.builtin.file:
     path: /var/cache/pausatf_html_changes.state
     state: touch
     owner: root
@@ -229,14 +229,14 @@
   tags: cloudflare
 
 - name: Schedule per-minute cache change monitor
-  cron:
+  ansible.builtin.cron:
     name: "Monitor and purge Cloudflare cache"
     job: "flock -n /var/run/monitor_purge.lock /usr/local/bin/monitor_and_purge.sh >> /var/log/cloudflare_purge.log 2>&1"
     user: root
   tags: cloudflare
 
 - name: Purge Cloudflare cache (optional)
-  uri:
+  ansible.builtin.uri:
     url: "https://api.cloudflare.com/client/v4/zones/{{ cloudflare_zone_id }}/purge_cache"
     method: POST
     headers:
@@ -252,6 +252,6 @@
     - cloudflare-purge
 
 - name: Include DNS management tasks (disabled by default; prefer Terraform)
-  include_tasks: dns.yml
+  ansible.builtin.include_tasks: dns.yml
   when: cloudflare_manage_dns | default(false)
   tags: [cloudflare, cloudflare-dns]

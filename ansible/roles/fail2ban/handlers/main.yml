@@ -1,10 +1,10 @@
 ---
 - name: Restart fail2ban
-  service:
+  ansible.builtin.service:
     name: fail2ban
     state: restarted
 
 - name: Reload fail2ban
-  service:
+  ansible.builtin.service:
     name: fail2ban
     state: reloaded
