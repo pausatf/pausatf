@@ -8,11 +8,34 @@ is_active_web: false
 
 # WordPress — staging overrides merged with defaults from all.yml
 wordpress_installs:
-  - "{{ wordpress_install_defaults | combine({ 'domain': 'stage.pausatf.org', 'wp_version': 'latest', 'debug_mode': false, 'db_password': vault_wp_stage_db_password,
-    'auth_key': vault_wp_stage_auth_key | default(lookup('password', '/dev/null length=64 chars=ascii_letters,digits,punctuation')), 'secure_auth_key': vault_wp_stage_secure_auth_key
-    | default(lookup('password', '/dev/null length=64 chars=ascii_letters,digits,punctuation')), 'logged_in_key': vault_wp_stage_logged_in_key | default(lookup('password',
-    '/dev/null length=64 chars=ascii_letters,digits,punctuation')), 'nonce_key': vault_wp_stage_nonce_key | default(lookup('password', '/dev/null length=64 chars=ascii_letters,digits,punctuation')),
-    'auth_salt': vault_wp_stage_auth_salt | default(lookup('password', '/dev/null length=64 chars=ascii_letters,digits,punctuation')), 'secure_auth_salt': vault_wp_stage_secure_auth_salt
-    | default(lookup('password', '/dev/null length=64 chars=ascii_letters,digits,punctuation')), 'logged_in_salt': vault_wp_stage_logged_in_salt | default(lookup('password',
-    '/dev/null length=64 chars=ascii_letters,digits,punctuation')), 'nonce_salt': vault_wp_stage_nonce_salt | default(lookup('password', '/dev/null length=64 chars=ascii_letters,digits,punctuation')),
-    }) }}"
+  - >-
+    {{ wordpress_install_defaults | combine({
+    'domain': 'stage.pausatf.org',
+    'wp_version': 'latest',
+    'debug_mode': false,
+    'db_password': vault_wp_stage_db_password,
+    'auth_key': vault_wp_stage_auth_key
+      | default(lookup('password',
+        '/dev/null length=64 chars=ascii_letters,digits,punctuation')),
+    'secure_auth_key': vault_wp_stage_secure_auth_key
+      | default(lookup('password',
+        '/dev/null length=64 chars=ascii_letters,digits,punctuation')),
+    'logged_in_key': vault_wp_stage_logged_in_key
+      | default(lookup('password',
+        '/dev/null length=64 chars=ascii_letters,digits,punctuation')),
+    'nonce_key': vault_wp_stage_nonce_key
+      | default(lookup('password',
+        '/dev/null length=64 chars=ascii_letters,digits,punctuation')),
+    'auth_salt': vault_wp_stage_auth_salt
+      | default(lookup('password',
+        '/dev/null length=64 chars=ascii_letters,digits,punctuation')),
+    'secure_auth_salt': vault_wp_stage_secure_auth_salt
+      | default(lookup('password',
+        '/dev/null length=64 chars=ascii_letters,digits,punctuation')),
+    'logged_in_salt': vault_wp_stage_logged_in_salt
+      | default(lookup('password',
+        '/dev/null length=64 chars=ascii_letters,digits,punctuation')),
+    'nonce_salt': vault_wp_stage_nonce_salt
+      | default(lookup('password',
+        '/dev/null length=64 chars=ascii_letters,digits,punctuation')),
+    }) }}
