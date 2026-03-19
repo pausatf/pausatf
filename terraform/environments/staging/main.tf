@@ -41,8 +41,8 @@ module "wordpress" {
   create_vpc               = false # staging uses default networking; no VPC isolation
   enable_monitoring_alerts = false
 
-  # Staging uses open firewall (not CF-only)
-  firewall_http_source_cidrs = ["0.0.0.0/0", "::/0"]
+  # Staging uses Cloudflare-only (same as production)
+  firewall_http_source_cidrs = null
   ssh_allowed_ips            = var.ssh_allowed_ips
 
   # OLS WebAdmin port

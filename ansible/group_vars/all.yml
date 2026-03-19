@@ -317,9 +317,18 @@ fail2ban_jails:
 
 # UFW Firewall
 ufw_enabled: true
-# Restrict SSH to specific CIDRs when possible (e.g. office/VPN ranges).
-# Empty list preserves current behavior (allow 22 from anywhere); DO firewall should still enforce perimeter rules.
-allowed_ssh_networks: []
+# SSH allowlist. Explicit IPs only; no broad ISP ranges.
+# Mirrors terraform/stacks/wordpress/main.tf (local.ssh_cidrs).
+# Updated: 2026-03-18.
+allowed_ssh_networks:
+  # DigitalOcean internal / VPC
+  - "100.128.0.0/9"
+  # Tailscale CGNAT range
+  - "100.64.0.0/10"
+  # Admin static IP
+  - "REDACTED_ADMIN_IP/32"
+  # Jeff Teeters (UC Berkeley campus)
+  - "136.152.0.0/16"
 ufw_allowed_ports:
   - "22/tcp"
   - "80/tcp"
