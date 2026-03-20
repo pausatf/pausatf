@@ -130,3 +130,7 @@ temp/
 # ============================================================================
 .claude
 .omc/
+
+# Legacy calendar credentials
+content/calendar/includes/settings.php
+backups/legacy/calendar/includes/settings.php
