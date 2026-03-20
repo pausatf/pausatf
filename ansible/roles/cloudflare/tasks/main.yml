@@ -208,6 +208,34 @@
     mode: "0755"
   tags: cloudflare
 
+- name: Deploy inotify-based cache purge watcher script
+  ansible.builtin.template:
+    src: cf-purge-watcher.sh.j2
+    dest: /usr/local/bin/cf-purge-watcher.sh
+    owner: root
+    group: root
+    mode: "0755"
+  notify: Restart cf-purge-watcher
+  tags: cloudflare
+
+- name: Deploy cf-purge-watcher systemd service
+  ansible.builtin.template:
+    src: cf-purge-watcher.service.j2
+    dest: /etc/systemd/system/cf-purge-watcher.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart cf-purge-watcher
+  tags: cloudflare
+
+- name: Enable and start cf-purge-watcher service
+  ansible.builtin.systemd:
+    name: cf-purge-watcher
+    enabled: yes
+    state: started
+    daemon_reload: yes
+  tags: cloudflare
+
 - name: Create log file for Cloudflare cache purges
   ansible.builtin.file:
     path: /var/log/cloudflare_purge.log
