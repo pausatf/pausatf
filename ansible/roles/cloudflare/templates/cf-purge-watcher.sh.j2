@@ -1,0 +1,28 @@
+#!/bin/bash
+# Managed by Ansible - do not edit manually
+CF_KEY="$(cat /etc/pausatf/cloudflare-api-token)"
+ZONE="{{ cloudflare_zone_id }}"
+SITE_URL="https://{{ cloudflare_zone }}"
+DATA_DIR="{{ legacy_data_dir | default('/var/www/legacy/public_html/data') }}"
+
+inotifywait -m -r -e close_write,moved_to --format "%w%f" "$DATA_DIR" | while read FILE; do
+    REL_PATH="${FILE#{{ web_root | default('/var/www/html') }}/}"
+    # Handle symlinked data dir
+    REL_PATH="${REL_PATH#{{ legacy_data_dir | default('/var/www/legacy/public_html') }}/}"
+    REL_PATH="data/${REL_PATH}"
+    URL="${SITE_URL}/${REL_PATH}"
+
+    HASH=$(echo -n "$URL" | md5sum | cut -d" " -f1)
+    LOCK="/tmp/cf-purge-${HASH}"
+    if [ -f "$LOCK" ] && [ $(($(date +%s) - $(stat -c %Y "$LOCK"))) -lt 5 ]; then
+        continue
+    fi
+    touch "$LOCK"
+
+    curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${ZONE}/purge_cache" \
+        -H "Authorization: Bearer ${CF_KEY}" \
+        -H "Content-Type: application/json" \
+        --data "{\"files\":[\"${URL}\"]}" > /dev/null 2>&1
+
+    logger -t cf-purge "Purged: ${URL}"
+done

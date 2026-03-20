@@ -5,3 +5,9 @@
   ansible.builtin.service:
     name: apache2
     state: reloaded
+
+- name: Restart cf-purge-watcher
+  ansible.builtin.systemd:
+    name: cf-purge-watcher
+    state: restarted
+    daemon_reload: yes
