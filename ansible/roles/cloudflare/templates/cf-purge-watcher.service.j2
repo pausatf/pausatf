@@ -1,0 +1,12 @@
+[Unit]
+Description=Cloudflare cache purge on legacy data file changes
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/cf-purge-watcher.sh
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

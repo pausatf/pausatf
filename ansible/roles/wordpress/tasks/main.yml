@@ -67,6 +67,26 @@
   loop: "{{ wordpress_installs | product(['disable-user-enum.php', 'noindex-non-prod.php']) | list }}"
   tags: mu_plugins
 
+- name: Deploy Cloudflare auto-purge mu-plugin
+  ansible.builtin.copy:
+    src: cf-auto-purge.php
+    dest: "{{ item.path | default('/var/www/html') }}/wp-content/mu-plugins/cf-auto-purge.php"
+    owner: www-data
+    group: www-data
+    mode: "0644"
+  loop: "{{ wordpress_installs }}"
+  tags: [wordpress, cloudflare]
+
+- name: Remove Cloudflare plugin email (force Bearer token auth)
+  ansible.builtin.command:
+    cmd: wp option delete cloudflare_api_email --allow-root
+    chdir: "{{ item.path | default('/var/www/html') }}"
+  register: cf_email_delete
+  changed_when: "'Deleted' in cf_email_delete.stdout"
+  failed_when: false
+  loop: "{{ wordpress_installs }}"
+  tags: [wordpress, cloudflare]
+
 - name: Set WP_ENVIRONMENT_TYPE for non-production
   ansible.builtin.lineinfile:
     path: "{{ item.path | default('/var/www/html') }}/wp-config.php"
