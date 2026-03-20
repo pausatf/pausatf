@@ -9,12 +9,16 @@ rules:
     check-multi-line-strings: false
   truthy:
     check-keys: false
-    allowed-values: ['true', 'false', 'yes', 'no']
+    allowed-values: ["true", "false", "yes", "no"]
   comments:
     min-spaces-from-content: 1
+  comments-indentation: false
   new-line-at-end-of-file: disable
   braces:
     max-spaces-inside: 1
     level: warning
+  octal-values:
+    forbid-implicit-octal: true
+    forbid-explicit-octal: true
 # yamllint configuration for pausatf ansible playbooks
-# v2: trigger after args[module] warn_list update
+# v3: ansible-lint 25.12.2 compatibility

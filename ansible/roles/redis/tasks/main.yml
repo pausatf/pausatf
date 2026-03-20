@@ -2,42 +2,42 @@
 # Redis role — local object cache for WordPress
 
 - name: Install redis-server
-  apt:
+  ansible.builtin.apt:
     name: redis-server
     state: present
 
 - name: Deploy Redis configuration
-  template:
+  ansible.builtin.template:
     src: redis.conf.j2
     dest: /etc/redis/redis.conf
     owner: redis
     group: redis
-    mode: '0640'
-    backup: yes
+    mode: "0640"
+    backup: true
   notify: Restart redis-server
 
 - name: Ensure redis group includes www-data (for unix socket access)
-  user:
+  ansible.builtin.user:
     name: www-data
     groups: redis
-    append: yes
+    append: true
   notify: Restart redis-server
 
 - name: Detect Docker environment
-  stat:
+  ansible.builtin.stat:
     path: /.dockerenv
   register: _dockerenv
   changed_when: false
 
 - name: Ensure Redis is enabled and running
-  service:
+  ansible.builtin.service:
     name: redis-server
     state: started
-    enabled: yes
+    enabled: true
   when: not _dockerenv.stat.exists
 
 - name: Verify Redis is listening on 127.0.0.1 only
-  command: redis-cli ping
+  ansible.builtin.command: redis-cli ping
   register: redis_ping
   changed_when: false
   failed_when: "'PONG' not in redis_ping.stdout"

@@ -17,25 +17,25 @@
         path: /var/www/html
         db_name: wordpress
         db_user: wordpress
-        db_password: "molecule-test-password"  # pragma: allowlist secret
+        db_password: "molecule-test-password" # pragma: allowlist secret
         db_host: localhost
     backup_items:
       - path: /var/www/html
         name: wordpress-files
   pre_tasks:
     - name: Install Apache and cron (dependencies)
-      apt:
+      ansible.builtin.apt:
         name:
           - apache2
           - cron
         state: present
         update_cache: true
     - name: Create WordPress directory
-      file:
+      ansible.builtin.file:
         path: /var/www/html/.well-known
         state: directory
         owner: www-data
         group: www-data
-        mode: '0755'
+        mode: "0755"
   roles:
     - role: monitoring

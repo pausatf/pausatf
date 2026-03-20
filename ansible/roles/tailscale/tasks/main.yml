@@ -8,13 +8,13 @@
 # ACL must allow tag:server to accept SSH connections.
 
 - name: Add Tailscale GPG key
-  get_url:
+  ansible.builtin.get_url:
     url: https://pkgs.tailscale.com/stable/ubuntu/noble.noarmor.gpg
     dest: /usr/share/keyrings/tailscale-archive-keyring.gpg
-    mode: '0644'
+    mode: "0644"
 
 - name: Add Tailscale apt repository
-  copy:
+  ansible.builtin.copy:
     dest: /etc/apt/sources.list.d/tailscale.list
     # yamllint disable rule:line-length
     content: |
@@ -22,24 +22,24 @@
     # yamllint enable rule:line-length
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   register: tailscale_repo
 
 - name: Update apt cache after adding Tailscale repo
-  apt:
-    update_cache: yes
+  ansible.builtin.apt:
+    update_cache: true
   when: tailscale_repo.changed
 
 - name: Install tailscale
-  apt:
+  ansible.builtin.apt:
     name: tailscale
     state: present
 
 - name: Enable and start tailscaled
-  service:
+  ansible.builtin.service:
     name: tailscaled
     state: started
-    enabled: yes
+    enabled: true
 
 # UFW rules — allow all traffic on the Tailscale interface.
 # Tailscale assigns 100.x.x.x addresses; the tailscale0 interface
@@ -55,13 +55,13 @@
 # tailscale0 exists as soon as tailscaled starts, but the overlay network
 # is not usable until the node is authenticated (BackendState == Running).
 - name: Check if Tailscale is authenticated
-  command: tailscale status --json
+  ansible.builtin.command: tailscale status --json
   register: tailscale_status
   changed_when: false
   failed_when: false
 
 - name: Get Tailscale IP address
-  command: tailscale ip -4
+  ansible.builtin.command: tailscale ip -4
   register: tailscale_ip
   changed_when: false
   failed_when: false
@@ -70,7 +70,7 @@
     - (tailscale_status.stdout | from_json).BackendState | default('') == 'Running'
 
 - name: Verify SSH is reachable over Tailscale
-  wait_for:
+  ansible.builtin.wait_for:
     host: "{{ tailscale_ip.stdout | trim }}"
     port: 22
     timeout: 5
@@ -95,7 +95,7 @@
   notify: Reload UFW
 
 - name: Document Tailscale authentication step
-  debug:
+  ansible.builtin.debug:
     msg: >
       Tailscale is installed but not yet authenticated.
       Run manually: tailscale up --authkey <AUTHKEY> --hostname pausatf-prod --advertise-tags=tag:server

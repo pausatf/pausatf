@@ -1,3 +1,4 @@
+---
 # Production-specific variables
 # ==============================
 # This file holds values that are specific to the production environment.
@@ -78,24 +79,21 @@ mysql_enabled: false
 # Production-specific overrides merged with shared defaults from all.yml.
 # Dev/staging define their own wordpress_installs in their group_vars.
 wordpress_installs:
-  - "{{ wordpress_install_defaults | combine({
-      'domain': 'www.pausatf.org',
-      'aliases': ['pausatf.org'],
-      'wp_version': '6.8.3',
-      'debug_mode': false,
-      'wp_memory_limit': '256M',
-      'wp_max_memory_limit': '512M',
-      'ssl_enabled': true,
-      'ssl_certificate': '/etc/letsencrypt/live/www.pausatf.org/fullchain.pem',
-      'ssl_certificate_key': '/etc/letsencrypt/live/www.pausatf.org/privkey.pem',
-      'manage_wp_config': false,
-      'db_host': managed_db_host ~ ':' ~ (managed_db_port | string),
-      'db_port': managed_db_port,
-      'db_user': managed_wp_db_user,
-      'db_password': managed_wp_db_password,
-      'db_ssl_mode': 'REQUIRED',
-      'db_ssl_required': true,
-    }) }}"
+  - >-
+    {{ wordpress_install_defaults | combine({
+    'domain': 'www.pausatf.org', 'aliases': ['pausatf.org'],
+    'wp_version': '6.8.3', 'debug_mode': false,
+    'wp_memory_limit': '256M', 'wp_max_memory_limit': '512M',
+    'ssl_enabled': true,
+    'ssl_certificate': '/etc/letsencrypt/live/www.pausatf.org/fullchain.pem',
+    'ssl_certificate_key': '/etc/letsencrypt/live/www.pausatf.org/privkey.pem',
+    'manage_wp_config': false,
+    'db_host': managed_db_host ~ ':' ~ (managed_db_port | string),
+    'db_port': managed_db_port,
+    'db_user': managed_wp_db_user,
+    'db_password': managed_wp_db_password,
+    'db_ssl_mode': 'REQUIRED', 'db_ssl_required': true,
+    }) }}
 
 # =============================================================================
 # ADDITIONAL VHOSTS (non-WordPress)

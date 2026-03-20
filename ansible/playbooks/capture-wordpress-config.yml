@@ -22,85 +22,85 @@
 
 - name: Capture WordPress Configuration
   hosts: webservers
-  become: yes
+  become: true
   vars:
     output_dir: "./wordpress-config-capture"
     timestamp: "{{ ansible_date_time.iso8601_basic_short }}"
 
   tasks:
     - name: Create local output directory
-      local_action:
-        module: file
+      delegate_to: localhost
+      ansible.builtin.file:
         path: "{{ output_dir }}/{{ inventory_hostname }}"
         state: directory
-        mode: '0755'
-      run_once: no
-      become: no
+        mode: "0755"
+      run_once: false
+      become: false
 
     - name: Gather WordPress core version
-      command: wp core version --path={{ wordpress_path }} --allow-root
+      ansible.builtin.command: wp core version --path={{ wordpress_path }} --allow-root
       register: wp_version
       changed_when: false
 
     - name: Gather WordPress database version
-      command: wp core version --path={{ wordpress_path }} --allow-root --extra --field=db_version
+      ansible.builtin.command: wp core version --path={{ wordpress_path }} --allow-root --extra --field=db_version
       register: wp_db_version
       changed_when: false
 
     - name: List installed plugins
-      command: wp plugin list --path={{ wordpress_path }} --allow-root --format=json
+      ansible.builtin.command: wp plugin list --path={{ wordpress_path }} --allow-root --format=json
       register: wp_plugins
       changed_when: false
 
     - name: List installed themes
-      command: wp theme list --path={{ wordpress_path }} --allow-root --format=json
+      ansible.builtin.command: wp theme list --path={{ wordpress_path }} --allow-root --format=json
       register: wp_themes
       changed_when: false
 
     - name: Get WordPress site URL
-      command: wp option get siteurl --path={{ wordpress_path }} --allow-root
+      ansible.builtin.command: wp option get siteurl --path={{ wordpress_path }} --allow-root
       register: wp_siteurl
       changed_when: false
 
     - name: Get WordPress home URL
-      command: wp option get home --path={{ wordpress_path }} --allow-root
+      ansible.builtin.command: wp option get home --path={{ wordpress_path }} --allow-root
       register: wp_home
       changed_when: false
 
     - name: Get active theme
-      command: wp theme list --path={{ wordpress_path }} --allow-root --status=active --field=name
+      ansible.builtin.command: wp theme list --path={{ wordpress_path }} --allow-root --status=active --field=name
       register: wp_active_theme
       changed_when: false
 
     - name: Get PHP version
-      command: php -v
+      ansible.builtin.command: php -v
       register: php_version
       changed_when: false
 
     - name: Get PHP modules
-      command: php -m
+      ansible.builtin.command: php -m
       register: php_modules
       changed_when: false
 
     - name: Get Apache version
-      command: apache2 -v
+      ansible.builtin.command: apache2 -v
       register: apache_version
       changed_when: false
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Get Apache modules
-      command: apache2ctl -M
+      ansible.builtin.command: apache2ctl -M
       register: apache_modules
       changed_when: false
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Get MySQL version
-      command: mysql --version
+      ansible.builtin.command: mysql --version
       register: mysql_version
       changed_when: false
 
     - name: Read wp-config.php (sanitized)
-      shell: |
+      ansible.builtin.shell: |
         grep -E "define\(|^\\\$table_prefix" {{ wordpress_path }}/wp-config.php | \
         sed 's/DB_PASSWORD.*/DB_PASSWORD", "***REDACTED***");/' | \
         sed 's/AUTH_KEY.*/AUTH_KEY", "***REDACTED***");/' | \
@@ -115,7 +115,7 @@
       changed_when: false
 
     - name: Get WordPress file permissions
-      shell: |
+      ansible.builtin.shell: |
         ls -la {{ wordpress_path }} | head -20
         echo "---"
         ls -la {{ wordpress_path }}/wp-content/ | head -10
@@ -127,71 +127,72 @@
       changed_when: false
 
     - name: Get disk usage
-      command: du -sh {{ wordpress_path }}
+      ansible.builtin.command: du -sh {{ wordpress_path }}
       register: wp_disk_usage
       changed_when: false
 
     - name: Get WordPress constants
-      command: wp config list --path={{ wordpress_path }} --allow-root --format=json
+      ansible.builtin.command: wp config list --path={{ wordpress_path }} --allow-root --format=json
       register: wp_constants
       changed_when: false
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Get database tables
-      command: wp db tables --path={{ wordpress_path }} --allow-root
+      ansible.builtin.command: wp db tables --path={{ wordpress_path }} --allow-root
       register: wp_db_tables
       changed_when: false
 
     - name: Get database size
-      shell: wp db size --path={{ wordpress_path }} --allow-root --format=json
+      ansible.builtin.command: wp db size --path={{ wordpress_path }} --allow-root --format=json
       register: wp_db_size
       changed_when: false
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Get root crontab
-      command: crontab -l
+      ansible.builtin.command: crontab -l
       register: root_crontab
       changed_when: false
       failed_when: false
 
     - name: Get system crontab
-      command: cat /etc/crontab
+      ansible.builtin.command: cat /etc/crontab
       register: system_crontab
       changed_when: false
       failed_when: false
 
     - name: List cron.d jobs
-      shell: ls -la /etc/cron.d/ && echo "---" && for f in /etc/cron.d/*; do echo "=== $f ==="; cat "$f" 2>/dev/null || echo "Unable to read"; echo ""; done
+      ansible.builtin.shell: ls -la /etc/cron.d/ && echo "---" && for f in /etc/cron.d/*; do echo "=== $f ==="; cat "$f"
+        2>/dev/null || echo "Unable to read"; echo ""; done
       register: crond_jobs
       changed_when: false
       failed_when: false
 
     - name: List cron.hourly scripts
-      shell: ls -la /etc/cron.hourly/
+      ansible.builtin.command: ls -la /etc/cron.hourly/
       register: cron_hourly
       changed_when: false
       failed_when: false
 
     - name: List cron.daily scripts
-      shell: ls -la /etc/cron.daily/
+      ansible.builtin.command: ls -la /etc/cron.daily/
       register: cron_daily
       changed_when: false
       failed_when: false
 
     - name: List cron.weekly scripts
-      shell: ls -la /etc/cron.weekly/
+      ansible.builtin.command: ls -la /etc/cron.weekly/
       register: cron_weekly
       changed_when: false
       failed_when: false
 
     - name: List cron.monthly scripts
-      shell: ls -la /etc/cron.monthly/
+      ansible.builtin.command: ls -la /etc/cron.monthly/
       register: cron_monthly
       changed_when: false
       failed_when: false
 
     - name: Get all user crontabs
-      shell: |
+      ansible.builtin.shell: |
         echo "=== Checking for user crontabs ==="
         for user in $(cut -f1 -d: /etc/passwd); do
           crontab -u $user -l 2>/dev/null && echo "User: $user" || true
@@ -201,13 +202,13 @@
       failed_when: false
 
     - name: Get systemd timers
-      shell: systemctl list-timers --all --no-pager
+      ansible.builtin.command: systemctl list-timers --all --no-pager
       register: systemd_timers
       changed_when: false
       failed_when: false
 
     - name: Extract script paths from cron jobs
-      shell: |
+      ansible.builtin.shell: |
         # Create a temporary file to collect all cron content
         TEMP_CRON_FILE=$(mktemp)
 
@@ -235,7 +236,7 @@
       failed_when: false
 
     - name: Find scripts in cron.hourly/daily/weekly/monthly directories
-      shell: |
+      ansible.builtin.shell: |
         echo "=== Cron.hourly Scripts ==="
         find /etc/cron.hourly -type f -executable 2>/dev/null || echo "No scripts found"
         echo ""
@@ -252,7 +253,7 @@
       failed_when: false
 
     - name: Capture content of cron-referenced scripts
-      shell: |
+      ansible.builtin.shell: |
         echo "# Cron-Referenced Scripts Inventory"
         echo "# Captured: {{ ansible_date_time.iso8601 }}"
         echo "# Server: {{ inventory_hostname }}"
@@ -345,13 +346,13 @@
       failed_when: false
 
     - name: Find all .htaccess files
-      shell: find {{ wordpress_path }} -name ".htaccess" -type f
+      ansible.builtin.command: find {{ wordpress_path }} -name ".htaccess" -type f
       register: htaccess_files
       changed_when: false
       failed_when: false
 
     - name: Read all .htaccess files
-      shell: |
+      ansible.builtin.shell: |
         for f in $(find {{ wordpress_path }} -name ".htaccess" -type f); do
           echo "=== $f ==="
           cat "$f"
@@ -363,7 +364,7 @@
       failed_when: false
 
     - name: Get Apache configuration (if Apache)
-      shell: |
+      ansible.builtin.shell: |
         echo "=== Apache Version ==="
         apache2 -v
         echo ""
@@ -399,7 +400,7 @@
       when: web_server == "apache"
 
     - name: Get OpenLiteSpeed configuration (if OLS)
-      shell: |
+      ansible.builtin.shell: |
         echo "=== OpenLiteSpeed Version ==="
         /usr/local/lsws/bin/lshttpd -v
         echo ""
@@ -426,7 +427,7 @@
       when: web_server == "openlitespeed"
 
     - name: Get PHP configuration files
-      shell: |
+      ansible.builtin.shell: |
         echo "=== PHP CLI Configuration ==="
         php --ini
         echo ""
@@ -449,7 +450,7 @@
       failed_when: false
 
     - name: Get SSL certificates information
-      shell: |
+      ansible.builtin.shell: |
         echo "=== SSL Certificates ==="
         ls -la /etc/letsencrypt/live/ 2>/dev/null || echo "No Let's Encrypt certs found"
         echo ""
@@ -465,8 +466,8 @@
       failed_when: false
 
     - name: Create configuration summary
-      local_action:
-        module: copy
+      delegate_to: localhost
+      ansible.builtin.copy:
         content: |
           # WordPress Configuration - {{ inventory_hostname }}
           # Captured: {{ timestamp }}
@@ -618,33 +619,33 @@
           Generated by Ansible playbook: capture-wordpress-config.yml
           Environment: {% if 'production' in group_names %}PRODUCTION{% elif 'staging' in group_names %}STAGING{% else %}{{ inventory_hostname }}{% endif %}
         dest: "{{ output_dir }}/{{ inventory_hostname }}/wordpress-config-{{ timestamp }}.md"
-      become: no
+      become: false
 
     - name: Save plugins list as JSON
-      local_action:
-        module: copy
+      delegate_to: localhost
+      ansible.builtin.copy:
         content: "{{ wp_plugins.stdout }}"
         dest: "{{ output_dir }}/{{ inventory_hostname }}/plugins-{{ timestamp }}.json"
-      become: no
+      become: false
 
     - name: Save themes list as JSON
-      local_action:
-        module: copy
+      delegate_to: localhost
+      ansible.builtin.copy:
         content: "{{ wp_themes.stdout }}"
         dest: "{{ output_dir }}/{{ inventory_hostname }}/themes-{{ timestamp }}.json"
-      become: no
+      become: false
 
     - name: Save WordPress constants as JSON
-      local_action:
-        module: copy
+      delegate_to: localhost
+      ansible.builtin.copy:
         content: "{{ wp_constants.stdout | default('[]') }}"
         dest: "{{ output_dir }}/{{ inventory_hostname }}/constants-{{ timestamp }}.json"
-      become: no
+      become: false
       when: wp_constants.stdout is defined
 
     - name: Save cron configuration
-      local_action:
-        module: copy
+      delegate_to: localhost
+      ansible.builtin.copy:
         content: |
           # Cron Configuration - {{ inventory_hostname }}
           # Captured: {{ timestamp }}
@@ -664,63 +665,65 @@
           ## Systemd Timers
           {{ systemd_timers.stdout }}
         dest: "{{ output_dir }}/{{ inventory_hostname }}/cron-config-{{ timestamp }}.txt"
-      become: no
+      become: false
 
     - name: Save cron scripts inventory
-      local_action:
-        module: copy
+      delegate_to: localhost
+      ansible.builtin.copy:
         content: "{{ cron_scripts_content.stdout }}"
         dest: "{{ output_dir }}/{{ inventory_hostname }}/cron-scripts-inventory-{{ timestamp }}.txt"
-      become: no
+      become: false
 
     - name: Save .htaccess files
-      local_action:
-        module: copy
+      delegate_to: localhost
+      ansible.builtin.copy:
         content: "{{ htaccess_contents.stdout }}"
         dest: "{{ output_dir }}/{{ inventory_hostname }}/htaccess-files-{{ timestamp }}.txt"
-      become: no
+      become: false
 
     - name: Save Apache configuration
-      local_action:
-        module: copy
+      delegate_to: localhost
+      ansible.builtin.copy:
         content: "{{ apache_config.stdout }}"
         dest: "{{ output_dir }}/{{ inventory_hostname }}/apache-config-{{ timestamp }}.txt"
-      become: no
+      become: false
       when: web_server == "apache" and apache_config.stdout is defined
 
     - name: Save OpenLiteSpeed configuration
-      local_action:
-        module: copy
+      delegate_to: localhost
+      ansible.builtin.copy:
         content: "{{ ols_config.stdout }}"
         dest: "{{ output_dir }}/{{ inventory_hostname }}/openlitespeed-config-{{ timestamp }}.txt"
-      become: no
+      become: false
       when: web_server == "openlitespeed" and ols_config.stdout is defined
 
     - name: Save PHP configuration
-      local_action:
-        module: copy
+      delegate_to: localhost
+      ansible.builtin.copy:
         content: "{{ php_config.stdout }}"
         dest: "{{ output_dir }}/{{ inventory_hostname }}/php-config-{{ timestamp }}.txt"
-      become: no
+      become: false
 
     - name: Save SSL certificates info
-      local_action:
-        module: copy
+      delegate_to: localhost
+      ansible.builtin.copy:
         content: "{{ ssl_certs.stdout }}"
         dest: "{{ output_dir }}/{{ inventory_hostname }}/ssl-certs-{{ timestamp }}.txt"
-      become: no
+      become: false
 
     - name: Display summary
-      debug:
+      ansible.builtin.debug:
         msg:
           - "WordPress Configuration Captured Successfully"
           - "============================================="
-          - "Environment: {% if 'production' in group_names %}PRODUCTION{% elif 'staging' in group_names %}STAGING{% else %}{{ inventory_hostname }}{% endif %}"
+          - "Environment: {% if 'production' in group_names %}PRODUCTION{% elif 'staging' in group_names %}STAGING{% else
+            %}{{ inventory_hostname }}{% endif %}"
           - "Server: {{ inventory_hostname }}"
           - "Web Server: {{ web_server | upper }}"
           - "WordPress Version: {{ wp_version.stdout }}"
           - "Active Theme: {{ wp_active_theme.stdout }}"
-          - "Active Plugins: {{ (wp_plugins.stdout | from_json | selectattr('status', 'equalto', 'active') | list | length) }}"
+          - "Active Plugins: {{ (wp_plugins.stdout | from_json | selectattr('status', 'equalto', 'active') | list | length)
+            }}"
           - "Total Plugins: {{ (wp_plugins.stdout | from_json) | length }}"
           - ".htaccess Files: {{ htaccess_files.stdout_lines | length }}"
           - ""

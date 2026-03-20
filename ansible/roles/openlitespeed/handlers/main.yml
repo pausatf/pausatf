@@ -1,5 +1,5 @@
 ---
-- name: restart ols
-  service:
+- name: Restart ols
+  ansible.builtin.service:
     name: lshttpd
     state: restarted

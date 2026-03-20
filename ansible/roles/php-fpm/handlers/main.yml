@@ -1,6 +1,6 @@
 ---
 - name: Restart php-fpm
-  service:
+  ansible.builtin.service:
     name: "php{{ php_version }}-fpm"
     state: restarted
   when: not (_dockerenv.stat.exists | default(false))

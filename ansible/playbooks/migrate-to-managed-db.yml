@@ -1,7 +1,7 @@
 ---
 - name: Migrate WordPress database to DigitalOcean Managed MySQL
   hosts: production
-  gather_facts: no
+  gather_facts: false
   become: true
 
   vars:
@@ -12,7 +12,8 @@
     tmp_mycnf: "/tmp/.managed-db-{{ migration_timestamp }}.cnf"
     tmp_wp_mycnf: "/tmp/.managed-wp-db-{{ migration_timestamp }}.cnf"
     spaces_backup_prefix: "db-migration/{{ migration_timestamp }}"
-    web_service_name: "{{ 'apache2' if (web_server | default('apache')) == 'apache' else ('lsws' if (web_server | default('apache')) == 'openlitespeed' else (web_server | default('apache2'))) }}"
+    web_service_name: "{{ 'apache2' if (web_server | default('apache')) == 'apache' else ('lsws' if (web_server | default('apache'))
+      == 'openlitespeed' else (web_server | default('apache2'))) }}"
     critical_wp_tables:
       - posts
       - postmeta
@@ -30,18 +31,18 @@
     # Phase 1: Pre-flight checks
     # ========================================
     - name: Set migration timestamp
-      set_fact:
+      ansible.builtin.set_fact:
         migration_timestamp: "{{ lookup('pipe', 'date +%Y%m%dT%H%M%S') }}"
 
     - name: Validate production safety gate
-      fail:
+      ansible.builtin.fail:
         msg: >-
           This playbook migrates the production database to managed MySQL.
           Pass --extra-vars "confirm_production=yes" to proceed.
       when: confirm_production | default('no') != 'yes'
 
     - name: Validate destructive reimport confirmation gate
-      fail:
+      ansible.builtin.fail:
         msg: >-
           force_reimport=yes is destructive and requires
           --extra-vars "confirm_data_loss=yes" to proceed.
@@ -50,50 +51,50 @@
         - confirm_data_loss | default('no') != 'yes'
 
     - name: Validate managed_db_host is defined
-      fail:
+      ansible.builtin.fail:
         msg: "managed_db_host must be set in vault or group_vars (Terraform output: database_host)"
       when: managed_db_host is not defined or managed_db_host | length == 0
 
     - name: Validate managed_db_port is defined
-      fail:
+      ansible.builtin.fail:
         msg: "managed_db_port must be set in group_vars (typically 25060 for DO managed MySQL)"
       when: managed_db_port is not defined
 
     - name: Validate managed_db_user is defined
-      fail:
+      ansible.builtin.fail:
         msg: "managed_db_user must be set in vault or group_vars (Terraform output: database_user)"
       when: managed_db_user is not defined or managed_db_user | length == 0
 
     - name: Validate managed_db_password is defined
-      fail:
+      ansible.builtin.fail:
         msg: "managed_db_password must be set in vault"
       when: managed_db_password is not defined or managed_db_password | length == 0
       no_log: true
 
     - name: Validate managed_wp_db_user is defined
-      fail:
+      ansible.builtin.fail:
         msg: "managed_wp_db_user must be set in vault/group_vars for wp-config runtime credentials"
       when: managed_wp_db_user is not defined or managed_wp_db_user | length == 0
 
     - name: Validate managed_wp_db_password is defined
-      fail:
+      ansible.builtin.fail:
         msg: "managed_wp_db_password must be set in vault/group_vars for wp-config runtime credentials"
       when: managed_wp_db_password is not defined or managed_wp_db_password | length == 0
       no_log: true
 
     - name: Fail if managed_db_host resolves to localhost
-      fail:
+      ansible.builtin.fail:
         msg: "managed_db_host ({{ managed_db_host }}) must not be localhost"
       when: managed_db_host in ['localhost', '127.0.0.1', '::1']
 
     - name: Verify local MySQL is running
-      command: mysqladmin ping --host=localhost
+      ansible.builtin.command: mysqladmin ping --host=localhost
       changed_when: false
 
     - name: Create temporary credentials file for managed DB
-      copy:
+      ansible.builtin.copy:
         dest: "{{ tmp_mycnf }}"
-        mode: '0600'
+        mode: "0600"
         content: |
           [client]
           host={{ managed_db_host }}
@@ -104,14 +105,14 @@
       no_log: true
 
     - name: Verify managed MySQL is reachable
-      command: mysqladmin --defaults-extra-file={{ tmp_mycnf }} ping
+      ansible.builtin.command: mysqladmin --defaults-extra-file={{ tmp_mycnf }} ping
       changed_when: false
       no_log: true
 
     - name: Create temporary credentials file for managed WP runtime user
-      copy:
+      ansible.builtin.copy:
         dest: "{{ tmp_wp_mycnf }}"
-        mode: '0600'
+        mode: "0600"
         content: |
           [client]
           host={{ managed_db_host }}
@@ -122,40 +123,40 @@
       no_log: true
 
     - name: Verify s3cmd is available
-      command: which s3cmd
+      ansible.builtin.command: which s3cmd
       changed_when: false
       when: backup_enabled | default(true)
 
     - name: Get WordPress database name
-      command: >-
+      ansible.builtin.command: >-
         {{ wpcli }} config get DB_NAME
         --path={{ wp_path }} --allow-root
       register: wp_db_name
       changed_when: false
 
     - name: Get WordPress database user
-      command: >-
+      ansible.builtin.command: >-
         {{ wpcli }} config get DB_USER
         --path={{ wp_path }} --allow-root
       register: wp_db_user
       changed_when: false
 
     - name: Get WordPress database host
-      command: >-
+      ansible.builtin.command: >-
         {{ wpcli }} config get DB_HOST
         --path={{ wp_path }} --allow-root
       register: wp_db_host
       changed_when: false
 
     - name: Get WordPress table prefix
-      command: >-
+      ansible.builtin.command: >-
         {{ wpcli }} config get table_prefix
         --path={{ wp_path }} --allow-root
       register: wp_table_prefix
       changed_when: false
 
     - name: Display migration plan
-      debug:
+      ansible.builtin.debug:
         msg: |
           === Migration Plan ===
           Source: {{ wp_db_host.stdout | default('(check mode)') }}  (local MySQL)
@@ -168,18 +169,18 @@
     # Phase 2: Snapshot production droplet
     # ========================================
     - name: Validate DO_TOKEN is available
-      fail:
+      ansible.builtin.fail:
         msg: "digitalocean_api_token must be set in vault for snapshot API calls"
       when: digitalocean_api_token is not defined or digitalocean_api_token | length == 0
       no_log: true
 
     - name: Validate droplet ID is available
-      fail:
+      ansible.builtin.fail:
         msg: "digitalocean_droplet_id must be set in group_vars"
       when: digitalocean_droplet_id is not defined
 
     - name: Create pre-migration droplet snapshot
-      uri:
+      ansible.builtin.uri:
         url: "https://api.digitalocean.com/v2/droplets/{{ digitalocean_droplet_id }}/actions"
         method: POST
         headers:
@@ -194,7 +195,7 @@
       no_log: true
 
     - name: Wait for snapshot to complete
-      uri:
+      ansible.builtin.uri:
         url: "https://api.digitalocean.com/v2/actions/{{ snapshot_action.json.action.id }}"
         method: GET
         headers:
@@ -208,14 +209,15 @@
       when: snapshot_action is not skipped
 
     - name: Fail if snapshot errored
-      fail:
-        msg: "Snapshot action {{ snapshot_action.json.action.id }} ended with status: {{ snapshot_status.json.action.status }}"
+      ansible.builtin.fail:
+        msg: "Snapshot action {{ snapshot_action.json.action.id }} ended with status: {{ snapshot_status.json.action.status
+          }}"
       when:
         - snapshot_status is not skipped
         - snapshot_status.json.action.status != 'completed'
 
     - name: Display snapshot result
-      debug:
+      ansible.builtin.debug:
         msg: "Snapshot 'pre-db-migration-{{ migration_timestamp }}' completed (action {{ snapshot_action.json.action.id }})"
       when: snapshot_action is not skipped
 
@@ -223,7 +225,7 @@
     # Phase 3: Full backup of local database
     # ========================================
     - name: Dump all local databases (full safety backup)
-      shell: >-
+      ansible.builtin.shell: >-
         set -o pipefail &&
         mysqldump --host=localhost
         --single-transaction --routines --triggers
@@ -233,14 +235,14 @@
       no_log: true
 
     - name: Verify full backup file exists and is non-empty
-      stat:
+      ansible.builtin.stat:
         path: "{{ tmp_fullbackup }}"
       register: fullbackup_stat
       failed_when: not fullbackup_stat.stat.exists or fullbackup_stat.stat.size == 0
       when: not ansible_check_mode
 
     - name: Upload full backup to Spaces
-      command: >-
+      ansible.builtin.command: >-
         s3cmd put {{ tmp_fullbackup }}
         s3://pausatf-backups/{{ spaces_backup_prefix }}/wordpress-db-premigration.sql.gz
       when:
@@ -253,31 +255,30 @@
     - name: Run export, import, and cutover workflow
       block:
         - name: Enable WordPress maintenance mode
-          command: >-
+          ansible.builtin.command: >-
             {{ wpcli }} maintenance-mode activate
             --path={{ wp_path }} --allow-root
-
         - name: Export WordPress database via WP-CLI
-          command: >-
+          ansible.builtin.command: >-
             {{ wpcli }} db export {{ tmp_export }}
             --path={{ wp_path }} --allow-root
           register: wp_export
 
         - name: Verify export file line count
-          command: wc -l {{ tmp_export }}
+          ansible.builtin.command: wc -l {{ tmp_export }}
           register: export_linecount
           changed_when: false
           when: not ansible_check_mode
 
         - name: Fail if export is suspiciously small
-          fail:
+          ansible.builtin.fail:
             msg: "Export has only {{ export_linecount.stdout.split()[0] }} lines — expected a larger database"
           when:
             - not ansible_check_mode
             - export_linecount.stdout.split()[0] | int < 100
 
         - name: Display export stats
-          debug:
+          ansible.builtin.debug:
             msg: "Exported {{ export_linecount.stdout.split()[0] }} lines to {{ tmp_export }}"
           when: not ansible_check_mode
 
@@ -285,11 +286,11 @@
         # Phase 5: Import to managed MySQL
         # ========================================
         - name: Set WordPress table prefix fact
-          set_fact:
+          ansible.builtin.set_fact:
             wp_table_prefix_name: "{{ (wp_table_prefix.stdout | default('wp_')) | trim }}"
 
         - name: Get local row count before import
-          command: >-
+          ansible.builtin.command: >-
             {{ wpcli }} db query
             "SELECT COUNT(*) FROM {{ wp_table_prefix_name }}posts"
             --path={{ wp_path }} --allow-root --skip-column-names
@@ -297,7 +298,7 @@
           changed_when: false
 
         - name: Check if managed DB already has WordPress tables
-          command: >-
+          ansible.builtin.command: >-
             mysql --defaults-extra-file={{ tmp_mycnf }}
             {{ wp_db_name.stdout | default('wordpress') }}
             --skip-column-names
@@ -306,12 +307,13 @@
           changed_when: false
 
         - name: Normalize existing managed WordPress table list
-          set_fact:
-            managed_existing_table_list: "{{ managed_existing_tables.stdout_lines | map('trim') | reject('equalto', '') | list }}"
+          ansible.builtin.set_fact:
+            managed_existing_table_list: "{{ managed_existing_tables.stdout_lines | map('trim') | reject('equalto', '') |
+              list }}"
           changed_when: false
 
         - name: Fail if managed DB already has data
-          fail:
+          ansible.builtin.fail:
             msg: >-
               Managed DB already contains WordPress tables. This may indicate a
               previous partial migration. Pass --extra-vars "force_reimport=yes"
@@ -322,7 +324,7 @@
             - force_reimport | default('no') != 'yes'
 
         - name: Drop existing managed WordPress tables before forced reimport
-          command: >-
+          ansible.builtin.command: >-
             mysql --defaults-extra-file={{ tmp_mycnf }}
             {{ wp_db_name.stdout | default('wordpress') }}
             -e "SET FOREIGN_KEY_CHECKS=0; DROP TABLE IF EXISTS \`{{ item | replace('`', '``') }}\`; SET FOREIGN_KEY_CHECKS=1;"
@@ -333,7 +335,7 @@
             - force_reimport | default('no') == 'yes'
 
         - name: Import WordPress database to managed MySQL
-          shell: >-
+          ansible.builtin.shell: >-
             set -o pipefail &&
             { echo "SET SESSION sql_require_primary_key=0;"; cat {{ tmp_export }}; } |
             mysql --defaults-extra-file={{ tmp_mycnf }}
@@ -346,7 +348,7 @@
         # Phase 6: Verify managed DB data
         # ========================================
         - name: Get managed DB row count
-          command: >-
+          ansible.builtin.command: >-
             mysql --defaults-extra-file={{ tmp_mycnf }}
             {{ wp_db_name.stdout | default('wordpress') }}
             --skip-column-names
@@ -355,7 +357,7 @@
           changed_when: false
 
         - name: Compare row counts
-          fail:
+          ansible.builtin.fail:
             msg: >-
               Row count mismatch — local: {{ local_post_count.stdout | trim }},
               managed: {{ managed_post_count.stdout | trim }}
@@ -364,7 +366,7 @@
             - local_post_count.stdout | default('') | trim != managed_post_count.stdout | default('') | trim
 
         - name: Verify siteurl in managed DB
-          command: >-
+          ansible.builtin.command: >-
             mysql --defaults-extra-file={{ tmp_mycnf }}
             {{ wp_db_name.stdout | default('wordpress') }}
             --skip-column-names
@@ -373,7 +375,7 @@
           changed_when: false
 
         - name: Get local core table row counts
-          command: >-
+          ansible.builtin.command: >-
             {{ wpcli }} db query
             "SELECT COUNT(*) FROM {{ wp_table_prefix_name }}{{ item }}"
             --path={{ wp_path }} --allow-root --skip-column-names
@@ -382,7 +384,7 @@
           changed_when: false
 
         - name: Get managed core table row counts
-          command: >-
+          ansible.builtin.command: >-
             mysql --defaults-extra-file={{ tmp_mycnf }}
             {{ wp_db_name.stdout | default('wordpress') }}
             --skip-column-names
@@ -392,7 +394,7 @@
           changed_when: false
 
         - name: Compare core table row counts
-          assert:
+          ansible.builtin.assert:
             that:
               - (local_core_counts.results[idx].stdout | trim) == (managed_core_counts.results[idx].stdout | trim)
             fail_msg: >-
@@ -405,7 +407,7 @@
           when: not ansible_check_mode
 
         - name: Display data verification results
-          debug:
+          ansible.builtin.debug:
             msg: |
               === Data Verification ===
               Posts rows (local):   {{ local_post_count.stdout | default('(check mode)') | trim }}
@@ -414,7 +416,7 @@
           when: not ansible_check_mode
 
         - name: Verify managed DB application user is reachable
-          command: >-
+          ansible.builtin.command: >-
             mysql --defaults-extra-file={{ tmp_wp_mycnf }}
             --skip-column-names
             -e "SELECT 1"
@@ -425,44 +427,41 @@
         # Phase 7: Switch wp-config.php
         # ========================================
         - name: Check wp-config.php exists
-          stat:
+          ansible.builtin.stat:
             path: "{{ wp_path }}/wp-config.php"
           register: wpconfig_stat
           when: not ansible_check_mode
 
         - name: Backup current wp-config.php
-          copy:
+          ansible.builtin.copy:
             src: "{{ wp_path }}/wp-config.php"
             dest: "{{ wp_path }}/wp-config.php.local-mysql.bak"
             remote_src: true
-            mode: '0640'
+            mode: "0640"
             owner: "{{ apache_user | default('www-data') }}"
             group: "{{ apache_group | default('www-data') }}"
           when: not ansible_check_mode
 
         - name: Update DB_HOST in wp-config.php
-          command: >-
+          ansible.builtin.command: >-
             {{ wpcli }} config set DB_HOST '{{ managed_db_host }}:{{ managed_db_port }}'
             --path={{ wp_path }} --allow-root
-
         - name: Update DB_USER in wp-config.php
-          command: >-
+          ansible.builtin.command: >-
             {{ wpcli }} config set DB_USER '{{ managed_wp_db_user }}'
             --path={{ wp_path }} --allow-root
-
         - name: Update DB_PASSWORD in wp-config.php
-          command: >-
+          ansible.builtin.command: >-
             {{ wpcli }} config set DB_PASSWORD '{{ managed_wp_db_password }}'
             --path={{ wp_path }} --allow-root
           no_log: true
 
         - name: Add MYSQL_CLIENT_FLAGS for SSL
-          command: >-
+          ansible.builtin.command: >-
             {{ wpcli }} config set MYSQL_CLIENT_FLAGS MYSQLI_CLIENT_SSL
             --path={{ wp_path }} --allow-root --raw --type=constant
-
         - name: Reload web server to pick up wp-config changes
-          service:
+          ansible.builtin.service:
             name: "{{ web_service_name }}"
             state: reloaded
           when: not ansible_check_mode
@@ -471,17 +470,15 @@
         # Phase 8: Verify WordPress on managed DB
         # ========================================
         - name: Verify WordPress is installed (managed DB)
-          command: >-
+          ansible.builtin.command: >-
             {{ wpcli }} core is-installed
             --path={{ wp_path }} --allow-root
-
         - name: Verify WordPress database integrity
-          command: >-
+          ansible.builtin.command: >-
             {{ wpcli }} db check
             --path={{ wp_path }} --allow-root
-
         - name: HTTP health check — WP REST API
-          uri:
+          ansible.builtin.uri:
             url: "https://www.pausatf.org/wp-json/"
             method: GET
             status_code: 200
@@ -491,7 +488,7 @@
           become: false
 
         - name: HTTP health check — WP login page
-          uri:
+          ansible.builtin.uri:
             url: "https://www.pausatf.org/wp-login.php"
             method: GET
             status_code: 200
@@ -501,7 +498,7 @@
           become: false
 
         - name: Display health check results
-          debug:
+          ansible.builtin.debug:
             msg: |
               === Health Checks Passed ===
               wp core is-installed: OK
@@ -512,18 +509,18 @@
 
       rescue:
         - name: Report migration workflow failure
-          debug:
+          ansible.builtin.debug:
             msg: >-
               Migration failed during export/import/cutover. Cleanup ran in always;
               review prior task output and use wp-config.php.local-mysql.bak for rollback.
 
         - name: Fail migration workflow
-          fail:
+          ansible.builtin.fail:
             msg: "Migration workflow failed; review prior task output."
 
       always:
         - name: Disable WordPress maintenance mode (best effort)
-          command: >-
+          ansible.builtin.command: >-
             {{ wpcli }} maintenance-mode deactivate
             --path={{ wp_path }} --allow-root
           changed_when: false
@@ -531,22 +528,22 @@
           when: not ansible_check_mode
 
         - name: Remove temporary credentials file
-          file:
+          ansible.builtin.file:
             path: "{{ tmp_mycnf }}"
             state: absent
 
         - name: Remove temporary WP credentials file
-          file:
+          ansible.builtin.file:
             path: "{{ tmp_wp_mycnf }}"
             state: absent
 
         - name: Remove local SQL export from /tmp
-          file:
+          ansible.builtin.file:
             path: "{{ tmp_export }}"
             state: absent
 
         - name: Remove full backup from /tmp
-          file:
+          ansible.builtin.file:
             path: "{{ tmp_fullbackup }}"
             state: absent
 
@@ -554,7 +551,7 @@
     # Phase 9: Summary
     # ========================================
     - name: Display migration summary
-      debug:
+      ansible.builtin.debug:
         msg: |
           ============================================
           Migration Complete

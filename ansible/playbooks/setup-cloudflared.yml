@@ -25,14 +25,14 @@
         state: directory
         owner: root
         group: root
-        mode: '0700'
+        mode: "0700"
 
     - name: Deploy tunnel config
       ansible.builtin.copy:
         dest: /etc/cloudflared/config.yml
         owner: root
         group: root
-        mode: '0600'
+        mode: "0600"
         content: |
           tunnel: {{ cloudflared_tunnel_id }}
           credentials-file: /root/.cloudflared/{{ cloudflared_tunnel_id }}.json
@@ -49,7 +49,7 @@
         content: "{{ cloudflared_tunnel_creds }}"
         owner: root
         group: root
-        mode: '0600'
+        mode: "0600"
       no_log: true
       when: cloudflared_tunnel_creds | length > 0
 

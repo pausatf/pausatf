@@ -32,7 +32,8 @@
       - backup_spaces_config_stat.stat.exists
       - backup_spaces_config_stat.stat.isreg
       - backup_spaces_config_stat.stat.readable
-    fail_msg: "backup_do_spaces_config_file ({{ backup_do_spaces_config_file }}) must exist and be readable when backup_do_spaces_bucket is set"
+    fail_msg: "backup_do_spaces_config_file ({{ backup_do_spaces_config_file }}) must exist and be readable when backup_do_spaces_bucket
+      is set"
   when: backup_do_spaces_bucket | length > 0
 
 - name: Install s3cmd for DO Spaces offload

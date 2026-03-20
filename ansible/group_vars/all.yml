@@ -34,7 +34,7 @@ cloudflare_api_token: "{{ vault_cloudflare_api_token | default('') }}"
 cloudflare_email: "{{ vault_cloudflare_email | default('') }}"
 cloudflare_plan: "Free Website"
 cloudflare_status: "active"
-cloudflare_manage_dns: false  # DNS is managed via Terraform
+cloudflare_manage_dns: false # DNS is managed via Terraform
 cloudflare_nameservers:
   - curt.ns.cloudflare.com
   - eva.ns.cloudflare.com
@@ -219,8 +219,8 @@ wpcli_auto_update: true
 # WP-CLI update settings
 wpcli_update_plugins: true
 wpcli_update_themes: true
-wpcli_update_core: "minor"  # false, true, or "minor"
-wpcli_update_schedule: "weekly"  # daily, weekly, monthly
+wpcli_update_core: "minor" # false, true, or "minor"
+wpcli_update_schedule: "weekly" # daily, weekly, monthly
 
 # Plugins to exclude from auto-updates (premium/custom)
 wpcli_exclude_plugins:
@@ -284,9 +284,11 @@ ssl_certificate_key: "/etc/letsencrypt/live/pausatf.org/privkey.pem"
 # yamllint disable rule:line-length
 csp_enabled: true
 csp_default_src: "'self'"
-csp_script_src: "'self' 'unsafe-inline' 'unsafe-eval' *.googleapis.com *.gstatic.com *.google.com *.googletagmanager.com *.google-analytics.com ajax.cloudflare.com static.cloudflareinsights.com challenges.cloudflare.com *.wp.com *.wordpress.com widgetlogic.org"
+csp_script_src: "'self' 'unsafe-inline' 'unsafe-eval' *.googleapis.com *.gstatic.com *.google.com *.googletagmanager.com *.google-analytics.com
+  ajax.cloudflare.com static.cloudflareinsights.com challenges.cloudflare.com *.wp.com *.wordpress.com widgetlogic.org"
 csp_style_src: "'self' 'unsafe-inline' fonts.googleapis.com *.wp.com"
-csp_img_src: "'self' data: *.googleapis.com *.gravatar.com *.wp.com *.google-analytics.com *.googletagmanager.com *.instagram.com *.cdninstagram.com *.pausatf.org"
+csp_img_src: "'self' data: *.googleapis.com *.gravatar.com *.wp.com *.google-analytics.com *.googletagmanager.com *.instagram.com
+  *.cdninstagram.com *.pausatf.org"
 csp_font_src: "'self' fonts.gstatic.com data:"
 csp_frame_src: "'self' *.google.com *.wp.com"
 csp_connect_src: "'self' *.googleapis.com *.google-analytics.com *.googletagmanager.com *.wp.com *.wordpress.com"
@@ -315,9 +317,18 @@ fail2ban_jails:
 
 # UFW Firewall
 ufw_enabled: true
-# Restrict SSH to specific CIDRs when possible (e.g. office/VPN ranges).
-# Empty list preserves current behavior (allow 22 from anywhere); DO firewall should still enforce perimeter rules.
-allowed_ssh_networks: []
+# SSH allowlist. Explicit IPs only; no broad ISP ranges.
+# Mirrors terraform/stacks/wordpress/main.tf (local.ssh_cidrs).
+# Updated: 2026-03-18.
+allowed_ssh_networks:
+  # DigitalOcean internal / VPC
+  - "100.128.0.0/9"
+  # Tailscale CGNAT range
+  - "100.64.0.0/10"
+  # Admin static IP
+  - "73.170.36.107/32"
+  # Jeff Teeters (UC Berkeley campus)
+  - "136.152.0.0/16"
 ufw_allowed_ports:
   - "22/tcp"
   - "80/tcp"
@@ -353,7 +364,7 @@ healthcheck_allowed_ips:
 backup_enabled: true
 backup_retention_days: 30
 backup_destination: "/var/backups/wordpress"
-backup_schedule: "0 2 * * *"  # 2 AM daily
+backup_schedule: "0 2 * * *" # 2 AM daily
 
 # =============================================================================
 # EMAIL (Google Workspace)

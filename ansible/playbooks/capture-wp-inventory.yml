@@ -1,7 +1,7 @@
 ---
 - name: Capture WordPress plugins/themes from production
   hosts: production
-  gather_facts: no
+  gather_facts: false
   become: false
 
   vars:
@@ -12,49 +12,56 @@
 
   tasks:
     - name: Check WP-CLI
-      raw: "sg www-data -c '{{ wp_bin }} --allow-root --version'"
+      ansible.builtin.raw: "sg www-data -c '{{ wp_bin }} --allow-root --version'"
       register: wpcli_v
       changed_when: false
 
     - name: List plugins (JSON)
-      raw: "sg www-data -c '{{ wp_bin }} plugin list --format=json --path={{ wp_path }} --allow-root 2>/dev/null | grep \"^\\[\"'"
+      ansible.builtin.raw: "sg www-data -c '{{ wp_bin }} plugin list --format=json --path={{ wp_path }} --allow-root 2>/dev/null
+        | grep \"^\\[\"'"
       register: plugins_json
       changed_when: false
 
     - name: List themes (JSON)
-      raw: "sg www-data -c '{{ wp_bin }} theme list --format=json --path={{ wp_path }} --allow-root 2>/dev/null | grep \"^\\[\"'"
+      ansible.builtin.raw: "sg www-data -c '{{ wp_bin }} theme list --format=json --path={{ wp_path }} --allow-root 2>/dev/null
+        | grep \"^\\[\"'"
       register: themes_json
       changed_when: false
 
     - name: Get active template (parent theme)
-      raw: "sg www-data -c '{{ wp_bin }} option get template --path={{ wp_path }} --allow-root 2>/dev/null | grep -v \"^Notice\\|^PHP Notice\\|^$\" | head -1'"
+      ansible.builtin.raw: "sg www-data -c '{{ wp_bin }} option get template --path={{ wp_path }} --allow-root 2>/dev/null
+        | grep -v \"^Notice\\ |^PHP Notice\\|^$\" | head -1'"
       register: active_template
       changed_when: false
 
     - name: Get active stylesheet (child theme)
-      raw: "sg www-data -c '{{ wp_bin }} option get stylesheet --path={{ wp_path }} --allow-root 2>/dev/null | grep -v \"^Notice\\|^PHP Notice\\|^$\" | head -1'"
+      ansible.builtin.raw: "sg www-data -c '{{ wp_bin }} option get stylesheet --path={{ wp_path }} --allow-root 2>/dev/null
+        | grep -v \"^Notice\\|^PHP Notice\\|^$\" | head -1'"
       register: active_stylesheet
       changed_when: false
 
     - name: Get child theme customizations
-      raw: "sg www-data -c '{{ wp_bin }} option get theme_mods_{{ active_stylesheet.stdout | trim }} --format=json --path={{ wp_path }} --allow-root 2>/dev/null | grep \"^[{\\[]\"'"
+      ansible.builtin.raw: "sg www-data -c '{{ wp_bin }} option get theme_mods_{{ active_stylesheet.stdout | trim }} --format=json
+        --path={{ wp_path }} --allow-root 2>/dev/null | grep \"^[{\\[]\"'"
       register: child_theme_mods
       changed_when: false
       ignore_errors: true
 
     - name: Get parent theme customizations
-      raw: "sg www-data -c '{{ wp_bin }} option get theme_mods_{{ active_template.stdout | trim }} --format=json --path={{ wp_path }} --allow-root 2>/dev/null | grep \"^[{\\[]\"'"
+      ansible.builtin.raw: "sg www-data -c '{{ wp_bin }} option get theme_mods_{{ active_template.stdout | trim }} --format=json
+        --path={{ wp_path }} --allow-root 2>/dev/null | grep \"^[{\\[]\"'"
       register: parent_theme_mods
       changed_when: false
       ignore_errors: true
 
     - name: Get WordPress users list
-      raw: "sg www-data -c '{{ wp_bin }} user list --format=json --fields=ID,user_login,user_email,roles,user_registered --path={{ wp_path }} --allow-root 2>/dev/null | grep \"^\\[\"'"
+      ansible.builtin.raw: "sg www-data -c '{{ wp_bin }} user list --format=json --fields=ID,user_login,user_email,roles,user_registered
+        --path={{ wp_path }} --allow-root 2>/dev/null | grep \"^\\[\"'"
       register: users_json
       changed_when: false
 
     - name: Get last login data for all users
-      raw: |
+      ansible.builtin.raw: |
         sg www-data -c '
         echo "["
         first=1
@@ -75,91 +82,98 @@
       changed_when: false
 
     - name: Get site URL
-      raw: "sg www-data -c '{{ wp_bin }} option get siteurl --path={{ wp_path }} --allow-root 2>/dev/null | grep -v \"^Notice\\|^PHP Notice\\|^$\" | head -1'"
+      ansible.builtin.raw: "sg www-data -c '{{ wp_bin }} option get siteurl --path={{ wp_path }} --allow-root 2>/dev/null
+        | grep -v \"^Notice\\ |^PHP Notice\\|^$\" | head -1'"
       register: site_url
       changed_when: false
 
     - name: Get site name
-      raw: "sg www-data -c '{{ wp_bin }} option get blogname --path={{ wp_path }} --allow-root 2>/dev/null | grep -v \"^Notice\\|^PHP Notice\\|^$\" | head -1'"
+      ansible.builtin.raw: "sg www-data -c '{{ wp_bin }} option get blogname --path={{ wp_path }} --allow-root 2>/dev/null
+        | grep -v \"^Notice\\ |^PHP Notice\\|^$\" | head -1'"
       register: site_name
       changed_when: false
 
     - name: Get admin email
-      raw: "sg www-data -c '{{ wp_bin }} option get admin_email --path={{ wp_path }} --allow-root 2>/dev/null | grep -v \"^Notice\\|^PHP Notice\\|^$\" | head -1'"
+      ansible.builtin.raw: "sg www-data -c '{{ wp_bin }} option get admin_email --path={{ wp_path }} --allow-root 2>/dev/null
+        | grep -v \"^Notice\\|^PHP Notice\\|^$\" | head -1'"
       register: admin_email
       changed_when: false
 
     - name: Get permalink structure
-      raw: "sg www-data -c '{{ wp_bin }} option get permalink_structure --path={{ wp_path }} --allow-root 2>/dev/null | grep -v \"^Notice\\|^PHP Notice\\|^$\" | head -1'"
+      ansible.builtin.raw: "sg www-data -c '{{ wp_bin }} option get permalink_structure --path={{ wp_path }} --allow-root
+        2>/dev/null | grep -v \"^Notice\\|^PHP Notice\\|^$\" | head -1'"
       register: permalink_structure
       changed_when: false
 
     - name: Get site language
-      raw: "sg www-data -c '{{ wp_bin }} option get WPLANG --path={{ wp_path }} --allow-root 2>/dev/null | grep -v \"^Notice\\|^PHP Notice\\|^$\" | head -1'"
+      ansible.builtin.raw: "sg www-data -c '{{ wp_bin }} option get WPLANG --path={{ wp_path }} --allow-root 2>/dev/null |
+        grep -v \"^Notice\\ |^PHP Notice\\|^$\" | head -1'"
       register: site_language
       changed_when: false
 
     - name: Get WordPress menus
-      raw: "sg www-data -c '{{ wp_bin }} menu list --format=json --path={{ wp_path }} --allow-root 2>/dev/null | grep \"^\\[\"'"
+      ansible.builtin.raw: "sg www-data -c '{{ wp_bin }} menu list --format=json --path={{ wp_path }} --allow-root 2>/dev/null
+        | grep \"^\\[\"'"
       register: menus_json
       changed_when: false
 
     - name: Get rewrite rules count
-      raw: "sg www-data -c '{{ wp_bin }} rewrite list --format=count --path={{ wp_path }} --allow-root 2>/dev/null | grep -v \"^Notice\\|^PHP Notice\\|^$\" | head -1'"
+      ansible.builtin.raw: "sg www-data -c '{{ wp_bin }} rewrite list --format=count --path={{ wp_path }} --allow-root 2>/dev/null
+        | grep -v \"^Notice\\|^PHP Notice\\|^$\" | head -1'"
       register: rewrite_count
       changed_when: false
 
     - name: Parse plugins JSON
-      set_fact:
+      ansible.builtin.set_fact:
         plugins_list: "{{ (plugins_json.stdout | trim | from_json) }}"
       delegate_to: localhost
 
     - name: Parse themes JSON
-      set_fact:
+      ansible.builtin.set_fact:
         themes_list: "{{ (themes_json.stdout | trim | from_json) }}"
       delegate_to: localhost
 
     - name: Parse child theme mods
-      set_fact:
+      ansible.builtin.set_fact:
         child_mods: "{{ (child_theme_mods.stdout | trim | from_json) if child_theme_mods.stdout | trim else {} }}"
       delegate_to: localhost
       when: child_theme_mods is not skipped
 
     - name: Parse parent theme mods
-      set_fact:
+      ansible.builtin.set_fact:
         parent_mods: "{{ (parent_theme_mods.stdout | trim | from_json) if parent_theme_mods.stdout | trim else {} }}"
       delegate_to: localhost
       when: parent_theme_mods is not skipped
 
     - name: Parse users JSON
-      set_fact:
+      ansible.builtin.set_fact:
         users_list: "{{ (users_json.stdout | trim | from_json) }}"
       delegate_to: localhost
 
     - name: Parse last logins JSON
-      set_fact:
+      ansible.builtin.set_fact:
         last_logins_list: "{{ (last_logins_json.stdout | trim | from_json) if last_logins_json.stdout | trim else [] }}"
       delegate_to: localhost
 
     - name: Parse menus JSON
-      set_fact:
+      ansible.builtin.set_fact:
         menus_list: "{{ (menus_json.stdout | trim | from_json) if menus_json.stdout | trim else [] }}"
       delegate_to: localhost
 
     - name: Ensure local output directory exists
       delegate_to: localhost
-      file:
+      ansible.builtin.file:
         path: "{{ out_dir }}"
         state: directory
-        mode: '0755'
+        mode: "0755"
 
     - name: Write captured vars to group_vars/production/wordpress.yml
       delegate_to: localhost
-      copy:
+      ansible.builtin.copy:
         dest: "{{ out_file }}"
-        mode: '0644'
+        mode: "0644"
         content: |
-          # Generated by capture-wp-inventory.yml on {{ lookup('pipe','date -u +%Y-%m-%dT%H:%M:%SZ') }}
+          # Generated by capture-wp-inventory.yml on {{ lookup('pipe', 'date -u +%Y-%m-%dT%H:%M:%SZ') }}
           # Do not edit manually; re-run the playbook to refresh from production.
           wp_main_plugins:
           {% for p in plugins_list %}

@@ -2,70 +2,71 @@
 # PHP-FPM role — replaces mod_php with FPM over unix socket
 
 - name: Add Ondrej PHP repository
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: "ppa:ondrej/php"
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Install PHP {{ php_version }}-FPM and extensions
-  apt:
+  ansible.builtin.apt:
     name: "{{ _php_packages }}"
     state: present
   vars:
-    _php_module_packages: "{{ php_modules | map('regex_replace', '^(redis)$', 'php-redis') | map('regex_replace', '^(?!php-redis$)(.*)$', 'php' + (php_version | string) + '-\\1') | list }}"
+    _php_module_packages: "{{ php_modules | map('regex_replace', '^(redis)$', 'php-redis') | map('regex_replace', '^(?!php-redis$)(.*)$',
+      'php' + (php_version | string) + '-\\1') | list }}"
     _php_extra_packages: "{{ ['php' + (php_version | string) + '-fpm', 'php-memcached'] }}"
     _php_packages: "{{ _php_module_packages + _php_extra_packages }}"
 
 - name: Remove mod_php if installed
-  apt:
+  ansible.builtin.apt:
     name:
       - "libapache2-mod-php*"
     state: absent
   notify: Restart php-fpm
 
 - name: Deploy FPM pool configuration
-  template:
+  ansible.builtin.template:
     src: www.conf.j2
     dest: /etc/php/{{ php_version }}/fpm/pool.d/www.conf
     owner: root
     group: root
-    mode: '0644'
-    backup: yes
+    mode: "0644"
+    backup: true
   notify: Restart php-fpm
 
 - name: Deploy php.ini for FPM
-  template:
+  ansible.builtin.template:
     src: php.ini.j2
     dest: /etc/php/{{ php_version }}/fpm/conf.d/99-pausatf.ini
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   notify: Restart php-fpm
 
 - name: Set default PHP CLI version
-  alternatives:
+  community.general.alternatives:
     name: php
     path: /usr/bin/php{{ php_version }}
   register: php_alternatives
   failed_when: php_alternatives is failed
 
 - name: Create PHP session directory
-  file:
+  ansible.builtin.file:
     path: /var/lib/php/sessions
     state: directory
     owner: www-data
     group: www-data
-    mode: '0770'
+    mode: "0770"
 
 - name: Detect Docker environment
-  stat:
+  ansible.builtin.stat:
     path: /.dockerenv
   register: _dockerenv
   changed_when: false
 
 - name: Ensure PHP {{ php_version }}-FPM is enabled and running
-  service:
+  ansible.builtin.service:
     name: php{{ php_version }}-fpm
     state: started
-    enabled: yes
+    enabled: true
   when: not _dockerenv.stat.exists

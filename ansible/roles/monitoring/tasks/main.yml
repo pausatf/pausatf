@@ -1,6 +1,6 @@
 ---
 - name: Install monitoring tools
-  apt:
+  ansible.builtin.apt:
     name:
       - htop
       - iotop
@@ -11,59 +11,59 @@
     state: present
 
 - name: Enable sysstat
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/default/sysstat
-    regexp: '^ENABLED='
+    regexp: "^ENABLED="
     line: 'ENABLED="true"'
     state: present
-  notify: restart sysstat
+  notify: Restart sysstat
 
 - name: Start and enable vnstat
-  systemd:
+  ansible.builtin.systemd:
     name: vnstat
     state: started
-    enabled: yes
+    enabled: true
 
 - name: Start and enable sysstat
-  systemd:
+  ansible.builtin.systemd:
     name: sysstat
     state: started
-    enabled: yes
+    enabled: true
 
 - name: Deploy WordPress backup script
-  template:
+  ansible.builtin.template:
     src: backup-wordpress.sh.j2
     dest: /usr/local/sbin/backup-wordpress.sh
     owner: root
     group: root
-    mode: '0700'
+    mode: "0700"
 
 - name: Ensure .well-known directory exists
-  file:
+  ansible.builtin.file:
     path: "{{ wordpress_installs[0].path | default('/var/www/html') }}/.well-known"
     state: directory
     owner: www-data
     group: www-data
-    mode: '0755'
+    mode: "0755"
   when:
     - healthcheck_enabled | default(false)
     - wordpress_installs is defined
     - wordpress_installs | length > 0
 
 - name: Deploy health check endpoint
-  template:
+  ansible.builtin.template:
     src: health-check.php.j2
     dest: "{{ wordpress_installs[0].path | default('/var/www/html') }}/.well-known/health-check.php"
     owner: www-data
     group: www-data
-    mode: '0640'
+    mode: "0640"
   when:
     - healthcheck_enabled | default(false)
     - wordpress_installs is defined
     - wordpress_installs | length > 0
 
 - name: Schedule nightly WordPress backup
-  cron:
+  ansible.builtin.cron:
     name: "WordPress backup"
     minute: "{{ (backup_schedule.split(' '))[0] }}"
     hour: "{{ (backup_schedule.split(' '))[1] }}"
@@ -74,15 +74,15 @@
     state: "{{ 'present' if backup_enabled | default(true) else 'absent' }}"
 
 - name: Deploy Apache health check script
-  template:
+  ansible.builtin.template:
     src: httpd-check.sh.j2
     dest: /usr/local/sbin/httpd-check.sh
     owner: root
     group: root
-    mode: '0755'
+    mode: "0755"
 
 - name: Schedule Apache health check every 30 minutes
-  cron:
+  ansible.builtin.cron:
     name: "Apache health check"
     minute: "*/30"
     job: "/usr/local/sbin/httpd-check.sh"

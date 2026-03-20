@@ -1,3 +1,4 @@
+---
 # Discovery role — gather infrastructure facts from a PAUSATF server
 # Detects Apache, PHP-FPM, Redis, ModSecurity, AppArmor, fail2ban, WordPress
 

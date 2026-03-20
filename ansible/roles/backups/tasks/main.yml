@@ -1,3 +1,4 @@
+---
 # Backups role — automated daily WordPress backups for PAUSATF
 # DB dump via WP-CLI, uploads rsync, retention pruning, cron scheduling
 
@@ -7,7 +8,7 @@
     state: directory
     owner: root
     group: root
-    mode: '0750'
+    mode: "0750"
   tags:
     - backups
 
@@ -17,7 +18,7 @@
     state: directory
     owner: root
     group: root
-    mode: '0750'
+    mode: "0750"
   tags:
     - backups
 
@@ -27,7 +28,7 @@
     dest: "{{ backup_script_path }}"
     owner: root
     group: root
-    mode: '0750'
+    mode: "0750"
   notify: Validate backup script
   tags:
     - backups
@@ -55,6 +56,6 @@
       }
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   tags:
     - backups
