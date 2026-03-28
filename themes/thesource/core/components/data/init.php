@@ -183,7 +183,7 @@ function et_core_esc_attr( $attr_key, $attr_value ) {
 	$callback = isset( $allowed_attrs[ $attr_key ] ) && 'data-*' !== $attr_key ? $allowed_attrs[ $attr_key ] : false;
 
 	// Get data attribute key callback.
-	if ( ! $callback && 'data-*' !== $attr_key && 0 === strpos( $attr_key, 'data-' ) && isset( $allowed_attrs['data-*'] ) ) {
+	if ( ! $callback && 'data-*' !== $attr_key && str_starts_with( $attr_key, 'data-' ) && isset( $allowed_attrs['data-*'] ) ) {
 		$callback = $allowed_attrs['data-*'];
 	}
 
@@ -384,13 +384,13 @@ endif;
 if ( ! function_exists( 'et_core_fix_unclosed_html_tags' ) ):
 function et_core_fix_unclosed_html_tags( $content ) {
 	// Exit if source has no HTML tags or we miss what we need to fix them anyway.
-	if ( false === strpos( $content, '<' ) || ! class_exists( 'DOMDocument' ) ) {
+	if ( ! str_contains( $content, '<' ) || ! class_exists( 'DOMDocument' ) ) {
 		return $content;
 	}
 
 	$scripts = false;
 
-	if ( false !== strpos( $content, '<script' ) ) {
+	if ( str_contains( $content, '<script' ) ) {
 		// Replace scripts with placeholders so we don't mess with HTML included in JS strings.
 		$scripts = new ET_Core_Data_ScriptReplacer();
 		$content = preg_replace_callback( '|<script.*?>[\s\S]+?</script>|', array( $scripts, 'replace' ), $content );
