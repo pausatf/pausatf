@@ -325,18 +325,23 @@ fail2ban_firehol_enabled: true
 
 # UFW Firewall
 ufw_enabled: true
-# SSH allowlist. Explicit IPs only; no broad ISP ranges.
+# SSH allowlist.
 # Mirrors terraform/stacks/wordpress/main.tf (local.ssh_cidrs).
-# Updated: 2026-03-18.
+# Updated: 2026-03-28.
 allowed_ssh_networks:
   # DigitalOcean internal / VPC
   - "100.128.0.0/9"
   # Tailscale CGNAT range
   - "100.64.0.0/10"
-  # Admin static IP
+  # Admin static IP (Tom Vincent)
   - "REDACTED_ADMIN_IP/32"
   # Jeff Teeters (UC Berkeley campus)
   - "136.152.0.0/16"
+  # Jeff Teeters (Comcast home)
+  - "REDACTED_ADMIN_RANGE"
+
+# Fail2ban ignoreip (admin IPs that should never be banned)
+fail2ban_ignoreip: "100.64.0.0/10 REDACTED_ADMIN_IP/32 136.152.0.0/16 REDACTED_ADMIN_RANGE"
 ufw_allowed_ports:
   - "22/tcp"
   - "80/tcp"

@@ -1,0 +1,86 @@
+---
+- name: Create DKIM key directory
+  ansible.builtin.file:
+    path: "/etc/opendkim/keys/{{ postfix_domain }}"
+    state: directory
+    owner: opendkim
+    group: opendkim
+    mode: "0700"
+
+- name: Generate DKIM key pair
+  ansible.builtin.command:
+    cmd: >
+      opendkim-genkey
+      -s {{ postfix_dkim_selector }}
+      -d {{ postfix_domain }}
+      -D /etc/opendkim/keys/{{ postfix_domain }}
+      -b 2048
+    creates: "/etc/opendkim/keys/{{ postfix_domain }}/{{ postfix_dkim_selector }}.private"
+
+- name: Set DKIM key ownership
+  ansible.builtin.file:
+    path: "/etc/opendkim/keys/{{ postfix_domain }}"
+    state: directory
+    owner: opendkim
+    group: opendkim
+    recurse: true
+
+- name: Deploy opendkim.conf
+  ansible.builtin.template:
+    src: opendkim.conf.j2
+    dest: /etc/opendkim.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart opendkim
+
+- name: Deploy TrustedHosts
+  ansible.builtin.template:
+    src: TrustedHosts.j2
+    dest: /etc/opendkim/TrustedHosts
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart opendkim
+
+- name: Deploy KeyTable
+  ansible.builtin.copy:
+    content: "{{ postfix_dkim_selector }}._domainkey.{{ postfix_domain }} {{ postfix_domain }}:{{ postfix_dkim_selector }}:/etc/opendkim/keys/{{ postfix_domain }}/{{ postfix_dkim_selector }}.private"
+    dest: /etc/opendkim/KeyTable
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart opendkim
+
+- name: Deploy SigningTable
+  ansible.builtin.copy:
+    content: "*@{{ postfix_domain }} {{ postfix_dkim_selector }}._domainkey.{{ postfix_domain }}"
+    dest: /etc/opendkim/SigningTable
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart opendkim
+
+- name: Create opendkim socket directory for postfix chroot
+  ansible.builtin.file:
+    path: /var/spool/postfix/opendkim
+    state: directory
+    owner: opendkim
+    group: postfix
+    mode: "0755"
+
+- name: Enable and start opendkim
+  ansible.builtin.systemd:
+    name: opendkim
+    enabled: true
+    state: started
+
+- name: Read DKIM public key for DNS
+  ansible.builtin.command:
+    cmd: "cat /etc/opendkim/keys/{{ postfix_domain }}/{{ postfix_dkim_selector }}.txt"
+  register: dkim_dns_record
+  changed_when: false
+
+- name: Display DKIM DNS record
+  ansible.builtin.debug:
+    msg: "{{ dkim_dns_record.stdout }}"

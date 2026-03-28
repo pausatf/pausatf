@@ -1,2 +1,3 @@
 ---
 timezone: "America/Los_Angeles"
+ssh_allow_users: "deploy jteeters somethingwithproof"

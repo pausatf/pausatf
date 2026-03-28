@@ -52,6 +52,36 @@
     port: "443"
     proto: tcp
 
+- name: Allow Cloudflare Tunnel (TCP 7844)
+  community.general.ufw:
+    rule: allow
+    port: "7844"
+    proto: tcp
+  when: cloudflare_tunnel_enabled | default(false)
+
+- name: Allow Cloudflare Tunnel (UDP 7844)
+  community.general.ufw:
+    rule: allow
+    port: "7844"
+    proto: udp
+  when: cloudflare_tunnel_enabled | default(false)
+
+- name: Protect loopback from ipset blocklists
+  ansible.builtin.lineinfile:
+    path: /etc/ufw/before.rules
+    insertbefore: "# allow all on loopback"
+    line: "-A ufw-before-input -i lo -j ACCEPT"
+    state: present
+  notify: Reload UFW
+
+- name: Ensure loopback accepted in iptables now
+  ansible.builtin.iptables:
+    chain: INPUT
+    in_interface: lo
+    jump: ACCEPT
+    action: insert
+    rule_num: 1
+
 - name: Enable UFW
   community.general.ufw:
     state: enabled

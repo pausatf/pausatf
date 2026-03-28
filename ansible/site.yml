@@ -76,6 +76,12 @@
             name: redis
           when: redis_enabled | default(false)
 
+        - name: Include Postfix role
+          ansible.builtin.include_role:
+            name: postfix
+          when: postfix_enabled | default(true)
+          tags: postfix
+
         - name: Include Fail2ban role
           ansible.builtin.include_role:
             name: fail2ban
