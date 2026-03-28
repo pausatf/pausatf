@@ -1,9 +1,11 @@
 ---
 # Fail2ban role - Intrusion prevention for PAUSATF
 
-- name: Install fail2ban
+- name: Install fail2ban and ipset
   ansible.builtin.apt:
-    name: fail2ban
+    name:
+      - fail2ban
+      - ipset
     state: present
 
 - name: Deploy fail2ban configuration
@@ -48,3 +50,49 @@
     name: fail2ban
     state: started
     enabled: true
+
+# AbuseIPDB blocklist
+- name: Deploy AbuseIPDB blocklist script
+  ansible.builtin.template:
+    src: abuseipdb-blocklist.sh.j2
+    dest: /usr/local/bin/abuseipdb-blocklist.sh
+    owner: root
+    group: root
+    mode: "0750"
+  when: fail2ban_abuseipdb_enabled and fail2ban_abuseipdb_apikey | length > 0
+
+- name: Run AbuseIPDB blocklist on deploy
+  ansible.builtin.command: /usr/local/bin/abuseipdb-blocklist.sh
+  changed_when: true
+  when: fail2ban_abuseipdb_enabled and fail2ban_abuseipdb_apikey | length > 0
+
+- name: Schedule daily AbuseIPDB blocklist refresh
+  ansible.builtin.cron:
+    name: "AbuseIPDB blocklist refresh"
+    minute: "0"
+    hour: "4"
+    job: "/usr/local/bin/abuseipdb-blocklist.sh >> /var/log/abuseipdb-blocklist.log 2>&1"
+  when: fail2ban_abuseipdb_enabled and fail2ban_abuseipdb_apikey | length > 0
+
+# Firehol blocklist
+- name: Deploy Firehol blocklist script
+  ansible.builtin.template:
+    src: firehol-blocklist.sh.j2
+    dest: /usr/local/bin/firehol-blocklist.sh
+    owner: root
+    group: root
+    mode: "0750"
+  when: fail2ban_firehol_enabled
+
+- name: Run Firehol blocklist on deploy
+  ansible.builtin.command: /usr/local/bin/firehol-blocklist.sh
+  changed_when: true
+  when: fail2ban_firehol_enabled
+
+- name: Schedule daily Firehol blocklist refresh
+  ansible.builtin.cron:
+    name: "Firehol Level 1 blocklist refresh"
+    minute: "30"
+    hour: "3"
+    job: "/usr/local/bin/firehol-blocklist.sh >> /var/log/firehol-blocklist.log 2>&1"
+  when: fail2ban_firehol_enabled

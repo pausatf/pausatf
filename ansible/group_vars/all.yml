@@ -315,6 +315,14 @@ fail2ban_jails:
   - name: wordpress-enum
     enabled: true
 
+# AbuseIPDB integration (report bans + pull shared blocklist)
+fail2ban_abuseipdb_enabled: true
+fail2ban_abuseipdb_apikey: "{{ vault_abuseipdb_apikey | default('') }}"
+fail2ban_abuseipdb_confidence: 90
+
+# Firehol Level 1 blocklist (high-confidence malicious networks)
+fail2ban_firehol_enabled: true
+
 # UFW Firewall
 ufw_enabled: true
 # SSH allowlist. Explicit IPs only; no broad ISP ranges.

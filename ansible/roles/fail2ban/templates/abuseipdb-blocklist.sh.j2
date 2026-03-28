@@ -1,0 +1,40 @@
+#!/bin/bash
+# Managed by Ansible - Do not edit manually
+set -euo pipefail
+
+API_KEY="{{ fail2ban_abuseipdb_apikey }}"
+CONFIDENCE={{ fail2ban_abuseipdb_confidence }}
+IPSET_NAME="abuseipdb-blocklist"
+BLOCKLIST="/tmp/abuseipdb-blocklist.txt"
+
+curl -sG "https://api.abuseipdb.com/api/v2/blacklist" \
+    -H "Key: ${API_KEY}" \
+    -H "Accept: text/plain" \
+    -d "confidenceMinimum=${CONFIDENCE}" \
+    -d "limit=10000" \
+    -o "${BLOCKLIST}"
+
+if [ ! -s "${BLOCKLIST}" ]; then
+    echo "Empty blocklist, skipping"
+    exit 0
+fi
+
+COUNT=$(wc -l < "${BLOCKLIST}")
+echo "Fetched ${COUNT} IPs from AbuseIPDB blocklist"
+
+if ! ipset list "${IPSET_NAME}" > /dev/null 2>&1; then
+    ipset create "${IPSET_NAME}" hash:ip hashsize 16384 maxelem 65536 timeout 86400
+fi
+ipset flush "${IPSET_NAME}"
+
+while IFS= read -r ip; do
+    [[ -z "${ip}" || "${ip}" == \#* ]] && continue
+    ipset -exist add "${IPSET_NAME}" "${ip}" timeout 86400 2>/dev/null || true
+done < "${BLOCKLIST}"
+
+if ! iptables -C INPUT -m set --match-set "${IPSET_NAME}" src -j DROP 2>/dev/null; then
+    iptables -I INPUT 1 -m set --match-set "${IPSET_NAME}" src -j DROP
+fi
+
+echo "AbuseIPDB blocklist loaded: ${COUNT} IPs blocked for 24h"
+rm -f "${BLOCKLIST}"
