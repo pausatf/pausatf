@@ -49,37 +49,4 @@ wordpress_installs:
 # WordPress authorized users for dev
 # These accounts exist on dev and are authorized.
 # Dev mirrors production admin accounts managed by Cynci.
-wp_users:
-  - id: 1
-    username: "thomasvincent"
-    roles: "administrator"
-  - id: 3
-    username: "REDACTED_EMAIL"
-    roles: "administrator"
-  - id: 6
-    username: "jeffteeters"
-    roles: "administrator"
-  - id: 10
-    username: "lesong"
-    roles: "administrator"
-  - id: 15
-    username: "daveshrock"
-    roles: "administrator"
-  - id: 17
-    username: "johnlilygren"
-    roles: "administrator"
-  - id: 18
-    username: "ngoldman"
-    roles: "administrator"
-  - id: 20
-    username: "seandulany"
-    roles: "administrator"
-  - id: 22
-    username: "tombernhard"
-    roles: "administrator"
-  - id: 30
-    username: "PAcharlotte"
-    roles: "administrator"
-  - id: 40
-    username: "lisar"
-    roles: "administrator"
+# wp_users: stored in GitHub Secret WP_USERS

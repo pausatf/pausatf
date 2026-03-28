@@ -19,9 +19,9 @@ digitalocean_vcpus: 4
 digitalocean_memory_mb: 8192
 digitalocean_disk_gb: 160
 digitalocean_image: "pausatf.org 2023-05-16"
-digitalocean_public_ip: "REDACTED_PROD_NEW_IP"
-digitalocean_private_ip: "REDACTED_PRIVATE_IP"
-digitalocean_vpc_uuid: "REDACTED_VPC_UUID"
+digitalocean_public_ip: "{{ vault_prod_new_server_ip }}"
+digitalocean_private_ip: "{{ vault_do_private_ip }}"
+digitalocean_vpc_uuid: "{{ vault_do_vpc_uuid }}"
 digitalocean_features:
   - backups
   - droplet_agent
@@ -39,23 +39,23 @@ digitalocean_tags:
 cloudflare_dns_records:
   - name: "@"
     type: "A"
-    content: "REDACTED_PROD_NEW_IP"
+    content: "{{ vault_prod_new_server_ip }}"
     proxied: true
   - name: "www"
     type: "A"
-    content: "REDACTED_PROD_NEW_IP"
+    content: "{{ vault_prod_new_server_ip }}"
     proxied: true
   - name: "ftp"
     type: "A"
-    content: "REDACTED_PROD_NEW_IP"
+    content: "{{ vault_prod_new_server_ip }}"
     proxied: false
   - name: "mail"
     type: "A"
-    content: "REDACTED_PROD_NEW_IP"
+    content: "{{ vault_prod_new_server_ip }}"
     proxied: false
   - name: "monitor"
     type: "A"
-    content: "REDACTED_PROD_NEW_IP"
+    content: "{{ vault_prod_new_server_ip }}"
     proxied: false
 
 # =============================================================================
