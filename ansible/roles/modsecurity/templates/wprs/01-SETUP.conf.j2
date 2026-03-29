@@ -1,0 +1,23 @@
+# WPRS Configuration
+# Managed by Ansible - Do not edit manually
+
+# Real client IP (behind Cloudflare, remoteip handles this)
+SecAction "phase:1,id:22000000,nolog,pass,t:none,setvar:tx.wprs_client_ip=%{REMOTE_ADDR}"
+
+# Brute force mitigation
+SecAction "id:22000004,phase:1,nolog,pass,t:none,setvar:tx.wprs_check_bruteforce={{ wprs_check_bruteforce | default(1) }}"
+SecAction "id:22000005,phase:1,nolog,pass,t:none,setvar:tx.wprs_bruteforce_timespan={{ wprs_bruteforce_timespan | default(120) }}"
+SecAction "id:22000010,phase:1,nolog,pass,t:none,setvar:tx.wprs_bruteforce_threshold={{ wprs_bruteforce_threshold | default(5) }}"
+SecAction "id:22000015,phase:1,nolog,pass,t:none,setvar:tx.wprs_bruteforce_banperiod={{ wprs_bruteforce_banperiod | default(600) }}"
+
+# Log authentication events
+SecAction "id:22000020,phase:1,nolog,pass,t:none,setvar:tx.wprs_log_authentications={{ wprs_log_authentications | default(1) }}"
+
+# xmlrpc access (1=allow, 0=block; Jetpack needs it, Apache-level protection handles non-Jetpack)
+SecAction "id:22000025,phase:1,nolog,pass,t:none,setvar:tx.wprs_allow_xmlrpc={{ wprs_allow_xmlrpc | default(1) }}"
+
+# User enumeration (0=block, 1=allow)
+SecAction "id:22000030,phase:1,nolog,pass,t:none,setvar:tx.wprs_allow_user_enumeration={{ wprs_allow_user_enumeration | default(0) }}"
+
+# DoS protection
+SecAction "id:22000035,phase:1,nolog,pass,t:none,setvar:tx.wprs_check_dos={{ wprs_check_dos | default(1) }}"
