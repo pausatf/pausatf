@@ -56,6 +56,29 @@
     mode: "0644"
   notify: Reload Apache
 
+- name: Deploy WPRS setup configuration
+  ansible.builtin.template:
+    src: wprs/01-SETUP.conf.j2
+    dest: /etc/modsecurity/crs/wprs-01-SETUP.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload Apache
+
+- name: Deploy WPRS rule files
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "/etc/modsecurity/crs/wprs-{{ item | basename }}"
+    owner: root
+    group: root
+    mode: "0644"
+  loop:
+    - wprs/02-INITIALIZATION.conf
+    - wprs/03-BRUTEFORCE.conf
+    - wprs/04-EVENTS.conf
+    - wprs/05-HARDENING.conf
+  notify: Reload Apache
+
 - name: Ensure ModSecurity audit log exists
   ansible.builtin.file:
     path: "{{ modsecurity_audit_log }}"

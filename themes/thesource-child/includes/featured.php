@@ -12,7 +12,7 @@
 	else {
 		global $pages_number;
 
-		if (get_option('thesource_feat_pages') <> '') $featured_num = count(get_option('thesource_feat_pages'));
+		if (get_option('thesource_feat_pages') != '') $featured_num = count(get_option('thesource_feat_pages'));
 		else $featured_num = $pages_number;
 
 		$et_featured_pages_args = array(

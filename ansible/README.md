@@ -19,8 +19,8 @@ Comprehensive Ansible playbooks and roles for managing PAUSATF WordPress infrast
 |-----------|------------|---------|-------------|
 | **Provider** | DigitalOcean | DigitalOcean | Local Docker |
 | **Hostname** | ftp.pausatf.org | stage.pausatf.org | dev.pausatf.org |
-| **IP Address** | REDACTED_PROD_NEW_IP | REDACTED_STAGE_IP | localhost |
-| **Droplet ID** | REDACTED_DROPLET_ID | REDACTED_DROPLET_ID | N/A |
+| **IP Address** | (GitHub Secret) | (GitHub Secret) | localhost |
+| **Droplet ID** | (GitHub Secret) | (GitHub Secret) | N/A |
 | **Size** | 8GB / 4 vCPU | 4GB / 2 vCPU | N/A |
 | **Web Server** | Apache 2.4 | OpenLiteSpeed 1.8 | OpenLiteSpeed |
 | **PHP** | 7.4 | 8.4 | 8.4 |
@@ -70,6 +70,32 @@ pausatf-dev:
   wordpress_path: /var/www/html
   web_server: openlitespeed
   php_version: "8.4"
+```
+
+## Required GitHub Secrets
+
+Server IPs and sensitive configuration are stored as GitHub Secrets and must be
+set as environment variables before running playbooks locally.
+
+| Secret | Description |
+|--------|-------------|
+| `PROD_SERVER_IP` | Production droplet public IP |
+| `DEV_SERVER_IP` | Development droplet public IP |
+| `STAGE_SERVER_IP` | Staging droplet public IP |
+| `PROD_NEW_SERVER_IP` | Migration target droplet IP |
+| `DO_VPC_UUID` | DigitalOcean VPC UUID |
+| `DO_PRIVATE_IP` | Droplet private/VPC IP |
+| `ALLOWED_SSH_NETWORKS` | JSON array of SSH allowlist CIDRs |
+| `FAIL2BAN_IGNOREIP` | Space-separated admin IPs for fail2ban |
+| `WP_ADMIN_EMAIL` | WordPress admin email address |
+| `SENDGRID_SUBDOMAIN` | SendGrid sending subdomain |
+
+For local runs, export these from your environment or pass via `--extra-vars`:
+
+```bash
+export PROD_SERVER_IP="<ip>"
+export DEV_SERVER_IP="<ip>"
+export STAGE_SERVER_IP="<ip>"
 ```
 
 ## Quick Start
@@ -163,7 +189,7 @@ ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook \
   - 6 users never logged in
   - 6 users inactive (last login >1 year ago)
   - 15 users active (logged in within last year)
-- Site: https://www.pausatf.org (admin: REDACTED_EMAIL)
+- Site: https://www.pausatf.org
 - Permalink structure: /%postname%/ (pretty permalinks)
 - 123 rewrite rules configured
 

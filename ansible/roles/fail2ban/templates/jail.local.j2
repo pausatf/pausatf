@@ -5,7 +5,7 @@
 bantime = {{ fail2ban_bantime }}
 findtime = {{ fail2ban_findtime }}
 maxretry = {{ fail2ban_maxretry }}
-ignoreip = 127.0.0.1/8 ::1
+ignoreip = 127.0.0.1/8 ::1 {{ fail2ban_ignoreip | default('') }}
 
 # Email notifications
 destemail = {{ fail2ban_destemail }}
@@ -19,6 +19,10 @@ port = ssh
 filter = sshd
 logpath = /var/log/auth.log
 maxretry = 3
+{% if fail2ban_abuseipdb_enabled and fail2ban_abuseipdb_apikey %}
+action = %(action_)s
+         abuseipdb[abuseipdb_apikey="{{ fail2ban_abuseipdb_apikey }}", abuseipdb_category="18,22"]
+{% endif %}
 
 [apache-auth]
 enabled = {{ 'true' if web_server | default('apache') == 'apache' else 'false' }}
@@ -26,6 +30,10 @@ port = http,https
 filter = apache-auth
 logpath = /var/log/apache2/*error.log
 maxretry = 6
+{% if fail2ban_abuseipdb_enabled and fail2ban_abuseipdb_apikey %}
+action = %(action_)s
+         abuseipdb[abuseipdb_apikey="{{ fail2ban_abuseipdb_apikey }}", abuseipdb_category="18,21"]
+{% endif %}
 
 [apache-badbots]
 enabled = {{ 'true' if web_server | default('apache') == 'apache' else 'false' }}
@@ -33,6 +41,10 @@ port = http,https
 filter = apache-badbots
 logpath = /var/log/apache2/*access.log
 maxretry = 2
+{% if fail2ban_abuseipdb_enabled and fail2ban_abuseipdb_apikey %}
+action = %(action_)s
+         abuseipdb[abuseipdb_apikey="{{ fail2ban_abuseipdb_apikey }}", abuseipdb_category="19,21"]
+{% endif %}
 
 [apache-noscript]
 enabled = {{ 'true' if web_server | default('apache') == 'apache' else 'false' }}
@@ -59,30 +71,50 @@ maxretry = 6
 enabled = true
 port = http,https
 filter = wordpress-auth
-logpath = /var/log/auth.log
-maxretry = 5
-bantime = 3600
+logpath = /var/log/syslog
+maxretry = 3
+findtime = 300
+bantime = 7200
+{% if fail2ban_abuseipdb_enabled and fail2ban_abuseipdb_apikey %}
+action = %(action_)s
+         abuseipdb[abuseipdb_apikey="{{ fail2ban_abuseipdb_apikey }}", abuseipdb_category="18,21"]
+{% endif %}
 
 [wordpress-enum]
 enabled = true
 port = http,https
 filter = wordpress-enum
-logpath = /var/log/apache2/pausatf-main-ssl-access.log
-maxretry = 1
-bantime = 86400
+logpath = /var/log/syslog
+maxretry = 2
+findtime = 300
+bantime = 7200
+{% if fail2ban_abuseipdb_enabled and fail2ban_abuseipdb_apikey %}
+action = %(action_)s
+         abuseipdb[abuseipdb_apikey="{{ fail2ban_abuseipdb_apikey }}", abuseipdb_category="18,21"]
+{% endif %}
 
 [wordpress-hard]
 enabled = true
 port = http,https
-filter = wordpress-auth
-logpath = /var/log/auth.log
-maxretry = 2
+filter = wordpress-hard
+logpath = /var/log/syslog
+maxretry = 1
+findtime = 300
 bantime = 86400
+{% if fail2ban_abuseipdb_enabled and fail2ban_abuseipdb_apikey %}
+action = %(action_)s
+         abuseipdb[abuseipdb_apikey="{{ fail2ban_abuseipdb_apikey }}", abuseipdb_category="18,21"]
+{% endif %}
 
 [wordpress-soft]
 enabled = true
 port = http,https
-filter = wordpress-auth
-logpath = /var/log/auth.log
+filter = wordpress-soft
+logpath = /var/log/syslog
 maxretry = 5
+findtime = 600
 bantime = 3600
+{% if fail2ban_abuseipdb_enabled and fail2ban_abuseipdb_apikey %}
+action = %(action_)s
+         abuseipdb[abuseipdb_apikey="{{ fail2ban_abuseipdb_apikey }}", abuseipdb_category="18,21"]
+{% endif %}

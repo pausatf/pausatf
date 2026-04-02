@@ -48,6 +48,37 @@
     append: true
     create_home: true
 
+- name: Create admin users
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    shell: /bin/bash
+    groups: "{{ item.groups }}"
+    append: true
+    create_home: true
+  loop:
+    - { name: "somethingwithproof", groups: "sudo,www-data" }
+    - { name: "jteeters", groups: "sudo,www-data" }
+
+- name: Configure admin SSH authorized keys from GitHub
+  ansible.posix.authorized_key:
+    user: "{{ item.name }}"
+    key: "https://github.com/{{ item.github }}.keys"
+    state: present
+  loop:
+    - { name: "somethingwithproof", github: "somethingwithproof" }
+    - { name: "jteeters", github: "jeffteeters" }
+  ignore_errors: true
+
+- name: Configure passwordless sudo for admin users
+  ansible.builtin.copy:
+    content: "{{ item }} ALL=(ALL:ALL) NOPASSWD: ALL"  # pragma: allowlist secret
+    dest: "/etc/sudoers.d/{{ item }}"
+    mode: "0440"
+    validate: "/usr/sbin/visudo -cf %s"
+  loop:
+    - somethingwithproof
+    - jteeters
+
 - name: Configure SSH
   ansible.builtin.include_tasks: ssh.yml
 

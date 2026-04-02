@@ -16,7 +16,7 @@
 	$thumbnail = get_thumbnail($width,$height,$classtext,$titletext,$titletext);
 	$thumb = $thumbnail["thumb"]; ?>
 
-<?php if ($thumb <> '') print_thumbnail($thumb, $thumbnail["use_timthumb"], $titletext , $width, $height, $classtext); ?>
+<?php if ($thumb != '') print_thumbnail($thumb, $thumbnail["use_timthumb"], $titletext , $width, $height, $classtext); ?>
 
 <div class="entry <?php echo($headingColor); ?>"<?php if ($thumb == '') echo(' style="padding-top: 70px;"'); ?>>
 	<div class="title"<?php if ($thumb == '') echo(' style="top: 13px;"'); ?>>

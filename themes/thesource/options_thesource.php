@@ -13,7 +13,7 @@ $pages_ids = array();
 $cats_ids = array();
 
 foreach ($pages_array as $pagg) {
-	$site_pages[$pagg->ID] = htmlspecialchars($pagg->post_title);
+	$site_pages[$pagg->ID] = htmlspecialchars($pagg->post_title, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 	$pages_ids[] = $pagg->ID;
 }
 

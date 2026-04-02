@@ -38,7 +38,7 @@ $et_ptemplate_blog_perpage = isset( $et_ptemplate_settings['et_ptemplate_blog_pe
 
 <?php get_header(); ?>
 
-	<?php if (get_option('thesource_integration_single_top') <> '' && get_option('thesource_integrate_singletop_enable') == 'on') echo(get_option('thesource_integration_single_top')); ?>
+	<?php if (get_option('thesource_integration_single_top') != '' && get_option('thesource_integrate_singletop_enable') == 'on') echo(get_option('thesource_integration_single_top')); ?>
 
 
 
@@ -80,7 +80,7 @@ $et_ptemplate_blog_perpage = isset( $et_ptemplate_settings['et_ptemplate_blog_pe
 
 
 
-						<?php if($thumb <> '' && get_option('thesource_page_thumbnails') == 'on') { ?>
+						<?php if($thumb != '' && get_option('thesource_page_thumbnails') == 'on') { ?>
 
 							<?php print_thumbnail($thumb, $thumbnail["use_timthumb"], $titletext , $width, $height, $classtext); ?>
 
@@ -144,7 +144,7 @@ $et_ptemplate_blog_perpage = isset( $et_ptemplate_settings['et_ptemplate_blog_pe
 
 
 
-									<?php if ( $thumb <> '' && !$et_ptemplate_showthumb ) { ?>
+									<?php if ( $thumb != '' && !$et_ptemplate_showthumb ) { ?>
 
 										<div class="et_pt_thumb alignleft">
 

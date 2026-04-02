@@ -1,0 +1,40 @@
+#!/bin/bash
+# Managed by Ansible - Do not edit manually
+set -euo pipefail
+
+IPSET_NAME="firehol-level1"
+BLOCKLIST_DIR="/etc/firehol"
+BLOCKLIST="${BLOCKLIST_DIR}/firehol_level1.netset"
+
+mkdir -p "${BLOCKLIST_DIR}"
+
+curl -sSf "https://iplists.firehol.org/files/firehol_level1.netset" \
+    | grep -v "^#" \
+    | grep -v "^$" \
+    | grep -vE "^(0\.0\.0\.0/8|10\.|127\.|172\.(1[6-9]|2[0-9]|3[01])\.|192\.168\.|100\.64\.|169\.254\.|198\.18\.)" \
+    > "${BLOCKLIST}.tmp"
+
+if [ ! -s "${BLOCKLIST}.tmp" ]; then
+    echo "Empty blocklist, skipping"
+    rm -f "${BLOCKLIST}.tmp"
+    exit 0
+fi
+
+mv "${BLOCKLIST}.tmp" "${BLOCKLIST}"
+COUNT=$(wc -l < "${BLOCKLIST}")
+echo "Fetched ${COUNT} networks from Firehol Level 1"
+
+if ! ipset list "${IPSET_NAME}" > /dev/null 2>&1; then
+    ipset create "${IPSET_NAME}" hash:net hashsize 4096 maxelem 65536
+fi
+ipset flush "${IPSET_NAME}"
+
+while IFS= read -r net; do
+    ipset -exist add "${IPSET_NAME}" "${net}" 2>/dev/null || true
+done < "${BLOCKLIST}"
+
+if ! iptables -C INPUT -m set --match-set "${IPSET_NAME}" src -j DROP 2>/dev/null; then
+    iptables -I INPUT 1 -m set --match-set "${IPSET_NAME}" src -j DROP
+fi
+
+echo "Firehol Level 1 loaded: ${COUNT} networks blocked"

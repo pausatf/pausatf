@@ -14,7 +14,7 @@ Theme Name: TheSource-child
 
 
 
-Theme URI: https://pausatf.org
+Theme URI: https: //pausatf.org
 
 
 
@@ -54,7 +54,7 @@ Template: TheSource
 
 
 
-Version: 0.2
+Version: 0.3-php8
 
 
 
@@ -1428,7 +1428,7 @@ padding-left:14px; padding-right:14px; text-shadow:1px 1px 1px #111111;}
 
 
 
-							.entry-content { position: relative; font-color:000000; }
+							.entry-content { position: relative; color: #000000; }
 
 
 
@@ -1692,7 +1692,7 @@ line-height:58px; padding-left:34px; position:absolute; top:0; width:603px; font
 
 
 
-						.nav li ul {box-shadow: 3px 6px 7px 1px rgba(0, 0, 0, 0.5); -moz-box-shadow:3px 6px 7px 1px rgba(0, 0, 0, 0.5); -webkit-box-shadow: 3px 6px 7px 1px rgba(0, 0, 0, 0.5); background: url(images/cat_menu_bg.png) repeat-y; border: 1px solid #111010; -moz-border-radius: 8px; -webkit-border-radius: 8px; -moz-border-radius-topleft: 0px; -webkit-border-top-left-radius: 0px; border-top: none; padding-bottom: 15px; }
+						.nav li ul {box-shadow: 3px 6px 7px 1px rgba(0, 0, 0, 0.5); background: url(images/cat_menu_bg.png) repeat-y; border: 1px solid #111010; border-top: none; padding-bottom: 15px; }
 
 
 
@@ -1812,7 +1812,7 @@ line-height:58px; padding-left:34px; position:absolute; top:0; width:603px; font
 
 
 
-							#cat-nav-content ul.nav ul ul { border-top: 1px solid #111010; -moz-border-radius-topleft: 8px; -webkit-border-top-left-radius: 8px; }
+							#cat-nav-content ul.nav ul ul { border-top: 1px solid #111010; }
 
 
 
@@ -2012,7 +2012,7 @@ line-height:58px; padding-left:34px; position:absolute; top:0; width:603px; font
 
 
 
-				#page-menu ul.nav ul ul { -moz-border-radius-topleft: 8px; -webkit-border-top-left-radius: 8px; }
+				#page-menu ul.nav ul ul { }
 
 
 
@@ -4204,7 +4204,17 @@ display:none;
 
 
 
-.entry h1.title {display:none}
+.entry h1.title {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
 
 
 
@@ -4274,7 +4284,232 @@ display:none;
 
 #recent-posts .entry p.date {display: none;}
 
-/* Social media icon links in header nav bar */
-.social-icon-link { display: inline-block; }
-.social-icon-link svg { width: 28px; height: 28px; fill: #888; transition: fill 0.2s; vertical-align: middle; }
-.social-icon-link:hover svg { fill: #555; }
+
+
+/* ======================================
+   Responsive overrides for mobile
+   ====================================== */
+
+/* Tablet and below */
+@media screen and (max-width: 980px) {
+    div.container,
+    #cat-nav {
+        width: 100% !important;
+        max-width: 960px;
+        box-sizing: border-box;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    #header-top {
+        height: auto !important;
+        padding-bottom: 10px;
+    }
+
+    img#logo {
+        max-width: 200px;
+        height: auto;
+    }
+
+    #page-menu {
+        position: relative !important;
+        top: auto !important;
+        right: auto !important;
+        clear: both;
+    }
+
+    #cat-nav {
+        position: relative !important;
+        bottom: auto !important;
+    }
+
+    #cat-nav-content {
+        width: 100% !important;
+        overflow-x: auto;
+    }
+
+    #cat-nav-left,
+    #cat-nav-right,
+    #p-menu-left,
+    #p-menu-right {
+        display: none !important;
+    }
+
+    #main-content {
+        background-image: none !important;
+    }
+
+    #recent-posts,
+    body#home #recent-posts {
+        width: 100% !important;
+        float: none !important;
+    }
+
+    #sidebar,
+    body#home #sidebar {
+        float: none !important;
+        width: 100% !important;
+        margin-top: 20px !important;
+    }
+
+    #sidebar div.widget,
+    body#home #sidebar div.widget {
+        width: 48% !important;
+        box-sizing: border-box;
+    }
+
+    #recent-posts .entry .post-meta,
+    body#home #recent-posts .entry .post-meta {
+        width: 100% !important;
+        margin-left: 0 !important;
+    }
+
+    #recent-posts .entry .post-meta p,
+    body#home #recent-posts .entry .post-meta p {
+        width: auto !important;
+    }
+
+    .entry-content img,
+    #recent-posts img {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+
+    #footer .footer-widget {
+        width: 48% !important;
+        float: left !important;
+        box-sizing: border-box;
+    }
+
+    #footer-bottom .bottom-nav {
+        text-align: center;
+    }
+
+    #footer-bottom .bottom-nav li {
+        display: inline-block;
+        float: none !important;
+    }
+
+    table,
+    .tablepress {
+        display: block;
+        overflow-x: auto;
+    }
+}
+
+/* Phone */
+@media screen and (max-width: 600px) {
+    div.container {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    img#logo {
+        float: none !important;
+        display: block;
+        margin: 10px auto !important;
+        max-width: 180px;
+    }
+
+    #slogan {
+        float: none !important;
+        text-align: center;
+        padding: 5px 0 !important;
+    }
+
+    #cat-nav-content ul.nav {
+        margin-left: 0 !important;
+    }
+
+    #cat-nav-content ul.nav > li {
+        padding: 0 8px 0 0 !important;
+    }
+
+    #cat-nav-content ul.nav li a {
+        font-size: 11px !important;
+        padding: 8px 2px 21px !important;
+    }
+
+    #sidebar div.widget,
+    body#home #sidebar div.widget {
+        width: 100% !important;
+        float: none !important;
+    }
+
+    #sidebar #onecol .widget {
+        width: 100% !important;
+    }
+
+    #footer .footer-widget {
+        width: 100% !important;
+        float: none !important;
+    }
+
+    #recent-posts .entry {
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+    }
+
+    #breadcrumbs {
+        position: relative !important;
+        width: 100% !important;
+        box-sizing: border-box;
+    }
+
+    iframe {
+        max-width: 100% !important;
+    }
+}
+
+/* Hide breadcrumb on front page */
+body.home #breadcrumbs,
+body.page-template-default.home #breadcrumbs {
+    display: none !important;
+}
+
+/* Mobile performance: defer rendering of below-fold content */
+@media screen and (max-width: 980px) {
+    #sidebar,
+    #footer,
+    #footer-bottom {
+        content-visibility: auto;
+        contain-intrinsic-size: auto 500px;
+    }
+}
+
+/* Screen reader text - accessible but visually hidden */
+.screen-reader-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Touch targets: minimum 48px for mobile accessibility */
+@media screen and (max-width: 980px) {
+    ul.nav li a,
+    ul.bottom-nav li a,
+    #cat-nav-content ul.nav li a {
+        min-height: 48px;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    #footer-bottom .bottom-nav li {
+        padding: 8px 12px;
+    }
+}
+
+/* Prevent CLS: reserve space for key layout elements */
+#header-top {
+    min-height: 150px;
+}
+
+#cat-nav {
+    min-height: 64px;
+}

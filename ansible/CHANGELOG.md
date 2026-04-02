@@ -48,7 +48,6 @@ and this project adheres to semantic versioning.
 
 ### Production Server
 - Hostname: pausatf-prod
-- IP: REDACTED_PROD_NEW_IP
 - OS: Ubuntu 20.04 LTS
 - Web Server: Apache 2.4
 - PHP: 7.4 (with 8.1, 8.4 available)
@@ -57,7 +56,6 @@ and this project adheres to semantic versioning.
 
 ### Staging Server
 - Hostname: pausatf-stage
-- IP: REDACTED_STAGE_IP
 - OS: Ubuntu 20.04 LTS
 - Web Server: OpenLiteSpeed 1.8.3
 - PHP: 8.4

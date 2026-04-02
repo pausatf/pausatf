@@ -48,6 +48,43 @@ cloudflare_always_use_https: true
 cloudflare_security_level: "medium"
 cloudflare_waf_enabled: true
 
+# Cloudflare IP ranges (auto-refreshable from cloudflare.com/ips-v4 and ips-v6)
+cloudflare_ipv4_ranges:
+  - "103.21.244.0/22"
+  - "103.22.200.0/22"
+  - "103.31.4.0/22"
+  - "104.16.0.0/13"
+  - "104.24.0.0/14"
+  - "108.162.192.0/18"
+  - "131.0.72.0/22"
+  - "141.101.64.0/18"
+  - "162.158.0.0/15"
+  - "172.64.0.0/13"
+  - "173.245.48.0/20"
+  - "188.114.96.0/20"
+  - "190.93.240.0/20"
+  - "197.234.240.0/22"
+  - "198.41.128.0/17"
+cloudflare_ipv6_ranges:
+  - "2400:cb00::/32"
+  - "2606:4700::/32"
+  - "2803:f800::/32"
+  - "2405:b500::/32"
+  - "2405:8100::/32"
+  - "2a06:98c0::/29"
+  - "2c0f:f248::/32"
+
+# Jetpack/Automattic IP ranges (from jetpack.com/ips-v4.txt)
+jetpack_ip_ranges:
+  - "192.0.64.0/18"
+  - "192.0.80.0/20"
+  - "192.0.96.0/20"
+  - "192.0.112.0/20"
+  - "195.234.108.0/22"
+  - "122.248.245.244/32"
+  - "54.217.201.243/32"
+  - "54.232.116.4/32"
+
 # Cloudflare Caching Settings
 cloudflare_cache_level: "aggressive"
 cloudflare_browser_cache_ttl: 0
@@ -315,20 +352,22 @@ fail2ban_jails:
   - name: wordpress-enum
     enabled: true
 
+# AbuseIPDB integration (report bans + pull shared blocklist)
+fail2ban_abuseipdb_enabled: true
+fail2ban_abuseipdb_apikey: "{{ vault_abuseipdb_apikey | default('') }}"
+fail2ban_abuseipdb_confidence: 90
+
+# Firehol Level 1 blocklist (high-confidence malicious networks)
+fail2ban_firehol_enabled: true
+
 # UFW Firewall
 ufw_enabled: true
-# SSH allowlist. Explicit IPs only; no broad ISP ranges.
-# Mirrors terraform/stacks/wordpress/main.tf (local.ssh_cidrs).
-# Updated: 2026-03-18.
-allowed_ssh_networks:
-  # DigitalOcean internal / VPC
-  - "100.128.0.0/9"
-  # Tailscale CGNAT range
-  - "100.64.0.0/10"
-  # Admin static IP
-  - "REDACTED_ADMIN_IP/32"
-  # Jeff Teeters (UC Berkeley campus)
-  - "136.152.0.0/16"
+# SSH allowlist sourced from GitHub Secret: ALLOWED_SSH_NETWORKS
+# Override via --extra-vars or CI environment.
+allowed_ssh_networks: "{{ vault_allowed_ssh_networks | default([]) }}"
+
+# Fail2ban ignoreip sourced from GitHub Secret: FAIL2BAN_IGNOREIP
+fail2ban_ignoreip: "{{ vault_fail2ban_ignoreip | default('') }}"
 ufw_allowed_ports:
   - "22/tcp"
   - "80/tcp"
@@ -384,7 +423,7 @@ email_mx_records:
 
 # SendGrid for transactional email
 sendgrid_enabled: true
-sendgrid_subdomain: "REDACTED_SENDGRID"
+sendgrid_subdomain: "{{ vault_sendgrid_subdomain | default('') }}"
 
 # =============================================================================
 # ADDITIONAL SERVICES

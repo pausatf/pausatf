@@ -1,0 +1,6 @@
+---
+postfix_enabled: true
+postfix_hostname: "pausatf.org"
+postfix_domain: "pausatf.org"
+postfix_dkim_enabled: true
+postfix_dkim_selector: "mail"

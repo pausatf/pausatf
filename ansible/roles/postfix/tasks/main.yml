@@ -1,0 +1,46 @@
+---
+- name: Install postfix and opendkim
+  ansible.builtin.apt:
+    name:
+      - postfix
+      - opendkim
+      - opendkim-tools
+      - mailutils
+    state: present
+    update_cache: true
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+
+- name: Configure postfix
+  ansible.builtin.template:
+    src: main.cf.j2
+    dest: /etc/postfix/main.cf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart postfix
+
+- name: Set mailname
+  ansible.builtin.copy:
+    content: "{{ postfix_domain }}"
+    dest: /etc/mailname
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Include DKIM tasks
+  ansible.builtin.include_tasks: dkim.yml
+  when: postfix_dkim_enabled
+
+- name: Add postfix to opendkim group
+  ansible.builtin.user:
+    name: postfix
+    groups: opendkim
+    append: true
+  when: postfix_dkim_enabled
+
+- name: Enable and start postfix
+  ansible.builtin.systemd:
+    name: postfix
+    enabled: true
+    state: started

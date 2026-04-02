@@ -2,3 +2,14 @@
 fail2ban_maxretry: 5
 fail2ban_bantime: 3600
 fail2ban_findtime: 600
+fail2ban_destemail: "admin@pausatf.org"
+fail2ban_sendername: "Fail2Ban"
+fail2ban_mta: "sendmail"
+
+# AbuseIPDB integration (report bans + pull blocklist)
+fail2ban_abuseipdb_enabled: true
+fail2ban_abuseipdb_apikey: ""
+fail2ban_abuseipdb_confidence: 90
+
+# Firehol blocklist
+fail2ban_firehol_enabled: true

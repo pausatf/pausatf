@@ -1,0 +1,9 @@
+# Use real client IP from Cloudflare CF-Connecting-IP header
+# Managed by Ansible - Do not edit manually
+RemoteIPHeader CF-Connecting-IP
+{% for cidr in cloudflare_ipv4_ranges %}
+RemoteIPTrustedProxy {{ cidr }}
+{% endfor %}
+{% for cidr in cloudflare_ipv6_ranges %}
+RemoteIPTrustedProxy {{ cidr }}
+{% endfor %}

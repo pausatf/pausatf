@@ -1,13 +1,13 @@
 ---
 # Sync WordPress content from old production to new production
-# Run: ansible-playbook playbooks/sync-content.yml -e source_host=REDACTED_PROD_NEW_IP
+# Run: ansible-playbook playbooks/sync-content.yml -e source_host=$PROD_SERVER_IP
 - name: Sync content to new production
   hosts: production_new
   gather_facts: true
   become: true
 
   vars:
-    source_host: "{{ old_prod_ip | default('REDACTED_PROD_NEW_IP') }}"
+    source_host: "{{ old_prod_ip | default(lookup('env', 'PROD_SERVER_IP')) }}"
     source_user: "root"
     sync_paths:
       - src: /var/www/html/wp-content/uploads/

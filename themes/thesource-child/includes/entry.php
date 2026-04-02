@@ -12,7 +12,7 @@
 		<h2 class="title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h2>
 
 		<div class="entry-content clearfix">
-			<?php if ($thumb <> '' && get_option('thesource_thumbnails_index') == 'on') { ?>
+			<?php if ($thumb != '' && get_option('thesource_thumbnails_index') == 'on') { ?>
 				<a href="<?php the_permalink(); ?>">
 					<?php print_thumbnail($thumb, $thumbnail["use_timthumb"], $titletext , $width, $height, $classtext); ?>
 				</a>

@@ -4,8 +4,8 @@ all:
     production:
       hosts:
         pausatf-prod:
-          ansible_host: REDACTED_PROD_NEW_IP
-          ansible_user: root
+          ansible_host: "{{ lookup('env', 'PROD_SERVER_IP') }}"
+          ansible_user: somethingwithproof
           environment: production
           server_role: web
           wordpress_enabled: true
@@ -15,8 +15,8 @@ all:
     staging:
       hosts:
         pausatf-stage:
-          ansible_host: REDACTED_STAGE_IP
-          ansible_user: root
+          ansible_host: "{{ lookup('env', 'STAGE_SERVER_IP') }}"
+          ansible_user: somethingwithproof
           environment: staging
           server_role: web
           wordpress_enabled: true

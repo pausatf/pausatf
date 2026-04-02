@@ -17,7 +17,7 @@
 		et_search_bar();
 		et_footer_improvements('#footer .footer-widget');
 
-		<!---- et_switcher plugin v1.3 ---->
+		// et_switcher plugin v1.3
 		(function($)
 		{
 			$.fn.et_switcher = function(options)
@@ -118,7 +118,7 @@
 		var $featuredArea = jQuery('#featured'),
 			$all_tabs = jQuery('#all_tabs');
 
-		jQuery(window).load( function(){
+		jQuery(window).on("load", function(){
 			if ($featuredArea.length) {
 				$featuredArea.addClass('et_slider_loaded').et_switcher({
 					useArrows: true <?php if (get_option($shortname.'_slider_auto') == 'on') { ?>,
@@ -141,7 +141,7 @@
 
 		<?php if (get_option($shortname.'_disable_toptier') == 'on') echo('jQuery("ul.nav > li > ul").prev("a").attr("href","#");'); ?>
 
-		<!---- Footer Improvements ---->
+		// Footer Improvements
 		function et_footer_improvements($selector){
 			var $footer_widget = jQuery($selector);
 
@@ -152,7 +152,7 @@
 			};
 		};
 
-		<!---- Search Bar Improvements ---->
+		// Search Bar Improvements
 		function et_search_bar(){
 			var $searchform = jQuery('#cat-nav div#search-form'),
 				$searchinput = $searchform.find("input#searchinput"),

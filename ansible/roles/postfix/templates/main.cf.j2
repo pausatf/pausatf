@@ -1,0 +1,31 @@
+# Postfix Configuration
+# Managed by Ansible - Do not edit manually
+
+smtpd_banner = $myhostname ESMTP
+biff = no
+append_dot_mydomain = no
+readme_directory = no
+compatibility_level = 3.6
+
+# TLS
+smtp_tls_security_level = may
+smtp_tls_CApath = /etc/ssl/certs
+
+# General
+myhostname = {{ postfix_hostname }}
+mydomain = {{ postfix_domain }}
+myorigin = /etc/mailname
+mydestination = localhost
+inet_interfaces = loopback-only
+inet_protocols = all
+mynetworks = 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+mailbox_size_limit = 0
+recipient_delimiter = +
+
+# DKIM milter
+{% if postfix_dkim_enabled %}
+milter_protocol = 6
+milter_default_action = accept
+smtpd_milters = unix:opendkim/opendkim.sock
+non_smtpd_milters = unix:opendkim/opendkim.sock
+{% endif %}
