@@ -1,0 +1,75 @@
+/**
+ * Legacy compatibility CSS for TheSource migration.
+ *
+ * Supports ePanel column shortcodes, old sidebar widget layout,
+ * and TheSource-specific class names that may appear in post content.
+ */
+
+/* ePanel column shortcode grid */
+.pausatf-col {
+	float: left;
+	box-sizing: border-box;
+	padding-right: 15px;
+	min-height: 1px;
+}
+
+.pausatf-col-last {
+	padding-right: 0;
+}
+
+/* Clearfix after shortcode rows */
+.pausatf-col-last::after {
+	content: '';
+	display: table;
+	clear: both;
+}
+
+/* Two-column sidebar widget layout from TheSource inner pages */
+#firstcol {
+	float: left;
+	width: 160px;
+}
+
+#secondcol {
+	float: left;
+	width: 162px;
+}
+
+/* TheSource .entry-content spacing for legacy post content */
+.entry-content {
+	line-height: 18px;
+}
+
+.entry-content p {
+	margin-bottom: 12px;
+}
+
+/* TheSource horizontal rule style */
+.entry-content hr {
+	border: none;
+	border-top: 1px solid #e0e0e0;
+	margin: 20px 0;
+}
+
+/* Preserve TheSource widget area styling */
+.widget {
+	margin-bottom: 20px;
+}
+
+.widget ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.widget ul li {
+	padding: 5px 0;
+	border-bottom: 1px dotted #e0e0e0;
+}
+
+/* TheSource .post class remnants in content */
+.post .post-meta {
+	color: #757474;
+	font-size: 11px;
+	margin-bottom: 10px;
+}

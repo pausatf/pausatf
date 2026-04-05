@@ -17,5 +17,6 @@
   <config name="testVersion" value="8.0-8.3"/>
 
   <arg name="extensions" value="php"/>
-  <arg value="-sp"/>
+  <arg value="s"/>
+  <arg value="p"/>
 </ruleset>

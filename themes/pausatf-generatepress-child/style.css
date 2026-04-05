@@ -1,0 +1,213 @@
+/*
+Theme Name: PAUSATF GeneratePress Child
+Template: generatepress
+Version: 1.0.0
+Description: Child theme for pausatf.org, migrated from TheSource-child.
+Author: PAUSATF
+Text Domain: pausatf-gp-child
+*/
+
+/* ==========================================================================
+   Visual Parity Overrides (TheSource match)
+   ========================================================================== */
+
+/* Container: match 960px fixed width from TheSource */
+.site-content .inside-article,
+.site-content .widget-area .inside-right-sidebar {
+	max-width: 960px;
+}
+
+/* Header: 150px tall, white background */
+.site-header {
+	background-color: #ffffff;
+	min-height: 150px;
+}
+
+/* Logo: match TheSource positioning */
+.site-header .header-image {
+	padding-top: 17px;
+	margin-left: 25px;
+}
+
+/* Tagline: Georgia italic, matching TheSource #slogan */
+.site-description {
+	font-family: Georgia, serif;
+	font-style: italic;
+	font-size: 14px;
+	color: #6e6e6e;
+}
+
+/* Primary nav: red bar matching #cat-nav */
+.main-navigation {
+	background-color: #b4282e;
+}
+
+.main-navigation .main-nav ul li a {
+	color: #ffffff;
+	font-weight: bold;
+}
+
+.main-navigation .main-nav ul li a:hover,
+.main-navigation .main-nav ul li.current-menu-item a {
+	background-color: #8d1a13;
+}
+
+/* Dropdown menus */
+.main-navigation .main-nav ul ul {
+	background-color: #ffffff;
+}
+
+.main-navigation .main-nav ul ul li a {
+	color: #383737;
+}
+
+.main-navigation .main-nav ul ul li a:hover {
+	background-color: #b4282e;
+	color: #ffffff;
+}
+
+/* Secondary nav: dark bar matching #page-menu */
+.secondary-navigation {
+	background-color: #232323;
+}
+
+.secondary-navigation .main-nav ul li a {
+	color: #ffffff;
+	font-weight: bold;
+	text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+}
+
+.secondary-navigation .main-nav ul ul {
+	background-color: #232323;
+}
+
+.secondary-navigation .main-nav ul ul li a {
+	color: #ffffff;
+}
+
+/* Body text */
+body {
+	font-family: Arial, Verdana, sans-serif;
+	font-size: 12px;
+	line-height: 21px;
+	color: #757474;
+	background-color: #ffffff;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+	font-family: Arial, sans-serif;
+	font-weight: 400;
+	letter-spacing: -1px;
+	color: #383737;
+}
+
+h1 { font-size: 30px; }
+h2 { font-size: 24px; }
+h3 { font-size: 20px; }
+h4 { font-size: 18px; }
+h5 { font-size: 16px; }
+
+/* Post title */
+.entry-title {
+	font-size: 36px;
+	font-weight: 700;
+}
+
+/* Links */
+a {
+	color: #b4282e;
+	text-decoration: none;
+}
+
+a:hover {
+	color: #8d1a13;
+}
+
+/* Sidebar */
+.widget-area {
+	width: 323px;
+}
+
+.widget-area .widget-title {
+	font-family: Georgia, serif;
+	font-style: italic;
+	font-size: 14px;
+	text-align: center;
+}
+
+/* Sidebar two-column inner layout */
+.widget-area #firstcol {
+	float: left;
+	width: 160px;
+}
+
+.widget-area #secondcol {
+	float: left;
+	width: 162px;
+}
+
+/* Footer */
+.site-footer {
+	background-color: #1c1c1c;
+	color: #757474;
+	font-size: 12px;
+}
+
+.pausatf-footer-nav ul {
+	list-style: none;
+	margin: 0;
+	padding: 10px 0;
+	text-align: center;
+}
+
+.pausatf-footer-nav ul li {
+	display: inline;
+	padding: 0 8px;
+	border-right: 1px solid #757474;
+}
+
+.pausatf-footer-nav ul li:last-child {
+	border-right: none;
+}
+
+.pausatf-footer-nav ul li a {
+	color: #ffffff;
+	text-decoration: none;
+	font-size: 12px;
+}
+
+.pausatf-footer-nav ul li a:hover {
+	color: #b4282e;
+}
+
+.pausatf-footer-credit {
+	text-align: center;
+	padding: 10px 0;
+	font-size: 11px;
+	color: #757474;
+}
+
+/* Breadcrumbs: Georgia italic, matching TheSource */
+.pausatf-breadcrumbs {
+	font-family: Georgia, serif;
+	font-style: italic;
+	font-size: 14px;
+	color: #6f6f6f;
+	padding: 10px 0;
+	margin-bottom: 15px;
+}
+
+.pausatf-breadcrumbs a {
+	color: #6f6f6f;
+	text-decoration: none;
+}
+
+.pausatf-breadcrumbs a:hover {
+	color: #b4282e;
+}
+
+/* Content area width match */
+.content-area {
+	width: 637px;
+}

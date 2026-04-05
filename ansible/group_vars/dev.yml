@@ -16,6 +16,7 @@ wordpress_installs:
     {{ wordpress_install_defaults | combine({
     'domain': 'dev.pausatf.org',
     'wp_version': 'latest',
+    'active_theme': 'pausatf-generatepress-child',
     'debug_mode': true,
     'db_password': vault_wp_dev_db_password
       | default(lookup('password',

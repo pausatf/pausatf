@@ -1,0 +1,66 @@
+/**
+ * Sport prefix label colors for the "Recent PA News" sidebar widget.
+ *
+ * These match the color-coded sport abbreviations used in TheSource sidebar:
+ * RR (Road Racing), XC (Cross Country), YOUTH, PA, etc.
+ * Content uses inline <font color="..."> tags in widget HTML.
+ * These classes provide a CSS-based alternative for future migration.
+ */
+
+.sport-label {
+	font-weight: bold;
+	font-size: 11px;
+	text-transform: uppercase;
+	margin-right: 4px;
+}
+
+.sport-label-rr,
+.sport-label-road-racing {
+	color: #cc0000;
+}
+
+.sport-label-xc,
+.sport-label-cross-country {
+	color: #006600;
+}
+
+.sport-label-youth {
+	color: #0000cc;
+}
+
+.sport-label-pa {
+	color: #b4282e;
+}
+
+.sport-label-tf,
+.sport-label-track-field {
+	color: #cc6600;
+}
+
+.sport-label-mut,
+.sport-label-trail {
+	color: #663300;
+}
+
+.sport-label-masters {
+	color: #660099;
+}
+
+.sport-label-rw,
+.sport-label-racewalk {
+	color: #009999;
+}
+
+.sport-label-para {
+	color: #336699;
+}
+
+.sport-label-officials {
+	color: #999900;
+}
+
+/* Preserve inline <font color="..."> tags from legacy widget HTML */
+.widget .custom-html-widget font[color] {
+	font-weight: bold;
+	font-size: 11px;
+}

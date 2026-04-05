@@ -200,6 +200,41 @@
     directory_mode: "0755"
   when: wp_site.active_theme | default('') == 'TheSource-child'
 
+- name: Install GeneratePress parent theme via WP-CLI
+  ansible.builtin.command: >
+    {{ wpcli_path | default('/usr/local/bin/wp') }}
+    theme install generatepress
+    --path={{ wp_site.path }}
+    --allow-root
+  register: gp_install
+  changed_when: "'installed successfully' in gp_install.stdout | lower"
+  failed_when: gp_install.rc != 0 and 'already installed' not in (gp_install.stderr | default(''))
+  when:
+    - wp_installed.rc == 0
+    - wp_site.active_theme | default('') == 'pausatf-generatepress-child'
+
+- name: Deploy GeneratePress child theme
+  ansible.builtin.copy:
+    src: pausatf-generatepress-child/
+    dest: "{{ wp_site.path }}/wp-content/themes/pausatf-generatepress-child/"
+    owner: www-data
+    group: www-data
+    mode: "0644"
+    directory_mode: "0755"
+  when: wp_site.active_theme | default('') == 'pausatf-generatepress-child'
+
+- name: Activate GeneratePress child theme
+  ansible.builtin.command: >
+    {{ wpcli_path | default('/usr/local/bin/wp') }}
+    theme activate pausatf-generatepress-child
+    --path={{ wp_site.path }}
+    --allow-root
+  register: gp_activate
+  changed_when: "'Success' in gp_activate.stdout"
+  when:
+    - wp_installed.rc == 0
+    - wp_site.active_theme | default('') == 'pausatf-generatepress-child'
+
 - name: Ensure fallback theme is installed
   ansible.builtin.command: "{{ wpcli_path | default('/usr/local/bin/wp') }} theme install twentytwentyfive --path={{ wp_site.path
     }} --allow-root"

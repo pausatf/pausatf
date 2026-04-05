@@ -1,0 +1,62 @@
+/**
+ * Google Calendar iframe embed responsive wrapper.
+ *
+ * The site uses Google Calendar iframes with 19 calendar feeds.
+ * This CSS ensures the iframe renders at the correct size in the
+ * content area and scales on smaller viewports.
+ */
+
+/* Container for Google Calendar embeds */
+.calendar-embed-wrapper {
+	position: relative;
+	width: 100%;
+	max-width: 637px;
+	overflow: hidden;
+	margin: 0 auto;
+}
+
+/* Homepage agenda view: narrower, inside TablePress cell */
+.tablepress .calendar-embed-wrapper {
+	max-width: 300px;
+}
+
+/* Default iframe styling */
+.entry-content iframe[src*="calendar.google.com"] {
+	max-width: 100%;
+	border: 0;
+}
+
+/* All events page: full content width */
+.page-template-default .entry-content iframe[src*="calendar.google.com"] {
+	width: 100%;
+	min-height: 600px;
+}
+
+/* Homepage calendar in TablePress: fixed height */
+.tablepress iframe[src*="calendar.google.com"] {
+	width: 300px;
+	height: 900px;
+	border: 0;
+}
+
+/* Color legend for calendar types (used on /all-events/) */
+.calendar-legend {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-bottom: 15px;
+	font-size: 11px;
+}
+
+.calendar-legend-item {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.calendar-legend-item .color-swatch {
+	display: inline-block;
+	width: 12px;
+	height: 12px;
+	border-radius: 2px;
+}

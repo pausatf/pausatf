@@ -266,6 +266,7 @@ wpcli_exclude_plugins:
 # Themes to exclude from auto-updates (custom child themes)
 wpcli_exclude_themes:
   - "TheSource-child"
+  - "pausatf-generatepress-child"
   - "pausatf-oceanwp-child"
   - "pausatf-oceanwp-child-v2"
   - "pausatf-oceanwp-theme"
