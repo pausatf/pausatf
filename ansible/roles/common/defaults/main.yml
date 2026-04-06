@@ -1,3 +1,12 @@
 ---
 timezone: "America/Los_Angeles"
-ssh_allow_users: "deploy jteeters somethingwithproof"
+common_deploy_user: "deploy"
+common_admin_users:
+  - name: "somethingwithproof"
+    github: "somethingwithproof"
+    groups: "sudo,www-data"
+  - name: "jteeters"
+    github: "jeffteeters"
+    groups: "sudo,www-data"
+
+ssh_allow_users: "{{ common_deploy_user }} {{ common_admin_users | map(attribute='name') | join(' ') }}"

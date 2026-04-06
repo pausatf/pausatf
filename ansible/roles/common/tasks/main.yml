@@ -42,7 +42,7 @@
 
 - name: Create deployment user
   ansible.builtin.user:
-    name: deploy
+    name: "{{ common_deploy_user }}"
     shell: /bin/bash
     groups: sudo
     append: true
@@ -55,18 +55,14 @@
     groups: "{{ item.groups }}"
     append: true
     create_home: true
-  loop:
-    - { name: "somethingwithproof", groups: "sudo,www-data" }
-    - { name: "jteeters", groups: "sudo,www-data" }
+  loop: "{{ common_admin_users }}"
 
 - name: Configure admin SSH authorized keys from GitHub
   ansible.posix.authorized_key:
     user: "{{ item.name }}"
     key: "https://github.com/{{ item.github }}.keys"
     state: present
-  loop:
-    - { name: "somethingwithproof", github: "somethingwithproof" }
-    - { name: "jteeters", github: "jeffteeters" }
+  loop: "{{ common_admin_users }}"
   ignore_errors: true
 
 - name: Configure passwordless sudo for admin users
@@ -75,9 +71,7 @@
     dest: "/etc/sudoers.d/{{ item }}"
     mode: "0440"
     validate: "/usr/sbin/visudo -cf %s"
-  loop:
-    - somethingwithproof
-    - jteeters
+  loop: "{{ common_admin_users | map(attribute='name') | list }}"
 
 - name: Configure SSH
   ansible.builtin.include_tasks: ssh.yml
