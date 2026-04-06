@@ -1,5 +1,11 @@
 ---
 # WordPress default variables
+wordpress_enabled: true
+wpcli_enabled: true
+is_active_web: true
+wp_environment_type: "production"
+wordpress_installs: []
+wp_main_plugins: []
 wordpress_version: "latest"
 wordpress_install_dir: "/var/www/html"
 wordpress_db_name: "wordpress"
