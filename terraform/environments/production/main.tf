@@ -69,7 +69,7 @@ module "wordpress" {
   ssh_allowed_ips          = var.ssh_allowed_ips
 
   create_vpc        = false
-  vpc_uuid_override = "REDACTED_VPC_UUID"
+  vpc_uuid_override = var.vpc_uuid
 
   cloud_init_content = templatefile("${path.module}/../../modules/droplet/cloud-init-ubuntu-24.yml", {
     environment = "production"

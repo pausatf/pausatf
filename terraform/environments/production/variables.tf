@@ -59,3 +59,8 @@ variable "database_size" {
     error_message = "Database size must start with 'db-s-'."
   }
 }
+
+variable "vpc_uuid" {
+  type        = string
+  description = "The UUID of the VPC to use for production"
+}
