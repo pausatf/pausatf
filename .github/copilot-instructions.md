@@ -6,12 +6,13 @@ This is the PAUSATF infrastructure monorepo, consolidating all infrastructure, c
 
 ### Directory Structure
 
-- **`/terraform`** – Infrastructure as Code for DigitalOcean, Cloudflare, and GitHub (uses Terraform ~1.6)
+- **`/terraform`** – Infrastructure as Code for DigitalOcean, Cloudflare, and GitHub (uses Terraform ~1.10)
 - **`/ansible`** – Configuration management playbooks and roles
 - **`/scripts`** – Bash automation scripts for backup, deployment, and maintenance
 - **`/docs`** – Documentation hub including guides, runbooks, and architecture docs
 - **`/content`** – Legacy content archive (race results, images, PDFs)
-- **`/themes`** – WordPress themes (TheSource parent and child themes)
+- **`/themes`** – WordPress themes (TheSource and GeneratePress child themes)
+- **`/teeters-php`** – Custom legacy PHP applications (e.g., results uploader)
 
 ## Coding Standards
 
@@ -24,7 +25,7 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 ```
 
 - Types: `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `ci`
-- Scopes: `terraform`, `ansible`, `scripts`, `docs`, `themes`, `ci`
+- Scopes: `terraform`, `ansible`, `scripts`, `docs`, `themes`, `ci`, `php`
 
 ### Terraform
 
@@ -33,15 +34,25 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 - Pass `tflint --recursive` and `tfsec .`
 - Use descriptive variable names with `description` attributes
 - Keep modules focused and reusable
-- Use remote state (already configured)
+- Use remote state (already configured in DigitalOcean Spaces)
 
 ### Ansible
 
-- Lint playbooks with `ansible-lint playbooks/`
+- **Standard Role Structure**: Every role must have a `README.md` and `defaults/main.yml`.
+- **Variable Naming**: Prefix role variables with the role name (e.g., `common_timezone`).
+- **Testing**: Use Molecule for all custom roles.
+- Lint playbooks with `ansible-lint`
 - Run `yamllint .` for YAML formatting (120-char line length)
 - Ensure playbooks are idempotent
 - Use `ansible-vault` for sensitive data
 - Test playbooks in staging before production
+
+### PHP
+
+- **Standards**: Follow WordPress Coding Standards (WPCS).
+- **Tooling**: Use PHPCS with `phpcs.xml.dist` ruleset.
+- **Testing**: Use PHPUnit for custom logic (see `teeters-php/tests`).
+- Target PHP 8.1+ for local dev and 8.4 for modern environments.
 
 ### Shell Scripts
 

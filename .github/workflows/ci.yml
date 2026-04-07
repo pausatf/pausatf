@@ -11,6 +11,7 @@ concurrency:
 
 permissions:
   contents: read
+  security-events: write
 
 jobs:
   # --- Ansible ---
@@ -33,10 +34,10 @@ jobs:
     if: "!contains(github.event.pull_request.title, 'chore(deps):')"
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
+        uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v5
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
@@ -44,8 +45,7 @@ jobs:
         run: pip install yamllint
 
       - name: Run yamllint
-        run: |
-          yamllint .
+        run: yamllint .
         working-directory: ansible
 
   syntax-check:
@@ -54,10 +54,10 @@ jobs:
     if: "!contains(github.event.pull_request.title, 'chore(deps):')"
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
+        uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v5
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
@@ -98,10 +98,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
+        uses: actions/checkout@v4
 
       - name: Run ShellCheck
-        uses: ludeeus/action-shellcheck@00b27aa7cb85167568cb48a3838b75f4265f2bca  # master
+        uses: ludeeus/action-shellcheck@v2
         with:
           scandir: './scripts'
           severity: warning
@@ -112,7 +112,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
+        uses: actions/checkout@v4
 
       - name: Check bash syntax
         run: |
@@ -123,6 +123,69 @@ jobs:
           done
         working-directory: scripts
 
+  # --- PHP ---
+
+  php-lint:
+    name: PHP Syntax Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+
+      - name: Lint PHP
+        run: |
+          shopt -s globstar nullglob
+          for f in themes/**/*.php wp-content/plugins/**/*.php teeters-php/**/*.php; do
+            php -l "$f" || exit 1
+          done
+
+  phpcs:
+    name: WordPress Coding Standards
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+
+      - name: Install PHPCS + WPCS
+        run: |
+          composer global config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
+          composer global require "squizlabs/php_codesniffer:^3" "wp-coding-standards/wpcs:^3" "phpcompatibility/php-compatibility:^9"
+          ~/.composer/vendor/bin/phpcs --config-set installed_paths ~/.composer/vendor/wp-coding-standards/wpcs,~/.composer/vendor/phpcompatibility/php-compatibility
+
+      - name: Run PHPCS
+        run: ~/.composer/vendor/bin/phpcs -q --standard=phpcs.xml.dist --report=full
+
+  # --- CSS ---
+
+  stylelint:
+    name: Stylelint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run Stylelint
+        run: |
+          npm install -g stylelint stylelint-config-standard
+          stylelint "themes/**/*.css" || echo "Stylelint failed, but continuing (legacy code)"
+
   # --- Markdown ---
 
   markdown-lint:
@@ -131,10 +194,10 @@ jobs:
     if: "!contains(github.event.pull_request.title, 'chore(deps):')"
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
+        uses: actions/checkout@v4
 
       - name: Run markdownlint
-        uses: nosborn/github-action-markdown-cli@508d6cefd8f0cc99eab5d2d4685b1d5f470042c1  # v3.5.0
+        uses: nosborn/github-action-markdown-cli@v3
         with:
           files: .
           config_file: .markdownlint.json
@@ -146,10 +209,10 @@ jobs:
     if: "!contains(github.event.pull_request.title, 'chore(deps):')"
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
+        uses: actions/checkout@v4
 
       - name: Check links
-        uses: gaurav-nelson/github-action-markdown-link-check@5c5dfc0ac2e225883c0e5f03a85311ec2830d368  # v1
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
         with:
           use-quiet-mode: 'yes'
           use-verbose-mode: 'yes'
@@ -163,10 +226,10 @@ jobs:
     if: "!contains(github.event.pull_request.title, 'chore(deps):')"
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
+        uses: actions/checkout@v4
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@5e8dbf3c6d9deaf4193ca7a8fb23f2ac83bb6c85  # v4.0.0
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: '1.10.3'
 
@@ -183,10 +246,10 @@ jobs:
         environment: [production, staging, github, dev, cloudflare]
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
+        uses: actions/checkout@v4
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@5e8dbf3c6d9deaf4193ca7a8fb23f2ac83bb6c85  # v4.0.0
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: '1.10.3'
 
@@ -201,16 +264,13 @@ jobs:
   tfsec:
     name: TFSec
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      security-events: write
     if: "!contains(github.event.pull_request.title, 'chore(deps):')"
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
+        uses: actions/checkout@v4
 
       - name: Run tfsec
-        uses: aquasecurity/tfsec-action@b466648d6e39e7c75324f25d83891162a721f2d6  # v1.0.3
+        uses: aquasecurity/tfsec-action@v1.0.3
         with:
           working_directory: terraform
           soft_fail: false
@@ -218,7 +278,7 @@ jobs:
           additional_args: --concise-output --out results.sarif
 
       - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@b1bff81932f5cdfc8695c7752dcee935dcd061c8  # v4.33.0
+        uses: github/codeql-action/upload-sarif@v3
         if: always()
         with:
           sarif_file: results.sarif
@@ -229,10 +289,10 @@ jobs:
     if: "!contains(github.event.pull_request.title, 'chore(deps):')"
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
+        uses: actions/checkout@v4
 
       - name: Setup TFLint
-        uses: terraform-linters/setup-tflint@b480b8fcdaa6f2c577f8e4fa799e89e756bb7c93  # v6
+        uses: terraform-linters/setup-tflint@v4
         with:
           tflint_version: latest
 
@@ -243,3 +303,15 @@ jobs:
       - name: Run TFLint
         run: tflint --recursive --format compact --minimum-failure-severity error
         working-directory: terraform
+
+  # --- Workflows ---
+
+  actionlint:
+    name: GitHub Actions Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run actionlint
+        uses: rhysd/actionlint@v1

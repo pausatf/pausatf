@@ -12,13 +12,39 @@ on:
       - 'ansible/roles/**'
       - '.github/workflows/molecule.yml'
 
+concurrency:
+  group: molecule-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
 jobs:
   molecule:
-    name: molecule / common
+    name: molecule / ${{ matrix.role }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        role:
+          - common
+          - security_hardening
+          - wordpress
+          - apache
+          - php-fpm
+          - mysql
+          - redis
+          - fail2ban
+          - certbot
+          - cloudflare
+          - postfix
+          - monitoring
+          - newrelic
+          - tailscale
+          - lsphp
+          - openlitespeed
+          - modsecurity
+          - apparmor
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -35,7 +61,7 @@ jobs:
 
       - name: Run Molecule tests
         run: |
-          cd ansible/roles/common
+          cd ansible/roles/${{ matrix.role }}
           molecule test
         env:
           PY_COLORS: '1'

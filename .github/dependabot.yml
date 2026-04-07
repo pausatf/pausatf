@@ -34,3 +34,13 @@ updates:
       day: "monday"
     labels:
       - "dependencies"
+
+  # PHP (Theme and Tool dependencies)
+  - package-ecosystem: "composer"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+      - "php"
