@@ -1,0 +1,20 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Check SSH PermitRootLogin
+      ansible.builtin.command: grep "^PermitRootLogin no" /etc/ssh/sshd_config
+      register: sshd_root_login
+      changed_when: false
+
+    - name: Check SSH MaxAuthTries
+      ansible.builtin.command: grep "^MaxAuthTries 3" /etc/ssh/sshd_config
+      register: sshd_max_auth
+      changed_when: false
+
+    - name: Check unattended-upgrades config
+      ansible.builtin.stat:
+        path: /etc/apt/apt.conf.d/50unattended-upgrades
+      register: unattended_stat
+      failed_when: not unattended_stat.stat.exists

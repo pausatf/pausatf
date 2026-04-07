@@ -1,10 +1,7 @@
 ---
 hardening_ssh_permit_root_login: "no"
-hardening_ssh_max_auth_tries: 6
-hardening_ssh_allow_users:
-  - deploy
-  - jteeters
-  - somethingwithproof
+hardening_ssh_max_auth_tries: 3
+hardening_ssh_allow_users: []
 hardening_wp_docroot: "/var/www/html"
 hardening_disable_services:
   - cups

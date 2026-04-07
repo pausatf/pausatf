@@ -157,7 +157,7 @@ add_action('wp_enqueue_scripts', function () {
 		$load_cf7 = true;
 	} elseif (is_singular()) {
 		global $post;
-		if (is_a($post, 'WP_Post') && has_shortcode($post->post_content, 'contact-form-7')) {
+		if (isset($post) && is_a($post, 'WP_Post') && has_shortcode($post->post_content, 'contact-form-7')) {
 			$load_cf7 = true;
 		}
 	}

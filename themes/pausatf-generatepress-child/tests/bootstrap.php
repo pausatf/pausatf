@@ -121,7 +121,7 @@ if (! function_exists('add_filter')) {
 }
 
 if (! function_exists('remove_action')) {
-    function remove_action(string $hook, callable $callback, int $priority = 10): bool
+    function remove_action(string $hook, $callback, int $priority = 10): bool
     {
         $GLOBALS['_pausatf_removed_actions'][$hook . ':' . $priority] = $callback;
         return true;
@@ -129,7 +129,7 @@ if (! function_exists('remove_action')) {
 }
 
 if (! function_exists('remove_filter')) {
-    function remove_filter(string $hook, callable $callback, int $priority = 10): bool
+    function remove_filter(string $hook, $callback, int $priority = 10): bool
     {
         $GLOBALS['_pausatf_removed_filters'][$hook . ':' . $priority] = $callback;
         return true;
@@ -178,6 +178,7 @@ if (! function_exists('wp_dequeue_style')) {
     function wp_dequeue_style(string $handle): void
     {
         $GLOBALS['_pausatf_dequeued']['styles'][$handle] = true;
+        unset($GLOBALS['_pausatf_enqueued']['styles'][$handle]);
     }
 }
 
@@ -185,6 +186,7 @@ if (! function_exists('wp_dequeue_script')) {
     function wp_dequeue_script(string $handle): void
     {
         $GLOBALS['_pausatf_dequeued']['scripts'][$handle] = true;
+        unset($GLOBALS['_pausatf_enqueued']['scripts'][$handle]);
     }
 }
 
@@ -339,6 +341,24 @@ if (! function_exists('__return_false')) {
     function __return_false(): bool
     {
         return false;
+    }
+}
+
+// ------------------------------------------------------------------
+// WP_Post stub for has_shortcode fallback tests.
+// ------------------------------------------------------------------
+
+if (! class_exists('WP_Post')) {
+    class WP_Post
+    {
+        public string $post_content = '';
+    }
+}
+
+if (! function_exists('has_shortcode')) {
+    function has_shortcode(string $content, string $tag): bool
+    {
+        return str_contains($content, '[' . $tag);
     }
 }
 

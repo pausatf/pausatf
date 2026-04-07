@@ -78,7 +78,7 @@
 
 - name: Set timezone
   community.general.timezone:
-    name: "{{ timezone }}"
+    name: "{{ common_timezone }}"
   when: ansible_virtualization_type != 'docker'
 
 - name: Configure automatic security updates
