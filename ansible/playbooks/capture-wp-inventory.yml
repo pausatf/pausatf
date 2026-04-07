@@ -1,4 +1,9 @@
 ---
+# Capture WordPress plugins/themes from production
+# TODO: After migrating production to Ubuntu 24.04 (Python 3.12), remove the `ansible.builtin.raw`
+# modules used below and replace them with standard `ansible.builtin.command` or `ansible.builtin.shell`
+# since the server will then have a Python version compatible with modern Ansible.
+
 - name: Capture WordPress plugins/themes from production
   hosts: production
   gather_facts: false
