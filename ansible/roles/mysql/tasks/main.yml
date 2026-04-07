@@ -131,3 +131,28 @@
     - name: MySQL setup failed
       ansible.builtin.fail:
         msg: "MySQL setup failed. Review the task output above for details."
+
+- name: Purge local MySQL installations when using Managed DB
+  when: (mysql_managed | default(false)) or not (mysql_enabled | default(true))
+  block:
+    - name: Ensure MySQL service is stopped and disabled
+      ansible.builtin.service:
+        name: mysql
+        state: stopped
+        enabled: false
+      failed_when: false
+      ignore_errors: true
+
+    - name: Uninstall MySQL server packages
+      ansible.builtin.apt:
+        name:
+          - mysql-server
+          - mysql-server-core-*
+          - mariadb-server
+          - mariadb-server-core-*
+        state: absent
+        purge: true
+  rescue:
+    - name: Ignore errors during MySQL cleanup
+      ansible.builtin.debug:
+        msg: "MySQL was not present or could not be completely purged. Continuing..."

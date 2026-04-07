@@ -1,0 +1,105 @@
+---
+- name: Capture Deep System State (FSTAB, Apache, Certs, Cron, Mail, Home, Legacy)
+  hosts: webservers
+  become: true
+  vars:
+    output_dir: "../../deep-capture/{{ inventory_hostname }}"
+
+  tasks:
+    - name: Create local output directory
+      delegate_to: localhost
+      ansible.builtin.file:
+        path: "{{ output_dir }}"
+        state: directory
+        mode: "0755"
+      run_once: false
+      become: false
+
+    - name: Fetch flat configuration files
+      ansible.builtin.fetch:
+        src: "{{ item }}"
+        dest: "{{ output_dir }}/{{ item | basename }}"
+        flat: yes
+      loop:
+        - /etc/fstab
+        - /etc/ssh/sshd_config
+      ignore_errors: true
+
+    - name: Fetch Mail (Postfix) configuration
+      ansible.builtin.fetch:
+        src: /etc/postfix/main.cf
+        dest: "{{ output_dir }}/postfix_main.cf"
+        flat: yes
+      ignore_errors: true
+
+    - name: Archive and fetch Apache configurations
+      ansible.builtin.shell: tar -czf /tmp/apache2-conf.tar.gz -C /etc apache2
+      changed_when: false
+
+    - name: Download Apache Archive
+      ansible.builtin.fetch:
+        src: /tmp/apache2-conf.tar.gz
+        dest: "{{ output_dir }}/apache2-conf.tar.gz"
+        flat: yes
+
+    - name: Archive and fetch Certs
+      ansible.builtin.shell: tar -czf /tmp/letsencrypt-certs.tar.gz -C /etc letsencrypt
+      changed_when: false
+
+    - name: Download Certs Archive
+      ansible.builtin.fetch:
+        src: /tmp/letsencrypt-certs.tar.gz
+        dest: "{{ output_dir }}/letsencrypt-certs.tar.gz"
+        flat: yes
+
+    - name: Capture Home Directories Listing
+      ansible.builtin.shell: ls -laR /home > /tmp/home_dirs.txt
+      changed_when: false
+
+    - name: Download Home Listing
+      ansible.builtin.fetch:
+        src: /tmp/home_dirs.txt
+        dest: "{{ output_dir }}/home_dirs.txt"
+        flat: yes
+
+    - name: Capture Legacy Data (Jeff's Stuff) Listing
+      ansible.builtin.shell: ls -laR /var/www/legacy > /tmp/legacy_data.txt
+      changed_when: false
+      ignore_errors: true
+
+    - name: Download Legacy Listing
+      ansible.builtin.fetch:
+        src: /tmp/legacy_data.txt
+        dest: "{{ output_dir }}/legacy_data.txt"
+        flat: yes
+
+    - name: Capture detailed Cron and Timers
+      ansible.builtin.shell: |
+        echo "=== SYSTEM CRON ===" > /tmp/cron_state.txt
+        cat /etc/crontab >> /tmp/cron_state.txt 2>/dev/null
+        echo -e "\n=== CRON.D ===" >> /tmp/cron_state.txt
+        for f in /etc/cron.d/*; do echo "--- $f ---"; cat "$f"; done >> /tmp/cron_state.txt 2>/dev/null
+        echo -e "\n=== ROOT CRON ===" >> /tmp/cron_state.txt
+        crontab -l -u root >> /tmp/cron_state.txt 2>/dev/null
+        echo -e "\n=== WWW-DATA CRON ===" >> /tmp/cron_state.txt
+        crontab -l -u www-data >> /tmp/cron_state.txt 2>/dev/null
+        echo -e "\n=== DEPLOY CRON ===" >> /tmp/cron_state.txt
+        crontab -l -u deploy >> /tmp/cron_state.txt 2>/dev/null
+      changed_when: false
+
+    - name: Download Cron State
+      ansible.builtin.fetch:
+        src: /tmp/cron_state.txt
+        dest: "{{ output_dir }}/cron_state.txt"
+        flat: yes
+
+    - name: Cleanup remote temporary files
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /tmp/apache2-conf.tar.gz
+        - /tmp/letsencrypt-certs.tar.gz
+        - /tmp/home_dirs.txt
+        - /tmp/legacy_data.txt
+        - /tmp/cron_state.txt

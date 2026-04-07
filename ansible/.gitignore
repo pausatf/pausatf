@@ -82,3 +82,6 @@ temp/
 
 # Development tools
 .claude
+
+# State capture outputs
+deep-capture/

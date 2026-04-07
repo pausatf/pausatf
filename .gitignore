@@ -135,3 +135,6 @@ temp/
 content/calendar/includes/settings.php
 backups/legacy/calendar/includes/settings.php
 vendor/
+
+# State capture outputs
+deep-capture/
