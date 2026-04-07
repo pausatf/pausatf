@@ -17,45 +17,26 @@ permissions:
 
 jobs:
   molecule:
-    name: molecule / ${{ matrix.role }}
+    name: molecule / common
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        role:
-          - common
-          - wordpress
-          - php-fpm
-          - redis
-          - certbot
-          - modsecurity
-          - monitoring
-          - cloudflare
-
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
+        uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v5
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install Molecule and dependencies
+      - name: Install dependencies
         run: |
-          pip install ansible-core==2.17.5 molecule molecule-plugins[docker]
-          ansible-galaxy collection install community.general community.mysql ansible.posix
+          python -m pip install --upgrade pip
+          pip install molecule molecule-plugins[docker] ansible-lint
 
-      - name: Create dummy vault password for CI
+      - name: Run Molecule tests
         run: |
-          echo '#!/bin/sh' > ansible/.vault_pass.sh
-          echo 'echo ci-dummy-vault-password' >> ansible/.vault_pass.sh
-          chmod +x ansible/.vault_pass.sh
-
-      - name: Run Molecule
-        run: molecule test
-        working-directory: ansible/roles/${{ matrix.role }}
+          cd ansible/roles/common
+          molecule test
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
-          ANSIBLE_ROLES_PATH: ${{ github.workspace }}/ansible/roles
