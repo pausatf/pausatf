@@ -76,15 +76,15 @@
     - name: Capture detailed Cron and Timers
       ansible.builtin.shell: |
         echo "=== SYSTEM CRON ===" > /tmp/cron_state.txt
-        cat /etc/crontab >> /tmp/cron_state.txt 2>/dev/null
+        cat /etc/crontab >> /tmp/cron_state.txt 2>/dev/null || true
         echo -e "\n=== CRON.D ===" >> /tmp/cron_state.txt
-        for f in /etc/cron.d/*; do echo "--- $f ---"; cat "$f"; done >> /tmp/cron_state.txt 2>/dev/null
+        for f in /etc/cron.d/*; do echo "--- $f ---"; cat "$f" 2>/dev/null || true; done >> /tmp/cron_state.txt 2>/dev/null || true
         echo -e "\n=== ROOT CRON ===" >> /tmp/cron_state.txt
-        crontab -l -u root >> /tmp/cron_state.txt 2>/dev/null
+        crontab -l -u root >> /tmp/cron_state.txt 2>/dev/null || true
         echo -e "\n=== WWW-DATA CRON ===" >> /tmp/cron_state.txt
-        crontab -l -u www-data >> /tmp/cron_state.txt 2>/dev/null
+        crontab -l -u www-data >> /tmp/cron_state.txt 2>/dev/null || true
         echo -e "\n=== DEPLOY CRON ===" >> /tmp/cron_state.txt
-        crontab -l -u deploy >> /tmp/cron_state.txt 2>/dev/null
+        crontab -l -u deploy >> /tmp/cron_state.txt 2>/dev/null || true
       changed_when: false
 
     - name: Download Cron State

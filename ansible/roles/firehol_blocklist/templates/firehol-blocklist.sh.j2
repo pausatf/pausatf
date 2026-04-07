@@ -1,0 +1,91 @@
+#!/bin/bash
+# Managed by Ansible - Do not edit manually
+set -euo pipefail
+
+IPSET_NAME="{{ firehol_blocklist_ipset_name }}"
+BLOCKLIST_DIR="{{ firehol_blocklist_dir }}"
+BLOCKLIST="${BLOCKLIST_DIR}/firehol_level1.netset"
+CF_WHITELIST="cloudflare-whitelist"
+
+mkdir -p "${BLOCKLIST_DIR}"
+
+# Refresh Cloudflare whitelist from their published IP ranges
+if CF_IPS=$(curl -sSf --max-time 10 "https://www.cloudflare.com/ips-v4" 2>/dev/null); then
+    ipset create "${CF_WHITELIST}" hash:net -exist
+    ipset flush "${CF_WHITELIST}"
+    while IFS= read -r cidr; do
+        [ -n "$cidr" ] && ipset -exist add "${CF_WHITELIST}" "${cidr}" 2>/dev/null || true
+    done <<< "$CF_IPS"
+    echo "Cloudflare whitelist refreshed: $(echo "$CF_IPS" | wc -l) ranges"
+
+    # Ensure Cloudflare ACCEPT rule exists before any DROP
+    if ! iptables -C INPUT -m set --match-set "${CF_WHITELIST}" src -j ACCEPT 2>/dev/null; then
+        iptables -I INPUT 2 -m set --match-set "${CF_WHITELIST}" src -j ACCEPT
+    fi
+fi
+
+# Refresh IPv6 Cloudflare whitelist
+if CF_IPS6=$(curl -sSf --max-time 10 "https://www.cloudflare.com/ips-v6" 2>/dev/null); then
+    ipset create cloudflare-whitelist6 hash:net family inet6 -exist
+    ipset flush cloudflare-whitelist6
+    while IFS= read -r cidr; do
+        [ -n "$cidr" ] && ipset -exist add cloudflare-whitelist6 "${cidr}" 2>/dev/null || true
+    done <<< "$CF_IPS6"
+    if ! ip6tables -C INPUT -m set --match-set cloudflare-whitelist6 src -j ACCEPT 2>/dev/null; then
+        ip6tables -I INPUT 2 -m set --match-set cloudflare-whitelist6 src -j ACCEPT
+    fi
+    echo "Cloudflare IPv6 whitelist refreshed: $(echo "$CF_IPS6" | wc -l) ranges"
+fi
+
+# Fetch firehol blocklist, exclude private and Cloudflare ranges
+curl -sSf "https://iplists.firehol.org/files/firehol_level1.netset" \
+    | grep -v "^#" \
+    | grep -v "^$" \
+    | grep -vE "^(0\.0\.0\.0/8|10\.|127\.|172\.(1[6-9]|2[0-9]|3[01])\.|192\.168\.|100\.64\.|169\.254\.|198\.18\.)" \
+    > "${BLOCKLIST}.tmp"
+
+# Also remove any Cloudflare ranges that might appear in the blocklist
+if [ -n "${CF_IPS:-}" ]; then
+    while IFS= read -r cf_cidr; do
+        [ -n "$cf_cidr" ] && sed -i "\|^${cf_cidr}$|d" "${BLOCKLIST}.tmp" 2>/dev/null || true
+    done <<< "$CF_IPS"
+fi
+
+if [ ! -s "${BLOCKLIST}.tmp" ]; then
+    echo "Empty blocklist, skipping"
+    rm -f "${BLOCKLIST}.tmp"
+    exit 0
+fi
+
+mv "${BLOCKLIST}.tmp" "${BLOCKLIST}"
+COUNT=$(wc -l < "${BLOCKLIST}")
+echo "Fetched ${COUNT} networks from Firehol Level 1 (private + Cloudflare ranges excluded)"
+
+if ! ipset list "${IPSET_NAME}" > /dev/null 2>&1; then
+    ipset create "${IPSET_NAME}" hash:net hashsize 4096 maxelem 65536
+fi
+ipset flush "${IPSET_NAME}"
+
+while IFS= read -r net; do
+    ipset -exist add "${IPSET_NAME}" "${net}" 2>/dev/null || true
+done < "${BLOCKLIST}"
+
+if ! iptables -C INPUT -m set --match-set "${IPSET_NAME}" src -j DROP 2>/dev/null; then
+    iptables -I INPUT 1 -m set --match-set "${IPSET_NAME}" src -j DROP
+fi
+
+echo "Firehol Level 1 loaded: ${COUNT} networks blocked"
+
+# Refresh Jetpack/Automattic whitelist
+if JP_IPS=$(curl -sSf --max-time 10 "https://jetpack.com/ips-v4.txt" 2>/dev/null); then
+    ipset create jetpack-whitelist hash:net -exist
+    ipset flush jetpack-whitelist
+    while IFS= read -r cidr; do
+        [ -n "$cidr" ] && ipset -exist add jetpack-whitelist "${cidr}" 2>/dev/null || true
+    done <<< "$JP_IPS"
+    echo "Jetpack whitelist refreshed: $(echo "$JP_IPS" | wc -l) ranges"
+
+    if ! iptables -C INPUT -m set --match-set jetpack-whitelist src -j ACCEPT 2>/dev/null; then
+        iptables -I INPUT 3 -m set --match-set jetpack-whitelist src -j ACCEPT
+    fi
+fi

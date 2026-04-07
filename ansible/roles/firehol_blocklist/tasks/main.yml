@@ -1,0 +1,37 @@
+---
+- name: Ensure firehol blocklist dependencies are installed
+  ansible.builtin.apt:
+    name:
+      - ipset
+      - curl
+      - iptables
+    state: present
+
+- name: Create firehol blocklist directory
+  ansible.builtin.file:
+    path: "{{ firehol_blocklist_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Deploy firehol blocklist script
+  ansible.builtin.template:
+    src: firehol-blocklist.sh.j2
+    dest: /usr/local/bin/firehol-blocklist.sh
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Configure firehol blocklist cron job
+  ansible.builtin.cron:
+    name: "Firehol blocklist update"
+    hour: "{{ firehol_blocklist_cron_hour }}"
+    minute: "{{ firehol_blocklist_cron_minute }}"
+    job: "/usr/local/bin/firehol-blocklist.sh >> /var/log/firehol-blocklist.log 2>&1"
+    user: root
+
+- name: Run firehol blocklist script once to initialize
+  ansible.builtin.command: /usr/local/bin/firehol-blocklist.sh
+  changed_when: true
+  ignore_errors: true

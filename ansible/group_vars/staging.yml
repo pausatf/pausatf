@@ -3,6 +3,7 @@
 web_server: openlitespeed
 php_version: "8.4"
 mysql_version: "8"
+mysql_managed: true
 wp_environment_type: "staging"
 is_active_web: false
 

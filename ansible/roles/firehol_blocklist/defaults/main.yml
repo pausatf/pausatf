@@ -1,0 +1,5 @@
+---
+firehol_blocklist_ipset_name: "firehol-level1"
+firehol_blocklist_dir: "/etc/firehol"
+firehol_blocklist_cron_hour: "3"
+firehol_blocklist_cron_minute: "30"

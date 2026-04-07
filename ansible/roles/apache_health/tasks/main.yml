@@ -1,0 +1,15 @@
+---
+- name: Deploy Apache health check script
+  ansible.builtin.template:
+    src: httpd-check.sh.j2
+    dest: /usr/local/sbin/httpd-check.sh
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Configure Apache health check cron job
+  ansible.builtin.cron:
+    name: "Apache health check"
+    minute: "{{ apache_health_check_interval }}"
+    job: "/usr/local/sbin/httpd-check.sh"
+    user: root

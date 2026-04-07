@@ -69,7 +69,8 @@
         - name: Include MySQL role
           ansible.builtin.include_role:
             name: mysql
-          when: mysql_enabled | default(true)
+          when: mysql_enabled | default(true) | bool
+          tags: mysql
 
         - name: Include Redis role
           ansible.builtin.include_role:
@@ -112,10 +113,23 @@
         - name: Include Security Hardening role
           ansible.builtin.include_role:
             name: security_hardening
-          when: security_hardening_enabled | default(true)
+          when: security_hardening_enabled | default(true) | bool
           tags: security_hardening
 
+        - name: Include Apache Health check role
+          ansible.builtin.include_role:
+            name: apache_health
+          when: apache_health_enabled | default(true) | bool
+          tags: apache_health
+
+        - name: Include Firehol Blocklist role
+          ansible.builtin.include_role:
+            name: firehol_blocklist
+          when: firehol_blocklist_enabled | default(true) | bool
+          tags: firehol_blocklist
+
         - name: Include Cloudflare role
+
           ansible.builtin.include_role:
             name: cloudflare
           when:

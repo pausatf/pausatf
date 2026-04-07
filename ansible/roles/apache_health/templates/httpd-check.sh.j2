@@ -1,0 +1,15 @@
+#!/bin/bash
+# Apache health check - restarts service if unresponsive
+# Managed by Ansible - do not edit manually
+
+set -uo pipefail
+
+url="{{ apache_health_url }}"
+response=$(curl --write-out "%{http_code}" --connect-timeout 5 --silent --output /dev/null "$url" || true)
+
+if [[ "$response" =~ ^[0-9]+$ ]] && [ "$response" -ge 200 ] && [ "$response" -lt 500 ]; then
+    echo "All working well"
+else
+    echo "$(date): HTTP '$response' from $url - restarting Apache" >> /var/log/httpd-check.log
+    systemctl restart apache2
+fi

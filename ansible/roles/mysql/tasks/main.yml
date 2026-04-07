@@ -8,9 +8,11 @@
       - mysql_root_password | length > 0
     fail_msg: "mysql_root_password must be set via vault for local MySQL installations"
   when: not (mysql_managed | default(false))
+  tags: [mysql]
 
 - name: Local MySQL setup
   when: not (mysql_managed | default(false))
+  tags: [mysql]
   block:
     - name: Install MySQL packages
       ansible.builtin.apt:
@@ -133,7 +135,8 @@
         msg: "MySQL setup failed. Review the task output above for details."
 
 - name: Purge local MySQL installations when using Managed DB
-  when: (mysql_managed | default(false)) or not (mysql_enabled | default(true))
+  when: (mysql_managed | default(false)) or not (mysql_enabled | default(true)) | bool
+  tags: [mysql]
   block:
     - name: Ensure MySQL service is stopped and disabled
       ansible.builtin.service:
