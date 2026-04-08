@@ -44,7 +44,7 @@ locals {
     "100.64.0.0/10",
     # Admin static IP
     "REDACTED_ADMIN_IP/32",
-    # Jeff Teeters (UC Berkeley campus)
+    # UC Berkeley campus network
     "136.152.0.0/16",
   ]
 }

@@ -10,11 +10,6 @@ variable "cloudflare_api_token" {
   sensitive   = true
 }
 
-variable "cloudflare_zone_id" {
-  description = "Cloudflare Zone ID for pausatf.org"
-  type        = string
-  sensitive   = true
-}
 
 variable "region" {
   description = "DigitalOcean region"

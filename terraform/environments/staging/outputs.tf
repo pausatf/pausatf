@@ -3,10 +3,6 @@ output "staging_ipv4" {
   value       = module.wordpress.droplet_ip
 }
 
-output "stage_dns_records" {
-  description = "Created DNS records for staging"
-  value       = module.cloudflare_dns_staging.record_hostnames
-}
 
 output "droplet_id" {
   description = "Staging droplet ID"

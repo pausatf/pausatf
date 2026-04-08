@@ -60,25 +60,8 @@ module "wordpress" {
   })
 }
 
-# NOTE: stage.pausatf.org A record is also managed by the cloudflare environment.
-# If both environments are applied, the last apply wins. Consider removing this
-# module and managing all DNS centrally in the cloudflare environment.
-# Cloudflare DNS for staging
-module "cloudflare_dns_staging" {
-  source  = "../../modules/cloudflare/dns"
-  zone_id = var.cloudflare_zone_id
-
-  dns_records = [
-    {
-      name    = "stage"
-      type    = "A"
-      value   = module.wordpress.droplet_ip
-      ttl     = 1
-      proxied = true
-      comment = "Staging web droplet"
-    }
-  ]
-}
+# DNS for staging is managed centrally in the cloudflare environment.
+# Removed from here to avoid last-apply-wins conflicts.
 
 # State migration — zero-recreation move from inline resources to stack module
 moved {
