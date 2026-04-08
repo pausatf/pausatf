@@ -45,7 +45,13 @@ if (!(strlen($_POST['pcontact'])) > 0) {  // Has screen been updated and returne
     // from http://stackoverflow.com/questions/4223028/
     // mysql-real-escape-string-for-entire-request-array-or-need-to-loop-through-i
                
-    $s_POST = array_map('mysql_real_escape_string', $_POST);
+    // Validate and sanitize input
+$s_POST = filter_input_array(INPUT_POST, [
+    'cname' => FILTER_SANITIZE_STRING,
+    'pcontact' => FILTER_SANITIZE_STRING,
+    'pphone' => FILTER_SANITIZE_STRING,
+    'paidYN' => FILTER_SANITIZE_STRING
+]);
                
 
     $pcontact = $s_POST['pcontact'];    // get variables from screen
@@ -102,11 +108,16 @@ if (!(strlen($_POST['pcontact'])) > 0) {  // Has screen been updated and returne
         require_once ('db.php');
 
 // do the update. 
-        $query = "UPDATE tblCLUBS SET club_name='$cname', primary_contact='$pcontact', primary_phone='$pphone', 
-                  approved = '$paidYN', update_date=CURDATE() 
-                  WHERE club_no='$cnum'";
-        
-        $result = @mysql_query ($query);
+        // Use PDO for secure, parameterized queries
+$pdo = new PDO('mysql:host=localhost;dbname=YOUR_DB_NAME', 'YOUR_DB_USER', 'YOUR_DB_PASS');
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+$stmt = $pdo->prepare("UPDATE tblCLUBS SET club_name = :cname, primary_contact = :pcontact, primary_phone = :pphone, approved = :paidYN, update_date = CURDATE() WHERE club_no = :cnum");
+$stmt->bindParam(':cname', $cname, PDO::PARAM_STR);
+$stmt->bindParam(':pcontact', $pcontact, PDO::PARAM_STR);
+$stmt->bindParam(':pphone', $pphone, PDO::PARAM_STR);
+$stmt->bindParam(':paidYN', $paidYN, PDO::PARAM_STR);
+$stmt->bindParam(':cnum', $cnum, PDO::PARAM_INT);
+$stmt->execute();
 
         if (mysql_affected_rows() == 1) {
             echo "Update successful for $cname";
