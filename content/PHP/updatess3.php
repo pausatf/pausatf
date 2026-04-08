@@ -1,45 +1,58 @@
 <?php
-// ----------------------------------------------------------------------------*
-// updatess1.php                                                               *
-// Created August 2006                                                         *
-// Created by Dan Preston                                                      *
-// This script handles updates of race number and/or club number for           * 
-// maintenance.                                                                *
-// ----------------------------------------------------------------------------*
-   require_once ('/home/pausat/dbss.php');
-   
-// Successful connection.  Set values for update:
-         
-        $rnum = 195;
-        $cname = 'Fleet Feet Sac';  
-        
-        $query = "SELECT * FROM RaceName   
-                 WHERE RaceNumber = '$rnum'"; 
-         
-        $result1 = @mysql_query ($query);  //Execute the SELECT
-       
-        if (!($result1)) {  // was SELECT succcessful
-            echo "<p>Error in updatess3 on SELECT Race $rnum</p><p>" . mysql_error() . '</p>';
-            exit();
-        } else {  
-            $num = mysql_num_rows($result1);   // if successful, get the number of rows 
-        }
-        if ($num == 0) {  // if num rows returned 1 or more, Race exists
-            echo "<p><b>The race number '$rnum' is not on the database.  Consult the Listing of Races.";
-            exit();
+
+declare(strict_types=1);
+
+require_once __DIR__ . '/db.php';
+
+$pdo = get_pdo();
+
+$rnum = get_post_int('rnum', 0);
+$cname = get_post_string('cname');
+$result = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!verify_csrf(get_post_string('csrf_token'))) {
+        die('Invalid request');
+    }
+
+    if ($rnum <= 0 || $cname === '') {
+        $result = '<p><b>Race number and club name are required.</b></p>';
+    } else {
+        $stmt = $pdo->prepare('SELECT * FROM RaceName WHERE RaceNumber = :rnum');
+        $stmt->execute([':rnum' => $rnum]);
+
+        if (!$stmt->fetch()) {
+            $result = '<p><b>The race number \'' . escape_html((string) $rnum) . '\' is not on the database.</b></p>';
         } else {
-            $query = "UPDATE RaceName SET ClubName = '$cname' WHERE RaceNumber='$rnum'"; 
-            $result = @mysql_query ($query);
-            $return = mysql_affected_rows();
-            if ($return == 0) {
-                echo "<p>No update occurred because nothing changed.";
+            $stmt2 = $pdo->prepare('UPDATE RaceName SET ClubName = :cname WHERE RaceNumber = :rnum');
+            $stmt2->execute([':cname' => $cname, ':rnum' => $rnum]);
+
+            if ($stmt2->rowCount() === 0) {
+                $result = '<p>No update occurred because nothing changed.</p>';
             } else {
-                if ($return < 0) {   // if nothing changed, return is 0; if anything changes, it's 1; -1 for error
-                    echo "<p>Return code $return error in updatess3 on UPDATE</p><p>" . mysql_error() . '</p>';
-                    mysql_close();
-                    exit();
-                } else {
-                    echo "<p><h3>Update of Club $rnum as $cname was successful</h3></p>"; 
-                }
-            } 
-        }            
+                $result = '<p><h3>Update of Race ' . escape_html((string) $rnum) . ' as ' . escape_html($cname) . ' was successful</h3></p>';
+            }
+        }
+    }
+}
+
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Scoresheet Maintenance</title>
+</head>
+<body>
+<h1>Scoresheet Maintenance</h1>
+<?= $result ?>
+<form action="" method="post">
+<?= csrf_field() ?>
+<fieldset><legend>Update Race Name</legend>
+<p><b>Race Number:</b> <input type="number" name="rnum" size="5" value="<?= escape_html((string) $rnum) ?>"></p>
+<p><b>Club Name:</b> <input type="text" name="cname" size="50" maxlength="50" value="<?= escape_html($cname) ?>"></p>
+</fieldset>
+<div style="text-align:center"><input type="submit" value="Update"></div>
+</form>
+</body>
+</html>

@@ -1,148 +1,98 @@
 <?php
-// ----------------------------------------------------------------------------*
-// enterss1.php                                                                *
-// Created December 2005                                                       *
-// Created by Dan Preston                                                      *
-// This script handles the entry of a race number and a club number for the    * 
-// display of the status of submitted scoresheets.                             *
-// ----------------------------------------------------------------------------*
-if (isset($_POST['submit'])) { // This begins an IF that processes the form if entered ('submit'),
-                               // but just displays a blank form (bottom of code) if not  
 
-// The form was entered, so this is 2nd pass (1st pass was to display blank screen for entry);
-// Edit the entered fields:
-    $msg = '';
+declare(strict_types=1);
 
-// Check Race entered  
-    if (strlen($_POST['rnumEntered']) > 0) {
-	$rnumEntered = $_POST['rnumEntered'];
-    } else {
-        $msg .= '<p><b>You did not select a race.</b></p>'; 
-    } 
-// Check Club entered  
-    if (strlen($_POST['cnumEntered']) > 0) {
-	$cnumEntered = $_POST['cnumEntered'];
-    } else {
-        $msg .= '<p><b>You did not select a club.</b></p>'; 
-    } 
-      
-    if ($rnumEntered & $cnumEntered) { 
-        $rnumEntered = 0 + $rnumEntered;    // make numeric
-        $cnumEntered = 0 + $cnumEntered; 
+require_once __DIR__ . '/db.php';
+
+$results = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!verify_csrf(get_post_string('csrf_token'))) {
+        die('Invalid request');
     }
 
-    if ($msg == '') {    
-        require_once ('/home/pausat/dbss.php');
+    $rnumEntered = get_post_string('rnumEntered');
+    $cnumEntered = get_post_string('cnumEntered');
+    $msg = '';
 
-// Successful connection.  Check to see if the club number exists.
-        
-        $query = "SELECT * FROM RaceName   
-                 WHERE RaceNumber = '$rnumEntered'"; 
-         
-        $result1 = @mysql_query ($query);  //Execute the SELECT
-       
-        if (!($result1)) {  // was SELECT succcessful
-            echo "<p>Error in enterss1 on SELECT Scoresheets $rnumEntered</p><p>" . mysql_error() . '</p>';
-            exit();
-        } else {  
-            $num = mysql_num_rows($result1);   // if successful, get the number of rows 
-        }
-        if ($num == 0) {  // if num rows returned 1 or more, Race exists
-            echo "<p><b>The race number '$rnumEntered' is not on the database. Contact webmaster.";
-            exit();
+    if ($rnumEntered === '') {
+        $msg .= '<p><b>You did not select a race.</b></p>';
+    }
+    if ($cnumEntered === '') {
+        $msg .= '<p><b>You did not select a club.</b></p>';
+    }
+
+    if ($msg === '') {
+        $pdo = get_pdo();
+        $rnum = (int) $rnumEntered;
+        $cnum = (int) $cnumEntered;
+
+        $stmt = $pdo->prepare('SELECT * FROM RaceName WHERE RaceNumber = :rnum');
+        $stmt->execute([':rnum' => $rnum]);
+        $race = $stmt->fetch(PDO::FETCH_NUM);
+
+        if (!$race) {
+            $results = '<p><b>The race number \'' . escape_html($rnumEntered) . '\' is not on the database. Contact webmaster.</b></p>';
         } else {
-            while ($row = mysql_fetch_array($result1, MYSQL_NUM)) {
-                $name = $row[1];
-                $date = $row[2];
-                echo "<h3>Scoresheet status for $name</h3>
-                      <i>scheduled $date</i><br>";
-                $query = "SELECT * FROM Teams   
-                WHERE RaceNumber = '$rnumEntered' AND ClubNumber = '$cnumEntered'"; 
-                $result2 = @mysql_query ($query);  //Execute the SELECT
-                if (!($result2)) {  // was SELECT succcessful
-                    echo "<p>Error in enterss1 on SELECT Teams for Race $rnumEntered Team $cnumEntered</p><p>" . mysql_error() . '</p>';
-                    exit();
-                } else {  
-                    $num = mysql_num_rows($result2);   // if successful, get the number of rows 
+            $results .= '<h3>Scoresheet status for ' . escape_html((string) $race[1]) . '</h3>';
+            $results .= '<i>scheduled ' . escape_html((string) $race[2]) . '</i><br>';
+
+            $stmt2 = $pdo->prepare('SELECT * FROM Teams WHERE RaceNumber = :rnum AND ClubNumber = :cnum');
+            $stmt2->execute([':rnum' => $rnum, ':cnum' => $cnum]);
+            $team = $stmt2->fetch(PDO::FETCH_NUM);
+
+            if (!$team) {
+                $results .= '<p><b>Race ' . escape_html($rnumEntered) . ' Team ' . escape_html($cnumEntered) . ' is not on database. Contact webmaster.</b></p>';
+            } else {
+                $results .= '<h3>For ' . escape_html((string) $team[2]) . '</h3>';
+                $categories = [
+                    ['Open Men', $team[3], $team[13]],
+                    ['Master Men', $team[4], $team[14]],
+                    ['Senior Men', $team[5], $team[15]],
+                    ['Super Senior Men', $team[6], $team[16]],
+                    ['Veteran Men', $team[7], $team[17]],
+                    ['Open Women', $team[8], $team[18]],
+                    ['Master Women', $team[9], $team[19]],
+                    ['Senior Women', $team[10], $team[20]],
+                    ['Super Senior Women', $team[11], $team[21]],
+                    ['Veteran Women', $team[12], $team[22]],
+                ];
+                foreach ($categories as [$label, $a, $b]) {
+                    $results .= '<p>' . escape_html($label) . ' &nbsp; ' . escape_html((string) $a) . ' &nbsp; B Team &nbsp;' . escape_html((string) $b) . '</p>';
                 }
-                if ($num == 0) {  // if num rows returned 1 or more, race exists
-                    echo "<p><b>Error in enterss1. Race $rnumEntered Team $cnumEntered is not on database.  Contact webmaster.";
-                    exit();
-                } else {
-                    while ($row = mysql_fetch_array($result2, MYSQL_NUM)) {
-                         $cnum = $row[1];
-                         $cname = $row[2];
-                         $MO = $row[3];    
-                         $MM = $row[4];
-                         $MS = $row[5];    
-                         $MSS = $row[6];
-                         $MV = $row[7];
-                         $WO = $row[8];    
-                         $WM = $row[9];
-                         $WS = $row[10];    
-                         $WSS = $row[11];
-                         $WV = $row[12];
-                         $MOB = $row[13];    
-                         $MMB = $row[14];
-                         $MSB = $row[15];    
-                         $MSSB = $row[16];
-                         $MVB = $row[17];
-                         $WOB = $row[18];    
-                         $WMB = $row[19];
-                         $WSB = $row[20];    
-                         $WSSB = $row[21];
-                         $WVB = $row[22];
-                         echo "<h3>For $cname</h3>";
-                         echo "<p>Open Men &nbsp; $MO &nbsp; B Team &nbsp;$MOB<br>";
-                         echo "<p>Master Men &nbsp; $MM &nbsp; B Team &nbsp;$MMB<br>";
-                         echo "<p>Senior Men &nbsp; $MS &nbsp; B Team &nbsp;$MSB<br>";
-                         echo "<p>Super Senior Men &nbsp; $MSS &nbsp; B Team &nbsp;$MSSB<br>";
-                         echo "<p>Veteran Men &nbsp; $MV &nbsp; B Team &nbsp;$MVB<br>";
-                         echo "<p>Open Women &nbsp; $WO &nbsp; B Team &nbsp;$WOB<br>";
-                         echo "<p>Master Women &nbsp; $WM &nbsp; B Team &nbsp;$WMB<br>";
-                         echo "<p>Senior Women &nbsp; $WS &nbsp; B Team &nbsp;$WSB<br>";
-                         echo "<p>Super Senior Women &nbsp; $WSS &nbsp; B Team &nbsp;$WSSB<br>";
-                         echo "<p>Veteran Women &nbsp; $WV &nbsp; B Team &nbsp;$WVB<br><hr><p>";
-                    }  // end of while 
-                }  // race number not on Teams database (exited)
-            } // end of while
-        } // race number not on scoresheet database (exited)
-    } else {  // (form did not pass edits--end of long string of nested if's)
-        echo "<p><b> $msg </b></p>";
-        echo '<p><b>Please try again.</b></p>';
-    } // end of edits if
+                $results .= '<hr>';
+            }
+        }
+    } else {
+        $results = $msg . '<p><b>Please try again.</b></p>';
+    }
+}
 
-}  // end of if at top of page to see if the form is already entered or not
-
-// end of PHP script.  HTML form follows. Displays blank form if not already entered, sticky form for values if already entered.
-?> 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-          "http://www.w3.org/TR/2000/REC-xhtml1-20000126/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+?>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+<meta charset="utf-8">
 <title>Scoresheet Status Entry Form</title>
-<link href="/PAstylesheetpg2.css" type="text/css" rel="stylesheet"></head>
+<link href="/PAstylesheetpg2.css" type="text/css" rel="stylesheet">
 </head>
 <body>
-<div align="left">
+<div>
 <table border="0" cellspacing="0" cellpadding="0">
 <tr>
-<td valign="top" width="60"><font size="2"><a href="/"><b>Home</b></a><br>
-<a href="http://www.pausatf.org/data/pacontacts.html"><b>Contacts</b></a></font></td>
+<td valign="top" width="60"><a href="/"><b>Home</b></a><br>
+<a href="/data/pacontacts.html"><b>Contacts</b></a></td>
 <td valign="top">
-</center> 
-<!-- nm_Form -->
-<form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
+<?= $results ?>
+<form action="" method="post">
+<?= csrf_field() ?>
 <fieldset><legend>Scoresheet Status Entry Form</legend>
 <p><i><b>The Road or XC Scorer updates this database when he receives a scoresheet.<br>
 If your status is N (for No) and you submitted a scoresheet, but did not receive your confirmation copy,<br>
-(and you have allowed time for the Scorer to do the update) then send the scoresheet <b>directly</b> to the scorer:<br>
-<a href="mailto:tlbernhard@comcast.net">Road Scorer&nbsp;&nbsp;&nbsp;<a href="mailto:djpreston@comcast.net">XC Scorer<br>
-<p>
+then send the scoresheet directly to the scorer.</b></i></p>
 <p><b>Select Race:</b> <select name="rnumEntered">
 <option value="01">NorCal</option>
-<option value="02">Standford 8K</option>
+<option value="02">Stanford 8K</option>
 <option value="03">Across the Bay 12K</option>
 <option value="04">Zippy 5K</option>
 <option value="05">Marin 10K</option>
@@ -165,7 +115,8 @@ If your status is N (for No) and you submitted a scoresheet, but did not receive
 <option value="22">Seagate 5K</option>
 <option value="23">CIM</option>
 <option value="24">Xmas Relays</option>
-</select><p><b>Select Club:</b>
+</select></p>
+<p><b>Select Club:</b>
 <select name="cnumEntered">
 <option value="178">adidas Transports</option>
 <option value="111">ASCIS Aggies</option>
@@ -181,7 +132,7 @@ If your status is N (for No) and you submitted a scoresheet, but did not receive
 <option value="132">Nike Farm Team</option>
 <option value="220">Pacific Striders</option>
 <option value="116">River City Rebels</option>
-<option value="233">Runniing Zone/Mizuno</option>
+<option value="233">Running Zone/Mizuno</option>
 <option value="126">San Luis Distance Club</option>
 <option value="137">Santa Cruz TC</option>
 <option value="32">Silver State Striders</option>
@@ -189,14 +140,14 @@ If your status is N (for No) and you submitted a scoresheet, but did not receive
 <option value="100">Tamalpa</option>
 <option value="177">UCSC Slugs</option>
 <option value="133">Wed Night Laundry</option>
-<option value="117">West Valley J&S</option>
+<option value="117">West Valley J&amp;S</option>
 <option value="110">West Valley TC</option>
 <option value="119">Wolfpack Intrnl</option>
-</select>
-<p>
+</select></p>
 </fieldset>
-<div align="center"><input type="submit" name="submit" value="Get Scoresheet Status" /></div>
+<div style="text-align:center"><input type="submit" name="submit" value="Get Scoresheet Status"></div>
 </form>
-</td></tr></table><div>
+</td></tr></table>
+</div>
 </body>
 </html>

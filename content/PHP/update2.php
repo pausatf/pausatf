@@ -1,168 +1,104 @@
 <?php
-// ----------------------------------------------------------------------------*
-// update2.php                                                                 *
-// Created August 2005                                                         *
-// Created by Dan Preston                                                      *
-// This script handles the update of primary contact and paid status by the    *
-// PA Office.  It is called by update1 which captures and passes club number.  *                                                                      *
-// ----------------------------------------------------------------------------*
-require_once ('db.php');
 
-if (!(strlen($_POST['pcontact'])) > 0) {  // Has screen been updated and returned yet?
-    $cnum = $_COOKIE[cnum];             // if not, read database with club number passed, fill screen
-    $cnum = 0 + $cnum;
-    
-    $query = "SELECT * FROM tblCLUBS WHERE club_no = '$cnum'";
+declare(strict_types=1);
 
-    $result = @mysql_query ($query);  // execute the SELECT
+require_once __DIR__ . '/db.php';
 
-    if (!($result)) {  // was SELECT successful
-       echo "<p>Database error in enterP2 on SELECT $cnum</p><p>" . mysql_error() . '</p>';
-       exit();
-    } else {         
-        $num = mysql_num_rows($result);   // see if a row was returned
-        if ($num > 0) {
-            while ($row = mysql_fetch_array($result, MYSQL_NUM)) {
-               $_POST['cname'] = $row[1];
-               $_POST['paidYN'] = $row[4];
-               $_POST['pcontact'] = $row[7];
-               $_POST['pphone'] = $row[8];       // Fill screen with data from the database
-               $cname = $row[1];
-               $paidYN = $row[4];
-               $cdate = $row[5]; 
-               $pcontact = $row[7];                
-               $pphone = $row[8];
-           } // end of while loop
-        } else {  
-            echo "<p><b>No match found for '$cnum'</b></p>";  // this should not happen. See update1.
-            exit();
-        }  // end of if ($num)
-    }  // end of was SELECT successful
-} else {
-    $cnum = $_COOKIE[cnum];            // if screen has something on it
+$pdo = get_pdo();
+$cnum = (int) (filter_input(INPUT_COOKIE, 'cnum', FILTER_SANITIZE_NUMBER_INT) ?? 0);
+$isUpdate = ($_SERVER['REQUEST_METHOD'] === 'POST' && get_post_string('pcontact') !== '');
+$cdate = '';
 
-    // protect $_POST variables
-    // from http://stackoverflow.com/questions/4223028/
-    // mysql-real-escape-string-for-entire-request-array-or-need-to-loop-through-i
-               
-    // Validate and sanitize input
-$s_POST = filter_input_array(INPUT_POST, [
-    'cname' => FILTER_SANITIZE_STRING,
-    'pcontact' => FILTER_SANITIZE_STRING,
-    'pphone' => FILTER_SANITIZE_STRING,
-    'paidYN' => FILTER_SANITIZE_STRING
-]);
-               
+if ($isUpdate) {
+    if (!verify_csrf(get_post_string('csrf_token'))) {
+        die('Invalid request');
+    }
 
-    $pcontact = $s_POST['pcontact'];    // get variables from screen
-    $pphone = $s_POST['pphone'];        // which has been updated by user   
-    $paidYN = $s_POST['paidYN'];
-    $cname = $s_POST['cname']; 
-    
-// Edit the entered fields:
+    $cname    = get_post_string('cname');
+    $pcontact = get_post_string('pcontact');
+    $pphone   = get_post_string('pphone');
+    $paidYN   = get_post_string('paidYN');
     $msg = '';
-// Check Club Name:
-    if (strlen($s_POST['cname']) > 0) {
-	$s_POST['cname'] = stripslashes($s_POST['cname']);
-        $cname = $s_POST['cname']; 
-    } else { 
-	$cname = FALSE;
-	$msg .= '<p><b>Club name is missing.</b></p>';
-    }	
-// Check Primary Contact Name:
-    if (strlen($s_POST['pcontact']) > 0) {
-	$s_POST['pcontact'] = stripslashes($s_POST['pcontact']);
-        $pcontact = $s_POST['pcontact']; 
-    } else { 
-	$pcontact = FALSE;
-	$msg .= '<p><b>Primary Contact name is missing.</b></p>';
-    }	
-// Check Primary Contact Phone:
-    if (strlen($s_POST['pphone']) > 0) {
-	$s_POST['pphone'] = stripslashes($s_POST['pphone']);
-        $pphone = $s_POST['pphone']; 
-    } else { 
-	$pphone = FALSE;
-	$msg .= '<p><b>Primary Contact phone number is missing.</b></p>';
-    }	
-// Check Paid Indicator (Y/N)
-    if (strlen($s_POST['paidYN']) > 0) {
-        $paidYN = $s_POST['paidYN'];
-        switch ($paidYN) {
-        case 'Y':
-        break;
-        case 'N':
-        break;
-        default:
-        $paidYN=FALSE;
-        $msg .= '<p><b>Approved Status for current year must be Y or N</b></p>'; 
-        break;
-        }  // end of switch
-    } else {  
-        $paidYN=FALSE;
-        $msg .= '<p><b>Approved Status for current year is missing.</b></p>';
-    } 
-    if ($cname && $pcontact && $pphone && $paidYN) { 
-//      If all fields passed edits, update database:
-        $cnum = 0 + $cnum;
-        require_once ('db.php');
 
-// do the update. 
-        // Use PDO for secure, parameterized queries
-$pdo = new PDO('mysql:host=localhost;dbname=YOUR_DB_NAME', 'YOUR_DB_USER', 'YOUR_DB_PASS');
-$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-$stmt = $pdo->prepare("UPDATE tblCLUBS SET club_name = :cname, primary_contact = :pcontact, primary_phone = :pphone, approved = :paidYN, update_date = CURDATE() WHERE club_no = :cnum");
-$stmt->bindParam(':cname', $cname, PDO::PARAM_STR);
-$stmt->bindParam(':pcontact', $pcontact, PDO::PARAM_STR);
-$stmt->bindParam(':pphone', $pphone, PDO::PARAM_STR);
-$stmt->bindParam(':paidYN', $paidYN, PDO::PARAM_STR);
-$stmt->bindParam(':cnum', $cnum, PDO::PARAM_INT);
-$stmt->execute();
+    if ($cname === '') {
+        $msg .= '<p><b>Club name is missing.</b></p>';
+    }
+    if ($pcontact === '') {
+        $msg .= '<p><b>Primary Contact name is missing.</b></p>';
+    }
+    if ($pphone === '') {
+        $msg .= '<p><b>Primary Contact phone number is missing.</b></p>';
+    }
+    if (!in_array($paidYN, ['Y', 'N'], true)) {
+        $msg .= '<p><b>Approved Status for current year must be Y or N.</b></p>';
+        $paidYN = '';
+    }
 
-        if (mysql_affected_rows() == 1) {
-            echo "Update successful for $cname";
-            exit();
-        } else {
-            if (mysql_affected_rows() == 0) { 
-                echo "Nothing changed.  Query only.";
-            } else {
-                echo "<p>Database error in enterP2 on UPDATE $cnum</p><p>" . mysql_error() . '</p>';
-                mysql_close();
-                exit();
-            } 
-        } 
+    if ($msg !== '') {
+        die($msg);
+    }
+
+    $stmt = $pdo->prepare(
+        'UPDATE tblCLUBS SET club_name = :cname, primary_contact = :pcontact,
+            primary_phone = :pphone, approved = :paidYN, update_date = CURDATE()
+         WHERE club_no = :cnum'
+    );
+    $stmt->execute([
+        ':cname'    => $cname,
+        ':pcontact' => $pcontact,
+        ':pphone'   => $pphone,
+        ':paidYN'   => $paidYN,
+        ':cnum'     => $cnum,
+    ]);
+
+    if ($stmt->rowCount() === 1) {
+        echo '<p>Update successful for ' . escape_html($cname) . '</p>';
     } else {
-      die($msg);
-    }          
-}  // end of first if at top of page
+        echo '<p>Nothing changed. Query only.</p>';
+    }
 
-// end of PHP script.  HTML form follows. 
-?> 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-          "http://www.w3.org/TR/2000/REC-xhtml1-20000126/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    $cdate = date('Y-m-d');
+} else {
+    $stmt = $pdo->prepare('SELECT * FROM tblCLUBS WHERE club_no = :cnum');
+    $stmt->execute([':cnum' => $cnum]);
+    $row = $stmt->fetch(PDO::FETCH_NUM);
+
+    if (!$row) {
+        echo '<p><b>No match found for \'' . escape_html((string) $cnum) . '\'</b></p>';
+        exit();
+    }
+
+    $cname    = $row[1];
+    $paidYN   = $row[4];
+    $cdate    = $row[5];
+    $pcontact = $row[7];
+    $pphone   = $row[8];
+}
+
+?>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+<meta charset="utf-8">
 <title>Update Primary Contact</title>
 </head>
-<body>   
-<center>
-<h1><font color="blue">PA Office Update</font></h1>
+<body>
+<div style="text-align:center">
+<h1 style="color:blue">PA Office Update</h1>
 <h2>PA Office, Folsom CA</h2>
-</center> 
-<!-- nm_Form -->
-<form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
+</div>
+<form action="" method="post">
+<?= csrf_field() ?>
 <fieldset><legend>Update PA Office Info</legend>
-<p><i><b>All fields are required.  When done with entry, click on the Submit Information box at the bottom.</b></i></p><br>
-<p><b>Club Number:</b>&nbsp; <?php echo $cnum; ?></p> 
-<p><b>Club Name:</b> <input type="text" name="cname" size="50" maxlength="50" value="<?php if (isset($_POST['cname'])) {echo $_POST['cname'];} ?>" /> </p> 
-<p><b>Last Updated:</b>&nbsp; <?php echo $cdate; ?> </p> 
-<p><b>Primary Contact:</b> <input type="text" name="pcontact" size="50" maxlength="50" value="<?php if (isset($_POST['pcontact'])) {echo $_POST['pcontact'];} ?>" /> </p>
-<p><b>Primary Phone: <input type="text" name="pphone" size="50" maxlength="50" value="<?php if (isset($_POST['pphone'])) {echo $_POST['pphone'];} ?>" /> </p>
-<p><b>Approved Status (Y/N): <input type="text" name="paidYN" size="1" maxlength="1" value="<?php if (isset($_POST['paidYN'])) {echo 
-$_POST['paidYN'];} ?>" /> </p> 
+<p><i><b>All fields are required. When done with entry, click on the Submit Information box at the bottom.</b></i></p>
+<p><b>Club Number:</b>&nbsp;<?= escape_html((string) $cnum) ?></p>
+<p><b>Club Name:</b> <input type="text" name="cname" size="50" maxlength="50" value="<?= escape_html((string) $cname) ?>"></p>
+<p><b>Last Updated:</b>&nbsp;<?= escape_html((string) $cdate) ?></p>
+<p><b>Primary Contact:</b> <input type="text" name="pcontact" size="50" maxlength="50" value="<?= escape_html((string) $pcontact) ?>"></p>
+<p><b>Primary Phone:</b> <input type="text" name="pphone" size="50" maxlength="50" value="<?= escape_html((string) $pphone) ?>"></p>
+<p><b>Approved Status (Y/N):</b> <input type="text" name="paidYN" size="1" maxlength="1" value="<?= escape_html((string) $paidYN) ?>"></p>
 </fieldset>
-<div align="center"><input type="submit" name="submit" value="Submit Update" /></div>
+<div style="text-align:center"><input type="submit" name="submit" value="Submit Update"></div>
 </form>
 </body>
 </html>
