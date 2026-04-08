@@ -23,41 +23,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // 3rd pass: process updates/deletes
         $validKeys = $_SESSION['dob5_valid_keys'] ?? [];
 
-        for ($i = 1; $i <= $maxRecords; $i++) {
-            $key = get_post_int("key{$i}");
-            $display = get_post_string("Display{$i}");
-            $action = get_post_string("UD{$i}");
+        try {
+            for ($i = 1; $i <= $maxRecords; $i++) {
+                $key = get_post_int("key{$i}");
+                $display = get_post_string("Display{$i}");
+                $action = get_post_string("UD{$i}");
 
-            if ($key <= 0) {
-                continue;
-            }
-
-            if (!in_array($key, $validKeys, true)) {
-                $messages .= '<p>Invalid record key submitted. Operation rejected.</p>';
-                continue;
-            }
-
-            try {
-                if ($action === 'U') {
-                    $stmt = $pdo->prepare('UPDATE DOBNames SET FullName = :name WHERE UKey = :key');
-                    $stmt->execute([':name' => $display, ':key' => $key]);
-                    $messages .= $stmt->rowCount() === 1
-                        ? '<p>' . escape_html($display) . ' successfully Updated</p>'
-                        : '<p>' . escape_html($display) . ' was not changed</p>';
-                } elseif ($action === 'D') {
-                    $stmt = $pdo->prepare('DELETE FROM DOBNames WHERE UKey = :key');
-                    $stmt->execute([':key' => $key]);
-                    $messages .= $stmt->rowCount() === 1
-                        ? '<p>' . escape_html($display) . ' successfully Deleted</p>'
-                        : '<p>' . escape_html($display) . ' was not Deleted</p>';
+                if ($key <= 0) {
+                    continue;
                 }
-            } catch (PDOException $e) {
-                error_log('DOB5 operation failed for key ' . $key . ': ' . $e->getMessage());
-                $messages .= '<p><b>A database error occurred for ' . escape_html($display) . '.</b></p>';
-            }
-        }
 
-        unset($_SESSION['dob5_valid_keys']);
+                if (!in_array($key, $validKeys, true)) {
+                    $messages .= '<p>Invalid record key submitted. Operation rejected.</p>';
+                    continue;
+                }
+
+                try {
+                    if ($action === 'U') {
+                        $stmt = $pdo->prepare('UPDATE DOBNames SET FullName = :name WHERE UKey = :key');
+                        $stmt->execute([':name' => $display, ':key' => $key]);
+                        $messages .= $stmt->rowCount() === 1
+                            ? '<p>' . escape_html($display) . ' successfully Updated</p>'
+                            : '<p>' . escape_html($display) . ' was not changed</p>';
+                    } elseif ($action === 'D') {
+                        $stmt = $pdo->prepare('DELETE FROM DOBNames WHERE UKey = :key');
+                        $stmt->execute([':key' => $key]);
+                        $messages .= $stmt->rowCount() === 1
+                            ? '<p>' . escape_html($display) . ' successfully Deleted</p>'
+                            : '<p>' . escape_html($display) . ' was not Deleted</p>';
+                    }
+                } catch (PDOException $e) {
+                    error_log('DOB5 operation failed for key ' . $key . ': ' . $e->getMessage());
+                    $messages .= '<p><b>A database error occurred for ' . escape_html($display) . '.</b></p>';
+                }
+            }
+        } finally {
+            unset($_SESSION['dob5_valid_keys']);
+        }
         $messages .= '<p><a href="DOB5.php">Return</a> to search screen.</p>';
     } else {
         // 2nd pass: search and display results for editing
@@ -75,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($msg === '') {
             try {
                 $stmt = $pdo->prepare('SELECT * FROM DOBNames WHERE LastName = :lname AND Club = :cnum');
-                $stmt->execute([':lname' => $nameEntered, ':cnum' => $cnumEntered]);
+                $stmt->execute([':lname' => $nameEntered, ':cnum' => (int) $cnumEntered]);
                 $rows = $stmt->fetchAll(PDO::FETCH_NUM);
 
                 if (!$rows) {

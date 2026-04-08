@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/db.php';
 
+require_admin();
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verify_csrf(get_post_string('csrf_token'))) {
         die('Invalid request');

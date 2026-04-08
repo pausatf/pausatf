@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $pdo = get_pdo();
             $stmt = $pdo->prepare('INSERT INTO DOBNames (Club, FullName, LastName) VALUES (:cnum, :name, :lname)');
-            $stmt->execute([':cnum' => $cnumEntered, ':name' => $nameEntered, ':lname' => $LnameEntered]);
+            $stmt->execute([':cnum' => (int) $cnumEntered, ':name' => $nameEntered, ':lname' => $LnameEntered]);
             echo '<p>' . escape_html($nameEntered) . ' in club ' . escape_html($cnumEntered) . ' successfully added</p>';
         } catch (PDOException $e) {
             error_log('DOB3 insert failed: ' . $e->getMessage());

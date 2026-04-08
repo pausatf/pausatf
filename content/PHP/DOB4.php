@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/db.php';
 
+require_admin();
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verify_csrf(get_post_string('csrf_token'))) {
         die('Invalid request');
@@ -24,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $pdo = get_pdo();
             $stmt = $pdo->prepare('SELECT * FROM DOBNames WHERE LastName = :lname AND Club = :cnum');
-            $stmt->execute([':lname' => $nameEntered, ':cnum' => $cnumEntered]);
+            $stmt->execute([':lname' => $nameEntered, ':cnum' => (int) $cnumEntered]);
             $results = $stmt->fetchAll(PDO::FETCH_NUM);
 
             if (!$results) {
