@@ -1,61 +1,60 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-          "http://www.w3.org/TR/2000/REC-xhtml1-20000126/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<?php
+
+declare(strict_types=1);
+
+require_once __DIR__ . '/db.php';
+
+$results = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!verify_csrf(get_post_string('csrf_token'))) {
+        die('Invalid request');
+    }
+
+    $rnum = get_post_int('rnum');
+
+    $pdo = get_pdo();
+    $stmt = $pdo->prepare('SELECT * FROM Teams WHERE RaceNumber = 1');
+    $stmt->execute();
+    $teams = $stmt->fetchAll(PDO::FETCH_NUM);
+
+    if (!$teams) {
+        $results = '<p><b>No teams found in Race 1 to copy</b></p>';
+    } else {
+        $insert = $pdo->prepare(
+            'INSERT INTO Teams (RaceNumber, ClubNumber, ClubName, MO, MM, MS, MSS, MV, WO, WM, WS, WSS, WV)
+             VALUES (:rnum, :cnum, :cname, :mo, :mm, :ms, :mss, :mv, :wo, :wm, :ws, :wss, :wv)'
+        );
+
+        foreach ($teams as $row) {
+            $insert->execute([
+                ':rnum' => $rnum, ':cnum' => (int) $row[1], ':cname' => $row[2],
+                ':mo' => $row[3], ':mm' => $row[4], ':ms' => $row[5],
+                ':mss' => $row[6], ':mv' => $row[7], ':wo' => $row[8],
+                ':wm' => $row[9], ':ws' => $row[10], ':wss' => $row[11], ':wv' => $row[12],
+            ]);
+            $results .= '<p>Record for race ' . $rnum . ' &nbsp; ' . escape_html((string) $row[2]) . ' created</p>';
+        }
+    }
+}
+
+?>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
-<title>Batch Update Scoresheet</title>
+<meta charset="utf-8">
+<title>Batch Create Race Entries</title>
 </head>
 <body>
-<?php
-// ----------------------------------------------------------------------------*
-// batchClubss                                                                   *
-// Created December 2005                                                       *
-// Created by Dan Preston                                                      *
-// This script is a batch utility program for batch updates to the database    *
-// Can be used to generate database entries for a new club                     *
-// ----------------------------------------------------------------------------*
-    require_once ('/home/pausat/dbss.php');
-    
-   $query = "SELECT * FROM Teams // get all the teams from Race 1
-
-    $result1 = @mysql_query ($query);  // execute the SELECT
-
-    if (!($result1)) {  // was SELECT successful
-       echo "<p>Error in batchClubss on SELECT</p><p>" . mysql_error() . '</p>';
-       exit();
-    } else {         
-        $num = mysql_num_rows($result1);   // see if a row was returned
-        if ($num > 0) {
-            while ($row = mysql_fetch_array($result1, MYSQL_NUM)) {          // while loop gets each team
-                $cnum = $row[1];
-                $cname = $row[2];
-                $MO = $row[3];
-                $MM = $row[4];
-                $MS = $row[5];
-                $MSS = $row[6];
-                $MV = $row[7];
-                $WO = $row[8];
-                $WM = $row[9];
-                $WS = $row[10];
-                $WSS = $row[11];
-                $WV = $row[12];
-                $cnum = 0 + $cnum;   // make numeric
-
-                $query = "INSERT INTO Teams (RaceNumber, ClubNumber, ClubName, MO, MM, MS, MSS, MV,
-                       WO, WM, WS, WSS, WV)
-                       VALUES ('$rnum', '$cnum', '$cname', '$MO', '$MM', '$MS', '$MSS', '$MV', 
-                       '$WO', '$WM', '$WS', '$WSS', '$WV')";
-                $result2 = @mysql_query ($query);
-                if ($result2) { 
-                    echo "<p>record for $rnum &nbsp; $cname created";
-                } else {
-                    echo "<p>Error in batchUtilss on INSERT</p><p>" . mysql_error() . '</p>'; 
-                }  
-            }  // end of while loop 
-        } else {
-            echo '<p><b>No records met WHERE condition</b></p>';
-        }  // end of if ($num)
-    }  // end of was SELECT successful
-?>
+<h2>Batch Create Race Entries from Race 1 Template</h2>
+<?= $results ?>
+<?php if ($results === ''): ?>
+<form action="" method="post">
+<?= csrf_field() ?>
+<p><b>Target Race Number:</b> <input type="number" name="rnum" min="1" max="24" required></p>
+<p>This will copy all team entries from Race 1 into the specified race number.</p>
+<input type="submit" value="Create Entries">
+</form>
+<?php endif; ?>
 </body>
 </html>

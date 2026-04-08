@@ -1,63 +1,59 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-          "http://www.w3.org/TR/2000/REC-xhtml1-20000126/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<?php
+
+declare(strict_types=1);
+
+require_once __DIR__ . '/db.php';
+
+$results = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!verify_csrf(get_post_string('csrf_token'))) {
+        die('Invalid request');
+    }
+
+    $pdo = get_pdo();
+    $stmt = $pdo->query('SELECT * FROM Teams');
+    $teams = $stmt->fetchAll(PDO::FETCH_NUM);
+
+    if (!$teams) {
+        $results = '<p><b>No records found in Teams table</b></p>';
+    } else {
+        $insert = $pdo->prepare(
+            'INSERT INTO Teams (RaceNumber, ClubNumber, ClubName, MO, MM, MS, MSS, MV, WO, WM, WS, WSS, WV)
+             VALUES (:rnum, :cnum, :cname, :mo, :mm, :ms, :mss, :mv, :wo, :wm, :ws, :wss, :wv)'
+        );
+
+        foreach ($teams as $row) {
+            for ($rnum = 2; $rnum <= 23; $rnum++) {
+                $insert->execute([
+                    ':rnum' => $rnum, ':cnum' => (int) $row[1], ':cname' => $row[2],
+                    ':mo' => $row[3], ':mm' => $row[4], ':ms' => $row[5],
+                    ':mss' => $row[6], ':mv' => $row[7], ':wo' => $row[8],
+                    ':wm' => $row[9], ':ws' => $row[10], ':wss' => $row[11], ':wv' => $row[12],
+                ]);
+            }
+            $results .= '<p>Entries for ' . escape_html((string) $row[2]) . ' created for races 2-23</p>';
+        }
+    }
+}
+
+?>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
-<title>Batch Update Scoresheet</title>
+<meta charset="utf-8">
+<title>Batch Utility - Generate Full Database</title>
 </head>
 <body>
-<?php
-// ----------------------------------------------------------------------------*
-// batchUtillss                                                                   *
-// Created December 2005                                                       *
-// Created by Dan Preston                                                      *
-// This script is a batch utility program for batch updates to the database    *
-// This utility was used to generate orginal database                          *
-// See batchRacess and batchClubss to add a new Race or Club to the database   *
-// ----------------------------------------------------------------------------*
-    require_once ('/home/pausat/dbss.php');
-    
-   $query = "SELECT * FROM Teams";
-
-    $result1 = @mysql_query ($query);  // execute the SELECT
-
-    if (!($result1)) {  // was SELECT successful
-       echo "<p>Error in batchUtilss on SELECT</p><p>" . mysql_error() . '</p>';
-       exit();
-    } else {         
-        $num = mysql_num_rows($result1);   // see if a row was returned
-        if ($num > 0) {
-            while ($row = mysql_fetch_array($result1, MYSQL_NUM)) {
-                $cnum = $row[1];
-                $cname = $row[2];
-                $MO = $row[3];
-                $MM = $row[4];
-                $MS = $row[5];
-                $MSS = $row[6];
-                $MV = $row[7];
-                $WO = $row[8];
-                $WM = $row[9];
-                $WS = $row[10];
-                $WSS = $row[11];
-                $WV = $row[12];
-                $cnum = 0 + $cnum;   // make numeric
-                for ($rnum = 2; $rnum <= 23; $rnum++) { 
-                    $query = "INSERT INTO Teams (RaceNumber, ClubNumber, ClubName, MO, MM, MS, MSS, MV,
-                       WO, WM, WS, WSS, WV)
-                       VALUES ('$rnum', '$cnum', '$cname', '$MO', '$MM', '$MS', '$MSS', '$MV', 
-                       '$WO', '$WM', '$WS', '$WSS', '$WV')";
-                    $result2 = @mysql_query ($query);
-                    if ($result2) { 
-                        echo "<p>record for $rnum &nbsp; $cname created";
-                    } else {
-                        echo "<p>Error in batchUtilss on INSERT</p><p>" . mysql_error() . '</p>'; 
-                    }  
-                } // end of for loop
-            }  // end of while loop 
-        } else {
-            echo '<p><b>No records met WHERE condition</b></p>';
-        }  // end of if ($num)
-    }  // end of was SELECT successful
-?>
+<h2>Batch Utility: Generate Full Scoresheet Database</h2>
+<p><i>Copies all teams from existing entries into races 2 through 23.</i></p>
+<?= $results ?>
+<?php if ($results === ''): ?>
+<form action="" method="post">
+<?= csrf_field() ?>
+<p>This will insert entries for all existing teams into races 2-23.</p>
+<input type="submit" value="Generate Database" onclick="return confirm('This will create many records. Continue?')">
+</form>
+<?php endif; ?>
 </body>
 </html>
