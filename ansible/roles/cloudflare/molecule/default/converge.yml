@@ -14,7 +14,7 @@
     legacy_content_path: /var/www/legacy
   pre_tasks:
     - name: Install Apache and dependencies
-      apt:
+      ansible.builtin.apt:
         name:
           - apache2
           - python3-pip

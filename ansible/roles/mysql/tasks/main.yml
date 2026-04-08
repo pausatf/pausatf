@@ -144,7 +144,6 @@
         state: stopped
         enabled: false
       failed_when: false
-      ignore_errors: true
 
     - name: Uninstall MySQL server packages
       ansible.builtin.apt:

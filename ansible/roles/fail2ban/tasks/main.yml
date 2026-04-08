@@ -63,7 +63,9 @@
 
 - name: Run AbuseIPDB blocklist on deploy
   ansible.builtin.command: /usr/local/bin/abuseipdb-blocklist.sh
-  changed_when: true
+  # Script is idempotent: it always fetches and replaces the ipset; no meaningful
+  # changed state to surface to Ansible.
+  changed_when: false
   when: fail2ban_abuseipdb_enabled and fail2ban_abuseipdb_apikey | length > 0
 
 - name: Schedule daily AbuseIPDB blocklist refresh
@@ -86,7 +88,9 @@
 
 - name: Run Firehol blocklist on deploy
   ansible.builtin.command: /usr/local/bin/firehol-blocklist.sh
-  changed_when: true
+  # Script is idempotent: it always fetches and replaces the ipset; no meaningful
+  # changed state to surface to Ansible.
+  changed_when: false
   when: fail2ban_firehol_enabled
 
 - name: Schedule daily Firehol blocklist refresh

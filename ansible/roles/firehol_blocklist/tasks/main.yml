@@ -34,4 +34,4 @@
 - name: Run firehol blocklist script once to initialize
   ansible.builtin.command: /usr/local/bin/firehol-blocklist.sh
   changed_when: true
-  ignore_errors: true
+  failed_when: false

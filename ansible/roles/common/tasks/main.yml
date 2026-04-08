@@ -63,7 +63,7 @@
     key: "https://github.com/{{ item.github }}.keys"
     state: present
   loop: "{{ common_admin_users }}"
-  ignore_errors: true
+  failed_when: false
 
 - name: Configure passwordless sudo for admin users
   ansible.builtin.copy:

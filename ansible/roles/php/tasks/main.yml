@@ -103,7 +103,7 @@
   community.general.alternatives:
     name: php
     path: "/usr/bin/php{{ php_version }}"
-  ignore_errors: true
+  failed_when: false
 
 - name: Create PHP session directory
   ansible.builtin.file:
