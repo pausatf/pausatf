@@ -5,6 +5,7 @@
       - wp_site is defined
       - wp_site.path is defined
       - wp_site.path | length > 0
+      - wp_site.path is match('^/([a-zA-Z0-9_\-/]+)$')
     fail_msg: "wp_site and wp_site.path must be defined"
     quiet: true
 

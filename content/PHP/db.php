@@ -70,3 +70,18 @@ function get_post_int(string $key, int $default = 0): int
     $val = $_POST[$key] ?? $default;
     return (int) $val;
 }
+
+/**
+ * Require an authenticated admin session before proceeding.
+ * Sends 403 and exits if the session lacks valid credentials.
+ */
+function require_admin(): void
+{
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    if (empty($_SESSION['admin_authenticated']) || $_SESSION['admin_authenticated'] !== true) {
+        http_response_code(403);
+        die('Access denied. Administrator login required.');
+    }
+}

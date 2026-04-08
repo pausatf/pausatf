@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/db.php';
 
+require_admin();
+
 $results = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

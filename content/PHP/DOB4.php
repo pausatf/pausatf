@@ -21,20 +21,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($msg === '') {
-        $pdo = get_pdo();
-        $stmt = $pdo->prepare('SELECT * FROM DOBNames WHERE LastName = :lname AND Club = :cnum');
-        $stmt->execute([':lname' => $nameEntered, ':cnum' => $cnumEntered]);
-        $results = $stmt->fetchAll(PDO::FETCH_NUM);
+        try {
+            $pdo = get_pdo();
+            $stmt = $pdo->prepare('SELECT * FROM DOBNames WHERE LastName = :lname AND Club = :cnum');
+            $stmt->execute([':lname' => $nameEntered, ':cnum' => $cnumEntered]);
+            $results = $stmt->fetchAll(PDO::FETCH_NUM);
 
-        if (!$results) {
-            echo '<p><b>Last Name \'' . escape_html($nameEntered) . '\' for club ' . escape_html($cnumEntered) . ' is not on the database.</b></p>';
+            if (!$results) {
+                echo '<p><b>Last Name \'' . escape_html($nameEntered) . '\' for club ' . escape_html($cnumEntered) . ' is not on the database.</b></p>';
+                exit();
+            }
+
+            foreach ($results as $row) {
+                echo '<p><b>' . escape_html((string) $row[1]) . '</b></p>';
+            }
             exit();
+        } catch (PDOException $e) {
+            error_log('DOB4 query failed: ' . $e->getMessage());
+            echo '<p><b>A database error occurred. Please try again later.</b></p>';
         }
-
-        foreach ($results as $row) {
-            echo '<p><b>' . escape_html((string) $row[1]) . '</b></p>';
-        }
-        exit();
     } else {
         echo $msg;
         echo '<p><b>Please try again.</b></p>';

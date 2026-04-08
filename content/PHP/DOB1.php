@@ -15,23 +15,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo '<p><b>You did not enter a club number.</b></p>';
         echo '<p><b>Please try again.</b></p>';
     } else {
-        $pdo = get_pdo();
-        $cnumInt = (int) $cnum;
+        $cnumInt = filter_var($cnum, FILTER_VALIDATE_INT);
+        if ($cnumInt === false) {
+            echo '<p><b>Club number must be numeric. Please try again.</b></p>';
+        } else {
+            try {
+                $pdo = get_pdo();
+                $stmt = $pdo->prepare('SELECT FullName FROM DOBNames WHERE Club = :cnum');
+                $stmt->execute([':cnum' => $cnumInt]);
+                $names = $stmt->fetchAll();
 
-        $stmt = $pdo->prepare('SELECT FullName FROM DOBNames WHERE Club = :cnum');
-        $stmt->execute([':cnum' => $cnumInt]);
-        $names = $stmt->fetchAll();
+                if (!$names) {
+                    echo '<p><b>Club number \'' . escape_html($cnum) . '\' does not have any athletes listed.</b></p>';
+                    exit();
+                }
 
-        if (!$names) {
-            echo '<p><b>Club number \'' . escape_html($cnum) . '\' does not have any athletes listed.</b></p>';
-            exit();
+                echo '<p>The following ' . count($names) . ' youth have their birth certificate verified:</p>';
+                foreach ($names as $row) {
+                    echo '<p><b>' . escape_html((string) $row['FullName']) . '</b></p>';
+                }
+                exit();
+            } catch (PDOException $e) {
+                error_log('DOB1 query failed: ' . $e->getMessage());
+                echo '<p><b>A database error occurred. Please try again later.</b></p>';
+            }
         }
-
-        echo '<p>The following ' . count($names) . ' youth have their birth certificate verified:</p>';
-        foreach ($names as $row) {
-            echo '<p><b>' . escape_html((string) $row['FullName']) . '</b></p>';
-        }
-        exit();
     }
 }
 

@@ -4,5 +4,6 @@
     that:
       - apache_server_name is defined
       - apache_server_name | length > 0
+      - apache_server_name is match('^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$')
     fail_msg: "apache_server_name must be defined"
     quiet: true

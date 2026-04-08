@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/db.php';
 
+require_admin();
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verify_csrf(get_post_string('csrf_token'))) {
         die('Invalid request');
@@ -25,10 +27,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($msg === '') {
-        $pdo = get_pdo();
-        $stmt = $pdo->prepare('INSERT INTO DOBNames (Club, FullName, LastName) VALUES (:cnum, :name, :lname)');
-        $stmt->execute([':cnum' => $cnumEntered, ':name' => $nameEntered, ':lname' => $LnameEntered]);
-        echo '<p>' . escape_html($nameEntered) . ' in club ' . escape_html($cnumEntered) . ' successfully added</p>';
+        try {
+            $pdo = get_pdo();
+            $stmt = $pdo->prepare('INSERT INTO DOBNames (Club, FullName, LastName) VALUES (:cnum, :name, :lname)');
+            $stmt->execute([':cnum' => $cnumEntered, ':name' => $nameEntered, ':lname' => $LnameEntered]);
+            echo '<p>' . escape_html($nameEntered) . ' in club ' . escape_html($cnumEntered) . ' successfully added</p>';
+        } catch (PDOException $e) {
+            error_log('DOB3 insert failed: ' . $e->getMessage());
+            echo '<p><b>A database error occurred. The record was not added.</b></p>';
+        }
     } else {
         echo $msg;
         echo '<p><b>Please try again.</b></p>';
