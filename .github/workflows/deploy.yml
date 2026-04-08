@@ -50,12 +50,25 @@ jobs:
           pip install ansible-core==2.17.5 cloudflare requests
           ansible-galaxy collection install -r ansible/requirements.yml
 
+      - name: Install cloudflared
+        run: |
+          curl -fsSL https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 \
+            -o /usr/local/bin/cloudflared
+          chmod +x /usr/local/bin/cloudflared
+
       - name: Setup SSH key
         env:
           SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
+          install -m 700 -d ~/.ssh
+          cat >> ~/.ssh/config << 'SSHCFG'
+          Host ssh.pausatf.org
+              ProxyCommand cloudflared access ssh --hostname %h
+              StrictHostKeyChecking accept-new
+              IdentityFile ~/.ssh/deploy_key
+              IdentitiesOnly yes
+          SSHCFG
           if [ -n "$SSH_KEY" ]; then
-            install -m 700 -d ~/.ssh
             printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
             chmod 600 ~/.ssh/deploy_key
             ln -sf ~/.ssh/deploy_key ~/.ssh/pausatf-prod
@@ -103,4 +116,4 @@ jobs:
       - name: Cleanup secrets
         if: always()
         run: |
-          rm -f vault.pass ansible/group_vars/vault.yml ~/.ssh/deploy_key ~/.ssh/pausatf-prod
+          rm -f vault.pass ansible/group_vars/vault.yml ~/.ssh/deploy_key ~/.ssh/pausatf-prod ~/.ssh/config

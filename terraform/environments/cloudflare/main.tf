@@ -29,6 +29,8 @@ data "terraform_remote_state" "production" {
     key                         = "production/terraform.tfstate"
     skip_credentials_validation = true
     skip_metadata_api_check     = true
+    skip_region_validation      = true
+    skip_requesting_account_id  = true
   }
 }
 
@@ -215,6 +217,16 @@ resource "cloudflare_dns_record" "prod" {
   comment = "Production alias"
 }
 
+resource "cloudflare_dns_record" "direct_ssh" {
+  zone_id = cloudflare_zone.pausatf.id
+  name    = "direct-ssh"
+  content = local.production_ip
+  type    = "A"
+  ttl     = 1
+  proxied = false
+  comment = "Direct SSH access (DNS only, not proxied)"
+}
+
 # =============================================================================
 # DNS Records — SendGrid
 # =============================================================================
@@ -229,7 +241,7 @@ resource "cloudflare_dns_record" "sendgrid_51871933" {
   comment = "SendGrid email tracking"
 }
 
-resource "cloudflare_dns_record" "sendgrid_REDACTED_SENDGRID" {
+resource "cloudflare_dns_record" "sendgrid_redacted" {
   zone_id = cloudflare_zone.pausatf.id
   name    = "REDACTED_SENDGRID"
   content = "u51871933.wl184.sendgrid.net"
