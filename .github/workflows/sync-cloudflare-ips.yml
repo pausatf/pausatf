@@ -19,7 +19,7 @@ jobs:
           echo "ips=$CF_IPS" >> "$GITHUB_OUTPUT"
 
       - name: Install doctl
-        uses: digitalocean/action-doctl@6374d029dfd5f449281f186d65663779c706c994 # v2
+        uses: digitalocean/action-doctl@3cb3953159719656269e044e0e24ca16dd2a690f # v2
         with:
           token: ${{ secrets.DO_TOKEN }}
 
