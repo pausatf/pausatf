@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# WP cron health check — alerts if the is-active-web marker is missing
+# or if more than {{ wp_cron_overdue_threshold | default(5) }} events are overdue.
+# Runs every 30 minutes via root cron. Output appended to /var/log/wp-cron-health.log.
+set -euo pipefail
+
+MARKER="/etc/pausatf/is-active-web"
+WP_PATH="{{ wordpress_installs[0].path | default('/var/www/html') }}"
+ADMIN_EMAIL="{{ wp_admin_email | default(wordpress_admin_email | default('root')) }}"
+MAX_OVERDUE="{{ wp_cron_overdue_threshold | default(5) }}"
+
+log() { printf '%s %s\n' "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" "$*" >> /var/log/wp-cron-health.log; }
+alert() { log "ALERT: $1"; printf '%s\n' "$1" | mail -s "[pausatf] WP cron alert" "$ADMIN_EMAIL"; }
+
+if [[ ! -f "$MARKER" ]]; then
+    alert "is-active-web marker missing — WP cron silently disabled on $(hostname -f)"
+    exit 0
+fi
+
+# Require WP-CLI; exit cleanly if not installed so the cron never errors.
+command -v wp &>/dev/null || { log "OK: wp-cli absent, skipping overdue check"; exit 0; }
+
+# Count events whose next_run_relative column shows "now" (overdue).
+# wp-cli prints "now" for events that should already have fired.
+OVERDUE=$(wp cron event list \
+    --path="$WP_PATH" \
+    --allow-root \
+    --format=csv \
+    --fields=hook,next_run_relative \
+    2>/dev/null \
+    | awk -F, 'NR > 1 && $2 == "now"' \
+    | wc -l \
+    || echo 0)
+
+if (( OVERDUE > MAX_OVERDUE )); then
+    alert "$OVERDUE WP cron events overdue (threshold: $MAX_OVERDUE) — check wp-cron-if-active.sh"
+fi
+
+log "OK: marker present, $OVERDUE overdue events"
