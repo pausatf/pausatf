@@ -161,6 +161,16 @@ apache_modules:
   - ssl
   - status
 
+# MPM Event settings (event MPM + PHP-FPM)
+apache_mpm_event:
+  start_servers: 2
+  min_spare_threads: 25
+  max_spare_threads: 50
+  threads_per_child: 25
+  max_request_workers: 75
+  server_limit: 3
+  max_connections_per_child: 10000
+
 # =============================================================================
 # PHP CONFIGURATION
 # =============================================================================

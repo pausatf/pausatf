@@ -11,11 +11,16 @@ listen.group = www-data
 listen.mode = 0660
 
 pm = dynamic
-pm.max_children = {{ php_fpm_max_children | default(10) }}
-pm.start_servers = {{ php_fpm_start_servers | default(2) }}
-pm.min_spare_servers = {{ php_fpm_min_spare | default(1) }}
-pm.max_spare_servers = {{ php_fpm_max_spare | default(3) }}
+pm.max_children = {{ php_fpm_max_children | default(15) }}
+pm.start_servers = {{ php_fpm_start_servers | default(3) }}
+pm.min_spare_servers = {{ php_fpm_min_spare | default(2) }}
+pm.max_spare_servers = {{ php_fpm_max_spare | default(5) }}
 pm.max_requests = {{ php_fpm_max_requests | default(500) }}
+pm.status_path = /fpm-status
+
+; Error logging
+php_admin_value[error_log] = /var/log/php8.4-fpm-error.log
+php_admin_flag[log_errors] = on
 
 ; Slow log for debugging
 slowlog = /var/log/php-fpm-slow.log

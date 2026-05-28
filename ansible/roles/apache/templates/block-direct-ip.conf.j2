@@ -1,0 +1,22 @@
+# Block direct IP access to the server
+# Managed by Ansible - Do not edit manually
+# Prevents bypassing Cloudflare by hitting the origin IP directly.
+
+<VirtualHost *:80>
+    ServerName {{ server_public_ip | default(ansible_host) }}
+    <Location />
+        Require all denied
+    </Location>
+</VirtualHost>
+
+{% if ssl_enabled | default(false) %}
+<VirtualHost *:443>
+    ServerName {{ server_public_ip | default(ansible_host) }}
+    SSLEngine on
+    SSLCertificateFile {{ ssl_certificate }}
+    SSLCertificateKeyFile {{ ssl_certificate_key }}
+    <Location />
+        Require all denied
+    </Location>
+</VirtualHost>
+{% endif %}

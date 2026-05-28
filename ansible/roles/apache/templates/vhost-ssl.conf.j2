@@ -12,6 +12,10 @@
 
     DocumentRoot {{ item.path }}
 
+    # Cloudflare SSL termination — propagate HTTPS to PHP/WordPress
+    SetEnvIf X-Forwarded-Proto https HTTPS=on
+    RequestHeader set X-Forwarded-Proto "https"
+
     # SSL Configuration
     SSLEngine on
     SSLCertificateFile {{ item.ssl_certificate }}
@@ -38,10 +42,22 @@
 
     # PHP-FPM via unix socket (event MPM)
     <FilesMatch "\.php$">
+        Header always unset Cache-Control
+        Header always set Cache-Control "public, max-age=60, s-maxage=300, must-revalidate"
         SetHandler "proxy:unix:{{ php_fpm_socket | default('/run/php/php' + php_version + '-fpm.sock') }}|fcgi://localhost"
     </FilesMatch>
     <Proxy "fcgi://localhost">
     </Proxy>
+
+    # Restricted status endpoints (localhost only)
+    <Location /server-status>
+        SetHandler server-status
+        Require ip 127.0.0.1 ::1
+    </Location>
+    <Location /fpm-status>
+        SetHandler "proxy:unix:{{ php_fpm_socket | default('/run/php/php' + php_version + '-fpm.sock') }}|fcgi://localhost"
+        Require ip 127.0.0.1 ::1
+    </Location>
 {% else %}
     # PHP via mod_php (prefork MPM)
     <FilesMatch "\.php$">
