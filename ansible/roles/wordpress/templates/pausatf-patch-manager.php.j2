@@ -1,0 +1,127 @@
+<?php
+/**
+ * Plugin Name: PAUSATF Patch Manager
+ * Description: Re-applies compatibility patches after WordPress/plugin/theme updates.
+ */
+
+add_action( 'upgrader_process_complete', 'pausatf_reapply_patches', 10, 2 );
+
+function pausatf_reapply_patches( $upgrader, $hook_extra ) {
+    $type   = $hook_extra['type']   ?? '';
+    $action = $hook_extra['action'] ?? '';
+
+    if ( $action !== 'update' && $action !== 'install' ) {
+        return;
+    }
+
+    if ( $type === 'core' ) {
+        pausatf_patch_kses();
+    }
+
+    if ( $type === 'plugin' ) {
+        $plugins = (array) ( $hook_extra['plugins'] ?? [] );
+        foreach ( $plugins as $plugin ) {
+            if ( strpos( $plugin, 'accordions' ) !== false ) {
+                pausatf_patch_accordions();
+            }
+        }
+    }
+
+    if ( $type === 'theme' ) {
+        $themes = (array) ( $hook_extra['themes'] ?? [] );
+        foreach ( $themes as $theme ) {
+            if ( $theme === 'TheSource' ) {
+                pausatf_patch_thesource();
+            }
+        }
+    }
+}
+
+function pausatf_patch_kses() {
+    $file = ABSPATH . 'wp-includes/kses.php';
+    if ( ! file_exists( $file ) ) {
+        return;
+    }
+    $content = file_get_contents( $file );
+
+    // Guard: skip if already patched.
+    if ( strpos( $content, 'if ( null === $content ) {' ) !== false ) {
+        return;
+    }
+
+    $needle      = "function wp_kses_no_null( \$content, \$options = null ) {\n\tif ( ! isset( \$options['slash_zero'] ) ) {";
+    $replacement = "function wp_kses_no_null( \$content, \$options = null ) {\n\tif ( null === \$content ) {\n\t\treturn '';\n\t}\n\tif ( ! isset( \$options['slash_zero'] ) ) {";
+
+    file_put_contents( $file, str_replace( $needle, $replacement, $content ) );
+    error_log( 'PAUSATF: re-applied kses.php null guard after core update' );
+}
+
+function pausatf_patch_accordions() {
+    $file = WP_PLUGIN_DIR . '/accordions/includes/functions.php';
+    if ( ! file_exists( $file ) ) {
+        return;
+    }
+    $content = file_get_contents( $file );
+
+    // Guard: skip if already patched.
+    if ( strpos( $content, "?? ''" ) !== false ) {
+        return;
+    }
+
+    $old = "\$accordionsBuilderCss = str_replace(\"&quot;\", '\"', \$accordionsBuilderCss);";
+    $new = "\$accordionsBuilderCss = str_replace(\"&quot;\", '\"', \$accordionsBuilderCss ?? '');";
+
+    file_put_contents( $file, str_replace( $old, $new, $content ) );
+    error_log( 'PAUSATF: re-applied accordions null coalescing after plugin update' );
+}
+
+function pausatf_patch_thesource() {
+    $base = get_theme_root() . '/TheSource/core/components';
+
+    pausatf_insert_property(
+        "$base/HTTPInterface.php",
+        'public $response;',
+        "\n\t/** @var bool */\n\tpublic \$expects_json;\n\n\t/** @var string */\n\tpublic \$owner;",
+        'public $expects_json;'
+    );
+
+    pausatf_insert_property(
+        "$base/api/Service.php",
+        'public $response_data_key;',
+        "\n\t/** @var ET_Core_Data_Utils */\n\tpublic \$data_utils;\n\n\t/** @var string */\n\tpublic \$API_KEY_REQUIRED;",
+        'public $data_utils;'
+    );
+
+    // Fix optional-before-required parameter order in Service.php.
+    $service = "$base/api/Service.php";
+    if ( file_exists( $service ) ) {
+        $c = file_get_contents( $service );
+        $c = str_replace( 'transform_data_to_our_format( $data = array(), $key_type,', 'transform_data_to_our_format( $data, $key_type,', $c );
+        $c = str_replace( 'transform_data_to_provider_format( $data = array(), $key_type,', 'transform_data_to_provider_format( $data, $key_type,', $c );
+        file_put_contents( $service, $c );
+    }
+
+    pausatf_insert_property(
+        "$base/PageResource.php",
+        'public $write_file_location;',
+        "\n\t/** @var string */\n\tpublic \$location;",
+        'public $location;'
+    );
+
+    error_log( 'PAUSATF: re-applied TheSource PHP 8.2 patches after theme update' );
+}
+
+/**
+ * Inserts $insert immediately after the first occurrence of $after in $file,
+ * unless $guard is already present (idempotent).
+ */
+function pausatf_insert_property( $file, $after, $insert, $guard ) {
+    if ( ! file_exists( $file ) ) {
+        return;
+    }
+    $content = file_get_contents( $file );
+    if ( strpos( $content, $guard ) !== false ) {
+        return;
+    }
+    file_put_contents( $file, str_replace( $after, $after . $insert, $content ) );
+}
