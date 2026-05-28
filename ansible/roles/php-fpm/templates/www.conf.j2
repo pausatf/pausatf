@@ -19,7 +19,7 @@ pm.max_requests = {{ php_fpm_max_requests | default(500) }}
 pm.status_path = /fpm-status
 
 ; Error logging
-php_admin_value[error_log] = /var/log/php8.4-fpm-error.log
+php_admin_value[error_log] = /var/log/php{{ php_version }}-fpm-error.log
 php_admin_flag[log_errors] = on
 
 ; Slow log for debugging

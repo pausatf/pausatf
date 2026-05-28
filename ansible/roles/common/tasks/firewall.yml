@@ -54,6 +54,26 @@
     proto: tcp
   when: not (ufw_restrict_web_to_cloudflare | default(false))
 
+# When restricting to Cloudflare IPs, first remove any existing broad
+# allow rules that would otherwise survive alongside the new narrower rules.
+- name: Delete broad HTTP allow rule (Cloudflare-only mode)
+  community.general.ufw:
+    rule: allow
+    port: "80"
+    proto: tcp
+    delete: true
+  when: ufw_restrict_web_to_cloudflare | default(false)
+  failed_when: false
+
+- name: Delete broad HTTPS allow rule (Cloudflare-only mode)
+  community.general.ufw:
+    rule: allow
+    port: "443"
+    proto: tcp
+    delete: true
+  when: ufw_restrict_web_to_cloudflare | default(false)
+  failed_when: false
+
 - name: Allow HTTP from Cloudflare IPs only
   community.general.ufw:
     rule: allow
