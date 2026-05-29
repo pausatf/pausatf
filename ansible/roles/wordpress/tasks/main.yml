@@ -232,6 +232,10 @@
     user: root
   tags: wp_cron
 
+- name: Configure Jetpack performance features
+  ansible.builtin.include_tasks: jetpack.yml
+  tags: [wordpress, jetpack]
+
 - name: Apply and verify PHP compatibility patches
   ansible.builtin.include_tasks: patches.yml
   tags: wp_patches

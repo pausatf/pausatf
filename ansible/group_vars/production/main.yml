@@ -76,6 +76,10 @@ modsecurity_audit_engine: "On"
 wp_debug: false
 wp_debug_log: false
 
+# Jetpack performance features activated on production (2026-05-28).
+jetpack_boost_defer_js: true
+jetpack_photon_enabled: true
+
 # Production WordPress runs on DigitalOcean Managed MySQL, not local MySQL.
 mysql_managed: true
 mysql_enabled: false
