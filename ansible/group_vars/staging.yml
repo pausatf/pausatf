@@ -6,13 +6,17 @@ mysql_version: "8"
 wp_environment_type: "staging"
 is_active_web: false
 
+# Debug enabled on staging; never on production
+wp_debug: true
+wp_debug_log: true
+
 # WordPress — staging overrides merged with defaults from all.yml
 wordpress_installs:
   - >-
     {{ wordpress_install_defaults | combine({
     'domain': 'stage.pausatf.org',
-    'wp_version': 'latest',
-    'debug_mode': false,
+    'wp_version': '7.0',
+    'debug_mode': true,
     'db_password': vault_wp_stage_db_password,
     'auth_key': vault_wp_stage_auth_key
       | default(lookup('password',

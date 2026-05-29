@@ -72,6 +72,10 @@ php_version: "8.4"
 modsecurity_rule_engine: "On"
 modsecurity_audit_engine: "On"
 
+# Debug must be off in production to prevent log disclosure.
+wp_debug: false
+wp_debug_log: false
+
 # Production WordPress runs on DigitalOcean Managed MySQL, not local MySQL.
 mysql_managed: true
 mysql_enabled: false
