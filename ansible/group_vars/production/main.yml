@@ -236,12 +236,6 @@ wp_main_plugins:
     version: "3.2.5"
     auto_update: true
     description: "Table management (premium)"
-  - name: "updraftplus"
-    slug: "updraftplus"
-    status: "active"
-    version: "2.25.9.0"
-    auto_update: true
-    description: "Backup and restore plugin"
   - name: "widget-logic"
     slug: "widget-logic"
     status: "active"
