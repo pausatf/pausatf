@@ -1,6 +1,6 @@
 ---
 modsecurity_enabled: true
-modsecurity_rule_engine: "DetectionOnly"
+modsecurity_rule_engine: "On"
 modsecurity_pcre_match_limit: 500000
 modsecurity_pcre_match_limit_recursion: 500000
 modsecurity_request_body_limit: 13107200

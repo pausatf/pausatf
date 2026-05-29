@@ -69,8 +69,7 @@ apache_mpm: "event"
 use_php_fpm: true
 php_version: "8.4"
 
-# Temporary incident mode: keep ModSecurity in audit-only operation while rules are tuned.
-modsecurity_rule_engine: "DetectionOnly"
+modsecurity_rule_engine: "On"
 modsecurity_audit_engine: "On"
 
 # Production WordPress runs on DigitalOcean Managed MySQL, not local MySQL.
