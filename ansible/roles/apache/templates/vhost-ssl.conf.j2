@@ -95,6 +95,13 @@
         Header set X-Upload-Allowed "1" env=CLOUDFLARE
     </IfModule>
 
+    # teeters-php upload endpoint: raise ModSecurity body limit to match the 50MB
+    # PHP script limit (SecRequestBodyLimit global default is 12.5MB).
+    <Location /teeters-php/scorer_upload.php>
+        SecRequestBodyLimit 52428800
+        SecRequestBodyNoFilesLimit 131072
+    </Location>
+
     # Cloudflare handles ETags at the edge
     FileETag None
 
