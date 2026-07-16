@@ -32,7 +32,7 @@
     owner: root
     group: root
     mode: "0644"
-  notify: restart opendkim
+  notify: Restart opendkim
 
 - name: Deploy TrustedHosts
   ansible.builtin.template:
@@ -41,7 +41,7 @@
     owner: root
     group: root
     mode: "0644"
-  notify: restart opendkim
+  notify: Restart opendkim
 
 - name: Deploy KeyTable
   ansible.builtin.copy:
@@ -50,7 +50,7 @@
     owner: root
     group: root
     mode: "0644"
-  notify: restart opendkim
+  notify: Restart opendkim
 
 - name: Deploy SigningTable
   ansible.builtin.copy:
@@ -59,7 +59,7 @@
     owner: root
     group: root
     mode: "0644"
-  notify: restart opendkim
+  notify: Restart opendkim
 
 - name: Create opendkim socket directory for postfix chroot
   ansible.builtin.file:

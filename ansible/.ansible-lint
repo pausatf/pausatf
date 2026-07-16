@@ -16,6 +16,7 @@ skip_list:
   - command-instead-of-module
   - ignore-errors
   - no-handler
+  - fqcn[canonical]
   - yaml[line-length]
 exclude_paths:
   - .cache/
