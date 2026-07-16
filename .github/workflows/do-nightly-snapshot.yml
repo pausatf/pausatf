@@ -11,8 +11,9 @@ permissions:
 jobs:
   snapshot:
     runs-on: ubuntu-latest
-    # No environment gate — uses DO_TOKEN and DO_PROD_DROPLET_ID repo secrets.
-    # If those secrets are missing, doctl will fail with "token required".
+    # No environment gate. Uses DO_TOKEN plus an optional DO_PROD_DROPLET_ID
+    # fallback; the production droplet is resolved by name at runtime so stale
+    # droplet IDs do not break scheduled snapshots.
     permissions:
       contents: read
     steps:
@@ -20,11 +21,10 @@ jobs:
         id: check
         env:
           DO_TOKEN: ${{ secrets.DO_TOKEN }}
-          DROPLET_ID: ${{ secrets.DO_PROD_DROPLET_ID }}
         run: |
           set -euo pipefail
-          if [ -z "$DO_TOKEN" ] || [ -z "$DROPLET_ID" ]; then
-            echo "::warning::DO_TOKEN or DO_PROD_DROPLET_ID secret not configured. Skipping snapshot."
+          if [ -z "$DO_TOKEN" ]; then
+            echo "::warning::DO_TOKEN secret not configured. Skipping snapshot."
             echo "skip=true" >> "$GITHUB_OUTPUT"
           fi
 
@@ -34,17 +34,48 @@ jobs:
         with:
           token: ${{ secrets.DO_TOKEN }}
 
-      - name: Snapshot prod droplet
+      - name: Resolve prod droplet
+        id: droplet
         if: steps.check.outputs.skip != 'true'
         env:
           DROPLET_ID: ${{ secrets.DO_PROD_DROPLET_ID }}
+          DROPLET_NAME: pausatf-prod
+        run: |
+          set -euo pipefail
+
+          if [ -n "$DROPLET_ID" ] && doctl compute droplet get "$DROPLET_ID" --format ID --no-header >/dev/null 2>&1; then
+            echo "id=$DROPLET_ID" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [ -n "$DROPLET_ID" ]; then
+            echo "::warning::DO_PROD_DROPLET_ID is not accessible; looking up $DROPLET_NAME by name."
+          fi
+
+          resolved_id="$(
+            doctl compute droplet list --format ID,Name --no-header \
+              | awk -v name="$DROPLET_NAME" '$2 == name { print $1; exit }'
+          )"
+
+          if [ -z "$resolved_id" ]; then
+            echo "::warning::Could not resolve $DROPLET_NAME. Skipping snapshot."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "id=$resolved_id" >> "$GITHUB_OUTPUT"
+
+      - name: Snapshot prod droplet
+        if: steps.check.outputs.skip != 'true' && steps.droplet.outputs.skip != 'true'
+        env:
+          DROPLET_ID: ${{ steps.droplet.outputs.id }}
         run: |
           set -euo pipefail
           doctl compute droplet-action snapshot "$DROPLET_ID" \
             --snapshot-name "prod-nightly-$(date -u +%Y%m%d-%H%M%S)"
 
       - name: Prune old snapshots (keep last 7)
-        if: steps.check.outputs.skip != 'true'
+        if: steps.check.outputs.skip != 'true' && steps.droplet.outputs.skip != 'true'
         env:
           DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DO_TOKEN }}
         run: |
