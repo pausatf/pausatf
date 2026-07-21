@@ -34,3 +34,120 @@ updates:
       day: "monday"
     labels:
       - "dependencies"
+
+  # Python (docs build)
+  - package-ecosystem: "pip"
+    directory: "/docs"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+      - "python"
+    groups:
+      pip:
+        update-types:
+          - "minor"
+          - "patch"
+
+  # PHP (membership plugin)
+  - package-ecosystem: "composer"
+    directory: "/wordpress/plugins/pausatf-membership"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+      - "php"
+    groups:
+      composer:
+        update-types:
+          - "minor"
+          - "patch"
+
+  # Docker (compose stack)
+  - package-ecosystem: "docker"
+    directory: "/scripts/docker"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+      - "docker"
+    groups:
+      docker:
+        update-types:
+          - "minor"
+          - "patch"
+
+  # Docker (nginx image)
+  - package-ecosystem: "docker"
+    directory: "/scripts/docker/nginx"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+      - "docker"
+    groups:
+      docker:
+        update-types:
+          - "minor"
+          - "patch"
+
+  # Docker (wordpress image)
+  - package-ecosystem: "docker"
+    directory: "/scripts/docker/wordpress"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+      - "docker"
+    groups:
+      docker:
+        update-types:
+          - "minor"
+          - "patch"
+
+  # GitHub Actions (docs workflows)
+  - package-ecosystem: "github-actions"
+    directory: "/docs"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+    groups:
+      actions:
+        patterns:
+          - "actions/*"
+          - "hashicorp/*"
+
+  # GitHub Actions (scripts workflows)
+  - package-ecosystem: "github-actions"
+    directory: "/scripts"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+    groups:
+      actions:
+        patterns:
+          - "actions/*"
+          - "hashicorp/*"
+
+  # GitHub Actions (terraform workflows)
+  - package-ecosystem: "github-actions"
+    directory: "/terraform"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+    groups:
+      actions:
+        patterns:
+          - "actions/*"
+          - "hashicorp/*"
