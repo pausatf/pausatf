@@ -5,12 +5,17 @@ on:
     - cron: '0 10 * * *'  # 2 AM Pacific approx
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 permissions:
   contents: read
 
 jobs:
   snapshot:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     # No environment gate — uses DO_TOKEN and DO_PROD_DROPLET_ID repo secrets.
     # If those secrets are missing, doctl will fail with "token required".
     permissions:
@@ -49,7 +54,7 @@ jobs:
           DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DO_TOKEN }}
         run: |
           # List all prod-nightly snapshots sorted by date, skip the 7 most recent
-          # head -n -7 is a GNU coreutils extension; safe on ubuntu-latest runners
+          # head -n -7 is a GNU coreutils extension; safe on ubuntu-24.04 runners
           doctl compute snapshot list --resource droplet --format ID,Name --no-header \
             | grep "^[0-9].*prod-nightly-" \
             | sort -t- -k3 -k4 \

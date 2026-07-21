@@ -8,12 +8,17 @@ on:
         required: false
         type: string
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 permissions:
   contents: read
 
 jobs:
   update:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
       - name: Determine IP
         id: ip
@@ -43,26 +48,26 @@ jobs:
           CF_HTTP: ${{ steps.cf.outputs.cf_http }}
         run: |
           echo "Updating firewalls to allow SSH from $MY_IP"
-          
+
           # Production
           doctl compute firewall update a4e42798-ab22-467f-a821-daa290f56655 \
             --name pausatf-production-firewall \
             --droplet-ids REDACTED_DROPLET_ID,REDACTED_DROPLET_ID \
             --inbound-rules "protocol:tcp,ports:22,address:100.64.0.0/10,address:${MY_IP}/32 protocol:tcp,ports:80,${CF_HTTP} protocol:tcp,ports:443,${CF_HTTP} protocol:tcp,ports:7844,address:0.0.0.0/0 protocol:udp,ports:7844,address:0.0.0.0/0" \
             --outbound-rules "protocol:tcp,ports:1-65535,address:0.0.0.0/0,address:::/0 protocol:udp,ports:1-65535,address:0.0.0.0/0,address:::/0 protocol:icmp,address:0.0.0.0/0,address:::/0"
-          
+
           # Staging
           doctl compute firewall update c12dfc7f-f43a-4b32-96c6-80ba34035b1a \
             --name pausatf-staging \
             --droplet-ids REDACTED_DROPLET_ID \
             --inbound-rules "protocol:tcp,ports:22,address:100.64.0.0/10,address:${MY_IP}/32 protocol:tcp,ports:80,address:0.0.0.0/0 protocol:tcp,ports:443,address:0.0.0.0/0 protocol:tcp,ports:7844,address:0.0.0.0/0 protocol:udp,ports:7844,address:0.0.0.0/0 protocol:icmp,address:0.0.0.0/0" \
             --outbound-rules "protocol:tcp,ports:1-65535,address:0.0.0.0/0,address:::/0 protocol:udp,ports:1-65535,address:0.0.0.0/0,address:::/0 protocol:icmp,address:0.0.0.0/0,address:::/0"
-          
+
           # Dev
           doctl compute firewall update 77eafd16-9a0f-4d1c-bf49-7408809b8d81 \
             --name pausatf-dev \
             --droplet-ids REDACTED_DROPLET_ID \
             --inbound-rules "protocol:tcp,ports:22,address:100.64.0.0/10,address:${MY_IP}/32 protocol:tcp,ports:80,address:0.0.0.0/0 protocol:tcp,ports:443,address:0.0.0.0/0 protocol:tcp,ports:7844,address:0.0.0.0/0 protocol:udp,ports:7844,address:0.0.0.0/0 protocol:icmp,address:0.0.0.0/0" \
             --outbound-rules "protocol:tcp,ports:1-65535,address:0.0.0.0/0,address:::/0 protocol:udp,ports:1-65535,address:0.0.0.0/0,address:::/0 protocol:icmp,address:0.0.0.0/0,address:::/0"
-          
+
           echo "All firewalls updated for IP: $MY_IP"

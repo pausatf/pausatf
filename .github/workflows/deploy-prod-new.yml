@@ -3,6 +3,10 @@ name: Deploy to Production (New)
 on:
   workflow_dispatch:
 
+concurrency:
+  group: deploy-production_new
+  cancel-in-progress: false
+
 permissions:
   contents: read
 

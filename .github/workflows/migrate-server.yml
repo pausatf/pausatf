@@ -40,7 +40,8 @@ concurrency:
 
 jobs:
   preflight:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     environment: ${{ inputs.environment == 'production' && 'production' || inputs.environment == 'staging' && 'staging' || 'development' }}
     permissions:
       contents: read
@@ -143,7 +144,8 @@ jobs:
             "$ANSIBLE_USER@$NEW_SERVER_IP" "echo OK"
 
   configure-new-server:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
     needs: preflight
     environment: ${{ inputs.environment == 'production' && 'production' || inputs.environment == 'staging' && 'staging' || 'development' }}
     permissions:
@@ -154,10 +156,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
       - name: Setup Python
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v5
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0
         with:
           python-version: '3.12'
 
@@ -217,7 +219,8 @@ jobs:
           rm -f vault.pass ~/.ssh/id_ed25519
 
   migrate-data:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
     needs: configure-new-server
     if: inputs.dry_run == false && inputs.skip_data_migration == false
     environment: ${{ inputs.environment == 'production' && 'production' || inputs.environment == 'staging' && 'staging' || 'development' }}
@@ -284,7 +287,8 @@ jobs:
         run: echo "Data migration complete"
 
   smoke-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     needs: configure-new-server
     if: needs.configure-new-server.result == 'success'
     env:
@@ -330,7 +334,8 @@ jobs:
         run: rm -f ~/.ssh/id_ed25519
 
   dns-cutover:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     needs: smoke-test
     if: inputs.dry_run == false && needs.smoke-test.result == 'success'
     environment: ${{ inputs.environment == 'production' && 'production' || inputs.environment == 'staging' && 'staging' || 'development' }}
@@ -339,7 +344,7 @@ jobs:
 
     steps:
       - name: Setup Python
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v5
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0
         with:
           python-version: '3.12'
 
@@ -388,7 +393,8 @@ jobs:
           PYEOF
 
   verify:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     needs: dns-cutover
     if: inputs.dry_run == false && needs.dns-cutover.result == 'success'
 
@@ -405,7 +411,8 @@ jobs:
         run: echo "Migration complete"
 
   rollback-on-failure:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     needs:
       - preflight
       - dns-cutover
@@ -417,7 +424,7 @@ jobs:
 
     steps:
       - name: Setup Python
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v5
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0
         with:
           python-version: '3.12'
 
