@@ -12,30 +12,62 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Fetch current Cloudflare IPv4 ranges
+      - name: Fetch current Cloudflare ranges
         id: cf
         run: |
-          CF_IPS=$(curl -sS https://www.cloudflare.com/ips-v4 | tr '\n' ',' | sed 's/,$//')
-          echo "ips=$CF_IPS" >> "$GITHUB_OUTPUT"
+          set -euo pipefail
+          CF_HTTP=$( { curl -sSf https://www.cloudflare.com/ips-v4; echo; \
+                       curl -sSf https://www.cloudflare.com/ips-v6; } \
+            | grep -E '^[0-9a-fA-F:.]+/[0-9]+$' \
+            | sed 's/^/,address:/' | tr -d '\n' )
+          if [ -z "$CF_HTTP" ]; then
+            echo "::error::Cloudflare returned no usable ranges; refusing to rewrite the firewall."
+            exit 1
+          fi
+          echo "http=$CF_HTTP" >> "$GITHUB_OUTPUT"
 
       - name: Install doctl
         uses: digitalocean/action-doctl@3cb3953159719656269e044e0e24ca16dd2a690f # v2
         with:
           token: ${{ secrets.DO_TOKEN }}
 
-      - name: Update production firewall
+      - name: Sync production firewall
         env:
-          CF_IPS: ${{ steps.cf.outputs.ips }}
-          MY_STATIC_IP: "REDACTED_ADMIN_IP"
-          PROD_FW_ID: "a4e42798-ab22-467f-a821-daa290f56655"
+          CF_HTTP: ${{ steps.cf.outputs.http }}
+          PROD_FW_ID: "5fb8b83b-12bb-4256-8ffc-ccf275f55a7e"
         run: |
-          # Build inbound rules with current Cloudflare IPs
-          CF_HTTP=$(echo "$CF_IPS" | tr ',' '\n' | sed 's/^/address:/' | tr '\n' ',' | sed 's/,$//')
-          
+          set -euo pipefail
+          FW=$(doctl compute firewall get "$PROD_FW_ID" -o json)
+
+          NAME=$(printf '%s' "$FW" | jq -r '.[0].name')
+          DROPLETS=$(printf '%s' "$FW" | jq -r '.[0].droplet_ids | join(",")')
+          if [ -z "$DROPLETS" ]; then
+            echo "::error::$PROD_FW_ID has no attached droplets; refusing to rewrite it."
+            exit 1
+          fi
+
+          # doctl's firewall update is a full replace: anything not restated here is
+          # dropped. Carry the rules this job does not own (ICMP, SSH) through verbatim
+          # so syncing the Cloudflare allowlist can never take SSH away.
+          KEEP=$(printf '%s' "$FW" | jq -r '
+            .[0].inbound_rules
+            | map(select((.protocol == "tcp" and (.ports == "80" or .ports == "443")) | not))
+            | map("protocol:" + .protocol
+                  + (if .ports != "0" then ",ports:" + .ports else "" end)
+                  + ((.sources.addresses // []) | map(",address:" + .) | join("")))
+            | join(" ")')
+
+          OUTBOUND=$(printf '%s' "$FW" | jq -r '
+            .[0].outbound_rules
+            | map("protocol:" + .protocol
+                  + (if .ports != "0" then ",ports:" + .ports else "" end)
+                  + ((.destinations.addresses // []) | map(",address:" + .) | join("")))
+            | join(" ")')
+
           doctl compute firewall update "$PROD_FW_ID" \
-            --name pausatf-production-firewall \
-            --droplet-ids REDACTED_DROPLET_ID,REDACTED_DROPLET_ID \
-            --inbound-rules "protocol:tcp,ports:22,address:100.64.0.0/10,address:${MY_STATIC_IP}/32 protocol:tcp,ports:80,${CF_HTTP} protocol:tcp,ports:443,${CF_HTTP} protocol:tcp,ports:7844,address:0.0.0.0/0 protocol:udp,ports:7844,address:0.0.0.0/0" \
-            --outbound-rules "protocol:tcp,ports:1-65535,address:0.0.0.0/0,address:::/0 protocol:udp,ports:1-65535,address:0.0.0.0/0,address:::/0 protocol:icmp,address:0.0.0.0/0,address:::/0"
-          
-          echo "Production firewall updated with $(echo "$CF_IPS" | tr ',' '\n' | wc -l) Cloudflare ranges"
+            --name "$NAME" \
+            --droplet-ids "$DROPLETS" \
+            --inbound-rules "$KEEP protocol:tcp,ports:80${CF_HTTP} protocol:tcp,ports:443${CF_HTTP}" \
+            --outbound-rules "$OUTBOUND"
+
+          echo "$NAME synced with $(printf '%s' "$CF_HTTP" | tr ',' '\n' | grep -c address:) Cloudflare ranges"
