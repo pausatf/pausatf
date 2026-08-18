@@ -40,7 +40,10 @@ jobs:
           DROPLET_ID: ${{ secrets.DO_PROD_DROPLET_ID }}
         run: |
           set -euo pipefail
-          doctl compute droplet-action snapshot "$DROPLET_ID" \
+          # --wait blocks until the snapshot finishes. Without it the step
+          # reports success the moment the request is accepted, so a snapshot
+          # that fails afterwards is invisible and the prune below still runs.
+          doctl compute droplet-action snapshot "$DROPLET_ID" --wait \
             --snapshot-name "prod-nightly-$(date -u +%Y%m%d-%H%M%S)"
 
       - name: Prune old snapshots (keep last 7)
@@ -48,8 +51,10 @@ jobs:
         env:
           DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DO_TOKEN }}
         run: |
-          # List all prod-nightly snapshots sorted by date, skip the 7 most recent
-          # head -n -7 is a GNU coreutils extension; safe on ubuntu-latest runners
+          # List all prod-nightly snapshots sorted by date, skip the 7 most recent.
+          # head -n -7 is a GNU coreutils extension; safe on ubuntu-latest runners.
+          # The step above waits for the new snapshot, so it is in this listing
+          # and the seven kept are seven, not six plus one still in flight.
           doctl compute snapshot list --resource droplet --format ID,Name --no-header \
             | grep "^[0-9].*prod-nightly-" \
             | sort -t- -k3 -k4 \
