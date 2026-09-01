@@ -5,4 +5,6 @@
 {% for cidr in jetpack_ip_ranges %}
     Require ip {{ cidr }}
 {% endfor %}
+    Header always set Cache-Control "private, no-store, no-cache, must-revalidate, max-age=0"
+    Header always set CF-Cache-Control "no-store"
 </Files>
