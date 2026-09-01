@@ -514,7 +514,7 @@ resource "cloudflare_ruleset" "cache_rules" {
 }
 
 # =============================================================================
-# WAF — Block xmlrpc.php
+# WAF — Restrict xmlrpc.php to Jetpack/Automattic
 # =============================================================================
 
 resource "cloudflare_ruleset" "waf_custom" {
@@ -526,9 +526,9 @@ resource "cloudflare_ruleset" "waf_custom" {
   rules = [
     {
       action      = "block"
-      description = "Block xmlrpc.php access"
+      description = "Block non-Jetpack xmlrpc.php access"
       enabled     = true
-      expression  = "(http.request.uri.path eq \"/xmlrpc.php\")"
+      expression  = "(http.request.uri.path eq \"/xmlrpc.php\" and not (ip.src in {192.0.64.0/18 192.0.80.0/20 192.0.96.0/20 192.0.112.0/20 195.234.108.0/22 122.248.245.244 54.217.201.243 54.232.116.4}))"
     },
   ]
 }

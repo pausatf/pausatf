@@ -1,0 +1,8 @@
+[Unit]
+Description=PAUSATF encrypted production backup to Spaces
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/pausatf-db-backup.sh

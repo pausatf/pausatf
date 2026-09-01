@@ -251,13 +251,11 @@
   notify: Reload Apache
 
 - name: Deploy block-xmlrpc configuration
-  ansible.builtin.copy:
+  ansible.builtin.template:
+    src: xmlrpc-protect.conf.j2
     dest: /etc/apache2/conf-available/block-xmlrpc.conf
-    content: |
-      # Block WordPress XML-RPC attacks
-      <Files xmlrpc.php>
-          Require all denied
-      </Files>
+    owner: root
+    group: root
     mode: "0644"
   notify: Reload Apache
 
