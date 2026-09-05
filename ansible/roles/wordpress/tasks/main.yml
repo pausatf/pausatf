@@ -205,6 +205,41 @@
   loop: "{{ wordpress_installs | default([]) }}"
   when: item.wp_cron_system | default(true)
 
+- name: Deploy WP cron health check script
+  ansible.builtin.template:
+    src: check-wp-cron-health.sh.j2
+    dest: /usr/local/sbin/check-wp-cron-health.sh
+    owner: root
+    group: root
+    mode: "0750"
+  tags: wp_cron
+
+- name: Create WP cron health check log file
+  ansible.builtin.file:
+    path: /var/log/wp-cron-health.log
+    state: touch
+    owner: root
+    group: root
+    mode: "0644"
+  changed_when: false
+  tags: wp_cron
+
+- name: Schedule WP cron health check every 30 minutes
+  ansible.builtin.cron:
+    name: "WP cron health check"
+    minute: "*/30"
+    job: "/usr/local/sbin/check-wp-cron-health.sh"
+    user: root
+  tags: wp_cron
+
+- name: Configure Jetpack performance features
+  ansible.builtin.include_tasks: jetpack.yml
+  tags: [wordpress, jetpack]
+
+- name: Apply and verify PHP compatibility patches
+  ansible.builtin.include_tasks: patches.yml
+  tags: wp_patches
+
 - name: Ensure legacy data year directory exists for current year
   ansible.builtin.file:
     path: "/var/www/legacy/public_html/data/{{ ansible_date_time.year }}"

@@ -1,0 +1,65 @@
+---
+# Idempotently ensure PHP compatibility patches survive WordPress/plugin/theme updates.
+# Each task checks via regexp before modifying so re-runs are safe.
+
+- name: Ensure kses.php null guard is present
+  ansible.builtin.lineinfile:
+    path: "{{ item.path | default('/var/www/html') }}/wp-includes/kses.php"
+    regexp: "if \\( null === \\$content \\)"
+    line: "\tif ( null === $content ) {"
+    insertafter: "function wp_kses_no_null\\( \\$content, \\$options = null \\)"
+    state: present
+  loop: "{{ wordpress_installs }}"
+  tags: wp_patches
+
+- name: Ensure accordions null coalescing is present
+  ansible.builtin.replace:
+    path: "{{ item.path | default('/var/www/html') }}/wp-content/plugins/accordions/includes/functions.php"
+    regexp: "str_replace\\(\"&quot;\", '\"', \\$accordionsBuilderCss\\);"
+    replace: "str_replace(\"&quot;\", '\"', $accordionsBuilderCss ?? '');"
+  loop: "{{ wordpress_installs }}"
+  failed_when: false
+  tags: wp_patches
+
+- name: Ensure TheSource HTTPInterface property declarations present
+  ansible.builtin.lineinfile:
+    path: "{{ item.path | default('/var/www/html') }}/wp-content/themes/TheSource/core/components/HTTPInterface.php"
+    regexp: "public \\$expects_json;"
+    insertafter: "public \\$response;"
+    line: "\tpublic $expects_json;"
+    state: present
+  loop: "{{ wordpress_installs }}"
+  failed_when: false
+  tags: wp_patches
+
+- name: Ensure TheSource Service property declarations present
+  ansible.builtin.lineinfile:
+    path: "{{ item.path | default('/var/www/html') }}/wp-content/themes/TheSource/core/components/api/Service.php"
+    regexp: "public \\$data_utils;"
+    insertafter: "public \\$response_data_key;"
+    line: "\tpublic $data_utils;"
+    state: present
+  loop: "{{ wordpress_installs }}"
+  failed_when: false
+  tags: wp_patches
+
+- name: Ensure TheSource PageResource location property present
+  ansible.builtin.lineinfile:
+    path: "{{ item.path | default('/var/www/html') }}/wp-content/themes/TheSource/core/components/PageResource.php"
+    regexp: "public \\$location;"
+    insertafter: "public \\$write_file_location;"
+    line: "\tpublic $location;"
+    state: present
+  loop: "{{ wordpress_installs }}"
+  failed_when: false
+  tags: wp_patches
+
+- name: Deploy PAUSATF patch manager MU-plugin
+  ansible.builtin.template:
+    src: pausatf-patch-manager.php.j2
+    dest: "{{ item.path | default('/var/www/html') }}/wp-content/mu-plugins/pausatf-patch-manager.php"
+    owner: www-data
+    group: www-data
+    mode: "0644"
+  loop: "{{ wordpress_installs }}"
+  tags: [wp_patches, mu_plugins]

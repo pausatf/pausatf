@@ -12,6 +12,10 @@
 
     DocumentRoot {{ item.path }}
 
+    # Cloudflare SSL termination — propagate HTTPS to PHP/WordPress
+    SetEnvIf X-Forwarded-Proto https HTTPS=on
+    RequestHeader set X-Forwarded-Proto "https"
+
     # SSL Configuration
     SSLEngine on
     SSLCertificateFile {{ item.ssl_certificate }}
@@ -37,11 +41,31 @@
     Protocols h2 http/1.1
 
     # PHP-FPM via unix socket (event MPM)
+    # setifempty lets WordPress's own nocache_headers() win for wp-admin/nonce pages.
     <FilesMatch "\.php$">
+        Header always unset Cache-Control
+        Header always unset Expires
+        Header always setifempty Cache-Control "public, max-age=60, s-maxage=300, must-revalidate"
         SetHandler "proxy:unix:{{ php_fpm_socket | default('/run/php/php' + php_version + '-fpm.sock') }}|fcgi://localhost"
     </FilesMatch>
+
+    # Authenticated WordPress paths must never be edge-cached.
+    <LocationMatch "^/wp-admin">
+        Header always set Cache-Control "private, no-store, no-cache, must-revalidate"
+        Header always unset Expires
+    </LocationMatch>
     <Proxy "fcgi://localhost">
     </Proxy>
+
+    # Restricted status endpoints (localhost only)
+    <Location /server-status>
+        SetHandler server-status
+        Require ip 127.0.0.1 ::1
+    </Location>
+    <Location /fpm-status>
+        SetHandler "proxy:unix:{{ php_fpm_socket | default('/run/php/php' + php_version + '-fpm.sock') }}|fcgi://localhost"
+        Require ip 127.0.0.1 ::1
+    </Location>
 {% else %}
     # PHP via mod_php (prefork MPM)
     <FilesMatch "\.php$">
@@ -70,6 +94,13 @@
         SetEnvIf X-Forwarded-For "^.*\..*\..*\..*" CLOUDFLARE=1
         Header set X-Upload-Allowed "1" env=CLOUDFLARE
     </IfModule>
+
+    # teeters-php upload endpoint: raise ModSecurity body limit to match the 50MB
+    # PHP script limit (SecRequestBodyLimit global default is 12.5MB).
+    <Location /teeters-php/scorer_upload.php>
+        SecRequestBodyLimit 52428800
+        SecRequestBodyNoFilesLimit 131072
+    </Location>
 
     # Cloudflare handles ETags at the edge
     FileETag None

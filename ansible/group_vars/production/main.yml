@@ -11,7 +11,7 @@
 # These values describe the live production droplet and must not bleed into
 # dev/staging, which use different (or no) DigitalOcean resources.
 digitalocean_droplet_id: "{{ vault_digitalocean_droplet_id }}"
-digitalocean_droplet_name: "pausatf-prod-new"
+digitalocean_droplet_name: "pausatf-prod-active"
 digitalocean_region: "sfo2"
 digitalocean_region_name: "San Francisco 2"
 digitalocean_size: "s-4vcpu-8gb"
@@ -61,7 +61,7 @@ cloudflare_dns_records:
 # =============================================================================
 # SYSTEM — PRODUCTION HOSTNAME
 # =============================================================================
-hostname: "pausatf-prod"
+hostname: "pausatf-prod-active"
 web_server: apache
 
 # Ubuntu 24.04: event MPM + PHP-FPM
@@ -69,9 +69,16 @@ apache_mpm: "event"
 use_php_fpm: true
 php_version: "8.4"
 
-# Temporary incident mode: keep ModSecurity in audit-only operation while rules are tuned.
-modsecurity_rule_engine: "DetectionOnly"
+modsecurity_rule_engine: "On"
 modsecurity_audit_engine: "On"
+
+# Debug must be off in production to prevent log disclosure.
+wp_debug: false
+wp_debug_log: false
+
+# Jetpack performance features activated on production (2026-05-28).
+jetpack_boost_defer_js: true
+jetpack_photon_enabled: false  # disabled: double-CDN with Cloudflare adds latency
 
 # Production WordPress runs on DigitalOcean Managed MySQL, not local MySQL.
 mysql_managed: true
@@ -90,6 +97,20 @@ certbot_enabled: true
 # This server is the active web server (controls wp-cron)
 is_active_web: true
 
+# Block direct IP access — prevents Cloudflare bypass
+block_direct_ip: true
+server_public_ip: "{{ vault_prod_server_ip }}"
+
+# Restrict HTTP/HTTPS ingress to Cloudflare edge IPs only
+ufw_restrict_web_to_cloudflare: true
+
+# Postfix hostname matches the droplet FQDN for correct mail headers
+postfix_hostname: "pausatf-prod-active.pausatf.org"
+
+# WordPress Redis and cron settings
+wp_redis_maxttl: 300
+wp_disable_cron: true
+
 # =============================================================================
 # WORDPRESS — PRODUCTION INSTALL
 # =============================================================================
@@ -99,7 +120,7 @@ wordpress_installs:
   - >-
     {{ wordpress_install_defaults | combine({
     'domain': 'www.pausatf.org', 'aliases': ['pausatf.org'],
-    'wp_version': '6.8.3', 'debug_mode': false,
+    'wp_version': '7.0', 'debug_mode': false,
     'wp_memory_limit': '256M', 'wp_max_memory_limit': '512M',
     'ssl_enabled': true,
     'ssl_certificate': '/etc/letsencrypt/live/www.pausatf.org/fullchain.pem',
@@ -215,12 +236,6 @@ wp_main_plugins:
     version: "3.2.5"
     auto_update: true
     description: "Table management (premium)"
-  - name: "updraftplus"
-    slug: "updraftplus"
-    status: "active"
-    version: "2.25.9.0"
-    auto_update: true
-    description: "Backup and restore plugin"
   - name: "widget-logic"
     slug: "widget-logic"
     status: "active"

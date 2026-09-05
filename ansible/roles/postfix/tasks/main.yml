@@ -18,7 +18,7 @@
     owner: root
     group: root
     mode: "0644"
-  notify: restart postfix
+  notify: Restart postfix
 
 - name: Set mailname
   ansible.builtin.copy:

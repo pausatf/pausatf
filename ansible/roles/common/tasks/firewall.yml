@@ -40,17 +40,57 @@
     src: "{{ item }}"
   loop: "{{ ssh_allow_networks_effective }}"
 
-- name: Allow HTTP
+- name: Allow HTTP from anywhere
   community.general.ufw:
     rule: allow
     port: "80"
     proto: tcp
+  when: not (ufw_restrict_web_to_cloudflare | default(false))
 
-- name: Allow HTTPS
+- name: Allow HTTPS from anywhere
   community.general.ufw:
     rule: allow
     port: "443"
     proto: tcp
+  when: not (ufw_restrict_web_to_cloudflare | default(false))
+
+# When restricting to Cloudflare IPs, first remove any existing broad
+# allow rules that would otherwise survive alongside the new narrower rules.
+- name: Delete broad HTTP allow rule (Cloudflare-only mode)
+  community.general.ufw:
+    rule: allow
+    port: "80"
+    proto: tcp
+    delete: true
+  when: ufw_restrict_web_to_cloudflare | default(false)
+  failed_when: false
+
+- name: Delete broad HTTPS allow rule (Cloudflare-only mode)
+  community.general.ufw:
+    rule: allow
+    port: "443"
+    proto: tcp
+    delete: true
+  when: ufw_restrict_web_to_cloudflare | default(false)
+  failed_when: false
+
+- name: Allow HTTP from Cloudflare IPs only
+  community.general.ufw:
+    rule: allow
+    port: "80"
+    proto: tcp
+    src: "{{ item }}"
+  loop: "{{ cloudflare_ipv4_ranges + cloudflare_ipv6_ranges }}"
+  when: ufw_restrict_web_to_cloudflare | default(false)
+
+- name: Allow HTTPS from Cloudflare IPs only
+  community.general.ufw:
+    rule: allow
+    port: "443"
+    proto: tcp
+    src: "{{ item }}"
+  loop: "{{ cloudflare_ipv4_ranges + cloudflare_ipv6_ranges }}"
+  when: ufw_restrict_web_to_cloudflare | default(false)
 
 - name: Allow Cloudflare Tunnel (TCP 7844)
   community.general.ufw:

@@ -397,6 +397,32 @@
     force: true
   notify: Reload Apache
 
+- name: Deploy block-direct-ip virtual host
+  ansible.builtin.template:
+    src: block-direct-ip.conf.j2
+    dest: /etc/apache2/sites-available/block-direct-ip.conf
+    owner: root
+    group: root
+    mode: "0644"
+  when: block_direct_ip | default(false)
+  notify: Reload Apache
+
+- name: Enable block-direct-ip virtual host
+  ansible.builtin.file:
+    src: /etc/apache2/sites-available/block-direct-ip.conf
+    dest: /etc/apache2/sites-enabled/block-direct-ip.conf
+    state: link
+    force: true
+  when: block_direct_ip | default(false)
+  notify: Reload Apache
+
+- name: Disable block-direct-ip virtual host
+  ansible.builtin.file:
+    path: /etc/apache2/sites-enabled/block-direct-ip.conf
+    state: absent
+  when: not (block_direct_ip | default(false))
+  notify: Reload Apache
+
 - name: Ensure Apache is started and enabled
   ansible.builtin.service:
     name: apache2
