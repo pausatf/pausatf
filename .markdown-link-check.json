@@ -15,6 +15,7 @@
     { "pattern": "^https://dev\\.mysql\\.com" },
     { "pattern": "^https://dmarcian\\.com" },
     { "pattern": "^https://admin\\.google\\.com" },
+    { "pattern": "^https://support\\.google\\.com" },
     { "pattern": "^https://elegantthemes\\.com" },
     { "pattern": "^https://www\\.isitdownrightnow\\.com" },
     { "pattern": "^https://docs\\.digitalocean\\.com/products/droplets/how-to/migrate" },

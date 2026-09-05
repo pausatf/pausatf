@@ -11,17 +11,29 @@ permissions:
 jobs:
   backup:
     runs-on: ubuntu-latest
-    environment: production
     permissions:
       contents: write
 
     steps:
+      - name: Check required secrets
+        id: check
+        env:
+          SSH_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "$SSH_KEY" ]; then
+            echo "::warning::PROD_SSH_PRIVATE_KEY secret not configured. Skipping legacy backup."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout
+        if: steps.check.outputs.skip != 'true'
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v4
         with:
           fetch-depth: 0
 
       - name: Setup SSH key
+        if: steps.check.outputs.skip != 'true'
         env:
           SSH_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
         run: |
@@ -32,15 +44,18 @@ jobs:
           ssh-keyscan -H ftp.pausatf.org >> ~/.ssh/known_hosts 2>/dev/null || true
 
       - name: Rsync legacy from prod
+        if: steps.check.outputs.skip != 'true'
         run: bash scripts/backup/rsync_legacy.sh
 
       - name: Strip nested git repos from backup tree
+        if: steps.check.outputs.skip != 'true'
         run: |
           # Nested .git dirs cause git-add to treat them as gitlinks (empty submodule
           # refs) which break the push. Remove them before staging.
           find backups/legacy -name ".git" -type d -exec rm -rf {} + 2>/dev/null || true
 
       - name: Commit and push if changed
+        if: steps.check.outputs.skip != 'true'
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
