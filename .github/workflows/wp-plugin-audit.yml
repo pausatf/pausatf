@@ -63,7 +63,8 @@ permissions:
 jobs:
   audit:
     name: Check for plugin updates
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     steps:
       - name: Probe widget logic recovery sources
         if: ${{ inputs.probe_widget_logic == true }}
@@ -1028,25 +1029,41 @@ jobs:
           PROD_HOST: ${{ vars.PROD_HOST }}
         run: |
           set -euo pipefail
-          if [ -z "${PROD_SSH_PRIVATE_KEY:-}" ] || [ -z "${PROD_HOST:-}" ]; then
-            echo "PROD_SSH_PRIVATE_KEY or PROD_HOST not set — skipping"
-            echo "updates_found=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
+          : "${PROD_SSH_PRIVATE_KEY:?Production SSH key is required}"
+          : "${PROD_HOST:?Production host is required}"
           mkdir -p ~/.ssh
           printf '%s\n' "$PROD_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          UPDATES=$(ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
-            github-deploy@"$PROD_HOST" \
-            "/usr/local/bin/wp plugin list --update=available --format=table --path=/var/www/html --allow-root 2>/dev/null" || true)
-          rm -f ~/.ssh/id_rsa
-          # Strip header-only output (no updates)
-          if printf '%s' "$UPDATES" | grep -qv '^+\|^|\|^$\|name'; then
+          trap 'rm -f ~/.ssh/id_rsa' EXIT
+          ssh -o BatchMode=yes -o ConnectTimeout=15 -o StrictHostKeyChecking=accept-new \
+            -i ~/.ssh/id_rsa github-deploy@"$PROD_HOST" 'bash -s' > updates.json <<'REMOTE'
+          set -euo pipefail
+          if sudo -n docker inspect pausatf-wordpress >/dev/null 2>&1; then
+            wpcli() {
+              sudo -n docker exec -u www-data pausatf-wordpress sh -c '
+                if command -v wp >/dev/null 2>&1; then
+                  exec wp "$@"
+                elif [ -r /tmp/wp-cli.phar ]; then
+                  exec php /tmp/wp-cli.phar "$@"
+                else
+                  echo "WP-CLI is not installed in the WordPress container" >&2
+                  exit 1
+                fi
+              ' sh "$@"
+            }
+          else
+            wpcli() { /usr/local/bin/wp --path=/var/www/html "$@"; }
+          fi
+          wpcli eval 'wp_update_plugins();' >/dev/null
+          wpcli plugin list --update=available --fields=name,version,update_version --format=json
+          REMOTE
+          jq -e 'type == "array"' updates.json >/dev/null
+          if [ "$(jq 'length' updates.json)" -gt 0 ]; then
             echo "updates_found=true" >> "$GITHUB_OUTPUT"
             {
-              echo "PLUGIN_UPDATES<<EOF"
-              printf '%s' "$UPDATES"
-              echo "EOF"
+              echo 'PLUGIN_UPDATES<<PLUGIN_UPDATES_END'
+              jq -r '.[] | [.name, .version, .update_version] | @tsv' updates.json
+              echo 'PLUGIN_UPDATES_END'
             } >> "$GITHUB_ENV"
           else
             echo "updates_found=false" >> "$GITHUB_OUTPUT"
