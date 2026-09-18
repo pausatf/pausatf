@@ -10,6 +10,8 @@ import sys
 def candidates(snapshots, droplet_id, completed_name, keep=7):
     if keep < 1 or not str(droplet_id).isdigit():
         raise ValueError("A numeric droplet ID and positive retention are required")
+    if not isinstance(snapshots, list) or any(not isinstance(s, dict) for s in snapshots):
+        raise ValueError("Expected a JSON list of snapshot objects")
     owned = [
         s for s in snapshots
         if s.get("resource_type") == "droplet"

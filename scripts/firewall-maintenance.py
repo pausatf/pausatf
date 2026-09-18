@@ -6,6 +6,7 @@ import ipaddress
 import json
 import os
 import urllib.request
+import urllib.error
 
 TARGETS = {
     '5fb8b83b-12bb-4256-8ffc-ccf275f55a7e': ('pausatf-prod-v2-fw', 586316413),
@@ -52,34 +53,46 @@ def main():
     args = parser.parse_args()
     if args.cloudflare == bool(args.ssh_ip):
         parser.error('Choose exactly one operation')
-    ranges = None
-    if args.cloudflare:
-        ranges = []
-        for family in ('v4', 'v6'):
-            with urllib.request.urlopen(f'https://www.cloudflare.com/ips-{family}', timeout=30) as response:
-                ranges.extend(response.read().decode().split())
-    token = os.environ['DIGITALOCEAN_ACCESS_TOKEN']
-    def request(path, body=None):
-        req = urllib.request.Request('https://api.digitalocean.com/v2/' + path,
-            data=json.dumps(body).encode() if body is not None else None,
-            method='PUT' if body is not None else 'GET',
-            headers={'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'})
-        with urllib.request.urlopen(req, timeout=30) as response:
-            data = response.read()
-            return json.loads(data) if data else {}
-    # Validate every target before making any changes.
-    changes = []
-    for ident, expected in TARGETS.items():
-        firewall = request('firewalls/' + ident)['firewall']
-        body = plan(firewall, expected, ranges=ranges, ssh_ip=args.ssh_ip)
-        original = {k: firewall[k] for k in body}
-        if body != original:
-            changes.append((ident, body))
-    for ident, body in changes:
-        print(('Updating' if args.apply else 'Would update'), body['name'])
-        if args.apply:
-            request('firewalls/' + ident, body)
-    print(f'{len(changes)} firewall(s) need changes')
+    applied = []
+    target = 'initial validation'
+    try:
+        token = os.environ['DIGITALOCEAN_ACCESS_TOKEN']
+        if not token:
+            raise ValueError('DigitalOcean token is empty')
+        ranges = None
+        if args.cloudflare:
+            ranges = []
+            for family in ('v4', 'v6'):
+                with urllib.request.urlopen(f'https://www.cloudflare.com/ips-{family}', timeout=30) as response:
+                    ranges.extend(response.read().decode().split())
+        def request(path, body=None):
+            req = urllib.request.Request('https://api.digitalocean.com/v2/' + path,
+                data=json.dumps(body).encode() if body is not None else None,
+                method='PUT' if body is not None else 'GET',
+                headers={'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'})
+            with urllib.request.urlopen(req, timeout=30) as response:
+                data = response.read()
+                return json.loads(data) if data else {}
+        # Validate every target before making any changes.
+        changes = []
+        for ident, expected in TARGETS.items():
+            target = expected[0]
+            firewall = request('firewalls/' + ident)['firewall']
+            body = plan(firewall, expected, ranges=ranges, ssh_ip=args.ssh_ip)
+            original = {k: firewall[k] for k in body}
+            if body != original:
+                changes.append((ident, body))
+        for ident, body in changes:
+            target = body['name']
+            print(('Updating' if args.apply else 'Would update'), target)
+            if args.apply:
+                request('firewalls/' + ident, body)
+                applied.append(target)
+        print(f'{len(changes)} firewall(s) need changes')
+    except (KeyError, ValueError, TypeError, OSError, urllib.error.URLError) as exc:
+        parser.exit(1, f'Firewall maintenance stopped at {target}: {exc}. '
+                       f'Confirmed updates: {", ".join(applied) or "none"}. '
+                       'A failed PUT may have reached the API; inspect before retrying.\n')
 
 
 if __name__ == '__main__':
