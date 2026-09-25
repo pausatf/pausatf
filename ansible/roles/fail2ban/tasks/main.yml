@@ -15,8 +15,11 @@
     regexp: '^\$RepeatedMsgReduction\s+'
     insertbefore: '^\$IncludeConfig /etc/rsyslog\.d/\*\.conf'
     line: '$RepeatedMsgReduction off'
-    validate: 'rsyslogd -N1 -f %s'
   notify: Restart rsyslog
+
+- name: Validate rsyslog configuration
+  ansible.builtin.command: rsyslogd -N1 -f /etc/rsyslog.conf
+  changed_when: false
 
 - name: Deploy fail2ban configuration
   ansible.builtin.template:
