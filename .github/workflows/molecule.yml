@@ -26,6 +26,7 @@ jobs:
           - common
           - wordpress
           - php-fpm
+          - fail2ban
           - redis
           - certbot
           - modsecurity
