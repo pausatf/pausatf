@@ -72,8 +72,8 @@ For full operational procedures see [RUNBOOK.md](RUNBOOK.md).
 
 | Environment | Host | Web server | PHP | Ansible user |
 |-------------|------|------------|-----|--------------|
-| Production | `ftp.pausatf.org` (REDACTED_PROD_NEW_IP) | Apache 2 + MPM Prefork | 7.4 | `github-deploy` |
-| Staging | `stage.pausatf.org` | OpenLiteSpeed | 8.3 | `github-deploy` |
+| Production | `ftp.pausatf.org` (REDACTED_PROD_NEW_IP) | Apache 2 + MPM Prefork | 8.4 | `github-deploy` |
+| Staging | `stage.pausatf.org` | OpenLiteSpeed | 8.4 | `github-deploy` |
 | Dev | `dev.pausatf.org` | OpenLiteSpeed | 8.4 | `root` |
 
 All servers: Ubuntu 20.04 LTS, DigitalOcean `sfo2`, MySQL 5.7 (prod local) / MySQL 8 (staging/dev managed cluster).
@@ -82,7 +82,7 @@ All servers: Ubuntu 20.04 LTS, DigitalOcean `sfo2`, MySQL 5.7 (prod local) / MyS
 
 - **Hosting**: DigitalOcean droplets + managed DB clusters (staging/dev)
 - **CDN/DNS**: Cloudflare (free plan, full SSL, aggressive caching)
-- **CMS**: WordPress 6.8.3, active theme `TheSource-child`
+- **CMS**: WordPress 7.1.2, active theme `TheSource-child`
 - **Config management**: Ansible with ansible-vault for secrets
 - **IaC**: Terraform ~1.6–1.10, state in DO Spaces (`pausatf-terraform-state`)
 - **Monitoring**: New Relic APM + infrastructure agent, Monit, sysstat
@@ -97,6 +97,8 @@ All servers: Ubuntu 20.04 LTS, DigitalOcean `sfo2`, MySQL 5.7 (prod local) / MyS
 | `deploy-dev.yml` | Push to `dev` branch, manual dispatch | Runs `site.yml` against dev |
 | `do-nightly-snapshot.yml` | Daily 02:00 Pacific, manual dispatch | Creates timestamped DigitalOcean snapshot of prod droplet |
 | `backup-legacy.yml` | Daily 01:00 Pacific, manual dispatch | Rsyncs `/var/www/legacy` from prod; commits changes to repo |
+| `wordpress-update-check.yml` | Daily 09:17 UTC, manual dispatch | Read-only production check for WordPress core and plugin updates; opens or closes a tracking issue without applying updates |
+| `wp-plugin-audit.yml` | Manual dispatch | Production plugin/auth/WordPress diagnostics and explicitly requested remediation probes |
 | `capture-prod-inventory.yml` | Manual dispatch | Runs `capture-wp-inventory.yml`; commits `group_vars/production/wordpress.yml` |
 | `infra-staging.yml` | Manual dispatch | Terraform plan + apply for staging environment |
 | `ansible-lint.yml` | PR/push touching `ansible/`, manual | ansible-lint, yamllint, syntax check |
@@ -109,6 +111,8 @@ All servers: Ubuntu 20.04 LTS, DigitalOcean `sfo2`, MySQL 5.7 (prod local) / MyS
 | Secret | Used by | Description |
 |--------|---------|-------------|
 | `PROD_SSH_PRIVATE_KEY` | deploy-prod, backup-legacy, capture-prod-inventory, do-nightly-snapshot | ED25519 private key authorized on `ftp.pausatf.org` as `github-deploy` |
+| `PROD_NEW_SSH_PRIVATE_KEY` | wordpress-update-check | Read-only update inventory access to the current production host as `github-deploy` |
+| `PROD_NEW_SERVER_IP` | wordpress-update-check | Current production host address |
 | `DEV_SSH_PRIVATE_KEY` | deploy-dev | Private key for dev host |
 | `ANSIBLE_VAULT_PASSWORD` | deploy-prod, deploy-staging, deploy-dev, capture-prod-inventory | Ansible vault decryption password |
 | `DO_TOKEN` | infra-staging, do-nightly-snapshot | DigitalOcean API token |

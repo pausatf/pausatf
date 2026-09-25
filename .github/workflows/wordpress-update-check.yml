@@ -1,0 +1,156 @@
+---
+name: WordPress Update Check
+
+on:  # yamllint disable-line rule:truthy
+  schedule:
+    - cron: '17 9 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: wordpress-update-check
+  cancel-in-progress: false
+
+jobs:
+  check:
+    name: Check production WordPress updates
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Read core and plugin update metadata
+        id: updates
+        env:
+          PROD_SSH_PRIVATE_KEY: ${{ secrets.PROD_NEW_SSH_PRIVATE_KEY }}
+          PROD_HOST: ${{ secrets.PROD_NEW_SERVER_IP }}
+        shell: bash
+        run: |
+          # shellcheck disable=SC2016
+          set -euo pipefail
+
+          if [[ -z "${PROD_SSH_PRIVATE_KEY:-}" || -z "${PROD_HOST:-}" ]]; then
+            echo "Production SSH credentials are not configured." >&2
+            exit 1
+          fi
+
+          install -m 700 -d "$HOME/.ssh"
+          key_file="$HOME/.ssh/pausatf_prod"
+          trap 'rm -f "$key_file"' EXIT
+          printf '%s\n' "$PROD_SSH_PRIVATE_KEY" > "$key_file"
+          chmod 600 "$key_file"
+
+          ssh_options=(
+            -o BatchMode=yes
+            -o ConnectTimeout=15
+            -o StrictHostKeyChecking=accept-new
+            -i "$key_file"
+          )
+          remote="github-deploy@${PROD_HOST}"
+          core_version="$(ssh "${ssh_options[@]}" "$remote" \
+            '/usr/local/bin/wp core version \
+            --path=/var/www/html --allow-root --no-color')"
+          core_updates="$(ssh "${ssh_options[@]}" "$remote" \
+            '/usr/local/bin/wp core check-update --format=json \
+            --path=/var/www/html --allow-root --no-color')"
+          plugin_list="$(ssh "${ssh_options[@]}" "$remote" \
+            '/usr/local/bin/wp plugin list --format=json \
+            --fields=name,status,version,update,update_version \
+            --path=/var/www/html --allow-root --no-color')"
+
+          if [[ -z "$core_updates" || "$core_updates" == Success:* ]]; then
+            core_updates='[]'
+          fi
+          jq -e 'type == "array"' <<< "$core_updates" >/dev/null
+          jq -e 'type == "array"' <<< "$plugin_list" >/dev/null
+          plugin_updates="$(jq -c \
+            '[.[] | select(.update == "available")]' <<< "$plugin_list")"
+
+          delimiter="JSON_$(openssl rand -hex 16)"
+          {
+            echo "core_version=$core_version"
+            echo "core_updates<<$delimiter"
+            printf '%s\n' "$core_updates"
+            echo "$delimiter"
+            echo "plugin_updates<<$delimiter"
+            printf '%s\n' "$plugin_updates"
+            echo "$delimiter"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create or refresh the update issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CORE_VERSION: ${{ steps.updates.outputs.core_version }}
+          CORE_UPDATES: ${{ steps.updates.outputs.core_updates }}
+          PLUGIN_UPDATES: ${{ steps.updates.outputs.plugin_updates }}
+        shell: bash
+        run: |
+          # shellcheck disable=SC2016
+          set -euo pipefail
+
+          core_count="$(jq 'length' <<< "$CORE_UPDATES")"
+          plugin_count="$(jq 'length' <<< "$PLUGIN_UPDATES")"
+          issue_number="$(gh issue list \
+            --repo pausatf/pausatf \
+            --state open \
+            --search '"chore(wordpress): updates available" in:title' \
+            --json number \
+            --jq '.[0].number // empty')"
+
+          if (( core_count > 0 || plugin_count > 0 )); then
+            body_file="$(mktemp)"
+            trap 'rm -f "$body_file"' EXIT
+            {
+              echo "## Daily production WordPress update check"
+              echo
+              printf 'Checked: %s UTC  \n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+              printf 'Installed WordPress core: %s\n' "$CORE_VERSION"
+              echo
+              echo "### Core updates"
+              if (( core_count > 0 )); then
+                jq -r '.[] |
+                  "- **" + .version + "** (" + .update_type + ")"' \
+                  <<< "$CORE_UPDATES"
+              else
+                echo "- None available"
+              fi
+              echo
+              echo "### Plugin updates"
+              if (( plugin_count > 0 )); then
+                jq -r '.[] |
+                  "- **" + .name + "** (`" + .version + "` → `" +
+                  .update_version + "`, " + .status + ")"' \
+                  <<< "$PLUGIN_UPDATES"
+              else
+                echo "- None available"
+              fi
+              echo
+              echo "This workflow only checks update metadata. Apply updates"
+              echo "through the reviewed release and backup process; it does"
+              echo "not change production."
+            } > "$body_file"
+
+            if [[ -n "$issue_number" ]]; then
+              gh issue edit "$issue_number" \
+                --repo pausatf/pausatf \
+                --body-file "$body_file"
+            else
+              gh issue create \
+                --repo pausatf/pausatf \
+                --title "chore(wordpress): updates available" \
+                --label wordpress,dependencies,ops \
+                --body-file "$body_file"
+            fi
+          elif [[ -n "$issue_number" ]]; then
+            checked_date="$(date -u +%Y-%m-%d)"
+            comment_body="$(printf '%s\n' \
+              "WordPress check on ${checked_date} found no pending updates." \
+              "Closing this issue; future findings open a new one.")"
+            gh issue comment "$issue_number" \
+              --repo pausatf/pausatf \
+              --body "$comment_body"
+            gh issue close "$issue_number" --repo pausatf/pausatf
+          else
+            echo "Production WordPress core and plugins are up to date."
+          fi
