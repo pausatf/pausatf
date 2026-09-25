@@ -140,7 +140,8 @@ OpenLiteSpeed.
 - Deploys custom filters `wordpress.conf` and `wordpress-hard.conf` to
   `/etc/fail2ban/filter.d/`
 - Disables rsyslog repeated-message reduction so Fail2ban sees each authentication
-  event and can count bursts against its retry thresholds.
+  event and routes the WordPress jails to `/var/log/auth.log`, where the MU
+  plugin's `LOG_AUTHPRIV` events are written on Ubuntu.
 
 **Tags**: none
 
