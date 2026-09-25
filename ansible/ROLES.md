@@ -139,6 +139,8 @@ OpenLiteSpeed.
   (10 min), and max retry (5)
 - Deploys custom filters `wordpress.conf` and `wordpress-hard.conf` to
   `/etc/fail2ban/filter.d/`
+- Disables rsyslog repeated-message reduction so Fail2ban sees each authentication
+  event and can count bursts against its retry thresholds.
 
 **Tags**: none
 

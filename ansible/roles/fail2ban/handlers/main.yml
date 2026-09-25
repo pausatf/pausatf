@@ -1,4 +1,9 @@
 ---
+- name: Restart rsyslog
+  ansible.builtin.service:
+    name: rsyslog
+    state: restarted
+
 - name: Restart fail2ban
   ansible.builtin.service:
     name: fail2ban

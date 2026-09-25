@@ -6,7 +6,16 @@
     name:
       - fail2ban
       - ipset
+      - rsyslog
     state: present
+
+- name: Preserve individual authentication events for Fail2ban
+  ansible.builtin.lineinfile:
+    path: /etc/rsyslog.conf
+    regexp: '^\$RepeatedMsgReduction\s+'
+    line: '$RepeatedMsgReduction off'
+    validate: 'rsyslogd -N1 -f %s'
+  notify: Restart rsyslog
 
 - name: Deploy fail2ban configuration
   ansible.builtin.template:
