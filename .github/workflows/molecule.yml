@@ -1,6 +1,6 @@
 name: Molecule Tests
 
-on:
+"on":
   pull_request:
     paths:
       - 'ansible/roles/**'
