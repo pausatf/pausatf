@@ -49,15 +49,17 @@ jobs:
           )
           remote="github-deploy@${PROD_HOST}"
           core_version="$(ssh "${ssh_options[@]}" "$remote" \
-            '/usr/local/bin/wp core version \
-            --path=/var/www/html --allow-root --no-color')"
+            'sudo -n -u www-data -- /usr/local/bin/wp core version \
+            --path=/var/www/html --no-color')"
           core_updates="$(ssh "${ssh_options[@]}" "$remote" \
-            '/usr/local/bin/wp core check-update --format=json \
-            --path=/var/www/html --allow-root --no-color')"
+            'sudo -n -u www-data -- /usr/local/bin/wp core check-update \
+            --format=json \
+            --path=/var/www/html --no-color')"
           plugin_list="$(ssh "${ssh_options[@]}" "$remote" \
-            '/usr/local/bin/wp plugin list --format=json \
+            'sudo -n -u www-data -- /usr/local/bin/wp plugin list \
+            --format=json \
             --fields=name,status,version,update,update_version \
-            --path=/var/www/html --allow-root --no-color')"
+            --path=/var/www/html --no-color')"
 
           if [[ -z "$core_updates" || "$core_updates" == Success:* ]]; then
             core_updates='[]'
