@@ -50,22 +50,18 @@ jobs:
           remote="github-deploy@${PROD_HOST}"
           update_json="$(ssh "${ssh_options[@]}" "$remote" 'bash -s' <<'REMOTE'
           set -euo pipefail
-          mapfile -t containers < <(sudo -n docker ps \
-            --filter 'label=com.docker.compose.project=pausatf-prod' \
-            --filter 'label=com.docker.compose.service=wordpress' \
-            --format '{{.Names}}')
-          if [[ "${#containers[@]}" -ne 1 ]]; then
-            echo "Expected exactly one production WordPress container; found ${#containers[@]}." >&2
-            exit 1
-          fi
-
-          sudo -n docker exec -i -u www-data "${containers[0]}" php <<'PHP'
-          <?php
-          require "/var/www/html/wp-load.php";
+          wp_path=/var/www/html
+          sudo -n -u www-data wp eval "$(cat <<'PHP'
           require_once ABSPATH . "wp-admin/includes/update.php";
           require_once ABSPATH . "wp-admin/includes/plugin.php";
 
           wp_version_check([], true);
+          $core_updates = get_core_updates();
+          if (!is_array($core_updates)) {
+              fwrite(STDERR, "Core update metadata refresh failed.\n");
+              exit(1);
+          }
+
           $previous_plugins = get_site_transient("update_plugins");
           delete_site_transient("update_plugins");
           wp_update_plugins();
@@ -89,10 +85,10 @@ jobs:
               ];
           }
 
-          $core_updates = [];
-          foreach ((array) get_core_updates() as $update) {
+          $available_core_updates = [];
+          foreach ($core_updates as $update) {
               if (($update->response ?? "") === "upgrade") {
-                  $core_updates[] = [
+                  $available_core_updates[] = [
                       "version" => $update->version ?? "",
                       "update_type" => "upgrade",
                   ];
@@ -101,10 +97,11 @@ jobs:
 
           echo wp_json_encode([
               "core_version" => get_bloginfo("version"),
-              "core_updates" => $core_updates,
+              "core_updates" => $available_core_updates,
               "plugin_updates" => $plugin_updates,
           ]), PHP_EOL;
           PHP
+          )" --path="$wp_path" --allow-root
           REMOTE
           )"
 
@@ -140,20 +137,21 @@ jobs:
           legacy_title_prefix='chore(wordpress): plugin updates available '
           core_count="$(jq 'length' <<< "$CORE_UPDATES")"
           plugin_count="$(jq 'length' <<< "$PLUGIN_UPDATES")"
-          issue_json="$(gh issue list \
-            --repo pausatf/pausatf \
-            --state open \
-            --label wordpress \
-            --label dependencies \
-            --limit 20 \
-            --json number,title)"
-          issue_number="$(jq -r \
+          issue_pages="$(gh api --paginate --slurp -X GET \
+            repos/pausatf/pausatf/issues \
+            -f state=open \
+            -f per_page=100 \
+            -f labels=wordpress,dependencies)"
+          issue_json="$(jq '[.[][] | select(has("pull_request") | not) | {number,title}]' \
+            <<< "$issue_pages")"
+          issue_numbers="$(jq -c \
             --arg canonical_title "$canonical_title" \
             --arg legacy_title_prefix "$legacy_title_prefix" \
             'map(select(
               .title == $canonical_title
               or (.title | startswith($legacy_title_prefix))
-            )) | .[0].number // empty' <<< "$issue_json")"
+            )) | map(.number)' <<< "$issue_json")"
+          issue_number="$(jq -r '.[0] // empty' <<< "$issue_numbers")"
 
           if (( core_count > 0 || plugin_count > 0 )); then
             body_file="$(mktemp)"
@@ -201,15 +199,24 @@ jobs:
                 --label wordpress,dependencies,ops \
                 --body-file "$body_file"
             fi
-          elif [[ -n "$issue_number" ]]; then
+            while IFS= read -r duplicate_number; do
+              [[ "$duplicate_number" == "$issue_number" ]] && continue
+              gh issue comment "$duplicate_number" \
+                --repo pausatf/pausatf \
+                --body "Consolidated into #$issue_number by the daily WordPress update check."
+              gh issue close "$duplicate_number" --repo pausatf/pausatf
+            done < <(jq -r '.[]' <<< "$issue_numbers")
+          elif [[ "$(jq 'length' <<< "$issue_numbers")" -gt 0 ]]; then
             checked_date="$(date -u +%Y-%m-%d)"
-            comment_body="$(printf '%s\n' \
-              "WordPress check on ${checked_date} found no pending updates." \
-              "Closing this issue; future findings open a new one.")"
-            gh issue comment "$issue_number" \
-              --repo pausatf/pausatf \
-              --body "$comment_body"
-            gh issue close "$issue_number" --repo pausatf/pausatf
+            while IFS= read -r stale_issue_number; do
+              comment_body="$(printf '%s\n' \
+                "WordPress check on ${checked_date} found no pending updates." \
+                "Closing this issue; future findings open a new one.")"
+              gh issue comment "$stale_issue_number" \
+                --repo pausatf/pausatf \
+                --body "$comment_body"
+              gh issue close "$stale_issue_number" --repo pausatf/pausatf
+            done < <(jq -r '.[]' <<< "$issue_numbers")
           else
             echo "Production WordPress core and plugins are up to date."
           fi
