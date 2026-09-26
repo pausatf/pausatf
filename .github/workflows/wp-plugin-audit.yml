@@ -1038,24 +1038,43 @@ jobs:
           ssh -o BatchMode=yes -o ConnectTimeout=15 -o StrictHostKeyChecking=accept-new \
             -i ~/.ssh/id_rsa github-deploy@"$PROD_HOST" 'bash -s' > updates.json <<'REMOTE'
           set -euo pipefail
-          if sudo -n docker inspect pausatf-wordpress >/dev/null 2>&1; then
-            wpcli() {
-              sudo -n docker exec -u www-data pausatf-wordpress sh -c '
-                if command -v wp >/dev/null 2>&1; then
-                  exec wp "$@"
-                elif [ -r /tmp/wp-cli.phar ]; then
-                  exec php /tmp/wp-cli.phar "$@"
-                else
-                  echo "WP-CLI is not installed in the WordPress container" >&2
-                  exit 1
-                fi
-              ' sh "$@"
-            }
-          else
-            wpcli() { /usr/local/bin/wp --path=/var/www/html "$@"; }
+          mapfile -t containers < <(sudo -n docker ps \
+            --filter 'label=com.docker.compose.project=pausatf-prod' \
+            --filter 'label=com.docker.compose.service=wordpress' \
+            --format '{{.Names}}')
+          if [[ "${#containers[@]}" -ne 1 ]]; then
+            echo "Expected exactly one production WordPress container; found ${#containers[@]}." >&2
+            exit 1
           fi
-          wpcli eval 'wp_update_plugins();' >/dev/null
-          wpcli plugin list --update=available --fields=name,version,update_version --format=json
+
+          sudo -n docker exec -i -u www-data "${containers[0]}" php <<'PHP'
+          <?php
+          require "/var/www/html/wp-load.php";
+          require_once ABSPATH . "wp-admin/includes/plugin.php";
+
+          $previous = get_site_transient("update_plugins");
+          delete_site_transient("update_plugins");
+          wp_update_plugins();
+          $available = get_site_transient("update_plugins");
+          if (!is_object($available) || !property_exists($available, "response")) {
+              if (false !== $previous) {
+                  set_site_transient("update_plugins", $previous, DAY_IN_SECONDS);
+              }
+              fwrite(STDERR, "Plugin update metadata refresh failed.\n");
+              exit(1);
+          }
+
+          $installed = get_plugins();
+          $updates = [];
+          foreach ((array) $available->response as $file => $update) {
+              $updates[] = [
+                  "name" => $installed[$file]["Name"] ?? $file,
+                  "version" => $installed[$file]["Version"] ?? "",
+                  "update_version" => $update->new_version ?? "",
+              ];
+          }
+          echo wp_json_encode($updates), PHP_EOL;
+          PHP
           REMOTE
           jq -e 'type == "array"' updates.json >/dev/null
           if [ "$(jq 'length' updates.json)" -gt 0 ]; then
