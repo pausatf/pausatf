@@ -2,7 +2,9 @@
 # Managed by Ansible - Do not edit manually
 # Jetpack IPs auto-refreshed from https://jetpack.com/ips-v4.txt
 <Files xmlrpc.php>
-{% for cidr in jetpack_ip_ranges %}
+{% for cidr in jetpack_ip_ranges | default([]) %}
     Require ip {{ cidr }}
+{% else %}
+    Require all denied
 {% endfor %}
 </Files>

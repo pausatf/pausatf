@@ -5,13 +5,16 @@ on:
     - cron: '0 9 * * *'  # 1 AM Pacific approx
   workflow_dispatch:
 
+concurrency:
+  group: pausatf-legacy-backup
+  cancel-in-progress: false
+
 permissions:
   contents: read
 
 jobs:
   backup:
     runs-on: ubuntu-latest
-    environment: production
     permissions:
       contents: write
 
