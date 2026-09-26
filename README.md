@@ -112,7 +112,7 @@ All servers: Ubuntu 20.04 LTS, DigitalOcean `sfo2`, MySQL 5.7 (prod local) / MyS
 | `DEV_SSH_PRIVATE_KEY` | deploy-dev | Private key for dev host |
 | `ANSIBLE_VAULT_PASSWORD` | deploy-prod, deploy-staging, deploy-dev, capture-prod-inventory | Ansible vault decryption password |
 | `DO_TOKEN` | infra-staging, do-nightly-snapshot | DigitalOcean API token |
-| `DO_PROD_DROPLET_ID` | do-nightly-snapshot | Numeric droplet ID for snapshot target |
+| `DO_PROD_DROPLET_ID` | do-nightly-snapshot (optional) | Numeric production droplet ID; when unset or inaccessible, the workflow resolves `pausatf-prod` by name |
 | `SPACES_ACCESS_KEY_ID` | infra-staging | DO Spaces key for Terraform state backend |
 | `SPACES_SECRET_ACCESS_KEY` | infra-staging | DO Spaces secret for Terraform state backend |
 | `CLOUDFLARE_API_TOKEN` | infra-staging | Cloudflare API token for Terraform |
