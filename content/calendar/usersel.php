@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: usersel.php.
+ * Legacy PAUSATF event calendar source: usersel.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -54,6 +54,7 @@ if ( $res ) {
 
 $INC = array('js/usersel.php');
 print_header($INC,'','',true);
+
 ?>
 
 <center>

@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: usersel.php.
+ * Legacy PAUSATF event calendar source: usersel.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -11,6 +11,7 @@
 	}
 	$form = clean_word($form);
 	$listid = clean_int($listid);
+
 ?>
 <script type="text/javascript">
 <!-- <![CDATA[

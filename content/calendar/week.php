@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: week.php.
+ * Legacy PAUSATF event calendar source: week.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -69,6 +69,7 @@ for ( $i = 0; $i < 7; $i++ ) {
   $header[$i] = $weekdays[$i] . "<br />\n" .
     date_to_str ( date ( "Ymd", $days[$i] ), $DATE_FORMAT_MD, false );
 }
+
 ?>
 
 <div class="title">

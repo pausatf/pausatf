@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: import_vcal.php.
+ * Legacy PAUSATF event calendar source: import_vcal.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -298,4 +298,5 @@ function rrule_endtime($int,$freq,$start,$end) {
   }
   return $endtime;
 }
+
 ?>

@@ -1,12 +1,13 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: help_bug.php.
+ * Legacy PAUSATF event calendar source: help_bug.php.
  *
  * @package PAUSATF_Calendar
  */
 
 	include_once 'includes/init.php';
 	print_header('','','',true);
+
 ?>
 
 <h2><?php etranslate("Report Bug")?></h2>

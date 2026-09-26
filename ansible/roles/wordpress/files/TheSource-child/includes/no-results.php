@@ -4,6 +4,7 @@
  *
  * @package PAUSATF_TheSource_Child
  */
+
 ?><div class="entry">
 <!--If no results are found-->
 	<h1><?php

@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: day.php.
+ * Legacy PAUSATF event calendar source: day.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -48,6 +48,7 @@ if ( $auto_refresh == "Y" && ! empty ( $auto_refresh_time ) ) {
 }
 $INC = array('js/popups.php');
 print_header($INC,$HeadX);
+
 ?>
 
 <?php

@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF website source: clubs.php.
+ * Legacy PAUSATF website source: clubs.php.
  *
  * @package PAUSATF_Legacy
  */
@@ -8,6 +8,7 @@
 // redirect to temporary site until this can be updated
 header("Location: http://pausatf.x10host.com/data/clubs.php");
 die();
+
 ?>
 <title>PAUSATF Club List</title><?php
   /* $Id: show-club.php,v 1.4 2007/02/08 16:04:49 Owner Exp $ */

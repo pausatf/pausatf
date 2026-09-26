@@ -1,9 +1,10 @@
 <?php
 /**
- * legacy PAUSATF website source: youthindex6.php.
+ * Legacy PAUSATF website source: youthindex6.php.
  *
  * @package PAUSATF_Legacy
  */
+
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
 <html>

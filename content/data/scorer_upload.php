@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF website source: scorer_upload.php.
+ * Legacy PAUSATF website source: scorer_upload.php.
  *
  * @package PAUSATF_Legacy
  */
@@ -138,5 +138,6 @@ class Scorer_upload {
 
 $su = new Scorer_upload();
 echo $su->report;
+
 
 ?>

@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: gradient.php.
+ * Legacy PAUSATF event calendar source: gradient.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -333,4 +333,5 @@ if ( function_exists ( "imagepng" ) ) {
 }
 
 imagedestroy ( $image );
+
 ?>

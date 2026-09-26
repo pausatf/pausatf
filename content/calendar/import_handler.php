@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: import_handler.php.
+ * Legacy PAUSATF event calendar source: import_handler.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -584,4 +584,5 @@ function RepeatType ($type) {
   $Repeat = array (0,'daily','weekly','monthlyByDay','monthlyByDate','yearly','monthlyByDayR');
   return $Repeat[$type];
 }
+
 ?>

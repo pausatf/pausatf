@@ -1,12 +1,13 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: help_import.php.
+ * Legacy PAUSATF event calendar source: help_import.php.
  *
  * @package PAUSATF_Calendar
  */
 
 	include_once 'includes/init.php';
 	print_header('','','',true);
+
 ?>
 
 <h2><?php etranslate("Help")?>: <?php etranslate("Import")?></h2>

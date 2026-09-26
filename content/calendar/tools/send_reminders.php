@@ -1,7 +1,7 @@
 #!/usr/local/bin/php -q
 <?php
 /**
- * legacy PAUSATF event calendar source: send_reminders.php.
+ * Legacy PAUSATF event calendar source: send_reminders.php.
  *
  * @package PAUSATF_Calendar
  */

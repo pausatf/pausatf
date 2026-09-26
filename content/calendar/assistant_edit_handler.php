@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: assistant_edit_handler.php.
+ * Legacy PAUSATF event calendar source: assistant_edit_handler.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -26,6 +26,7 @@ if (($is_admin || $is_nonuser_admin) && $login != $user )
 do_redirect ( $url );
 
 print_header();
+
 ?>
 <h2><?php etranslate("Error")?></h2>
 

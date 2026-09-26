@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: publish.php.
+ * Legacy PAUSATF event calendar source: publish.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -524,4 +524,5 @@ function export_ical () {
 //header ( "Content-Type: text/plain" );
 header ( "Content-Type: text/calendar" );
 export_ical();
+
 ?>

@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: nonusers_handler.php.
+ * Legacy PAUSATF event calendar source: nonusers_handler.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -90,6 +90,7 @@ if ( $action == "Delete" || $action == translate ("Delete") ) {
 if ( empty ( $error ) ) do_redirect ( "nonusers.php" );
 
 print_header();
+
 ?>
 
 <h2><?php etranslate("Error")?></h2>

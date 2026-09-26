@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: activity_log.php.
+ * Legacy PAUSATF event calendar source: activity_log.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -78,6 +78,7 @@ if ( $res ) {
 } else {
   echo translate("Database error") . ": " . dbi_error ();
 }
+
 ?>
 </table><br />
 <div class="navigation">

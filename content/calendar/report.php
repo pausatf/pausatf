@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: report.php.
+ * Legacy PAUSATF event calendar source: report.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -565,6 +565,7 @@ if ( ! empty ( $list ) || $report_include_header == 'Y'
 } else {
   print_trailer ( false );
 }
+
 
 ?>
 </body>

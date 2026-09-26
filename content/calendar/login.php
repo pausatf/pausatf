@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: login.php.
+ * Legacy PAUSATF event calendar source: login.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -137,6 +137,7 @@ load_user_preferences ();
 }
 $charset = ( ! empty ( $LANGUAGE )?translate("charset"): "iso-8859-1" );
 echo "<?xml version=\"1.0\" encoding=\"$charset\"?>" . "\n";
+
 ?>
 <!DOCTYPE html
     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "DTD/xhtml1-transitional.dtd">

@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: purge.php.
+ * Legacy PAUSATF event calendar source: purge.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -51,6 +51,7 @@ if ( ! empty ( $user ) ) {
 }
 
 print_header ( $INC, '', $BodyX );
+
 ?>
 
 <table style="border-width:0px;">

@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: edit_report_handler.php.
+ * Legacy PAUSATF event calendar source: edit_report_handler.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -256,6 +256,7 @@ if ( empty ( $error ) ) {
 }
 
 print_header();
+
 ?>
 
 <h2><?php etranslate("Error")?></h2>

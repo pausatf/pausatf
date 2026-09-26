@@ -202,7 +202,7 @@ ansible-playbook --syntax-check playbooks/your-playbook.yml
 ### PHP Standards (maintained PHP sources)
 
 - Start each maintained PHP source file with a file-level PHPDoc block that briefly identifies its role and declares an `@package`. Keep PHPDoc inside PHP tags so it produces no output. Exclude generated files, upstream parent-theme/vendor code, empty files, and `.php` files containing only static HTML or JavaScript.
-- WordPress Coding Standards and PHPCompatibility run on added or changed PHP lines. Existing violations on untouched legacy lines do not block new changes; new violations on changed lines remain blocking.
+- WordPress Coding Standards and PHPCompatibility run on changed PHP files. The check compares findings with the base version so existing legacy violations do not block changes; newly introduced violations remain blocking.
 - PHP versions: 8.0–8.3 (project target)
 - Install PHPCS + WPCS locally (optional, CI enforces it):
 

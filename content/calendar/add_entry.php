@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: add_entry.php.
+ * Legacy PAUSATF event calendar source: add_entry.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -56,4 +56,5 @@ if ( $id > 0 ) {
 
 send_to_preferred_view ();
 exit;
+
 ?>

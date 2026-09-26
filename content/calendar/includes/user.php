@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: user.php.
+ * Legacy PAUSATF event calendar source: user.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -384,4 +384,5 @@ function user_get_users () {
   }
   return $ret;
 }
+
 ?>

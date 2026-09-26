@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: view_t.php.
+ * Legacy PAUSATF event calendar source: view_t.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -181,6 +181,7 @@ if ( ! empty ( $error ) ) {
   print_trailer ();
   exit;
 }
+
 
 ?>
 

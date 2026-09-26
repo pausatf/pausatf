@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: view_d.php.
+ * Legacy PAUSATF event calendar source: view_d.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -139,6 +139,7 @@ $prevday = date ( "d", $prev );
 $prevdate = sprintf ( "%04d%02d%02d", $prevyear, $prevmonth, $prevday );
 
 $thisdate = sprintf ( "%04d%02d%02d", $thisyear, $thismonth, $thisday );
+
 ?>
 
 <div style="border-width:0px; width:99%;">

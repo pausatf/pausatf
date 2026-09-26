@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: upcoming.php.
+ * Legacy PAUSATF event calendar source: upcoming.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -187,6 +187,7 @@ if ( ! empty ( $LANGUAGE ) ) {
 }
 echo "<title>".translate($application_name)."</title>\n";
  
+
 ?>
 </head>
 <body>

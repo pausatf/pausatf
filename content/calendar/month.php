@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: month.php.
+ * Legacy PAUSATF event calendar source: month.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -61,6 +61,7 @@ display_small_month ( $prevmonth, $prevyear, true, true, "prevmonth",
   $monthURL );
 display_small_month ( $nextmonth, $nextyear, true, true, "nextmonth",
   $monthURL );
+
 ?>
 <div class="title">
 <span class="date"><br /><?php

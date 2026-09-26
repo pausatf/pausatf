@@ -1,12 +1,13 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: group_edit.php.
+ * Legacy PAUSATF event calendar source: group_edit.php.
  *
  * @package PAUSATF_Calendar
  */
 
 include_once 'includes/init.php';
 print_header( '', '', '', true );
+
 ?>
 
 <form action="group_edit_handler.php" method="post">

@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF website source: indexclubsaa.php.
+ * Legacy PAUSATF website source: indexclubsaa.php.
  *
  * @package PAUSATF_Legacy
  */
@@ -520,6 +520,7 @@ Field Type Collation Attributes Null Default Extra Action
 
   // start everything
   main();
+
 ?>
 
 <div align="left">

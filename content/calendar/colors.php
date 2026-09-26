@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: colors.php.
+ * Legacy PAUSATF event calendar source: colors.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -13,6 +13,7 @@ $colors = array("00", "33", "66", "99", "CC", "FF");
 $grayscale = array("FFFFFF","DDDDDD","C0C0C0","969696","808080","646464","4B4B4B","242424","000000");
 $green1 = array("FF", "CC", "99");
 $green2 = array("66", "33", "00");
+
 
 ?>
 

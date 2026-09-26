@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF website source: Copy of clubs.php.
+ * Legacy PAUSATF website source: Copy of clubs.php.
  *
  * @package PAUSATF_Legacy
  */
@@ -513,4 +513,5 @@ Field Type Collation Attributes Null Default Extra Action
 
   // start everything
   main();
+
 ?>

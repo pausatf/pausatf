@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: view_entry.php.
+ * Legacy PAUSATF event calendar source: view_entry.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -446,6 +446,7 @@ if ( $categories_enabled == "Y" ) {
     dbi_free_result ( $res2 );
   }
 }
+
 ?>
 <h2><?php echo htmlspecialchars ( $name ); ?></h2>
 <table style="border-width:0px;">

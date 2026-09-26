@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: availability.php.
+ * Legacy PAUSATF event calendar source: availability.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -60,6 +60,7 @@ $next_url = $base_url."&amp;year=".  strftime('%Y', $time + 86400)
                      ."&amp;day=".   strftime('%d', $time + 86400);
 
 $users = explode(",",$users);
+
 ?>
 
 <div style="border-width:0px; width:99%;">

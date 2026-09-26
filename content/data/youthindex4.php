@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF website source: youthindex4.php.
+ * Legacy PAUSATF website source: youthindex4.php.
  *
  * @package PAUSATF_Legacy
  */
@@ -13,6 +13,7 @@
     // cookie not set, set it now.  Show flash this time
     setcookie($cookie_name, $current_flash, time()+60*60*24*30);  // set cookie to expire in 30 days
   }
+
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">

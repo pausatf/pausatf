@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: set_entry_cat.php.
+ * Legacy PAUSATF event calendar source: set_entry_cat.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -64,6 +64,7 @@ if ( ! empty ( $cat_id ) && empty ( $error ) ) {
 }
 
 print_header();
+
 ?>
 
 <?php if ( ! empty ( $error ) ) { ?>

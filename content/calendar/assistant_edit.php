@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: assistant_edit.php.
+ * Legacy PAUSATF event calendar source: assistant_edit.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -22,6 +22,7 @@ if ( $groups_enabled == "Y" ) {
   $INC = '';
 }
 print_header($INC);
+
 ?>
 
 <form action="assistant_edit_handler.php" method="post" name="assistanteditform">

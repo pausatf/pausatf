@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: layers_toggle.php.
+ * Legacy PAUSATF event calendar source: layers_toggle.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -49,6 +49,7 @@ if ( empty ( $error ) ) {
 }
 
 print_header();
+
 ?>
 
 <h2><?php etranslate("Error")?></h2>

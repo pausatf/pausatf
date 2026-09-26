@@ -23,6 +23,7 @@ if ( ! current_user_can( 'read' ) ) {
 	echo '<p>' . esc_html__( 'You do not have permission to view this page.', 'pausatf-membership' ) . '</p>';
 	return;
 }
+
 ?>
 <div class="pausatf-members">
 

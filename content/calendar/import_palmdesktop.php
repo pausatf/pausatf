@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: import_palmdesktop.php.
+ * Legacy PAUSATF event calendar source: import_palmdesktop.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -65,4 +65,5 @@ function ParseLine($line){
   if (($WeekNum == '5') && ($Entry['Repeat']['Interval'] == '3')) $Entry['Repeat']['Interval'] = '6';
   return $Entry;
 }
+
 ?>

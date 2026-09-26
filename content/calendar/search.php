@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: search.php.
+ * Legacy PAUSATF event calendar source: search.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -13,6 +13,7 @@ if ( $is_admin == "Y" ) {
   $INC = '';
 }
 	print_header($INC);
+
 ?>
 <h2><?php 
 	etranslate("Search"); 

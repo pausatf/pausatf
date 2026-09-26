@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: del_layer.php.
+ * Legacy PAUSATF event calendar source: del_layer.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -36,4 +36,5 @@ if ( $updating_public )
   do_redirect ( "layers.php?public=1" );
 else
   do_redirect ( "layers.php" );
+
 ?>

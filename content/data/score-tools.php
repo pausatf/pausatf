@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF website source: score-tools.php.
+ * Legacy PAUSATF website source: score-tools.php.
  *
  * @package PAUSATF_Legacy
  */
@@ -108,4 +108,5 @@ function download_members() {
 
   // call the main function to start everything
   main();
+
 ?>

@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF website source: ScoreSheet-broken.php.
+ * Legacy PAUSATF website source: ScoreSheet-broken.php.
  *
  * @package PAUSATF_Legacy
  */
@@ -1068,5 +1068,6 @@ function mail_user($to, $subject, $message, $from, $html=false, $test_mode) {
   }
 
 main();
+
 
 ?>

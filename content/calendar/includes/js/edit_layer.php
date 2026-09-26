@@ -1,9 +1,10 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: edit_layer.php.
+ * Legacy PAUSATF event calendar source: edit_layer.php.
  *
  * @package PAUSATF_Calendar
  */
+
 ?><script type="text/javascript">
 <!-- <![CDATA[
 function valid_color ( str ) {

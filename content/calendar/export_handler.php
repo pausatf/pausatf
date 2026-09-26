@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: export_handler.php.
+ * Legacy PAUSATF event calendar source: export_handler.php.
  *
  * @package PAUSATF_Calendar
  */

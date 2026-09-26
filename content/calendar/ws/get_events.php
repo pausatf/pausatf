@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: get_events.php.
+ * Legacy PAUSATF event calendar source: get_events.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -299,5 +299,6 @@ echo "</events>\n";
 
 if ( $debug )
   echo "Done.\n";
+
 
 ?>

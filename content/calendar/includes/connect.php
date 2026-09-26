@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: connect.php.
+ * Legacy PAUSATF event calendar source: connect.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -259,5 +259,6 @@ if ( $not_auth ) {
   */
   do_redirect ( "week.php" );
 }
+
 
 ?>

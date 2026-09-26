@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: category_handler.php.
+ * Legacy PAUSATF event calendar source: category_handler.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -86,6 +86,7 @@ if ( empty ( $error ) )
   do_redirect ( "category.php" );
 
 print_header();
+
 ?>
 <h2><?php etranslate("Error")?></h2>
 

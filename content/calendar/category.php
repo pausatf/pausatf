@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: category.php.
+ * Legacy PAUSATF event calendar source: category.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -36,6 +36,7 @@ if ( ! empty ( $id ) ) {
 }
 
 print_header();
+
 ?>
 <h2><?php etranslate("Categories")?></h2>
 <a title="<?php etranslate("Admin") ?>" class="nav" href="adminhome.php">&laquo;&nbsp;<?php etranslate("Admin") ?></a><br /><br />

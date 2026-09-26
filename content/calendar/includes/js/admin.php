@@ -1,9 +1,10 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: admin.php.
+ * Legacy PAUSATF event calendar source: admin.php.
  *
  * @package PAUSATF_Calendar
  */
+
 ?><script type="text/javascript">
 <!-- <![CDATA[
 // error check the colors

@@ -8,5 +8,6 @@ Included by Jeff Teeters, April 4. 2012 after PAUSATF.org moved.  **
  */
 
 require_once('../../private/db.php');
+
 ?>
 

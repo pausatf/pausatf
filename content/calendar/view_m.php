@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: view_m.php.
+ * Legacy PAUSATF event calendar source: view_m.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -76,6 +76,7 @@ $enddate = sprintf ( "%04d%02d31", $thisyear, $thismonth );
 $monthstart = mktime ( 3, 0, 0, $thismonth, 1, $thisyear );
 $monthend = mktime ( 3, 0, 0, $thismonth + 1, 0, $thisyear );
 $thisdate = $startdate;
+
 ?>
 
 <div style="border-width:0px; width:99%;">

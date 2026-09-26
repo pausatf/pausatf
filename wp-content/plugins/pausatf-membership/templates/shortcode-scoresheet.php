@@ -25,6 +25,7 @@ $prev = array(
 	'result'       => sanitize_text_field( $_POST['result'] ?? '' ),
 	'submitted_by' => sanitize_email( $_POST['submitted_by'] ?? '' ),
 );
+
 ?>
 <div class="pausatf-scoresheet">
 

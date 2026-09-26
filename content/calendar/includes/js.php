@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: js.php.
+ * Legacy PAUSATF event calendar source: js.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -12,6 +12,7 @@ if ( empty ( $PHP_SELF ) && ! empty ( $_SERVER ) &&
 if ( ! empty ( $PHP_SELF ) && preg_match ( "/\/includes\//", $PHP_SELF ) ) {
     die ( "You can't access this file directly!" );
 }
+
 ?>
 <script type="text/javascript">
 <!--

@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: edit_entry_handler.php.
+ * Legacy PAUSATF event calendar source: edit_entry_handler.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -812,6 +812,7 @@ if ( empty ( $error ) ) {
 
 print_header();
 if ( strlen ( $conflicts ) ) { 
+
 ?>
 <h2><?php etranslate("Scheduling Conflict")?></h2>
 

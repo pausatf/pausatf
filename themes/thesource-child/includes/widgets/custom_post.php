@@ -14,6 +14,7 @@
 
 	$thumbnail = get_thumbnail($width,$height,$classtext,$titletext,$titletext);
 	$thumb = $thumbnail["thumb"];
+
 ?>
 
 <li class="clearfix">

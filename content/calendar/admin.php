@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: admin.php.
+ * Legacy PAUSATF event calendar source: admin.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -31,6 +31,7 @@ if ( $res ) {
 $BodyX = 'onload="public_handler(); eu_handler(); email_handler();"';
 $INC = array('js/admin.php','js/visible.php');
 print_header ( $INC, '', $BodyX );
+
 ?>
 
 <h2><?php etranslate("System Settings")?>&nbsp;<img src="help.gif" alt="<?php etranslate("Help")?>" class="help" onclick="window.open ( 'help_admin.php', 'cal_help', 'dependent,menubar,scrollbars,height=400,width=400,innerHeight=420,outerWidth=420');" /></h2>

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail PHPCS only for violations on added or changed PHP lines."""
+"""Fail PHPCS when changed PHP files introduce new violations."""
 
 from __future__ import annotations
 
@@ -51,6 +51,51 @@ def normalized_path(path: str, root: Path) -> str:
     return candidate.resolve().relative_to(root.resolve()).as_posix()
 
 
+def baseline_violations(
+    base: str, paths: list[str], phpcs: str, root: Path
+) -> dict[str, dict[tuple[str, str], int]]:
+    """Count existing violations from the base version of each changed file."""
+    result: dict[str, dict[tuple[str, str], int]] = {}
+    for path in paths:
+        source = subprocess.run(
+            ["git", "show", f"{base}:{path}"],
+            cwd=root,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if source.returncode:
+            continue
+
+        report = subprocess.run(
+            [
+                phpcs,
+                "-q",
+                f"--stdin-path={path}",
+                "--standard=phpcs.xml.dist",
+                "--report=json",
+                "-",
+            ],
+            cwd=root,
+            input=source.stdout,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        try:
+            data = json.loads(report.stdout)
+        except json.JSONDecodeError:
+            continue
+
+        counts: dict[tuple[str, str], int] = {}
+        for file_data in data.get("files", {}).values():
+            for item in file_data.get("messages", []):
+                fingerprint = (item.get("source", ""), item.get("message", ""))
+                counts[fingerprint] = counts.get(fingerprint, 0) + 1
+        result[path] = counts
+    return result
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--base", required=True, help="Base commit or ref to compare against")
@@ -64,6 +109,7 @@ def main() -> int:
         return 0
 
     paths = sorted(changed)
+    existing = baseline_violations(args.base, paths, args.phpcs, root)
     report = subprocess.run(
         [args.phpcs, "-q", "--standard=phpcs.xml.dist", "--report=json", *paths],
         cwd=root,
@@ -82,6 +128,7 @@ def main() -> int:
     violations: list[tuple[str, int, str, str, str]] = []
     ignored = 0
     total_messages = 0
+    remaining_existing = {path: counts.copy() for path, counts in existing.items()}
     for reported_path, file_data in phpcs_report.get("files", {}).items():
         relative_path = normalized_path(reported_path, root)
         ranges = changed.get(relative_path, [])
@@ -89,6 +136,12 @@ def main() -> int:
             total_messages += 1
             line = int(item["line"])
             if any(start <= line <= end for start, end in ranges):
+                fingerprint = (item.get("source", ""), item.get("message", ""))
+                previous = remaining_existing.get(relative_path, {}).get(fingerprint, 0)
+                if previous:
+                    remaining_existing[relative_path][fingerprint] -= 1
+                    ignored += 1
+                    continue
                 violations.append(
                     (
                         relative_path,
@@ -118,7 +171,7 @@ def main() -> int:
 
     print(
         f"PHPCS passed on {len(paths)} changed PHP file(s); "
-        f"{ignored} existing violation(s) on unchanged lines were not blocking."
+        f"{ignored} existing violation(s) matching the base version were not blocking."
     )
     return 0
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: nonusers.php.
+ * Legacy PAUSATF event calendar source: nonusers.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -18,6 +18,7 @@ if ( ! $NONUSER_PREFIX ) {
   exit;
 }
 $add = getValue ( "add" );
+
 ?>
 	<a name="tabnonusers"></a>
 	<div id="tabscontent_nonusers">

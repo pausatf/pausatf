@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: edit_entry.php.
+ * Legacy PAUSATF event calendar source: edit_entry.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -269,6 +269,7 @@ if ( $allow_html_description == "Y" ){
 }
 
 print_header ( $INC, '', $BodyX );
+
 ?>
 
 

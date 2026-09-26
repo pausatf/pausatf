@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: pref.php.
+ * Legacy PAUSATF event calendar source: pref.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -43,6 +43,7 @@ if ( $res ) {
 
 $INC = array('js/pref.php');
 print_header($INC);
+
 ?>
 
 <h2><?php

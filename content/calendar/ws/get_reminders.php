@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: get_reminders.php.
+ * Legacy PAUSATF event calendar source: get_reminders.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -373,5 +373,6 @@ echo "</reminders>\n";
 
 if ( $debug )
   echo "Done.\n";
+
 
 ?>

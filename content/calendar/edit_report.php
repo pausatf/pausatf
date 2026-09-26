@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: edit_report.php.
+ * Legacy PAUSATF event calendar source: edit_report.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -203,6 +203,7 @@ print_header();
 //echo "report_id: $report_id <br />\n";
 //echo "report_name: $report_name <br />\n";
 //echo "report_user: $report_user <br />\n";
+
 ?>
 
 <h2><?php

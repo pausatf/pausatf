@@ -58,4 +58,5 @@ if ( function_exists('register_sidebar') )
 		'before_title' => '<h4 class="widgettitle">',
 		'after_title' => '</h4>',
     ));
+
 ?>

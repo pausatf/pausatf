@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF website source: members.php.
+ * Legacy PAUSATF website source: members.php.
  *
  * @package PAUSATF_Legacy
  */
@@ -928,4 +928,5 @@ class Option_information {
 
   // call the main function to start everything
   main();
+
 ?>

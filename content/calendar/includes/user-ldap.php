@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: user-ldap.php.
+ * Legacy PAUSATF event calendar source: user-ldap.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -428,5 +428,6 @@ function connect_and_bind() {
   }
   return $ret;
 }
+
 
 ?>

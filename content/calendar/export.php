@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: export.php.
+ * Legacy PAUSATF event calendar source: export.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -24,6 +24,7 @@ if ( empty ( $login) || $login == "__public__" ) {
 
 $INC = array('js/export.php');
 print_header($INC);
+
 ?>
 
 <h2><?php etranslate("Export")?></h2>

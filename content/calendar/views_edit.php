@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: views_edit.php.
+ * Legacy PAUSATF event calendar source: views_edit.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -33,6 +33,7 @@ if ( $groups_enabled == "Y" ) {
   $INC = array( 'js/visible.php');
 }
 print_header ( $INC, "", $BodyX );
+
 ?>
 
 <form action="views_edit_handler.php" method="post" name="editviewform">

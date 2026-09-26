@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: view_v.php.
+ * Legacy PAUSATF event calendar source: view_v.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -95,6 +95,7 @@ for ( $i = 0; $i < 7; $i++ ) {
      month_short_name ( date ( "m", $days[$i] ) - 1 ) .
      " " . date ( "d", $days[$i] );
 }
+
 ?>
 
 <div style="border-width:0px; width:99%;">

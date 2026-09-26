@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: validate.php.
+ * Legacy PAUSATF event calendar source: validate.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -160,4 +160,5 @@ if ( $single_user == "Y" ) {
     }
   }
 }
+
 ?>

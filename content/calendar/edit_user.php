@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: edit_user.php.
+ * Legacy PAUSATF event calendar source: edit_user.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -33,6 +33,7 @@ if ( empty ( $user ) ) {
 $disableCustom = true;
 
 print_header ( '', '', '', $disableCustom );
+
 ?>
 <table style="border-width:0px;">
 <tr><td style="vertical-align:top; width:50%;">

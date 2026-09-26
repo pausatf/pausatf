@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: dbtable.php.
+ * Legacy PAUSATF event calendar source: dbtable.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -503,4 +503,5 @@ function dbtable_build_name_index ( $tablear, $valuesar ) {
   }
   return $ret;
 }
+
 ?>

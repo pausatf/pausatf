@@ -11,4 +11,5 @@ get_template_part('includes/widgets/widget-ads');
 get_template_part('includes/widgets/widget-popular');
 get_template_part('includes/widgets/widget-random');
 get_template_part('includes/widgets/widget-tabbed');
+
 ?>

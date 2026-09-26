@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: site_extras.php.
+ * Legacy PAUSATF event calendar source: site_extras.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -173,4 +173,5 @@ $site_extras = array (
                          // arg 2: specifies reminder options bit-or
   )
 );
+
 ?>

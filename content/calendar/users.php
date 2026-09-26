@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: users.php.
+ * Legacy PAUSATF event calendar source: users.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -42,6 +42,7 @@ print_header($INC);
 //  echo "</body>\n</html>";
 //  exit;
 //}
+
 ?>
 <a title="<?php etranslate("Admin") ?>" class="nav" href="adminhome.php">&laquo;&nbsp;<?php etranslate("Admin") ?></a><br /><br />
 

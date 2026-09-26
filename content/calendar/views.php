@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: views.php.
+ * Legacy PAUSATF event calendar source: views.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -11,6 +11,7 @@ if ( ! $is_admin )
   $user = $login;
 
 print_header();
+
 ?>
 
 <h2><?php etranslate("Views")?></h2>

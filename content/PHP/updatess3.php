@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF website source: updatess3.php.
+ * Legacy PAUSATF website source: updatess3.php.
  *
  * @package PAUSATF_Legacy
  */

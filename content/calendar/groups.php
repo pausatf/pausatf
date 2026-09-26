@@ -1,9 +1,10 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: groups.php.
+ * Legacy PAUSATF event calendar source: groups.php.
  *
  * @package PAUSATF_Calendar
  */
+
 ?>	<a name="tabgroups"></a>
 	<div id="tabscontent_groups">
 		<?php

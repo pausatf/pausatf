@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF website source: calendar.php.
+ * Legacy PAUSATF website source: calendar.php.
  *
  * @package PAUSATF_Legacy
  */

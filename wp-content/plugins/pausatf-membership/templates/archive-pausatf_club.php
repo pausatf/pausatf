@@ -11,6 +11,7 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
 ?>
 <div class="pausatf-clubs">
 	<?php if ( $clubs_query->have_posts() ) : ?>

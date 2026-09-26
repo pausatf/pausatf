@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF website source: ScoreSheet.php.
+ * Legacy PAUSATF website source: ScoreSheet.php.
  *
  * @package PAUSATF_Legacy
  */
@@ -11,5 +11,6 @@
 // redirect to temporary site until this can be updated
 header("Location: http://pausatf.x10host.com/data/ScoreSheet.php");
 die();
+
 ?>
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * legacy PAUSATF event calendar source: edit_layer.php.
+ * Legacy PAUSATF event calendar source: edit_layer.php.
  *
  * @package PAUSATF_Calendar
  */
@@ -26,6 +26,7 @@ load_user_layers ( $layer_user, 1 );
 
 $INC = array('js/edit_layer.php');
 print_header($INC);
+
 ?>
 
 <h2><?php
