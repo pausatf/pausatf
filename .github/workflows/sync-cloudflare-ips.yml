@@ -5,6 +5,10 @@ on:
     - cron: '0 6 * * 1'  # Weekly Monday 6AM UTC
   workflow_dispatch:
 
+concurrency:
+  group: production-firewall-rules
+  cancel-in-progress: false
+
 permissions:
   contents: read
 
@@ -53,14 +57,14 @@ jobs:
             .[0].inbound_rules
             | map(select((.protocol == "tcp" and (.ports == "80" or .ports == "443")) | not))
             | map("protocol:" + .protocol
-                  + (if .ports != "0" then ",ports:" + .ports else "" end)
+                  + (if (.ports // "") != "" and (.ports // "") != "0" then ",ports:" + .ports else "" end)
                   + ((.sources.addresses // []) | map(",address:" + .) | join("")))
             | join(" ")')
 
           OUTBOUND=$(printf '%s' "$FW" | jq -r '
             .[0].outbound_rules
             | map("protocol:" + .protocol
-                  + (if .ports != "0" then ",ports:" + .ports else "" end)
+                  + (if (.ports // "") != "" and (.ports // "") != "0" then ",ports:" + .ports else "" end)
                   + ((.destinations.addresses // []) | map(",address:" + .) | join("")))
             | join(" ")')
 
