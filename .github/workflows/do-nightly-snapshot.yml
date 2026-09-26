@@ -75,7 +75,8 @@ jobs:
         run: |
           set -euo pipefail
           doctl compute droplet-action snapshot "$DROPLET_ID" \
-            --snapshot-name "prod-nightly-$(date -u +%Y%m%d-%H%M%S)"
+            --snapshot-name "prod-nightly-$(date -u +%Y%m%d-%H%M%S)" \
+            --wait
 
       - name: Prune old snapshots (keep last 7)
         if: steps.check.outputs.skip != 'true' && steps.droplet.outputs.skip != 'true'
