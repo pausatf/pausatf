@@ -244,14 +244,24 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v4
 
       - name: Run tfsec
-        uses: aquasecurity/tfsec-action@b466648d6e39e7c75324f25d83891162a721f2d6  # v1.0.3
+        run: |
+          version=v1.28.14
+          curl --fail --silent --show-error --location \
+            "https://github.com/aquasecurity/tfsec/releases/download/${version}/tfsec-linux-amd64" \
+            --output tfsec-linux-amd64
+          curl --fail --silent --show-error --location \
+            "https://github.com/aquasecurity/tfsec/releases/download/${version}/tfsec_checksums.txt" \
+            --output tfsec_checksums.txt
+          grep 'tfsec-linux-amd64$' tfsec_checksums.txt | sha256sum --check --status
+          chmod 0755 tfsec-linux-amd64
+          ./tfsec-linux-amd64 --format sarif --concise-output \
+            --out results.sarif terraform
+
+      - name: Upload TFSec SARIF
+        if: ${{ always() && hashFiles('results.sarif') != '' }}
+        uses: github/codeql-action/upload-sarif@8aad20d150bbac5944a9f9d289da16a4b0d87c1e0 # v3
         with:
-          working_directory: terraform
-          soft_fail: false
-          format: sarif
-          additional_args: --concise-output --out results.sarif
-          version: v1.28.14
-          github_token: ${{ github.token }}
+          sarif_file: results.sarif
 
       - name: Upload SARIF file
         uses: github/codeql-action/upload-sarif@8aad20d150bbac5944a9f9d289da16a4b0d87c1e  # v4.36.2
