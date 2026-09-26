@@ -82,7 +82,7 @@ All servers: Ubuntu 20.04 LTS, DigitalOcean `sfo2`, MySQL 5.7 (prod local) / MyS
 
 - **Hosting**: DigitalOcean droplets + managed DB clusters (staging/dev)
 - **CDN/DNS**: Cloudflare (free plan, full SSL, aggressive caching)
-- **CMS**: WordPress 7.1.2, active theme `TheSource-child`
+- **CMS**: WordPress 6.8.3, active theme `TheSource-child`
 - **Config management**: Ansible with ansible-vault for secrets
 - **IaC**: Terraform ~1.6–1.10, state in DO Spaces (`pausatf-terraform-state`)
 - **Monitoring**: New Relic APM + infrastructure agent, Monit, sysstat
@@ -106,13 +106,11 @@ All servers: Ubuntu 20.04 LTS, DigitalOcean `sfo2`, MySQL 5.7 (prod local) / MyS
 | `shellcheck.yml` | PR/push touching `scripts/`, manual | ShellCheck + bash syntax check |
 | `markdown-lint.yml` | PR/push touching `*.md`, manual | markdownlint + link check |
 
-## Secrets Required
+## Secrets and Variables Required
 
 | Secret | Used by | Description |
 |--------|---------|-------------|
-| `PROD_SSH_PRIVATE_KEY` | deploy-prod, backup-legacy, capture-prod-inventory, do-nightly-snapshot | ED25519 private key authorized on `ftp.pausatf.org` as `github-deploy` |
-| `PROD_NEW_SSH_PRIVATE_KEY` | wordpress-update-check | Read-only update inventory access to the current production host as `github-deploy` |
-| `PROD_NEW_SERVER_IP` | wordpress-update-check | Current production host address |
+| `PROD_SSH_PRIVATE_KEY` | deploy-prod, backup-legacy, capture-prod-inventory, do-nightly-snapshot, wordpress-update-check | ED25519 private key authorized on `ftp.pausatf.org` as `github-deploy` |
 | `DEV_SSH_PRIVATE_KEY` | deploy-dev | Private key for dev host |
 | `ANSIBLE_VAULT_PASSWORD` | deploy-prod, deploy-staging, deploy-dev, capture-prod-inventory | Ansible vault decryption password |
 | `DO_TOKEN` | infra-staging, do-nightly-snapshot | DigitalOcean API token |
@@ -120,6 +118,10 @@ All servers: Ubuntu 20.04 LTS, DigitalOcean `sfo2`, MySQL 5.7 (prod local) / MyS
 | `SPACES_ACCESS_KEY_ID` | infra-staging | DO Spaces key for Terraform state backend |
 | `SPACES_SECRET_ACCESS_KEY` | infra-staging | DO Spaces secret for Terraform state backend |
 | `CLOUDFLARE_API_TOKEN` | infra-staging | Cloudflare API token for Terraform |
+
+| Variable | Used by | Description |
+|----------|---------|-------------|
+| `PROD_HOST` | capture-prod-inventory, wp-plugin-audit, wordpress-update-check | Production SSH host/IP for GitHub Actions workflows that run remote checks over SSH |
 
 ## Development Workflow
 

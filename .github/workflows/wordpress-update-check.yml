@@ -23,8 +23,8 @@ jobs:
       - name: Read core and plugin update metadata
         id: updates
         env:
-          PROD_SSH_PRIVATE_KEY: ${{ secrets.PROD_NEW_SSH_PRIVATE_KEY }}
-          PROD_HOST: ${{ secrets.PROD_NEW_SERVER_IP }}
+          PROD_SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+          PROD_HOST: ${{ vars.PROD_HOST }}
         shell: bash
         run: |
           # shellcheck disable=SC2016
@@ -91,14 +91,24 @@ jobs:
           # shellcheck disable=SC2016
           set -euo pipefail
 
+          canonical_title='chore(wordpress): updates available'
+          legacy_title_prefix='chore(wordpress): plugin updates available '
           core_count="$(jq 'length' <<< "$CORE_UPDATES")"
           plugin_count="$(jq 'length' <<< "$PLUGIN_UPDATES")"
-          issue_number="$(gh issue list \
+          issue_json="$(gh issue list \
             --repo pausatf/pausatf \
             --state open \
-            --search '"chore(wordpress): updates available" in:title' \
-            --json number \
-            --jq '.[0].number // empty')"
+            --label wordpress \
+            --label dependencies \
+            --limit 20 \
+            --json number,title)"
+          issue_number="$(jq -r \
+            --arg canonical_title "$canonical_title" \
+            --arg legacy_title_prefix "$legacy_title_prefix" \
+            'map(select(
+              .title == $canonical_title
+              or (.title | startswith($legacy_title_prefix))
+            )) | .[0].number // empty' <<< "$issue_json")"
 
           if (( core_count > 0 || plugin_count > 0 )); then
             body_file="$(mktemp)"
@@ -136,11 +146,13 @@ jobs:
             if [[ -n "$issue_number" ]]; then
               gh issue edit "$issue_number" \
                 --repo pausatf/pausatf \
+                --title "$canonical_title" \
+                --add-label ops \
                 --body-file "$body_file"
             else
               gh issue create \
                 --repo pausatf/pausatf \
-                --title "chore(wordpress): updates available" \
+                --title "$canonical_title" \
                 --label wordpress,dependencies,ops \
                 --body-file "$body_file"
             fi
