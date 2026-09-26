@@ -43,13 +43,16 @@ jobs:
         run: |
           set -euo pipefail
 
-          if [ -n "$DROPLET_ID" ] && doctl compute droplet get "$DROPLET_ID" --format ID --no-header >/dev/null 2>&1; then
-            echo "id=$DROPLET_ID" >> "$GITHUB_OUTPUT"
-            exit 0
+          if [ -n "$DROPLET_ID" ]; then
+            resolved_name="$(doctl compute droplet get "$DROPLET_ID" --format Name --no-header 2>/dev/null || true)"
+            if [ "$resolved_name" = "$DROPLET_NAME" ]; then
+              echo "id=$DROPLET_ID" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
           fi
 
           if [ -n "$DROPLET_ID" ]; then
-            echo "::warning::DO_PROD_DROPLET_ID is not accessible; looking up $DROPLET_NAME by name."
+            echo "::warning::DO_PROD_DROPLET_ID does not resolve to $DROPLET_NAME; looking up the production droplet by name."
           fi
 
           resolved_id="$(
