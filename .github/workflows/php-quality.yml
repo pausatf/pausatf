@@ -75,7 +75,38 @@ jobs:
             fi
             ~/.composer/vendor/bin/phpcs -q --standard=phpcs.xml.dist --report=full "${existing_php[@]}"
           else
-            ~/.composer/vendor/bin/phpcs -q --standard=phpcs.xml.dist --report=full themes wp-content/plugins
+            baseline_dir="$(mktemp -d)"
+            trap 'git worktree remove --force "$baseline_dir"; rm -rf "$baseline_dir"' EXIT
+            git worktree add --quiet --detach "$baseline_dir" "$BASE_SHA"
+            cp phpcs.xml.dist "$baseline_dir/phpcs.xml.dist"
+
+            set +e
+            ~/.composer/vendor/bin/phpcs --standard=phpcs.xml.dist --report=json themes wp-content/plugins > "$RUNNER_TEMP/phpcs-current.json"
+            current_status=$?
+            (cd "$baseline_dir" && ~/.composer/vendor/bin/phpcs --standard=phpcs.xml.dist --report=json themes wp-content/plugins) > "$RUNNER_TEMP/phpcs-baseline.json"
+            baseline_status=$?
+            set -e
+            if ((current_status > 2 || baseline_status > 2)); then
+              echo 'PHPCS could not complete with the current and baseline rulesets.' >&2
+              exit 1
+            fi
+
+            jq -c --arg root "$GITHUB_WORKSPACE" \
+              '[.files | to_entries[] as $file | $file.value.messages[] | [($file.key | sub("^" + $root + "/"; "")), .source, .message]] | sort' \
+              "$RUNNER_TEMP/phpcs-current.json" > "$RUNNER_TEMP/phpcs-current-findings.json"
+            jq -c --arg root "$baseline_dir" \
+              '[.files | to_entries[] as $file | $file.value.messages[] | [($file.key | sub("^" + $root + "/"; "")), .source, .message]] | sort' \
+              "$RUNNER_TEMP/phpcs-baseline.json" > "$RUNNER_TEMP/phpcs-baseline-findings.json"
+            comm -13 \
+              <(jq -r '.[] | @json' "$RUNNER_TEMP/phpcs-baseline-findings.json" | sort) \
+              <(jq -r '.[] | @json' "$RUNNER_TEMP/phpcs-current-findings.json" | sort) \
+              > "$RUNNER_TEMP/phpcs-new-findings.txt"
+            if [[ -s "$RUNNER_TEMP/phpcs-new-findings.txt" ]]; then
+              echo 'PHPCS found new violations under the updated ruleset:' >&2
+              cat "$RUNNER_TEMP/phpcs-new-findings.txt" >&2
+              exit 1
+            fi
+            echo 'PHPCS scanned all configured directories; no findings were added beyond the baseline.'
           fi
 
   actionlint:
