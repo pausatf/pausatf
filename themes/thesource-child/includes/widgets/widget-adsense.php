@@ -5,6 +5,11 @@
  * @package PAUSATF_TheSource_Child
  */
 
+/**
+ * AdsenseWidget displays AdSense content.
+ *
+ * @package PAUSATF_TheSource_Child
+ */
 class AdsenseWidget extends WP_Widget {
 
 	public function __construct() {

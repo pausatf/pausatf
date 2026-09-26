@@ -5,6 +5,11 @@
  * @package PAUSATF_TheSource_Child
  */
 
+/**
+ * PopularWidget displays popular posts content.
+ *
+ * @package PAUSATF_TheSource_Child
+ */
 class PopularWidget extends WP_Widget {
 
     public function __construct() {

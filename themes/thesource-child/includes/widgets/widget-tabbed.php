@@ -5,6 +5,11 @@
  * @package PAUSATF_TheSource_Child
  */
 
+/**
+ * TabbedWidget displays tabbed posts content.
+ *
+ * @package PAUSATF_TheSource_Child
+ */
 class TabbedWidget extends WP_Widget {
 
     public function __construct() {
