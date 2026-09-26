@@ -14,9 +14,10 @@
 #   7. Audit SSH authorized_keys across all users
 #   8. Audit cron jobs for unexpected scheduled tasks
 #
-# Usage:
-#   ansible-playbook playbooks/security-remediation.yml -i inventory/production
-#   ansible-playbook playbooks/security-remediation.yml -i inventory/production --check
+# Usage (safe audit; read-only checks only):
+#   ansible-playbook playbooks/security-remediation.yml -i inventory/hosts.yml -l production --tags audit
+# Mutating remediation tasks require explicit selection:
+#   ansible-playbook playbooks/security-remediation.yml -i inventory/hosts.yml -l production --tags remediate
 
 - name: WordPress security remediation
   hosts: production
@@ -40,6 +41,7 @@
       register: wp_user_delete
       changed_when: "'Deleted user' in wp_user_delete.stdout"
       failed_when: false
+      tags: [remediate]
       vars:
         wp_site: "{{ wordpress_installs | selectattr('name', 'equalto', 'pausatf-main') | first }}"
 
@@ -54,6 +56,7 @@
         wp_site: "{{ wordpress_installs | selectattr('name', 'equalto', 'pausatf-main') | first }}"
       register: salt_rotation
       changed_when: true
+      tags: [remediate]
 
     # -------------------------------------------------------------------------
     # 3. Audit admin accounts for additional persistence
@@ -67,10 +70,12 @@
         wp_site: "{{ wordpress_installs | selectattr('name', 'equalto', 'pausatf-main') | first }}"
       register: admin_list
       changed_when: false
+      tags: [audit]
 
     - name: Display current administrators (review for unexpected accounts)
       ansible.builtin.debug:
         var: admin_list.stdout_lines
+      tags: [audit]
 
     - name: Get administrator login names
       ansible.builtin.command: >
@@ -80,16 +85,19 @@
         wp_site: "{{ wordpress_installs | selectattr('name', 'equalto', 'pausatf-main') | first }}"
       register: admin_logins
       changed_when: false
+      tags: [audit]
 
     - name: Build authorized administrator logins
       ansible.builtin.set_fact:
         wp_authorized_admins: >-
           {{ wp_users | default([]) | selectattr('roles', 'search', 'administrator') | map(attribute='username') | list }}
+      tags: [audit]
 
     - name: Identify unexpected administrator accounts
       ansible.builtin.set_fact:
         wp_unexpected_admins: >-
           {{ admin_logins.stdout_lines | default([]) | difference(wp_authorized_admins) }}
+      tags: [audit]
 
     - name: Warn about unexpected administrator accounts
       ansible.builtin.debug:
@@ -97,6 +105,7 @@
           WARNING: Unexpected administrator account(s) found: {{ wp_unexpected_admins | join(', ') }}.
           Investigate and add to wp_users_remove if confirmed illegitimate.
       when: wp_unexpected_admins | length > 0
+      tags: [audit]
 
     - name: Confirm no unexpected administrators remain
       ansible.builtin.assert:
@@ -105,6 +114,7 @@
           Unexpected administrator account(s) remain: {{ wp_unexpected_admins | join(', ') }}.
           Manual review required before completing remediation.
         success_msg: "All administrator accounts are in the authorized list."
+      tags: [audit]
 
     # -------------------------------------------------------------------------
     # 4. Remove wp-file-manager-pro (active RCE vector — CVE-2020-25213)
@@ -118,6 +128,7 @@
       register: fmgr_deactivate
       changed_when: "'Plugin deactivated' in fmgr_deactivate.stdout"
       failed_when: false
+      tags: [remediate]
 
     - name: Delete wp-file-manager-pro
       ansible.builtin.command: >
@@ -128,6 +139,7 @@
       register: fmgr_delete
       changed_when: "'Deleted' in fmgr_delete.stdout"
       failed_when: false
+      tags: [remediate]
 
     - name: Confirm wp-file-manager-pro plugin directory is gone
       ansible.builtin.stat:
@@ -135,6 +147,7 @@
       vars:
         wp_site: "{{ wordpress_installs | selectattr('name', 'equalto', 'pausatf-main') | first }}"
       register: fmgr_dir
+      tags: [audit]
 
     - name: Warn if wp-file-manager-pro directory still exists
       ansible.builtin.debug:
@@ -146,6 +159,7 @@
       vars:
         wp_site: "{{ wordpress_installs | selectattr('name', 'equalto', 'pausatf-main') | first }}"
       when: fmgr_dir.stat.exists
+      tags: [audit]
 
     # -------------------------------------------------------------------------
     # 6. Enable Jetpack login notifications for admins
@@ -159,6 +173,7 @@
       register: jetpack_active
       changed_when: false
       failed_when: false
+      tags: [audit, remediate]
 
     - name: Enable Jetpack master user login notification
       # Use option patch insert to avoid overwriting the full jetpack_options blob.
@@ -171,6 +186,7 @@
       when: jetpack_active.rc == 0
       register: jetpack_notif
       changed_when: "'Success' in jetpack_notif.stdout"
+      tags: [remediate]
 
     # -------------------------------------------------------------------------
     # 5. Webshell scan — PHP files in uploads directories
@@ -184,8 +200,8 @@
       loop_control:
         label: "{{ item.name }}"
       register: uploads_php_scan
-      failed_when: false
       changed_when: false
+      tags: [audit]
 
     - name: Fail if PHP files found in any uploads directory
       ansible.builtin.fail:
@@ -197,6 +213,7 @@
       loop_control:
         label: "{{ item.item.name }}"
       when: item.matched | default(0) | int > 0
+      tags: [audit]
 
     # -------------------------------------------------------------------------
     # 6. WordPress core integrity check
@@ -211,6 +228,7 @@
       register: wp_checksums
       changed_when: false
       failed_when: false
+      tags: [audit]
 
     - name: Fail if core checksums do not match
       ansible.builtin.fail:
@@ -222,6 +240,7 @@
       loop_control:
         label: "{{ item.item.name }}"
       when: item.rc | default(0) != 0
+      tags: [audit]
 
     # -------------------------------------------------------------------------
     # 7. SSH authorized_keys audit
@@ -235,6 +254,7 @@
         recurse: true
       register: auth_keys_files
       changed_when: false
+      tags: [audit]
 
     - name: Read authorized_keys contents
       ansible.builtin.command: cat {{ item.path }}
@@ -243,6 +263,7 @@
         label: "{{ item.path }}"
       changed_when: false
       register: auth_keys_content
+      tags: [audit]
 
     - name: Display authorized_keys for manual review
       ansible.builtin.debug:
@@ -250,6 +271,7 @@
       loop: "{{ auth_keys_content.results }}"
       loop_control:
         label: "{{ item.item.path }}"
+      tags: [audit]
 
     # -------------------------------------------------------------------------
     # 8. Cron job audit
@@ -264,33 +286,28 @@
         done
       changed_when: false
       register: all_crontabs
+      tags: [audit]
 
     - name: Display cron jobs for manual review
       ansible.builtin.debug:
         msg: "{{ all_crontabs.stdout_lines | default(['(no cron jobs found)']) }}"
+      tags: [audit]
 
     # -------------------------------------------------------------------------
     # 9. Summary
     # -------------------------------------------------------------------------
-    - name: Remediation summary
+    - name: Read-only security audit summary
       # yamllint disable rule:line-length
       ansible.builtin.debug:
         msg: |
           ============================================================
-          Security Remediation Complete
+          Read-only Security Audit Complete
           ============================================================
-          Accounts removed : {{ wp_users_remove | default([]) | map(attribute='username') | join(', ') or 'none' }}
-          Auth salts rotated: {{ 'yes' if (salt_rotation is defined and salt_rotation.rc is defined and salt_rotation.rc == 0) else 'FAILED' }}
           Admin audit      : {{ 'PASS — no unexpected admins' if wp_unexpected_admins | length == 0 else 'FAIL — review required' }}
-          Login notify     : {{ 'enabled (Jetpack)' if (jetpack_active.rc == 0 and jetpack_notif is defined and jetpack_notif.rc is defined and jetpack_notif.rc == 0) else 'skipped (Jetpack not active)' }}
           Webshell scan    : PASS — no PHP files in uploads
           Core checksums   : PASS — all installs verified clean
           SSH keys         : displayed above — review output manually
           Cron jobs        : displayed above — review output manually
+          Remediation tasks: NOT RUN — select --tags remediate explicitly if required
           ============================================================
-          Next steps:
-            - Rotate WordPress managed DB password (vault_managed_wp_db_password)
-            - Rotate all admin user passwords manually
-            - Review server access logs for the Jan-2026 breach window
-            - Re-run capture-wp-inventory.yml to refresh group_vars
-            - Add DO_TOKEN + DO_PROD_DROPLET_ID repo secrets to restore nightly snapshots
+      tags: [audit]
