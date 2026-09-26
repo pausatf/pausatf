@@ -9,7 +9,7 @@ terraform {
   }
 }
 
-#tfsec:ignore:github-repositories-private: PAUSATF is an intentionally public track and field club repository.
+#tfsec:ignore:GIT-0001: PAUSATF is an intentionally public track and field club repository.
 resource "github_repository" "repo" {
   #checkov:skip=CKV_GIT_1:pausatf repo is intentionally public (track & field club)
   name        = var.name

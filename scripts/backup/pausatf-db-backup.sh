@@ -15,8 +15,8 @@ umask 077
 DB_ENV_FILE=$(mktemp /run/pausatf-db-backup-env.XXXXXX)
 trap 'rm -f -- "$DB_ENV_FILE"' EXIT
 
-if [ ! -r "$S3CMD_CONFIG" ]; then
-  echo "FAIL: s3cmd credentials/config are not readable: $S3CMD_CONFIG" >&2
+if [ ! -f "$S3CMD_CONFIG" ] || [ -L "$S3CMD_CONFIG" ] || [ "$(stat -c '%u:%a' "$S3CMD_CONFIG")" != '0:600' ]; then
+  echo "FAIL: s3cmd credentials/config must be a regular root-owned file with mode 0600: $S3CMD_CONFIG" >&2
   exit 1
 fi
 
