@@ -42,7 +42,6 @@ $sql = "INSERT INTO webcal_user_pref " .
 if ( ! dbi_query ( $sql ) ) {
   $error = "Unable to update preference: " . dbi_error () .
     "<br /><br /><span style=\"font-weight:bold;\">SQL:</span> $sql";
-  break;
 }
 
 if ( empty ( $error ) ) {
