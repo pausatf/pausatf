@@ -82,7 +82,7 @@ All servers: Ubuntu 20.04 LTS, DigitalOcean `sfo2`, MySQL 5.7 (prod local) / MyS
 
 - **Hosting**: DigitalOcean droplets + managed DB clusters (staging/dev)
 - **CDN/DNS**: Cloudflare (free plan, full SSL, aggressive caching)
-- **CMS**: WordPress 6.8.3, active theme `TheSource-child`
+- **CMS**: WordPress 7.1.2, active theme `TheSource-child`
 - **Config management**: Ansible with ansible-vault for secrets
 - **IaC**: Terraform ~1.6–1.10, state in DO Spaces (`pausatf-terraform-state`)
 - **Monitoring**: New Relic APM + infrastructure agent, Monit, sysstat
