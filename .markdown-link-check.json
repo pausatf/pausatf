@@ -58,9 +58,6 @@
       "pattern": "^https://openlitespeed\\.org/kb"
     },
     {
-      "pattern": "^https://wiki\\.ubuntu\\.com/FocalFossa/ReleaseNotes$"
-    },
-    {
       "pattern": "^https://github\\.com/settings/"
     },
     {
