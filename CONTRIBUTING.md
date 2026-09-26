@@ -199,23 +199,23 @@ ansible-playbook --syntax-check playbooks/your-playbook.yml
 
 ### Shell Script Standards
 
-### PHP Standards (themes/ and custom plugins)
+### PHP Standards (maintained PHP sources)
 
 - Start each maintained PHP source file with a file-level PHPDoc block that briefly identifies its role and declares an `@package`. Keep PHPDoc inside PHP tags so it produces no output. Exclude generated files, upstream parent-theme/vendor code, empty files, and `.php` files containing only static HTML or JavaScript.
-- Coding standard: WordPress-Core/Extra/Docs via PHPCS
+- WordPress Coding Standards and PHPCompatibility run on added or changed PHP lines. Existing violations on untouched legacy lines do not block new changes; new violations on changed lines remain blocking.
 - PHP versions: 8.0–8.3 (project target)
 - Install PHPCS + WPCS locally (optional, CI enforces it):
 
 ```bash
-composer global require squizlabs/php_codesniffer:^3 wp-coding-standards/wpcs:^3 phpcompatibility/php-compatibility:^9
-phpcs --config-set installed_paths ~/.composer/vendor/wp-coding-standards/wpcs,~/.composer/vendor/phpcompatibility/php-compatibility
+composer global config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
+composer global require dealerdirect/phpcodesniffer-composer-installer:^1 squizlabs/php_codesniffer:^3 wp-coding-standards/wpcs:^3 phpcompatibility/php-compatibility:^9
 ```
 
 - Run checks locally:
 
 ```bash
 php -l themes/thesource-child/functions.php
-phpcs --standard=phpcs.xml.dist themes wp-content/plugins
+python3 scripts/check_phpcs_changed_lines.py --base origin/main --phpcs "$(command -v phpcs)"
 ```
 
 - **ShellCheck**: All scripts must pass ShellCheck

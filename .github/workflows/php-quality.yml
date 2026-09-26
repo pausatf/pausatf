@@ -3,20 +3,34 @@ name: PHP Quality
 on:
   pull_request:
     paths:
-      - 'themes/**.php'
-      - 'themes/**/**.php'
+      - 'themes/thesource-child/**/*.php'
       - 'wp-content/plugins/**.php'
       - 'wp-content/plugins/**/**.php'
+      - 'wp-content/mu-plugins/**/*.php'
+      - 'wordpress/plugins/**/*.php'
+      - 'wordpress/mu-plugins/**/*.php'
+      - 'ansible/roles/wordpress/files/TheSource-child/**/*.php'
+      - 'ansible/roles/apache/files/**/*.php'
+      - 'content/**/*.php'
+      - 'teeters-php/**/*.php'
+      - 'pausatf-content-architecture.php'
       - 'phpcs.xml.dist'
       - 'scripts/check_phpcs_changed_lines.py'
       - '.github/workflows/php-quality.yml'
   push:
     branches: [main]
     paths:
-      - 'themes/**.php'
-      - 'themes/**/**.php'
+      - 'themes/thesource-child/**/*.php'
       - 'wp-content/plugins/**.php'
       - 'wp-content/plugins/**/**.php'
+      - 'wp-content/mu-plugins/**/*.php'
+      - 'wordpress/plugins/**/*.php'
+      - 'wordpress/mu-plugins/**/*.php'
+      - 'ansible/roles/wordpress/files/TheSource-child/**/*.php'
+      - 'ansible/roles/apache/files/**/*.php'
+      - 'content/**/*.php'
+      - 'teeters-php/**/*.php'
+      - 'pausatf-content-architecture.php'
       - 'phpcs.xml.dist'
       - 'scripts/check_phpcs_changed_lines.py'
 
@@ -36,7 +50,7 @@ jobs:
       - name: Lint PHP
         run: |
           shopt -s globstar nullglob
-          for f in themes/**/*.php wp-content/plugins/**/*.php; do
+          for f in themes/thesource-child/**/*.php wp-content/plugins/**/*.php wp-content/mu-plugins/**/*.php wordpress/plugins/**/*.php wordpress/mu-plugins/**/*.php ansible/roles/wordpress/files/TheSource-child/**/*.php ansible/roles/apache/files/**/*.php content/**/*.php teeters-php/**/*.php pausatf-content-architecture.php; do
             php -l "$f" || exit 1
           done
 

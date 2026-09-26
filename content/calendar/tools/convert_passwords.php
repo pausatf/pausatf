@@ -4,7 +4,7 @@
  *
  * @package PAUSATF_Calendar
  */
-?><?
+?><?php
 
 
 /*
