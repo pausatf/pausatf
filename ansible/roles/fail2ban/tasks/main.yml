@@ -48,6 +48,24 @@
     mode: "0644"
   notify: Restart fail2ban
 
+- name: Deploy WordPress hard failure fail2ban filter
+  ansible.builtin.template:
+    src: wordpress-hard.conf.j2
+    dest: /etc/fail2ban/filter.d/wordpress-hard.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart fail2ban
+
+- name: Deploy WordPress soft failure fail2ban filter
+  ansible.builtin.template:
+    src: wordpress-soft.conf.j2
+    dest: /etc/fail2ban/filter.d/wordpress-soft.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart fail2ban
+
 - name: Deploy OpenLiteSpeed fail2ban filter
   ansible.builtin.template:
     src: openlitespeed-auth.conf.j2
