@@ -4,5 +4,7 @@
   become: true
   vars:
     fail2ban_manage_service: false
+    fail2ban_abuseipdb_enabled: false
+    fail2ban_firehol_enabled: false
   roles:
     - role: fail2ban
