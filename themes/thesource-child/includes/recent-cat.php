@@ -4,6 +4,7 @@
  *
  * @package PAUSATF_TheSource_Child
  */
+
  if($last) echo(" last"); ?>">
 <?php
 	$current_category = get_option( $cat_option );

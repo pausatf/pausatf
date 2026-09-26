@@ -4,6 +4,7 @@
  *
  * @package PAUSATF_TheSource
  */
+
  global $default_colorscheme, $shortname, $category_menu, $exclude_pages, $exclude_cats, $hide, $strdepth, $strdepth2, $page_menu; ?>
 <?php $colorSchemePath = '';
 	  $colorScheme = get_option($shortname . '_color_scheme');

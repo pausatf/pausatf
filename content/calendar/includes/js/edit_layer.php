@@ -27,6 +27,7 @@ function valid_form ( form ) {
  *
  * @package PAUSATF_Calendar
  */
+
  etranslate("Invalid color")?>.\n";
 
   if ( err.length > 0 ) {

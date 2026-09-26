@@ -4,6 +4,7 @@
  *
  * @package PAUSATF_TheSource
  */
+
  get_header(); ?>
 
 <div id="main-content-wrap">

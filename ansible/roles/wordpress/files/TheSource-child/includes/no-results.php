@@ -6,6 +6,7 @@
  *
  * @package PAUSATF_TheSource_Child
  */
+
  esc_html_e('No Results Found','TheSource'); ?></h1>
 	<p><?php esc_html_e('The page you requested could not be found. Try refining your search, or use the navigation above to locate the post.','TheSource'); ?></p>
 </div>

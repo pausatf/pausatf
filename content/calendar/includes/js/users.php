@@ -18,6 +18,7 @@ function hide(foo,f,section) {
  *
  * @package PAUSATF_Calendar
  */
+
  //see the showTab function in includes/js.php for common code shared by all pages
 	//using the tabbed GUI.
 ?>var tabs = new Array();

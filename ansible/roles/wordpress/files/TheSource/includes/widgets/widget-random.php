@@ -4,6 +4,7 @@
  *
  * @package PAUSATF_TheSource
  */
+
  class RandomWidget extends WP_Widget
 {
     function __construct(){

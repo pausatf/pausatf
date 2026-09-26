@@ -31,6 +31,7 @@ function selectDate ( day, month, year, current, evt ) {
  *
  * @package PAUSATF_Calendar
  */
+
  //see the showTab function in includes/js/visible.php for common code shared by all pages
 	//using the tabbed GUI.
 ?>var tabs = new Array();

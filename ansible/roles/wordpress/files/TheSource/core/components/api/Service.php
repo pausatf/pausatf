@@ -7,6 +7,7 @@
  *
  * @package ET\Core\API
  */
+
 abstract class ET_Core_API_Service {
 
 	/**

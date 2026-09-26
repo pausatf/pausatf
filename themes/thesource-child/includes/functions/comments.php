@@ -4,6 +4,7 @@
  *
  * @package PAUSATF_TheSource_Child
  */
+
  if ( ! function_exists( 'et_custom_comments_display' ) ) :
 function et_custom_comments_display($comment, $args, $depth) {
    $GLOBALS['comment'] = $comment; ?>

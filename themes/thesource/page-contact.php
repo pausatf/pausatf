@@ -4,6 +4,7 @@
  *
  * @package PAUSATF_TheSource
  */
+
  if ( ! isset( $_SESSION ) ) session_start();
 /*
 Template Name: Contact Page

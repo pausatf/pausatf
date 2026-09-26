@@ -4,6 +4,7 @@
  *
  * @package PAUSATF_TheSource
  */
+
  get_header(); ?>
 
 <?php if (get_option('thesource_recent_fromcat_display') == 'on') { ?>

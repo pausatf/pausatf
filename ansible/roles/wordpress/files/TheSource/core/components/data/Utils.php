@@ -9,6 +9,7 @@
  *
  * @package ET\Core\Data
  */
+
 class ET_Core_Data_Utils {
 
 	private static $_instance;

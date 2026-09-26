@@ -4,6 +4,7 @@
  *
  * @package PAUSATF_TheSource
  */
+
  class PopularWidget extends WP_Widget
 {
     function __construct(){

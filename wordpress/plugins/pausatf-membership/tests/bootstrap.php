@@ -8,6 +8,8 @@
  * of WP's API that is referenced at class-definition time (outside of
  * methods) needs to be present here; method-level WP calls are handled per
  * test via overrides or are avoided by testing only pure-PHP paths.
+ *
+ * @package PAUSATF_Membership
  */
 
 declare( strict_types=1 );

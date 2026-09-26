@@ -1,6 +1,9 @@
 <?php
 
-/********* Shortcodes v.3.0 ************/
+/********* Shortcodes v.3.0 ***********
+ *
+ * @package PAUSATF_TheSource
+ */
 
 if ( ! defined( 'ET_SHORTCODES_VERSION' ) ) define( 'ET_SHORTCODES_VERSION', '3.0' );
 if ( ! defined( 'ET_SHORTCODES_DIR' ) ) define( 'ET_SHORTCODES_DIR', get_template_directory_uri() . '/epanel/shortcodes' );

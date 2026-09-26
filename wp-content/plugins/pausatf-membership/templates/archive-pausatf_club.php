@@ -4,6 +4,8 @@
  *
  * Loaded via ob_start() from pausatf_clubs_shortcode().
  * Variables available: $clubs_query (WP_Query)
+ *
+ * @package PAUSATF_Membership
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

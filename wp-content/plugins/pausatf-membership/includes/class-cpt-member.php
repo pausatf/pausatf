@@ -7,6 +7,8 @@
  * and template level via current_user_can('read').
  *
  * Replaces the legacy members.php / fetch-members.php scripts.
+ *
+ * @package PAUSATF_Membership
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

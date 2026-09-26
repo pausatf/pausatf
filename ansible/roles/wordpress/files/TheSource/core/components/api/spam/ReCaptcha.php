@@ -7,6 +7,7 @@
  *
  * @package ET\Core\API\Misc\ReCaptcha
  */
+
 class ET_Core_API_Spam_ReCaptcha extends ET_Core_API_Spam_Provider {
 
 	/**

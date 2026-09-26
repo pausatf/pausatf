@@ -4,6 +4,7 @@
  *
  * @package PAUSATF_TheSource
  */
+
  $thumb = '';
 
 	$width = 74;

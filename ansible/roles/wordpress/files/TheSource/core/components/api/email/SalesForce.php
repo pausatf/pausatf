@@ -7,6 +7,7 @@
  *
  * @package ET\Core\API\Email
  */
+
 class ET_Core_API_Email_SalesForce extends ET_Core_API_Email_Provider {
 
 	/**

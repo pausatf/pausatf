@@ -4,6 +4,7 @@
  *
  * @package PAUSATF_TheSource_Child
  */
+
  global $shortname; ?>
 	<script>
 		jQuery.noConflict();

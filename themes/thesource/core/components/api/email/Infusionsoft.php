@@ -7,6 +7,7 @@
  *
  * @package ET\Core\API\Email
  */
+
 class ET_Core_API_Email_Infusionsoft extends ET_Core_API_Email_Provider {
 
 	private static $_data_keys = array(

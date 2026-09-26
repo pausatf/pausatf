@@ -1,6 +1,8 @@
 <?php
 /**
  * About Me Widget for TheSource Child Theme
+ *
+ * @package PAUSATF_TheSource_Child
  */
 
 class AboutMeWidget extends WP_Widget {

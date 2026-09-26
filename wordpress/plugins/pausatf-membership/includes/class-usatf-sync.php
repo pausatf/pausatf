@@ -10,6 +10,8 @@
  *
  * To trigger manually from WP-CLI:
  *   wp eval 'PAUSATF_USATF_Sync::run();'
+ *
+ * @package PAUSATF_Membership
  */
 
 declare( strict_types=1 );

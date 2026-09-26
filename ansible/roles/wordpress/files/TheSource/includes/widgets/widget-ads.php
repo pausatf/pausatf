@@ -4,6 +4,7 @@
  *
  * @package PAUSATF_TheSource
  */
+
  class AdvWidget extends WP_Widget
 {
     function __construct(){

@@ -5,6 +5,7 @@
  *
  * @package PAUSATF_TheSource
  */
+
  if (!is_home()) { ?>
 
 		<div id="onecol">

@@ -4,4 +4,5 @@
  *
  * @package PAUSATF_TheSource
  */
+
  esc_html_e( 'Read TheSource Documentation', $themename ); ?></a>

@@ -4,6 +4,7 @@
  *
  * @package PAUSATF_TheSource
  */
+
  class AboutMeWidget extends WP_Widget
 {
     function __construct(){

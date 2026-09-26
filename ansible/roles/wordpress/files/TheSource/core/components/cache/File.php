@@ -10,6 +10,7 @@
  *
  * @package ET\Core\Cache_File
  */
+
 class ET_Core_Cache_File {
 
 	/**

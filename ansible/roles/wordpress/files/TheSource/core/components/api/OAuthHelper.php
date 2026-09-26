@@ -11,6 +11,7 @@
  * @property string access_token
  * @property string access_token_secret
  */
+
 class ET_Core_API_OAuthHelper {
 
 	/**

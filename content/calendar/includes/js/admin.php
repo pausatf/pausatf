@@ -17,6 +17,7 @@ function valid_form ( form ) {
  *
  * @package PAUSATF_Calendar
  */
+
  etranslate("Server URL is required")?>.\n";
     form.admin_server_url.select ();
     form.admin_server_url.focus ();

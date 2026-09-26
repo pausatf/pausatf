@@ -10,6 +10,7 @@
  * @since   1.1.0
  * @package ET\Core\API\Email
  */
+
 class ET_Core_API_Email_Mailster extends ET_Core_API_Email_Provider {
 
 	/**

@@ -7,6 +7,7 @@
  *
  * @package ET\Core\Data
  */
+
 class ET_Core_Data_ScriptReplacer {
 
 	private $_map = array();

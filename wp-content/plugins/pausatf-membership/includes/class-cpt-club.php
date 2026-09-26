@@ -4,6 +4,8 @@
  *
  * Public club directory. Replaces the legacy clubs.php / clubprofiles.php
  * scripts that queried the pausatf_clubs MySQL database.
+ *
+ * @package PAUSATF_Membership
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

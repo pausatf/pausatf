@@ -10,6 +10,8 @@
  *   $members_query (WP_Query)
  *   $club          (string) — active club filter, may be empty
  *   $per_page      (int)
+ *
+ * @package PAUSATF_Membership
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
