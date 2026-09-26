@@ -68,9 +68,6 @@
     },
     {
       "pattern": "^https://github\\.com/gdsmith/jquery\\.easing"
-    },
-    {
-      "pattern": "^https://docs\\.ansible\\.com/"
     }
   ],
   "timeout": "20s",
@@ -79,6 +76,7 @@
   "fallbackRetryDelay": "30s",
   "aliveStatusCodes": [
     200,
-    206
+    206,
+    429
   ]
 }
