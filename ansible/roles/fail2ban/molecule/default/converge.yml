@@ -2,5 +2,7 @@
 - name: Converge
   hosts: all
   become: true
+  vars:
+    fail2ban_manage_service: false
   roles:
     - role: fail2ban
