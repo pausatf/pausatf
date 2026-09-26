@@ -57,7 +57,7 @@ on:
         type: boolean
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: pausatf-production-maintenance
   cancel-in-progress: false
 
 permissions:

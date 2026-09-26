@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: pausatf-production-firewall
   cancel-in-progress: false
 
 permissions:
