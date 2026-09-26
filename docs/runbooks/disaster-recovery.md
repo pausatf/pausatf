@@ -63,7 +63,7 @@ Store securely in password manager:
 | Credential | Purpose | Location |
 |------------|---------|----------|
 | **DO_TOKEN** | DigitalOcean API | GitHub secret |
-| **DO_PROD_DROPLET_ID** | Production droplet ID | REDACTED_DROPLET_ID |
+| **DO_PROD_DROPLET_ID** | Optional production droplet ID override for nightly snapshots. If unset or inaccessible, the workflow resolves `pausatf-prod` by name. | GitHub Actions secret (optional) |
 | **CLOUDFLARE_API_TOKEN** | Cloudflare API | GitHub secret |
 | **PROD_SSH_PRIVATE_KEY** | Production SSH | GitHub secret / local |
 | **SPACES_ACCESS_KEY_ID** | Terraform state backend | GitHub secret |
