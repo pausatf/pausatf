@@ -5,7 +5,7 @@
 before = common.conf
 
 [Definition]
-_daemon = (?:wordpress|wp)
+_daemon = (?:wordpress(?:\([^)]*\))?|wp)
 
 failregex = ^%(__prefix_line)sAuthentication failure for .* from <HOST>$
             ^%(__prefix_line)sREST authentication failure for .* from <HOST>$
