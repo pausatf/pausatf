@@ -5,6 +5,11 @@
  * @package PAUSATF_TheSource_Child
  */
 
+/**
+ * RandomWidget displays random posts content.
+ *
+ * @package PAUSATF_TheSource_Child
+ */
 class RandomWidget extends WP_Widget {
 
     public function __construct() {
