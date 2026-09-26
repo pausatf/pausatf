@@ -107,7 +107,7 @@ def main() -> int:
         print(f"Found {len(violations)} PHPCS violation(s) on changed lines.", file=sys.stderr)
         return 1
 
-    if report.returncode and total_messages == 0:
+    if report.returncode > 3 or (report.returncode and total_messages == 0):
         if report.stderr:
             print(report.stderr, file=sys.stderr)
         print(
