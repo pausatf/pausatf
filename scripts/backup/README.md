@@ -4,6 +4,10 @@ Production backups run on the droplet because GitHub-hosted runners cannot reach
 Cloudflare Access boundary. The systemd timer creates age-encrypted database and legacy-data artifacts and uploads
 them privately to DigitalOcean Spaces.
 
+Provision `/root/.s3cfg` out of band on the droplet with a least-privilege Spaces key. Keep it owned by root with
+mode `0600`; the service explicitly passes this file to every `s3cmd` invocation. It is included only in the
+age-encrypted host-configuration recovery archive. Do not commit the key or place it in GitHub workflow logs.
+
 Install or refresh the managed files from the repository:
 
 ```bash
@@ -25,4 +29,7 @@ sudo systemctl status pausatf-db-backup.service
 sudo s3cmd ls s3://pausatf/backups/prod/
 ```
 
-The age private key and object-storage credentials must not be stored in this repository or on the droplet.
+The age private key stays off-host. The root-only Spaces config is provisioned on the droplet as described above;
+its encrypted recovery copy permits restoration if the host is lost. Restore operations require the off-host age
+private key. Keep the most recent three artifacts locally and `BACKUP_KEEP` remote artifacts per database/legacy
+type; the recovery wrapper separately writes a manifest only after its backup set has uploaded and verified.

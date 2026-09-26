@@ -88,11 +88,10 @@ Store securely in password manager:
    - Captures: Plugins, themes, configurations
    - Location: `ansible/group_vars/production/wordpress.yml` (committed to git)
 
-3. **Legacy Directory Backup**
-   - Workflow: `.github/workflows/backup-legacy.yml`
-   - Frequency: Daily
-   - Location: `backups/legacy/` (committed to git)
-   - Size: ~5GB
+3. **Encrypted Database and Legacy Backup**
+   - Timer: production `pausatf-db-backup.timer` (daily)
+   - Location: private, age-encrypted DigitalOcean Spaces objects under `s3://pausatf/backups/prod/` and verified recovery sets under `s3://pausatf/backups/recovery/sets/`
+   - Restore requires the off-host age private key; see `scripts/backup/README.md`.
 
 ### On-Demand Backups
 
