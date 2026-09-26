@@ -198,6 +198,14 @@
   loop_control:
     loop_var: wp_site
 
+- name: Check externally managed wp-config.php exists
+  ansible.builtin.stat:
+    path: "{{ item.path | default('/var/www/html') }}/wp-config.php"
+  loop: "{{ wordpress_installs | default([]) }}"
+  register: wp_external_config_stats
+  when: not (item.manage_wp_config | default(false))
+  tags: wordpress_config
+
 - name: Preserve runtime settings in externally managed wp-config.php
   ansible.builtin.blockinfile:
     path: "{{ item.path | default('/var/www/html') }}/wp-config.php"
@@ -219,7 +227,11 @@
       {% endif %}
     validate: "php -l %s"
   loop: "{{ wordpress_installs | default([]) }}"
-  when: not (item.manage_wp_config | default(false))
+  loop_control:
+    index_var: wp_config_index
+  when:
+    - not (item.manage_wp_config | default(false))
+    - wp_external_config_stats.results[wp_config_index].stat.exists
   tags: wordpress_config
 
 - name: Deploy WP cron health check script
