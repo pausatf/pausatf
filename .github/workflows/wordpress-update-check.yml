@@ -25,13 +25,14 @@ jobs:
         env:
           PROD_SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
           PROD_HOST: ${{ vars.PROD_HOST }}
+          PROD_SSH_KNOWN_HOSTS: ${{ vars.PROD_SSH_KNOWN_HOSTS }}
         shell: bash
         run: |
           # shellcheck disable=SC2016
           set -euo pipefail
 
-          if [[ -z "${PROD_SSH_PRIVATE_KEY:-}" || -z "${PROD_HOST:-}" ]]; then
-            echo "Production SSH credentials are not configured." >&2
+          if [[ -z "${PROD_SSH_PRIVATE_KEY:-}" || -z "${PROD_HOST:-}" || -z "${PROD_SSH_KNOWN_HOSTS:-}" ]]; then
+            echo "Production SSH credentials or trusted host keys are not configured." >&2
             exit 1
           fi
 
@@ -40,11 +41,15 @@ jobs:
           trap 'rm -f "$key_file"' EXIT
           printf '%s\n' "$PROD_SSH_PRIVATE_KEY" > "$key_file"
           chmod 600 "$key_file"
+          known_hosts_file="$HOME/.ssh/known_hosts"
+          printf '%s\n' "$PROD_SSH_KNOWN_HOSTS" > "$known_hosts_file"
+          chmod 600 "$known_hosts_file"
 
           ssh_options=(
             -o BatchMode=yes
             -o ConnectTimeout=15
-            -o StrictHostKeyChecking=accept-new
+            -o StrictHostKeyChecking=yes
+            -o "UserKnownHostsFile=$known_hosts_file"
             -i "$key_file"
           )
           remote="github-deploy@${PROD_HOST}"
@@ -55,9 +60,38 @@ jobs:
           require_once ABSPATH . "wp-admin/includes/update.php";
           require_once ABSPATH . "wp-admin/includes/plugin.php";
 
+          $previous_core = get_site_transient("update_core");
+          delete_site_transient("update_core");
+          if (false !== get_site_transient("update_core")) {
+              if (false !== $previous_core) {
+                  set_site_transient("update_core", $previous_core, DAY_IN_SECONDS);
+              }
+              fwrite(STDERR, "Could not clear the cached core update metadata.\n");
+              exit(1);
+          }
+
+          $core_check_started = time();
+          $core_transient_writes = 0;
+          $track_core_transient_write = static function ($transient) use (&$core_transient_writes) {
+              $core_transient_writes++;
+              return $transient;
+          };
+          add_filter("pre_set_site_transient_update_core", $track_core_transient_write);
           wp_version_check([], true);
+          remove_filter("pre_set_site_transient_update_core", $track_core_transient_write);
+
+          $refreshed_core = get_site_transient("update_core");
           $core_updates = get_core_updates();
-          if (!is_array($core_updates)) {
+          if (
+              $core_transient_writes < 2
+              || !is_object($refreshed_core)
+              || !isset($refreshed_core->last_checked)
+              || (int) $refreshed_core->last_checked < $core_check_started
+              || !is_array($core_updates)
+          ) {
+              if (false !== $previous_core) {
+                  set_site_transient("update_core", $previous_core, DAY_IN_SECONDS);
+              }
               fwrite(STDERR, "Core update metadata refresh failed.\n");
               exit(1);
           }
