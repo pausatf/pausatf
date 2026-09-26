@@ -63,12 +63,20 @@ jobs:
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: |
-          mapfile -d '' changed_php < <(git diff --name-only -z "$BASE_SHA" "$GITHUB_SHA" -- '*.php')
-          if ((${#changed_php[@]} == 0)); then
-            echo 'No changed PHP files; skipping PHPCS.'
-            exit 0
+          if git diff --quiet "$BASE_SHA" "$GITHUB_SHA" -- phpcs.xml.dist; then
+            mapfile -d '' changed_php < <(git diff --diff-filter=ACMR --name-only -z "$BASE_SHA" "$GITHUB_SHA" -- '*.php')
+            existing_php=()
+            for file in "${changed_php[@]}"; do
+              [[ -f "$file" ]] && existing_php+=("$file")
+            done
+            if ((${#existing_php[@]} == 0)); then
+              echo 'No changed PHP files; skipping PHPCS.'
+              exit 0
+            fi
+            ~/.composer/vendor/bin/phpcs -q --standard=phpcs.xml.dist --report=full "${existing_php[@]}"
+          else
+            ~/.composer/vendor/bin/phpcs -q --standard=phpcs.xml.dist --report=full themes wp-content/plugins
           fi
-          ~/.composer/vendor/bin/phpcs -q --standard=phpcs.xml.dist --report=full "${changed_php[@]}"
 
   actionlint:
     name: actionlint

@@ -250,9 +250,10 @@ jobs:
             "https://github.com/aquasecurity/tfsec/releases/download/${version}/tfsec-linux-amd64" \
             --output tfsec-linux-amd64
           curl --fail --silent --show-error --location \
-            "https://github.com/aquasecurity/tfsec/releases/download/${version}/tfsec_checksums.txt" \
-            --output tfsec_checksums.txt
-          grep 'tfsec-linux-amd64$' tfsec_checksums.txt | sha256sum --check --status
+            "https://github.com/aquasecurity/tfsec/releases/download/${version}/tfsec-linux-amd64" \
+            --output tfsec-linux-amd64
+          echo 'a32d0799bbefababaa4fcd814da9f4d251cd932789590b99d1d5fcb89ace6f68  tfsec-linux-amd64' \
+            | sha256sum --check --status
           chmod 0755 tfsec-linux-amd64
           ./tfsec-linux-amd64 --format sarif --concise-output \
             --out results.sarif terraform
