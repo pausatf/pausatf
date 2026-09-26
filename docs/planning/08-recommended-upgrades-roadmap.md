@@ -783,7 +783,7 @@ After each upgrade, update the following documentation:
 
 **Ubuntu Release Information:**
 - Ubuntu 20.04: https://wiki.ubuntu.com/FocalFossa/ReleaseNotes
-- Ubuntu 24.04: https://wiki.ubuntu.com/NobleNumbat/ReleaseNotes
+- Ubuntu 24.04: https://documentation.ubuntu.com/release-notes/24.04/
 
 **WordPress Requirements:**
 - https://wordpress.org/about/requirements/
