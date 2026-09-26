@@ -1,4 +1,44 @@
 ---
+- name: Fetch current Cloudflare IPv4 ranges before configuring UFW
+  ansible.builtin.get_url:
+    url: https://www.cloudflare.com/ips-v4
+    dest: /tmp/pausatf-cloudflare-ips-v4.txt
+    mode: "0644"
+  when: ufw_restrict_web_to_cloudflare | default(false)
+
+- name: Read current Cloudflare IPv4 ranges for UFW
+  ansible.builtin.slurp:
+    src: /tmp/pausatf-cloudflare-ips-v4.txt
+  register: _ufw_cloudflare_ipv4
+  when: ufw_restrict_web_to_cloudflare | default(false)
+
+- name: Fetch current Cloudflare IPv6 ranges before configuring UFW
+  ansible.builtin.get_url:
+    url: https://www.cloudflare.com/ips-v6
+    dest: /tmp/pausatf-cloudflare-ips-v6.txt
+    mode: "0644"
+  when: ufw_restrict_web_to_cloudflare | default(false)
+
+- name: Read current Cloudflare IPv6 ranges for UFW
+  ansible.builtin.slurp:
+    src: /tmp/pausatf-cloudflare-ips-v6.txt
+  register: _ufw_cloudflare_ipv6
+  when: ufw_restrict_web_to_cloudflare | default(false)
+
+- name: Use current Cloudflare IP ranges for UFW rules
+  ansible.builtin.set_fact:
+    cloudflare_ipv4_ranges: "{{ (_ufw_cloudflare_ipv4.content | b64decode | trim).split('\n') | select | list }}"
+    cloudflare_ipv6_ranges: "{{ (_ufw_cloudflare_ipv6.content | b64decode | trim).split('\n') | select | list }}"
+  when: ufw_restrict_web_to_cloudflare | default(false)
+
+- name: Validate Cloudflare IP ranges before restricting UFW
+  ansible.builtin.assert:
+    that:
+      - cloudflare_ipv4_ranges | length > 0
+      - cloudflare_ipv6_ranges | length > 0
+    fail_msg: "Refusing to restrict UFW with empty Cloudflare IP range lists"
+  when: ufw_restrict_web_to_cloudflare | default(false)
+
 - name: Reset UFW to default
   community.general.ufw:
     state: reset
@@ -37,7 +77,7 @@
     rule: allow
     port: "22"
     proto: tcp
-    src: "{{ item }}"
+    from_ip: "{{ item }}"
   loop: "{{ ssh_allow_networks_effective }}"
 
 - name: Allow HTTP from anywhere
@@ -79,7 +119,7 @@
     rule: allow
     port: "80"
     proto: tcp
-    src: "{{ item }}"
+    from_ip: "{{ item }}"
   loop: "{{ cloudflare_ipv4_ranges + cloudflare_ipv6_ranges }}"
   when: ufw_restrict_web_to_cloudflare | default(false)
 
@@ -88,7 +128,7 @@
     rule: allow
     port: "443"
     proto: tcp
-    src: "{{ item }}"
+    from_ip: "{{ item }}"
   loop: "{{ cloudflare_ipv4_ranges + cloudflare_ipv6_ranges }}"
   when: ufw_restrict_web_to_cloudflare | default(false)
 

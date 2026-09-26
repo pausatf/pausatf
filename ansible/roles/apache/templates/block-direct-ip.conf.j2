@@ -5,7 +5,7 @@
 <VirtualHost *:80>
     ServerName {{ server_public_ip | default(ansible_host) }}
     <Location />
-        Require all denied
+        Require ip 127.0.0.1 ::1
     </Location>
 </VirtualHost>
 
@@ -16,7 +16,7 @@
     SSLCertificateFile {{ ssl_certificate }}
     SSLCertificateKeyFile {{ ssl_certificate_key }}
     <Location />
-        Require all denied
+        Require ip 127.0.0.1 ::1
     </Location>
 </VirtualHost>
 {% endif %}

@@ -45,6 +45,7 @@
     job: "/usr/local/sbin/wp-cron-if-active.sh"
     user: root
   loop: "{{ wordpress_installs }}"
+  when: item.wp_cron_system | default(true)
   tags: wp_cron
 
 - name: Ensure mu-plugins directory exists
@@ -197,13 +198,29 @@
   loop_control:
     loop_var: wp_site
 
-- name: Schedule WordPress cron via system cron
-  ansible.builtin.cron:
-    name: "WordPress cron for {{ item.domain }}"
-    job: "wget -q -O - https://{{ item.domain }}/wp-cron.php?doing_wp_cron > /dev/null 2>&1"
-    user: root
+- name: Preserve runtime settings in externally managed wp-config.php
+  ansible.builtin.blockinfile:
+    path: "{{ item.path | default('/var/www/html') }}/wp-config.php"
+    insertbefore: "That's all, stop editing"
+    marker: "// {mark} PAUSATF runtime settings"
+    block: |
+      if ( isset( $_SERVER['HTTP_X_FORWARDED_PROTO'] ) && 'https' === $_SERVER['HTTP_X_FORWARDED_PROTO'] ) {
+          $_SERVER['HTTPS'] = 'on';
+      }
+      {% if wp_redis_maxttl is defined %}
+      if ( ! defined( 'WP_REDIS_MAXTTL' ) ) {
+          define( 'WP_REDIS_MAXTTL', {{ wp_redis_maxttl | int }} );
+      }
+      {% endif %}
+      {% if wp_disable_cron | default(false) %}
+      if ( ! defined( 'DISABLE_WP_CRON' ) ) {
+          define( 'DISABLE_WP_CRON', true );
+      }
+      {% endif %}
+    validate: "php -l %s"
   loop: "{{ wordpress_installs | default([]) }}"
-  when: item.wp_cron_system | default(true)
+  when: not (item.manage_wp_config | default(false))
+  tags: wordpress_config
 
 - name: Deploy WP cron health check script
   ansible.builtin.template:
@@ -230,6 +247,7 @@
     minute: "*/30"
     job: "/usr/local/sbin/check-wp-cron-health.sh"
     user: root
+  when: is_active_web | default(false)
   tags: wp_cron
 
 - name: Configure Jetpack performance features

@@ -6,6 +6,10 @@ on:
       - main
   workflow_dispatch:
 
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
 permissions:
   contents: read
 
@@ -60,7 +64,6 @@ jobs:
           ansible-playbook -i inventory/hosts.yml site.yml \
             -l staging \
             --check \
-            --diff \
             --vault-password-file ../vault.pass
 
       - name: Cleanup secrets

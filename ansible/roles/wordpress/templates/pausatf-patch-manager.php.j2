@@ -20,6 +20,9 @@ function pausatf_reapply_patches( $upgrader, $hook_extra ) {
 
     if ( $type === 'plugin' ) {
         $plugins = (array) ( $hook_extra['plugins'] ?? [] );
+        if ( isset( $hook_extra['plugin'] ) && is_string( $hook_extra['plugin'] ) ) {
+            $plugins[] = $hook_extra['plugin'];
+        }
         foreach ( $plugins as $plugin ) {
             if ( strpos( $plugin, 'accordions' ) !== false ) {
                 pausatf_patch_accordions();
@@ -29,6 +32,9 @@ function pausatf_reapply_patches( $upgrader, $hook_extra ) {
 
     if ( $type === 'theme' ) {
         $themes = (array) ( $hook_extra['themes'] ?? [] );
+        if ( isset( $hook_extra['theme'] ) && is_string( $hook_extra['theme'] ) ) {
+            $themes[] = $hook_extra['theme'];
+        }
         foreach ( $themes as $theme ) {
             if ( $theme === 'TheSource' ) {
                 pausatf_patch_thesource();
@@ -78,19 +84,20 @@ function pausatf_patch_accordions() {
 function pausatf_patch_thesource() {
     $base = get_theme_root() . '/TheSource/core/components';
 
-    pausatf_insert_property(
+    $patches_ok = true;
+    $patches_ok = pausatf_insert_property(
         "$base/HTTPInterface.php",
         'public $response;',
-        "\n\t/** @var bool */\n\tpublic \$expects_json;\n\n\t/** @var string */\n\tpublic \$owner;",
+        "\n\t/** @var bool */\n\tpublic \$expects_json;",
         'public $expects_json;'
-    );
+    ) && $patches_ok;
 
-    pausatf_insert_property(
+    $patches_ok = pausatf_insert_property(
         "$base/api/Service.php",
         'public $response_data_key;',
         "\n\t/** @var ET_Core_Data_Utils */\n\tpublic \$data_utils;\n\n\t/** @var string */\n\tpublic \$API_KEY_REQUIRED;",
         'public $data_utils;'
-    );
+    ) && $patches_ok;
 
     // Fix optional-before-required parameter order in Service.php.
     $service = "$base/api/Service.php";
@@ -98,17 +105,27 @@ function pausatf_patch_thesource() {
         $c = file_get_contents( $service );
         $c = str_replace( 'transform_data_to_our_format( $data = array(), $key_type,', 'transform_data_to_our_format( $data, $key_type,', $c );
         $c = str_replace( 'transform_data_to_provider_format( $data = array(), $key_type,', 'transform_data_to_provider_format( $data, $key_type,', $c );
-        file_put_contents( $service, $c );
+        $patches_ok = file_put_contents( $service, $c ) !== false
+            && strpos( $c, 'transform_data_to_our_format( $data, $key_type,' ) !== false
+            && strpos( $c, 'transform_data_to_provider_format( $data, $key_type,' ) !== false
+            && $patches_ok;
+    } else {
+        $patches_ok = false;
+        error_log( 'PAUSATF ERROR: TheSource Service.php is missing' );
     }
 
-    pausatf_insert_property(
+    $patches_ok = pausatf_insert_property(
         "$base/PageResource.php",
         'public $write_file_location;',
         "\n\t/** @var string */\n\tpublic \$location;",
         'public $location;'
-    );
+    ) && $patches_ok;
 
-    error_log( 'PAUSATF: re-applied TheSource PHP 8.2 patches after theme update' );
+    if ( $patches_ok ) {
+        error_log( 'PAUSATF: TheSource compatibility patches verified after theme update' );
+    } else {
+        error_log( 'PAUSATF ERROR: one or more TheSource compatibility patches could not be applied' );
+    }
 }
 
 /**
@@ -117,11 +134,26 @@ function pausatf_patch_thesource() {
  */
 function pausatf_insert_property( $file, $after, $insert, $guard ) {
     if ( ! file_exists( $file ) ) {
-        return;
+        error_log( "PAUSATF ERROR: patch target is missing: $file" );
+        return false;
     }
     $content = file_get_contents( $file );
-    if ( strpos( $content, $guard ) !== false ) {
-        return;
+    if ( false === $content ) {
+        error_log( "PAUSATF ERROR: patch target could not be read: $file" );
+        return false;
     }
-    file_put_contents( $file, str_replace( $after, $after . $insert, $content ) );
+    if ( strpos( $content, $guard ) !== false ) {
+        return true;
+    }
+    $anchor = strpos( $content, $after );
+    if ( false === $anchor ) {
+        error_log( "PAUSATF ERROR: expected patch anchor not found in $file" );
+        return false;
+    }
+    $updated = substr_replace( $content, $after . $insert, $anchor, strlen( $after ) );
+    if ( file_put_contents( $file, $updated ) === false ) {
+        error_log( "PAUSATF ERROR: patched file could not be written: $file" );
+        return false;
+    }
+    return true;
 }

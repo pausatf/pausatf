@@ -6,9 +6,17 @@
   ansible.builtin.lineinfile:
     path: "{{ item.path | default('/var/www/html') }}/wp-includes/kses.php"
     regexp: "if \\( null === \\$content \\)"
-    line: "\tif ( null === $content ) {"
+    line: "    if ( null === $content ) {"
     insertafter: "function wp_kses_no_null\\( \\$content, \\$options = null \\)"
     state: present
+  loop: "{{ wordpress_installs }}"
+  tags: wp_patches
+
+- name: Complete the kses null guard inserted above
+  ansible.builtin.replace:
+    path: "{{ item.path | default('/var/www/html') }}/wp-includes/kses.php"
+    regexp: '^(?:\t| {4})if \( null === \$content \) \{$'
+    replace: "    if ( null === $content ) {\n        return '';\n    }"
   loop: "{{ wordpress_installs }}"
   tags: wp_patches
 
@@ -28,6 +36,15 @@
     insertafter: "public \\$response;"
     line: "\tpublic $expects_json;"
     state: present
+  loop: "{{ wordpress_installs }}"
+  failed_when: false
+  tags: wp_patches
+
+- name: Fix optional-before-required TheSource Service parameters on deployment
+  ansible.builtin.replace:
+    path: "{{ item.path | default('/var/www/html') }}/wp-content/themes/TheSource/core/components/api/Service.php"
+    regexp: 'transform_data_to_(our|provider)_format\( \$data = array\(\), \$key_type,'
+    replace: 'transform_data_to_\1_format( $data, $key_type,'
   loop: "{{ wordpress_installs }}"
   failed_when: false
   tags: wp_patches

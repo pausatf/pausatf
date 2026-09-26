@@ -22,15 +22,21 @@ command -v wp &>/dev/null || { log "OK: wp-cli absent, skipping overdue check"; 
 
 # Count events whose next_run_relative column shows "now" (overdue).
 # wp-cli prints "now" for events that should already have fired.
-OVERDUE=$(wp cron event list \
+if ! OVERDUE=$(sudo -u www-data -- wp cron event list \
     --path="$WP_PATH" \
-    --allow-root \
     --format=csv \
     --fields=hook,next_run_relative \
     2>/dev/null \
     | awk -F, 'NR > 1 && $2 == "now"' \
-    | wc -l \
-    || echo 0)
+    | wc -l); then
+    alert "WP-CLI could not list cron events on $(hostname -f)"
+    exit 1
+fi
+OVERDUE="$(printf '%s' "$OVERDUE" | tr -d '[:space:]')"
+if [[ ! "$OVERDUE" =~ ^[0-9]+$ ]]; then
+    alert "WP-CLI returned an invalid overdue count on $(hostname -f)"
+    exit 1
+fi
 
 if (( OVERDUE > MAX_OVERDUE )); then
     alert "$OVERDUE WP cron events overdue (threshold: $MAX_OVERDUE) — check wp-cron-if-active.sh"

@@ -43,8 +43,6 @@
     # PHP-FPM via unix socket (event MPM)
     # setifempty lets WordPress's own nocache_headers() win for wp-admin/nonce pages.
     <FilesMatch "\.php$">
-        Header always unset Cache-Control
-        Header always unset Expires
         Header always setifempty Cache-Control "public, max-age=60, s-maxage=300, must-revalidate"
         SetHandler "proxy:unix:{{ php_fpm_socket | default('/run/php/php' + php_version + '-fpm.sock') }}|fcgi://localhost"
     </FilesMatch>
