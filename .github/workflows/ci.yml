@@ -31,7 +31,15 @@ jobs:
       - name: Install Ansible and ansible-lint
         run: |
           pip install ansible-core==2.17.5 ansible-lint==25.12.2
-          ansible-galaxy collection install community.general community.mysql ansible.posix
+          for attempt in 1 2 3; do
+            if ansible-galaxy collection install -r ansible/requirements.yml; then
+              exit 0
+            fi
+            if [ "$attempt" -lt 3 ]; then
+              sleep "$((attempt * 15))"
+            fi
+          done
+          exit 1
 
       - name: Create dummy vault password for CI
         run: |
@@ -80,7 +88,15 @@ jobs:
       - name: Install Ansible
         run: |
           pip install ansible-core==2.17.5
-          ansible-galaxy collection install community.general community.mysql ansible.posix
+          for attempt in 1 2 3; do
+            if ansible-galaxy collection install -r ansible/requirements.yml; then
+              exit 0
+            fi
+            if [ "$attempt" -lt 3 ]; then
+              sleep "$((attempt * 15))"
+            fi
+          done
+          exit 1
 
       - name: Create dummy vault password for CI
         run: |
@@ -226,18 +242,23 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v4
 
       - name: Run tfsec
-        uses: aquasecurity/tfsec-action@b466648d6e39e7c75324f25d83891162a721f2d6  # v1.0.3
-        with:
-          working_directory: terraform
-          soft_fail: false
-          format: sarif
-          additional_args: --concise-output --out results.sarif
+        run: |
+          version=v1.28.14
+          curl --fail --silent --show-error --location \
+            "https://github.com/aquasecurity/tfsec/releases/download/${version}/tfsec-linux-amd64" \
+            --output tfsec-linux-amd64
+          echo 'a32d0799bbefababaa4fcd814da9f4d251cd932789590b99d1d5fcb89ace6f68  tfsec-linux-amd64' \
+            | sha256sum --check --status
+          chmod 0755 tfsec-linux-amd64
+          ./tfsec-linux-amd64 --format sarif --concise-output \
+            --out results.sarif terraform
 
       - name: Upload SARIF file
         uses: github/codeql-action/upload-sarif@8aad20d150bbac5944a9f9d289da16a4b0d87c1e  # v4.36.2
-        if: always()
+        if: ${{ always() && hashFiles('results.sarif') != '' }}
         with:
           sarif_file: results.sarif
+          category: tfsec
 
   tflint:
     name: TFLint

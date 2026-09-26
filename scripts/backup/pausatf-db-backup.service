@@ -1,0 +1,10 @@
+[Unit]
+Description=PAUSATF encrypted production backup to Spaces
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+Environment=LEGACY_DIR=/home/somethingwithproof/pausatf-deployment/legacy-data
+Environment=S3CMD_CONFIG=/root/.s3cfg
+ExecStart=/usr/local/sbin/pausatf-db-backup.sh

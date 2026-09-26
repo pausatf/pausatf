@@ -46,7 +46,7 @@
         mode: "0750"
 
     - name: Set MySQL root password
-      community.mysql.mysql_user:
+      ansible.mysql.mysql_user:
         name: root
         password: "{{ mysql_root_password }}"
         host: localhost
@@ -67,20 +67,20 @@
         mode: "0600"
 
     - name: Remove anonymous MySQL users
-      community.mysql.mysql_user:
+      ansible.mysql.mysql_user:
         name: ""
         host_all: true
         state: absent
         login_unix_socket: "{{ mysql_socket }}"
 
     - name: Remove test database
-      community.mysql.mysql_db:
+      ansible.mysql.mysql_db:
         name: test
         state: absent
         login_unix_socket: "{{ mysql_socket }}"
 
     - name: Create WordPress databases
-      community.mysql.mysql_db:
+      ansible.mysql.mysql_db:
         name: "{{ item.db_name }}"
         state: present
         encoding: utf8mb4
@@ -93,7 +93,7 @@
       when: item.db_name is defined
 
     - name: Create WordPress database users
-      community.mysql.mysql_user:
+      ansible.mysql.mysql_user:
         name: "{{ item.db_user }}"
         password: "{{ item.db_password }}"
         priv: "{{ item.db_name }}.*:SELECT,INSERT,UPDATE,DELETE,CREATE,DROP,INDEX,ALTER,CREATE TEMPORARY TABLES,LOCK TABLES"

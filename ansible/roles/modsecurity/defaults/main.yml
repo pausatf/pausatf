@@ -4,7 +4,8 @@ modsecurity_rule_engine: "DetectionOnly"
 modsecurity_pcre_match_limit: 500000
 modsecurity_pcre_match_limit_recursion: 500000
 modsecurity_request_body_limit: 13107200
-modsecurity_request_body_nofiles_limit: 131072
+# Jetpack backup helper payloads can exceed the CRS default of 128 KiB.
+modsecurity_request_body_nofiles_limit: 2097152
 modsecurity_request_body_inmemory_limit: 131072
 modsecurity_response_body_limit: 524288
 modsecurity_audit_engine: "RelevantOnly"

@@ -96,7 +96,7 @@ All servers: Ubuntu 20.04 LTS, DigitalOcean `sfo2`, MySQL 5.7 (prod local) / MyS
 | `deploy-staging.yml` | Push to `staging` branch | Runs `site.yml` against staging; healthchecks `https://stage.pausatf.org` |
 | `deploy-dev.yml` | Push to `dev` branch, manual dispatch | Runs `site.yml` against dev |
 | `do-nightly-snapshot.yml` | Daily 02:00 Pacific, manual dispatch | Creates timestamped DigitalOcean snapshot of prod droplet |
-| `backup-legacy.yml` | Daily 01:00 Pacific, manual dispatch | Rsyncs `/var/www/legacy` from prod; commits changes to repo |
+| systemd `pausatf-db-backup.timer` | Daily on production | Age-encrypted database and legacy-data artifacts uploaded to private DigitalOcean Spaces under `backups/prod/` |
 | `capture-prod-inventory.yml` | Manual dispatch | Runs `capture-wp-inventory.yml`; commits `group_vars/production/wordpress.yml` |
 | `infra-staging.yml` | Manual dispatch | Terraform plan + apply for staging environment |
 | `ansible-lint.yml` | PR/push touching `ansible/`, manual | ansible-lint, yamllint, syntax check |
@@ -108,7 +108,7 @@ All servers: Ubuntu 20.04 LTS, DigitalOcean `sfo2`, MySQL 5.7 (prod local) / MyS
 
 | Secret | Used by | Description |
 |--------|---------|-------------|
-| `PROD_SSH_PRIVATE_KEY` | deploy-prod, backup-legacy, capture-prod-inventory, do-nightly-snapshot | ED25519 private key authorized on `ftp.pausatf.org` as `github-deploy` |
+| `PROD_SSH_PRIVATE_KEY` | deploy-prod, capture-prod-inventory, do-nightly-snapshot | ED25519 private key authorized on `ftp.pausatf.org` as `github-deploy` |
 | `DEV_SSH_PRIVATE_KEY` | deploy-dev | Private key for dev host |
 | `ANSIBLE_VAULT_PASSWORD` | deploy-prod, deploy-staging, deploy-dev, capture-prod-inventory | Ansible vault decryption password |
 | `DO_TOKEN` | infra-staging, do-nightly-snapshot | DigitalOcean API token |
