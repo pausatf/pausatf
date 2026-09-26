@@ -65,8 +65,8 @@ updates:
           - "minor"
           - "patch"
 
-  # Docker (compose stack)
-  - package-ecosystem: "docker"
+  # Docker Compose (compose stack)
+  - package-ecosystem: "docker-compose"
     directory: "/scripts/docker"
     schedule:
       interval: "weekly"
