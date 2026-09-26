@@ -57,7 +57,7 @@ on:
         type: boolean
 
 concurrency:
-  group: pausatf-production-maintenance
+  group: deploy-production
   cancel-in-progress: false
 
 permissions:
