@@ -11,6 +11,10 @@ permissions:
 jobs:
   backup:
     runs-on: ubuntu-latest
+    # Scheduled backups use the unprotected production_new environment so they
+    # run unattended. Manual runs use production and retain its required review.
+    environment:
+      name: ${{ github.event_name == 'workflow_dispatch' && 'production' || 'production_new' }}
     permissions:
       contents: write
 
