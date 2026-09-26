@@ -64,9 +64,13 @@ def base_line_for_changed_line(
     for old_start, old_count, new_start, new_count in hunks:
         if new_start <= line < new_start + new_count:
             offset = line - new_start
-            if offset < old_count:
-                return old_start + offset
-            return None
+            if old_count == 0:
+                return None
+            # A replacement can expand one old line into several new lines,
+            # as happens when a PHPDoc block is added after ``<?php``. Map
+            # every expanded line to the replaced base line so existing
+            # findings on the original code remain non-blocking.
+            return old_start + min(offset, old_count - 1)
     return None
 
 
