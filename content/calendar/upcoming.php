@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: upcoming.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 /*
  * $Id: upcoming.php,v 1.18.2.2 2006/03/17 00:53:23 cknudsen Exp $
  *

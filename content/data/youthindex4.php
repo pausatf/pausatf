@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF website source: youthindex4.php.
+ *
+ * @package PAUSATF_Legacy
+ */
+
   // This php section must go at the TOP of the page, before ANYTHING else
   $current_flash = 1;  // assign a unique number to each flash content
   $cookie_name = 'SAW_FLASH';

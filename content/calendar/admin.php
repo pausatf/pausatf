@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: admin.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 include_once 'includes/init.php';
 
 function print_color_sample ( $color ) {

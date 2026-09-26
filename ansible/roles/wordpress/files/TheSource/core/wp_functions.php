@@ -1,4 +1,10 @@
 <?php
+/**
+ * PAUSATF TheSource theme source: wp_functions.php.
+ *
+ * @package PAUSATF_TheSource
+ */
+
 
 
 if ( ! function_exists( '_sanitize_text_fields' ) ):

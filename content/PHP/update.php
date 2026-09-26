@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF website source: update.php.
+ *
+ * @package PAUSATF_Legacy
+ */
+
 // ----------------------------------------------------------------------------*
 // Created August 2005                                                         *
 // Created by Dan Preston                                                      *

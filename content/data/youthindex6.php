@@ -10,6 +10,12 @@
 <body>
 <div align="center">
  <?php
+/**
+ * legacy PAUSATF website source: youthindex6.php.
+ *
+ * @package PAUSATF_Legacy
+ */
+
   $current_flash = 3;  // assign a unique number to each flash content
   $cookie_name = 'SAW_FLASH';
   if($_COOKIE[$cookie_name] == $current_flash) {

@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: visible.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 /*
  * $Id
  *

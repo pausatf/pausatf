@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: assistant_edit_handler.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 include_once 'includes/init.php';
 
 $error = "";

@@ -1,4 +1,10 @@
-<?php class AboutMeWidget extends WP_Widget
+<?php
+/**
+ * PAUSATF TheSource theme source: widget-about.php.
+ *
+ * @package PAUSATF_TheSource
+ */
+ class AboutMeWidget extends WP_Widget
 {
     function __construct(){
 		$widget_ops = array( 'description' => 'Displays About Me Information' );

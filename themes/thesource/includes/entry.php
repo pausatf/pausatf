@@ -1,4 +1,10 @@
-<?php if (have_posts()) : while (have_posts()) : the_post(); ?>
+<?php
+/**
+ * PAUSATF TheSource theme source: entry.php.
+ *
+ * @package PAUSATF_TheSource
+ */
+ if (have_posts()) : while (have_posts()) : the_post(); ?>
 	<?php $thumb = '';
 		$width = (int) get_option('thesource_thumbnail_width_usual');
 		$height = (int) get_option('thesource_thumbnail_height_usual');

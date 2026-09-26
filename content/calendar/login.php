@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: login.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 include "includes/config.php";
 include "includes/php-dbi.php";
 include "includes/functions.php";

@@ -1,4 +1,10 @@
 <?php
+/**
+ * PAUSATF TheSource theme source: SupportCenter.php.
+ *
+ * @package PAUSATF_TheSource
+ */
+
 
 // Quick exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {

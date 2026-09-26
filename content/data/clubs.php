@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF website source: clubs.php.
+ *
+ * @package PAUSATF_Legacy
+ */
+
 // redirect to temporary site until this can be updated
 header("Location: http://pausatf.x10host.com/data/clubs.php");
 die();

@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: del_layer.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 include_once 'includes/init.php';
 
 if ( $allow_view_other != 'Y' ) {

@@ -1,6 +1,12 @@
 	<a name="tabgroups"></a>
 	<div id="tabscontent_groups">
 		<?php
+/**
+ * legacy PAUSATF event calendar source: groups.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 			echo "<a title=\"" . 
 				translate("Add New Group") . "\" href=\"group_edit.php\" target=\"grpiframe\" onclick=\"javascript:show('grpiframe');\">" . 
 				translate("Add New Group") . "</a><br />\n";

@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: week.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 include_once 'includes/init.php';
 
 if (($user != $login) && $is_nonuser_admin) {

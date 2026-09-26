@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: availability.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 /*
  * Page Description:
  *	Display a timebar view of a single day.

@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF website source: scorer_upload.php.
+ *
+ * @package PAUSATF_Legacy
+ */
+
 
 
 // This script is used by the new PA online race scoring program to upload result files

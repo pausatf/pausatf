@@ -1,4 +1,10 @@
-<?php global $shortname; ?>
+<?php
+/**
+ * PAUSATF TheSource child theme source: scripts.php.
+ *
+ * @package PAUSATF_TheSource_Child
+ */
+ global $shortname; ?>
 	<script>
 		jQuery.noConflict();
 

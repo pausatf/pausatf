@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF website source: DOB4.php.
+ *
+ * @package PAUSATF_Legacy
+ */
+
 // ----------------------------------------------------------------------------*
 // DOB4.php                                                                    *
 // Created January 2006                                                        *

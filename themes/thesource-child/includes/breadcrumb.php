@@ -1,6 +1,12 @@
 <div id="breadcrumbs">
 
-	<?php if(function_exists('bcn_display')) { bcn_display(); }
+	<?php
+/**
+ * PAUSATF TheSource child theme source: breadcrumb.php.
+ *
+ * @package PAUSATF_TheSource_Child
+ */
+ if(function_exists('bcn_display')) { bcn_display(); }
 		  else { ?>
 				<a href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php esc_html_e('Home','TheSource') ?></a> &raquo;
 

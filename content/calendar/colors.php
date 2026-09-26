@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: colors.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 include_once 'includes/init.php';
 $INC = array('js/colors.php');
 print_header($INC,'','',true);

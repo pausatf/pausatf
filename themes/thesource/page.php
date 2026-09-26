@@ -1,4 +1,10 @@
-<?php get_header(); ?>
+<?php
+/**
+ * PAUSATF TheSource theme source: page.php.
+ *
+ * @package PAUSATF_TheSource
+ */
+ get_header(); ?>
 	<?php if (get_option('thesource_integration_single_top') <> '' && get_option('thesource_integrate_singletop_enable') == 'on') echo(get_option('thesource_integration_single_top')); ?>
 
 	<div id="main-content-wrap">

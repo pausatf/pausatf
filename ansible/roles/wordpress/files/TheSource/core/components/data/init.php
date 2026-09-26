@@ -1,4 +1,10 @@
 <?php
+/**
+ * PAUSATF TheSource theme source: init.php.
+ *
+ * @package PAUSATF_TheSource
+ */
+
 
 if ( ! function_exists( 'et_core_data_init' ) ):
 function et_core_data_init() {}

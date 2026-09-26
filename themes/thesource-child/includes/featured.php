@@ -2,6 +2,12 @@
 <div id="featured">
 
 	<?php
+/**
+ * PAUSATF TheSource child theme source: featured.php.
+ *
+ * @package PAUSATF_TheSource_Child
+ */
+
 	$arr = array();
 	$i=1;
 

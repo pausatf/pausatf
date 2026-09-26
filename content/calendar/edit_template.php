@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: edit_template.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 /*
  * $Id: edit_template.php,v 1.9.2.1 2005/11/28 22:22:51 cknudsen Exp $
  *

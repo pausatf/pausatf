@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: get_reminders.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 /*
  * $Id: get_reminders.php,v 1.1 2004/06/24 02:18:30 cknudsen Exp $
  *

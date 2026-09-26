@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: category.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 include_once 'includes/init.php';
 
 // load user and global cats

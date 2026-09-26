@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF website source: delete.php.
+ *
+ * @package PAUSATF_Legacy
+ */
+
 // ----------------------------------------------------------------------------*
 // update1.php                                                                 *
 // Created Sept 2005                                                           *

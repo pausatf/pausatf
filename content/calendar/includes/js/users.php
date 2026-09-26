@@ -12,7 +12,13 @@ function hide(foo,f,section) {
 	}
 }
 
-<?php //see the showTab function in includes/js.php for common code shared by all pages
+<?php
+/**
+ * legacy PAUSATF event calendar source: users.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+ //see the showTab function in includes/js.php for common code shared by all pages
 	//using the tabbed GUI.
 ?>var tabs = new Array();
 tabs[1] = "users";

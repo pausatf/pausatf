@@ -1,4 +1,10 @@
 <?php
+/**
+ * PAUSATF TheSource theme source: WPHttp.php.
+ *
+ * @package PAUSATF_TheSource
+ */
+
 
 require_once ABSPATH . WPINC . '/class-http.php';
 

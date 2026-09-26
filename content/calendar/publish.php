@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: publish.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 /*
  * $Id: publish.php,v 1.12.4.1 2005/11/10 21:01:23 umcesrjones Exp $
  *

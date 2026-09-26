@@ -1,4 +1,10 @@
 <?php
+/**
+ * PAUSATF TheSource theme source: page-sitemap.php.
+ *
+ * @package PAUSATF_TheSource
+ */
+
 /*
 Template Name: Sitemap Page
 */

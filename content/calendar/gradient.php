@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: gradient.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 /*
  * $Id: gradient.php,v 1.5 2005/01/19 13:54:13 cknudsen Exp $
  *

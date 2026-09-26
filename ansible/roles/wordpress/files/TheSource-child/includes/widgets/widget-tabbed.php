@@ -1,4 +1,10 @@
 <?php
+/**
+ * PAUSATF TheSource child theme source: widget-tabbed.php.
+ *
+ * @package PAUSATF_TheSource_Child
+ */
+
 class TabbedWidget extends WP_Widget {
 
     public function __construct() {

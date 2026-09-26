@@ -1,4 +1,10 @@
 <?php
+/**
+ * PAUSATF infrastructure PHP source: scorer_upload.php.
+ *
+ * @package PAUSATF_Infrastructure
+ */
+
 
 // This script is used by the PA online race scoring program to upload result files
 // to the proper year directory (e.g. 2024, 2025, ...).  It was written by Jeff Teeters

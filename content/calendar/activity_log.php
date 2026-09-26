@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: activity_log.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 include_once 'includes/init.php';
 include_once 'includes/site_extras.php';
 $PAGE_SIZE = 25;

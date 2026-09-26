@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF website source: clubprofiles.php.
+ *
+ * @package PAUSATF_Legacy
+ */
+
 // ----------------------------------------------------------------------------*
 // enterP1.php                                                                 *
 // Created August 2005                                                         *

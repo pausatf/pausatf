@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: purge.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 /*
  * $Id: purge.php,v 1.31 2005/02/22 01:29:58 cknudsen Exp $
  *

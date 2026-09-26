@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF website source: enterP2-orig.php.
+ *
+ * @package PAUSATF_Legacy
+ */
+
 // ----------------------------------------------------------------------------*
 // enterP2                                                                     *
 // Created August 2005                                                         *

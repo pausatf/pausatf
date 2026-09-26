@@ -1,4 +1,10 @@
 <?php
+/**
+ * PAUSATF TheSource theme source: options_thesource.php.
+ *
+ * @package PAUSATF_TheSource
+ */
+
 global $epanelMainTabs, $themename, $shortname, $options;
 
 $epanelMainTabs = array('general','navigation','layout','ad','colorization','seo','integration','support','updates');

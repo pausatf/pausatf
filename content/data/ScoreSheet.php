@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF website source: ScoreSheet.php.
+ *
+ * @package PAUSATF_Legacy
+ */
+
 // Current version of ScoreSheet.php is broken (was being edited by
 // me and Thomas V. at the same time.  It's renamed SchoreSheet-broken.php).
 

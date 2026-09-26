@@ -7,6 +7,12 @@
 </head>
 <body>
 <?php
+/**
+ * legacy PAUSATF website source: batchUtilss.php.
+ *
+ * @package PAUSATF_Legacy
+ */
+
 // ----------------------------------------------------------------------------*
 // batchUtillss                                                                   *
 // Created December 2005                                                       *

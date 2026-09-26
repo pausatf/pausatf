@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF website source: calendar.php.
+ *
+ * @package PAUSATF_Legacy
+ */
+
 
 require_once 'Zend/Feed.php';
 require_once 'Zend/Cache.php';

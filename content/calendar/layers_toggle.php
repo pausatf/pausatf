@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: layers_toggle.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 /* $Id: layers_toggle.php,v 1.17.2.1 2005/12/02 21:45:15 cknudsen Exp $ */
 include_once 'includes/init.php';
 load_user_layers ();

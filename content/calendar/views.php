@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: views.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 include_once 'includes/init.php';
 
 if ( ! $is_admin )

@@ -1,4 +1,10 @@
 <?
+
+/**
+ * legacy PAUSATF event calendar source: convert_passwords.php.
+ *
+ * @package PAUSATF_Calendar
+ */
 /*
  * $Id: convert_passwords.php,v 1.2.4.1 2006/06/07 15:10:46 cknudsen Exp $
  *

@@ -1,5 +1,11 @@
 <div id="sidebar">
-	<?php if (!is_home()) { ?>
+	<?php
+/**
+ * PAUSATF TheSource theme source: sidebar.php.
+ *
+ * @package PAUSATF_TheSource
+ */
+ if (!is_home()) { ?>
 
 		<div id="onecol">
 			<?php if ( !function_exists('dynamic_sidebar') || !dynamic_sidebar('Sidebar One Column') ) : ?>

@@ -1,4 +1,10 @@
-<?php global $shortname; ?>
+<?php
+/**
+ * PAUSATF TheSource theme source: scripts.php.
+ *
+ * @package PAUSATF_TheSource
+ */
+ global $shortname; ?>
 	<script type="text/javascript" src="<?php echo get_template_directory_uri(); ?>/js/superfish.js"></script>
 	<script type="text/javascript">
 	//<![CDATA[

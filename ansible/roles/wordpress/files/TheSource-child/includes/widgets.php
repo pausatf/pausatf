@@ -1,4 +1,10 @@
-<?php get_template_part('includes/widgets/widget-about');
+<?php
+/**
+ * PAUSATF TheSource child theme source: widgets.php.
+ *
+ * @package PAUSATF_TheSource_Child
+ */
+ get_template_part('includes/widgets/widget-about');
 get_template_part('includes/widgets/widget-adsense');
 get_template_part('includes/widgets/widget-ads');
 get_template_part('includes/widgets/widget-popular');

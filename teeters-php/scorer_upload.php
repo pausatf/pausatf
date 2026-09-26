@@ -1,4 +1,10 @@
 <?php
+/**
+ * PAUSATF PHP source: scorer_upload.php.
+ *
+ * @package PAUSATF
+ */
+
 
 declare(strict_types=1);
 

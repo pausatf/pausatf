@@ -21,7 +21,13 @@ function valid_color ( str ) {
 function valid_form ( form ) {
   var err = "";
   if ( ! valid_color ( form.layercolor.value ) )
-    err += "<?php etranslate("Invalid color")?>.\n";
+    err += "<?php
+/**
+ * legacy PAUSATF event calendar source: edit_layer.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+ etranslate("Invalid color")?>.\n";
 
   if ( err.length > 0 ) {
     alert ( "Error:\n\n" + err + "\n\n<?php etranslate("Color format should be '#RRGGBB'")?>" );

@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: assistant_edit.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 include_once 'includes/init.php';
 
 if ( empty ( $login) || $login == "__public__" ) {

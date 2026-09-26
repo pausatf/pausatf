@@ -1,4 +1,10 @@
-<?php $thumb = '';
+<?php
+/**
+ * PAUSATF TheSource theme source: custom_post.php.
+ *
+ * @package PAUSATF_TheSource
+ */
+ $thumb = '';
 
 	$width = 74;
 	$height = 74;

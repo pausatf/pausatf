@@ -16,6 +16,12 @@
 <h2><font color="blue">PA/USATF Youth Clubs</font></h2>
 </center>
 <?php
+/**
+ * legacy PAUSATF website source: DOB2.php.
+ *
+ * @package PAUSATF_Legacy
+ */
+
 // ----------------------------------------------------------------------------*
 // DOB2.php                                                                    *
 // Created January 2006                                                        *

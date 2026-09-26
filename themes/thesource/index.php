@@ -1,4 +1,10 @@
-<?php get_header(); ?>
+<?php
+/**
+ * PAUSATF TheSource theme source: index.php.
+ *
+ * @package PAUSATF_TheSource
+ */
+ get_header(); ?>
 
 <div id="main-content-wrap">
 	<div id="main-content" class="clearfix">

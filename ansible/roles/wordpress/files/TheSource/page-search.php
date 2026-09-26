@@ -1,4 +1,10 @@
 <?php
+/**
+ * PAUSATF TheSource theme source: page-search.php.
+ *
+ * @package PAUSATF_TheSource
+ */
+
 /*
 Template Name: Search Page
 */

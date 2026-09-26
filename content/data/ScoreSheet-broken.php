@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF website source: ScoreSheet-broken.php.
+ *
+ * @package PAUSATF_Legacy
+ */
+
 /*
  * Script for submitting scoresheets
  * Written by Jeff Teeters, June 2007.  jeff@teeters.us

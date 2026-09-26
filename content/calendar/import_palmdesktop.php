@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: import_palmdesktop.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 
 // Parse the datebook file and return the data hash.
 //

@@ -1,4 +1,10 @@
 <?php
+/**
+ * PAUSATF TheSource child theme source: widget-popular.php.
+ *
+ * @package PAUSATF_TheSource_Child
+ */
+
 class PopularWidget extends WP_Widget {
 
     public function __construct() {

@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: trailer.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 
 if ( empty ( $PHP_SELF ) && ! empty ( $_SERVER ) &&
   ! empty ( $_SERVER['PHP_SELF'] ) ) {

@@ -11,7 +11,13 @@ function valid_form ( form ) {
   var err = "";
 
   if ( form.admin_server_url.value == "" ) {
-    err += "<?php etranslate("Server URL is required")?>.\n";
+    err += "<?php
+/**
+ * legacy PAUSATF event calendar source: admin.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+ etranslate("Server URL is required")?>.\n";
     form.admin_server_url.select ();
     form.admin_server_url.focus ();
   }

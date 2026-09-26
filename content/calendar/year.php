@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: year.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 include_once 'includes/init.php';
 send_no_cache_header ();
 

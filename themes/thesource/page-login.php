@@ -1,4 +1,10 @@
 <?php
+/**
+ * PAUSATF TheSource theme source: page-login.php.
+ *
+ * @package PAUSATF_TheSource
+ */
+
 /*
 Template Name: Login Page
 */

@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: export.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 /*
  * Page Description:
  *	This page will present the user with forms for exporting calendar

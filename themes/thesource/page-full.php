@@ -1,4 +1,10 @@
 <?php
+/**
+ * PAUSATF TheSource theme source: page-full.php.
+ *
+ * @package PAUSATF_TheSource
+ */
+
 /*
 Template Name: Full Width Page
 */

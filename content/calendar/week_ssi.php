@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: week_ssi.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 
 // This page is intended to be used as a server-side include
 // for another page.

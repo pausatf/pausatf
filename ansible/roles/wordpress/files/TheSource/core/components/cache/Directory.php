@@ -1,4 +1,10 @@
 <?php
+/**
+ * PAUSATF TheSource theme source: Directory.php.
+ *
+ * @package PAUSATF_TheSource
+ */
+
 
 class ET_Core_Cache_Directory {
 

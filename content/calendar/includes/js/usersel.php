@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: usersel.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 	global $form,$listid,$groups;
 	if (preg_match("/\/includes\//", $PHP_SELF)) {
 		die ("You can't access this file directly!");

@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: del_entry.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 include_once 'includes/init.php';
 
 $my_event = false;

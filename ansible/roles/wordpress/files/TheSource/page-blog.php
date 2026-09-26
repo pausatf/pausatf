@@ -1,4 +1,10 @@
 <?php
+/**
+ * PAUSATF TheSource theme source: page-blog.php.
+ *
+ * @package PAUSATF_TheSource
+ */
+
 /*
 Template Name: Blog Page
 */

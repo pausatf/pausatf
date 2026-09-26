@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: users.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 /*
 	NOTE:
 	There are THREE components that make up the functionality of users.php.

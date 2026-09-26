@@ -1,4 +1,10 @@
-<?php class AdvWidget extends WP_Widget
+<?php
+/**
+ * PAUSATF TheSource theme source: widget-ads.php.
+ *
+ * @package PAUSATF_TheSource
+ */
+ class AdvWidget extends WP_Widget
 {
     function __construct(){
 		$widget_ops = array('description' => 'Displays Advertisements');

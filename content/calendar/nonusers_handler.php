@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: nonusers_handler.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 include_once 'includes/init.php';
 load_user_layers ();
 

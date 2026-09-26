@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: usersel.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 include_once 'includes/init.php';
 
 // input args in URL

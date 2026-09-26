@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: colors.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 global $color;
 if (preg_match("/\/includes\//", $PHP_SELF)) {
     die ("You can't access this file directly!");

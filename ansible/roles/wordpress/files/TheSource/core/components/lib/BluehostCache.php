@@ -1,4 +1,10 @@
 <?php
+/**
+ * PAUSATF TheSource theme source: BluehostCache.php.
+ *
+ * @package PAUSATF_TheSource
+ */
+
 
 if ( ! class_exists( 'Endurance_Page_Cache' ) ) {
 	return;

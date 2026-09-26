@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: edit_user_handler.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 /* $Id */
 
 // There is the potential for a lot of mischief from users trying to

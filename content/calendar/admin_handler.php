@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: admin_handler.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 /* $Id: admin_handler.php,v 1.7.4.4 2006/03/23 16:06:06 cknudsen Exp $ */
 include_once 'includes/init.php';
 

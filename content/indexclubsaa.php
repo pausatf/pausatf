@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF website source: indexclubsaa.php.
+ *
+ * @package PAUSATF_Legacy
+ */
+
   /* $Id: show-club.php,v 1.4 2007/02/08 16:04:49 Owner Exp $ */
 
   /* Script for displaying PA clubs.  Written by Jeff Teeters, January 2007 */

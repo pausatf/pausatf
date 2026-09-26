@@ -1,4 +1,10 @@
 <?php
+/**
+ * PAUSATF TheSource theme source: functions.php.
+ *
+ * @package PAUSATF_TheSource
+ */
+
 
 if ( ! function_exists( 'et_allow_ampersand' ) ) :
 /**

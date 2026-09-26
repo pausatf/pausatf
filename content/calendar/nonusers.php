@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: nonusers.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 if ( ! $is_admin ) {
   echo "<h2>" . translate("Error") . "</h2>\n" . 
   		translate("You are not authorized") . ".\n";

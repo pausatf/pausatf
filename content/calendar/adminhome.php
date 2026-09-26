@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: adminhome.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 /*
 	$Id: adminhome.php,v 1.15 2005/01/19 13:54:13 cknudsen Exp $
 

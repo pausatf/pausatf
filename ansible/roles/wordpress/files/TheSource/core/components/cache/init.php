@@ -1,4 +1,10 @@
 <?php
+/**
+ * PAUSATF TheSource theme source: init.php.
+ *
+ * @package PAUSATF_TheSource
+ */
+
 
 if ( ! defined( 'et_core_cache_init' ) ):
 function et_core_cache_init() {}

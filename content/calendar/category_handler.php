@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: category_handler.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 include_once 'includes/init.php';
 
 // does the category belong to the user?

@@ -1,4 +1,10 @@
 <?php
+/**
+ * legacy PAUSATF event calendar source: import_ical.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+
 /*
  * $Id: import_ical.php,v 1.19.2.1 2005/08/19 17:52:35 umcesrjones Exp $
  *

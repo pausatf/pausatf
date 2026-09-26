@@ -1,4 +1,10 @@
-<?php if ( ! function_exists( 'et_custom_comments_display' ) ) :
+<?php
+/**
+ * PAUSATF TheSource child theme source: comments.php.
+ *
+ * @package PAUSATF_TheSource_Child
+ */
+ if ( ! function_exists( 'et_custom_comments_display' ) ) :
 function et_custom_comments_display($comment, $args, $depth) {
    $GLOBALS['comment'] = $comment; ?>
    <li <?php comment_class(); ?> id="li-comment-<?php comment_ID() ?>">

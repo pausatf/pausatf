@@ -1,4 +1,10 @@
 <?php
+/**
+ * PAUSATF TheSource theme source: core_functions.php.
+ *
+ * @package PAUSATF_TheSource
+ */
+
 // Prevent file from being loaded directly
 if ( ! defined( 'ABSPATH' ) ) {
 	die( '-1' );
