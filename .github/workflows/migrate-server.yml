@@ -220,7 +220,8 @@ jobs:
 
   migrate-data:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    # The documented production transfer takes 2–4 hours; leave an hour of buffer.
+    timeout-minutes: 300
     needs: configure-new-server
     if: inputs.dry_run == false && inputs.skip_data_migration == false
     environment: ${{ inputs.environment == 'production' && 'production' || inputs.environment == 'staging' && 'staging' || 'development' }}
@@ -289,8 +290,13 @@ jobs:
   smoke-test:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
-    needs: configure-new-server
-    if: needs.configure-new-server.result == 'success'
+    needs:
+      - configure-new-server
+      - migrate-data
+    if: >-
+      always() &&
+      needs.configure-new-server.result == 'success' &&
+      (inputs.dry_run == true || inputs.skip_data_migration == true || needs.migrate-data.result == 'success')
     env:
       NEW_SERVER_IP: ${{ inputs.new_server_ip }}
 
