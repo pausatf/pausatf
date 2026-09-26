@@ -1,6 +1,6 @@
 name: Molecule Tests
 
-on:
+"on":
   pull_request:
     paths:
       - 'ansible/roles/**'
@@ -26,6 +26,7 @@ jobs:
           - common
           - wordpress
           - php-fpm
+          - fail2ban
           - redis
           - certbot
           - modsecurity
@@ -44,7 +45,7 @@ jobs:
       - name: Install Molecule and dependencies
         run: |
           pip install ansible-core==2.17.5 molecule molecule-plugins[docker]
-          ansible-galaxy collection install community.general community.mysql ansible.posix
+          ansible-galaxy collection install -r ansible/requirements.yml
 
       - name: Create dummy vault password for CI
         run: |
