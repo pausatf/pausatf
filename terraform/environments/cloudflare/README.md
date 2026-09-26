@@ -2,6 +2,14 @@
 
 This Terraform environment manages the Cloudflare zone and all DNS records for `pausatf.org`.
 
+## Reconciliation safety notice
+
+The Cloudflare remote state is currently empty and the declarations below do not match
+the live Tunnel-backed DNS records. A read-only plan reports 39 creates. Do not run
+`terraform apply` or the legacy `import-dns-records.sh` until issue [#137](https://github.com/pausatf/pausatf/issues/137)
+is completed: first reconcile the resource declarations with the live DNS inventory,
+then import the existing resources and require a no-change plan.
+
 ## Resources Managed
 
 ### Zone
