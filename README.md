@@ -122,6 +122,7 @@ All servers: Ubuntu 20.04 LTS, DigitalOcean `sfo2`, MySQL 5.7 (prod local) / MyS
 | Variable | Used by | Description |
 |----------|---------|-------------|
 | `PROD_HOST` | capture-prod-inventory, wp-plugin-audit, wordpress-update-check | Production SSH host/IP for GitHub Actions workflows that run remote checks over SSH |
+| `PROD_SSH_KNOWN_HOSTS` | wordpress-update-check | Trusted `known_hosts` entries for the production SSH endpoint; configure the host key out of band and keep strict host-key checking enabled |
 
 ## Development Workflow
 

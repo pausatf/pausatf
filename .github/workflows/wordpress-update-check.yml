@@ -83,7 +83,7 @@ jobs:
           $refreshed_core = get_site_transient("update_core");
           $core_updates = get_core_updates();
           if (
-              $core_transient_writes < 2
+              $core_transient_writes < 1
               || !is_object($refreshed_core)
               || !isset($refreshed_core->last_checked)
               || (int) $refreshed_core->last_checked < $core_check_started
