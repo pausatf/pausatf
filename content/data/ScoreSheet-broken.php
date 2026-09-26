@@ -712,9 +712,9 @@ CREATE TABLE IF NOT EXISTS score_sheet (
     // modify the following to change who gets what submitted team sheets
     $to_emails = array(
           // 'all' => 'tlbernhard@att.net;tct3@pge.com;jeff@teeters.us',
-          'all' => '',
-          'xc' => 'lesong@tkecapital.com',
-          'road' => 'tlbernhard2@gmail.com');
+        'all'  => '',
+        'xc'   => 'lesong@tkecapital.com',
+        'road' => 'tlbernhard2@gmail.com');
     $series_xlate = array('long' => 'road', 'short' => 'road', 'xc' => 'xc');
     $series_to = $to_emails[$series_xlate[strtolower($series)]];
     $to_list = array();
