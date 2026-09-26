@@ -257,17 +257,12 @@ jobs:
           ./tfsec-linux-amd64 --format sarif --concise-output \
             --out results.sarif terraform
 
-      - name: Upload TFSec SARIF
-        if: ${{ always() && hashFiles('results.sarif') != '' }}
-        uses: github/codeql-action/upload-sarif@8aad20d150bbac5944a9f9d289da16a4b0d87c1e0 # v3
-        with:
-          sarif_file: results.sarif
-
       - name: Upload SARIF file
         uses: github/codeql-action/upload-sarif@8aad20d150bbac5944a9f9d289da16a4b0d87c1e  # v4.36.2
-        if: always()
+        if: ${{ always() && hashFiles('results.sarif') != '' }}
         with:
           sarif_file: results.sarif
+          category: tfsec
 
   tflint:
     name: TFLint
