@@ -32,4 +32,4 @@ sudo s3cmd ls s3://pausatf/backups/prod/
 The age private key stays off-host. The root-only Spaces config is provisioned on the droplet as described above;
 its encrypted recovery copy permits restoration if the host is lost. Restore operations require the off-host age
 private key. Keep the most recent three artifacts locally and `BACKUP_KEEP` remote artifacts per database/legacy
-type; the recovery wrapper separately writes a manifest only after its backup set has uploaded and verified.
+type. This timer uploads only the database dump and legacy-data archive; it does not create a host configuration snapshot or recovery manifest.

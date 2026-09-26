@@ -90,7 +90,7 @@ Store securely in password manager:
 
 3. **Encrypted Database and Legacy Backup**
    - Timer: production `pausatf-db-backup.timer` (daily)
-   - Location: private, age-encrypted DigitalOcean Spaces objects under `s3://pausatf/backups/prod/` and verified recovery sets under `s3://pausatf/backups/recovery/sets/`
+   - Location: private, age-encrypted database and legacy-data objects under `s3://pausatf/backups/prod/`. The timer does not create deployment snapshots or verified recovery manifests.
    - Restore requires the off-host age private key; see `scripts/backup/README.md`.
 
 ### On-Demand Backups
