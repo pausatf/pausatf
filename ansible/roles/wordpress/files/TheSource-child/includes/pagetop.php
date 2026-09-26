@@ -7,9 +7,7 @@
 
 ?><div id="pagetop">
 	<h1>
-		<?php
-
- if (is_category()) single_cat_title();
+		<?php if (is_category()) single_cat_title();
 			  elseif (is_tag()) single_tag_title();
 			  elseif (is_day()) the_time('F jS, Y');
 			  elseif (is_month()) the_time('F, Y');
