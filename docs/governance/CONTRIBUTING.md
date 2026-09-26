@@ -285,7 +285,7 @@ ansible-playbook -i inventory/hosts.yml playbooks/site.yml
 ## Resources
 
 - [Terraform Best Practices](https://www.terraform-best-practices.com/)
-- [Ansible Best Practices](https://docs.ansible.com/ansible/latest/user_guide/playbooks_best_practices.html)
+- [Ansible Playbook Guide](https://github.com/ansible/ansible-documentation/blob/devel/docs/docsite/rst/playbook_guide/playbooks_intro.rst)
 - [GitHub Flow](https://guides.github.com/introduction/flow/)
 - [Conventional Commits](https://www.conventionalcommits.org/)
 

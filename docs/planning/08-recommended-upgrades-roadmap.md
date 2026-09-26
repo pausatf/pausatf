@@ -782,8 +782,8 @@ After each upgrade, update the following documentation:
 - PHP 8.3: https://www.php.net/releases/8.3/en.php
 
 **Ubuntu Release Information:**
-- Ubuntu 20.04: https://wiki.ubuntu.com/FocalFossa/ReleaseNotes
-- Ubuntu 24.04: https://wiki.ubuntu.com/NobleNumbat/ReleaseNotes
+- Ubuntu 20.04: https://releases.ubuntu.com/focal/
+- Ubuntu 24.04: https://documentation.ubuntu.com/release-notes/24.04/
 
 **WordPress Requirements:**
 - https://wordpress.org/about/requirements/

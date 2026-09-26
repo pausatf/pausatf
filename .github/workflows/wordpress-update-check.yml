@@ -1,0 +1,256 @@
+---
+name: WordPress Update Check
+
+on:  # yamllint disable-line rule:truthy
+  schedule:
+    - cron: '17 9 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: wordpress-update-check
+  cancel-in-progress: false
+
+jobs:
+  check:
+    name: Check production WordPress updates
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Read core and plugin update metadata
+        id: updates
+        env:
+          PROD_SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+          PROD_HOST: ${{ vars.PROD_HOST }}
+          PROD_SSH_KNOWN_HOSTS: ${{ vars.PROD_SSH_KNOWN_HOSTS }}
+        shell: bash
+        run: |
+          # shellcheck disable=SC2016
+          set -euo pipefail
+
+          if [[ -z "${PROD_SSH_PRIVATE_KEY:-}" || -z "${PROD_HOST:-}" || -z "${PROD_SSH_KNOWN_HOSTS:-}" ]]; then
+            echo "Production SSH credentials or trusted host keys are not configured." >&2
+            exit 1
+          fi
+
+          install -m 700 -d "$HOME/.ssh"
+          key_file="$HOME/.ssh/pausatf_prod"
+          trap 'rm -f "$key_file"' EXIT
+          printf '%s\n' "$PROD_SSH_PRIVATE_KEY" > "$key_file"
+          chmod 600 "$key_file"
+          known_hosts_file="$HOME/.ssh/known_hosts"
+          printf '%s\n' "$PROD_SSH_KNOWN_HOSTS" > "$known_hosts_file"
+          chmod 600 "$known_hosts_file"
+
+          ssh_options=(
+            -o BatchMode=yes
+            -o ConnectTimeout=15
+            -o StrictHostKeyChecking=yes
+            -o "UserKnownHostsFile=$known_hosts_file"
+            -i "$key_file"
+          )
+          remote="github-deploy@${PROD_HOST}"
+          update_json="$(ssh "${ssh_options[@]}" "$remote" 'bash -s' <<'REMOTE'
+          set -euo pipefail
+          wp_path=/var/www/html
+          sudo -n -u www-data wp eval "$(cat <<'PHP'
+          require_once ABSPATH . "wp-admin/includes/update.php";
+          require_once ABSPATH . "wp-admin/includes/plugin.php";
+
+          $previous_core = get_site_transient("update_core");
+          delete_site_transient("update_core");
+          if (false !== get_site_transient("update_core")) {
+              if (false !== $previous_core) {
+                  set_site_transient("update_core", $previous_core, DAY_IN_SECONDS);
+              }
+              fwrite(STDERR, "Could not clear the cached core update metadata.\n");
+              exit(1);
+          }
+
+          $core_check_started = time();
+          $core_transient_writes = 0;
+          $track_core_transient_write = static function ($transient) use (&$core_transient_writes) {
+              $core_transient_writes++;
+              return $transient;
+          };
+          add_filter("pre_set_site_transient_update_core", $track_core_transient_write);
+          wp_version_check([], true);
+          remove_filter("pre_set_site_transient_update_core", $track_core_transient_write);
+
+          $refreshed_core = get_site_transient("update_core");
+          $core_updates = get_core_updates();
+          if (
+              $core_transient_writes < 2
+              || !is_object($refreshed_core)
+              || !isset($refreshed_core->last_checked)
+              || (int) $refreshed_core->last_checked < $core_check_started
+              || !is_array($core_updates)
+          ) {
+              if (false !== $previous_core) {
+                  set_site_transient("update_core", $previous_core, DAY_IN_SECONDS);
+              }
+              fwrite(STDERR, "Core update metadata refresh failed.\n");
+              exit(1);
+          }
+
+          $previous_plugins = get_site_transient("update_plugins");
+          delete_site_transient("update_plugins");
+          wp_update_plugins();
+          $available_plugins = get_site_transient("update_plugins");
+          if (!is_object($available_plugins) || !property_exists($available_plugins, "response")) {
+              if (false !== $previous_plugins) {
+                  set_site_transient("update_plugins", $previous_plugins, DAY_IN_SECONDS);
+              }
+              fwrite(STDERR, "Plugin update metadata refresh failed.\n");
+              exit(1);
+          }
+
+          $installed = get_plugins();
+          $plugin_updates = [];
+          foreach ((array) $available_plugins->response as $file => $update) {
+              $plugin_updates[] = [
+                  "name" => $installed[$file]["Name"] ?? $file,
+                  "version" => $installed[$file]["Version"] ?? "",
+                  "update_version" => $update->new_version ?? "",
+                  "status" => is_plugin_active($file) ? "active" : "inactive",
+              ];
+          }
+
+          $available_core_updates = [];
+          foreach ($core_updates as $update) {
+              if (($update->response ?? "") === "upgrade") {
+                  $available_core_updates[] = [
+                      "version" => $update->version ?? "",
+                      "update_type" => "upgrade",
+                  ];
+              }
+          }
+
+          echo wp_json_encode([
+              "core_version" => get_bloginfo("version"),
+              "core_updates" => $available_core_updates,
+              "plugin_updates" => $plugin_updates,
+          ]), PHP_EOL;
+          PHP
+          )" --path="$wp_path" --allow-root
+          REMOTE
+          )"
+
+          jq -e '.core_updates | type == "array"' <<< "$update_json" >/dev/null
+          jq -e '.plugin_updates | type == "array"' <<< "$update_json" >/dev/null
+          core_version="$(jq -r '.core_version' <<< "$update_json")"
+          core_updates="$(jq -c '.core_updates' <<< "$update_json")"
+          plugin_updates="$(jq -c '.plugin_updates' <<< "$update_json")"
+
+          delimiter="JSON_$(openssl rand -hex 16)"
+          {
+            echo "core_version=$core_version"
+            echo "core_updates<<$delimiter"
+            printf '%s\n' "$core_updates"
+            echo "$delimiter"
+            echo "plugin_updates<<$delimiter"
+            printf '%s\n' "$plugin_updates"
+            echo "$delimiter"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create or refresh the update issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CORE_VERSION: ${{ steps.updates.outputs.core_version }}
+          CORE_UPDATES: ${{ steps.updates.outputs.core_updates }}
+          PLUGIN_UPDATES: ${{ steps.updates.outputs.plugin_updates }}
+        shell: bash
+        run: |
+          # shellcheck disable=SC2016
+          set -euo pipefail
+
+          canonical_title='chore(wordpress): updates available'
+          legacy_title_prefix='chore(wordpress): plugin updates available '
+          core_count="$(jq 'length' <<< "$CORE_UPDATES")"
+          plugin_count="$(jq 'length' <<< "$PLUGIN_UPDATES")"
+          issue_pages="$(gh api --paginate --slurp -X GET \
+            repos/pausatf/pausatf/issues \
+            -f state=open \
+            -f per_page=100 \
+            -f labels=wordpress,dependencies)"
+          issue_json="$(jq '[.[][] | select(has("pull_request") | not) | {number,title}]' \
+            <<< "$issue_pages")"
+          issue_numbers="$(jq -c \
+            --arg canonical_title "$canonical_title" \
+            --arg legacy_title_prefix "$legacy_title_prefix" \
+            'map(select(
+              .title == $canonical_title
+              or (.title | startswith($legacy_title_prefix))
+            )) | map(.number)' <<< "$issue_json")"
+          issue_number="$(jq -r '.[0] // empty' <<< "$issue_numbers")"
+
+          if (( core_count > 0 || plugin_count > 0 )); then
+            body_file="$(mktemp)"
+            trap 'rm -f "$body_file"' EXIT
+            {
+              echo "## Daily production WordPress update check"
+              echo
+              printf 'Checked: %s UTC  \n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+              printf 'Installed WordPress core: %s\n' "$CORE_VERSION"
+              echo
+              echo "### Core updates"
+              if (( core_count > 0 )); then
+                jq -r '.[] |
+                  "- **" + .version + "** (" + .update_type + ")"' \
+                  <<< "$CORE_UPDATES"
+              else
+                echo "- None available"
+              fi
+              echo
+              echo "### Plugin updates"
+              if (( plugin_count > 0 )); then
+                jq -r '.[] |
+                  "- **" + .name + "** (`" + .version + "` → `" +
+                  .update_version + "`, " + .status + ")"' \
+                  <<< "$PLUGIN_UPDATES"
+              else
+                echo "- None available"
+              fi
+              echo
+              echo "This workflow only checks update metadata. Apply updates"
+              echo "through the reviewed release and backup process; it does"
+              echo "not change production."
+            } > "$body_file"
+
+            if [[ -n "$issue_number" ]]; then
+              gh issue edit "$issue_number" \
+                --repo pausatf/pausatf \
+                --title "$canonical_title" \
+                --add-label ops \
+                --body-file "$body_file"
+            else
+              gh issue create \
+                --repo pausatf/pausatf \
+                --title "$canonical_title" \
+                --label wordpress,dependencies,ops \
+                --body-file "$body_file"
+            fi
+            while IFS= read -r duplicate_number; do
+              [[ "$duplicate_number" == "$issue_number" ]] && continue
+              gh issue comment "$duplicate_number" \
+                --repo pausatf/pausatf \
+                --body "Consolidated into #$issue_number by the daily WordPress update check."
+              gh issue close "$duplicate_number" --repo pausatf/pausatf
+            done < <(jq -r '.[]' <<< "$issue_numbers")
+          elif [[ "$(jq 'length' <<< "$issue_numbers")" -gt 0 ]]; then
+            checked_date="$(date -u +%Y-%m-%d)"
+            while IFS= read -r stale_issue_number; do
+              comment_body="$(printf '%s\n' \
+                "WordPress check on ${checked_date} found no pending updates." \
+                "Closing this issue; future findings open a new one.")"
+              gh issue comment "$stale_issue_number" \
+                --repo pausatf/pausatf \
+                --body "$comment_body"
+              gh issue close "$stale_issue_number" --repo pausatf/pausatf
+            done < <(jq -r '.[]' <<< "$issue_numbers")
+          else
+            echo "Production WordPress core and plugins are up to date."
+          fi

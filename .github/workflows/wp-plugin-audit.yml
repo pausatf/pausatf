@@ -1,8 +1,6 @@
 name: WordPress Plugin Audit
 
 on:
-  schedule:
-    - cron: '0 9 * * 1'  # Monday 09:00 UTC
   workflow_dispatch:
     inputs:
       probe_auth_mail:
@@ -1052,15 +1050,9 @@ jobs:
             echo "updates_found=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Open issue for available updates
+      - name: Report available plugin updates
         if: steps.check.outputs.updates_found == 'true' && inputs.probe_auth_mail != true && inputs.probe_widget_logic != true && inputs.probe_modsecurity_logs != true
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PLUGIN_UPDATES: ${{ env.PLUGIN_UPDATES }}
         run: |
-          TODAY=$(date +%Y-%m-%d)
-          ISSUE_BODY=$(printf "Plugin updates available as of %s.\n\n\`\`\`\n%s\n\`\`\`\n\nTo update: \`wp plugin update --all --path=/var/www/html --allow-root\`" "$TODAY" "$PLUGIN_UPDATES")
-          gh issue create \
-            --repo pausatf/pausatf \
-            --title "chore(wordpress): plugin updates available ${TODAY}" \
-            --label "wordpress,dependencies" \
-            --body "$ISSUE_BODY"
+          printf 'Plugin updates were found. The scheduled WordPress Update Check workflow owns the consolidated update issue.\n\n%s\n' "$PLUGIN_UPDATES"
