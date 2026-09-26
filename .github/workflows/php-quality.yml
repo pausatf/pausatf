@@ -51,7 +51,6 @@ jobs:
         run: |
           composer global config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
           composer global require "squizlabs/php_codesniffer:^3" "wp-coding-standards/wpcs:^3" "phpcompatibility/php-compatibility:^9"
-          ~/.composer/vendor/bin/phpcs --config-set installed_paths ~/.composer/vendor/wp-coding-standards/wpcs,~/.composer/vendor/phpcompatibility/php-compatibility
       - name: Run PHPCS
         run: |
           ~/.composer/vendor/bin/phpcs -q --standard=phpcs.xml.dist --report=full
