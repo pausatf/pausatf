@@ -1,0 +1,13 @@
+# Fail2Ban filter for WordPress soft failures
+# Managed by Ansible; compatible with WP fail2ban log messages.
+
+[INCLUDES]
+before = common.conf
+
+[Definition]
+_daemon = (?:wordpress|wp)
+
+failregex = ^%(__prefix_line)sAuthentication failure for .* from <HOST>$
+            ^%(__prefix_line)sREST authentication failure for .* from <HOST>$
+            ^%(__prefix_line)sXML-RPC authentication failure for .* from <HOST>$
+ignoreregex =
