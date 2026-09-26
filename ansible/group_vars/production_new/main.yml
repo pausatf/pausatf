@@ -82,7 +82,7 @@ wordpress_installs:
   - >-
     {{ wordpress_install_defaults | combine({
     'domain': 'www.pausatf.org', 'aliases': ['pausatf.org'],
-    'wp_version': '6.8.3', 'debug_mode': false,
+    'wp_version': '7.1.2', 'debug_mode': false,
     'wp_memory_limit': '256M', 'wp_max_memory_limit': '512M',
     'ssl_enabled': true,
     'ssl_certificate': '/etc/letsencrypt/live/www.pausatf.org/fullchain.pem',
