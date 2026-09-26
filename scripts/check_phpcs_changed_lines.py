@@ -81,10 +81,12 @@ def main() -> int:
 
     violations: list[tuple[str, int, str, str, str]] = []
     ignored = 0
+    total_messages = 0
     for reported_path, file_data in phpcs_report.get("files", {}).items():
         relative_path = normalized_path(reported_path, root)
         ranges = changed.get(relative_path, [])
         for item in file_data.get("messages", []):
+            total_messages += 1
             line = int(item["line"])
             if any(start <= line <= end for start, end in ranges):
                 violations.append(
@@ -104,6 +106,15 @@ def main() -> int:
             print(f"{path}:{line}: {kind} [{source}] {message}")
         print(f"Found {len(violations)} PHPCS violation(s) on changed lines.", file=sys.stderr)
         return 1
+
+    if report.returncode and total_messages == 0:
+        if report.stderr:
+            print(report.stderr, file=sys.stderr)
+        print(
+            f"PHPCS exited with status {report.returncode} without reporting violations.",
+            file=sys.stderr,
+        )
+        return report.returncode
 
     print(
         f"PHPCS passed on {len(paths)} changed PHP file(s); "
