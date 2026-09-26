@@ -63,7 +63,8 @@ permissions:
 jobs:
   audit:
     name: Check for plugin updates
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     steps:
       - name: Probe widget logic recovery sources
         if: ${{ inputs.probe_widget_logic == true }}
@@ -1028,25 +1029,60 @@ jobs:
           PROD_HOST: ${{ vars.PROD_HOST }}
         run: |
           set -euo pipefail
-          if [ -z "${PROD_SSH_PRIVATE_KEY:-}" ] || [ -z "${PROD_HOST:-}" ]; then
-            echo "PROD_SSH_PRIVATE_KEY or PROD_HOST not set — skipping"
-            echo "updates_found=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
+          : "${PROD_SSH_PRIVATE_KEY:?Production SSH key is required}"
+          : "${PROD_HOST:?Production host is required}"
           mkdir -p ~/.ssh
           printf '%s\n' "$PROD_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          UPDATES=$(ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
-            github-deploy@"$PROD_HOST" \
-            "/usr/local/bin/wp plugin list --update=available --format=table --path=/var/www/html --allow-root 2>/dev/null" || true)
-          rm -f ~/.ssh/id_rsa
-          # Strip header-only output (no updates)
-          if printf '%s' "$UPDATES" | grep -qv '^+\|^|\|^$\|name'; then
+          trap 'rm -f ~/.ssh/id_rsa' EXIT
+          ssh -o BatchMode=yes -o ConnectTimeout=15 -o StrictHostKeyChecking=accept-new \
+            -i ~/.ssh/id_rsa github-deploy@"$PROD_HOST" 'bash -s' > updates.json <<'REMOTE'
+          set -euo pipefail
+          mapfile -t containers < <(sudo -n docker ps \
+            --filter 'label=com.docker.compose.project=pausatf-prod' \
+            --filter 'label=com.docker.compose.service=wordpress' \
+            --format '{{.Names}}')
+          if [[ "${#containers[@]}" -ne 1 ]]; then
+            echo "Expected exactly one production WordPress container; found ${#containers[@]}." >&2
+            exit 1
+          fi
+
+          sudo -n docker exec -i -u www-data "${containers[0]}" php <<'PHP'
+          <?php
+          require "/var/www/html/wp-load.php";
+          require_once ABSPATH . "wp-admin/includes/plugin.php";
+
+          $previous = get_site_transient("update_plugins");
+          delete_site_transient("update_plugins");
+          wp_update_plugins();
+          $available = get_site_transient("update_plugins");
+          if (!is_object($available) || !property_exists($available, "response")) {
+              if (false !== $previous) {
+                  set_site_transient("update_plugins", $previous, DAY_IN_SECONDS);
+              }
+              fwrite(STDERR, "Plugin update metadata refresh failed.\n");
+              exit(1);
+          }
+
+          $installed = get_plugins();
+          $updates = [];
+          foreach ((array) $available->response as $file => $update) {
+              $updates[] = [
+                  "name" => $installed[$file]["Name"] ?? $file,
+                  "version" => $installed[$file]["Version"] ?? "",
+                  "update_version" => $update->new_version ?? "",
+              ];
+          }
+          echo wp_json_encode($updates), PHP_EOL;
+          PHP
+          REMOTE
+          jq -e 'type == "array"' updates.json >/dev/null
+          if [ "$(jq 'length' updates.json)" -gt 0 ]; then
             echo "updates_found=true" >> "$GITHUB_OUTPUT"
             {
-              echo "PLUGIN_UPDATES<<EOF"
-              printf '%s' "$UPDATES"
-              echo "EOF"
+              echo 'PLUGIN_UPDATES<<PLUGIN_UPDATES_END'
+              jq -r '.[] | [.name, .version, .update_version] | @tsv' updates.json
+              echo 'PLUGIN_UPDATES_END'
             } >> "$GITHUB_ENV"
           else
             echo "updates_found=false" >> "$GITHUB_OUTPUT"

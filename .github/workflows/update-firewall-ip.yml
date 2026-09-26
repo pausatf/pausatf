@@ -1,68 +1,24 @@
 name: Update SSH Firewall IP
-
 on:
   workflow_dispatch:
     inputs:
       new_ip:
-        description: 'Your current public IP (leave blank to auto-detect from runner)'
-        required: false
+        description: 'Public host IPv4 or IPv6 address to add to existing SSH rules'
+        required: true
         type: string
-
 permissions:
   contents: read
-
+concurrency:
+  group: pausatf-firewall-maintenance
+  cancel-in-progress: false
 jobs:
   update:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
     steps:
-      - name: Determine IP
-        id: ip
-        run: |
-          if [ -n "${{ inputs.new_ip }}" ]; then
-            echo "ip=${{ inputs.new_ip }}" >> "$GITHUB_OUTPUT"
-          else
-            echo "Auto-detecting is not useful here (this is the runner IP, not yours)."
-            echo "Please re-run with your IP. Find it at: https://api.ipify.org"
-            exit 1
-          fi
-
-      - name: Install doctl
-        uses: digitalocean/action-doctl@3cb3953159719656269e044e0e24ca16dd2a690f # v2
-        with:
-          token: ${{ secrets.DO_TOKEN }}
-
-      - name: Fetch current Cloudflare IPs
-        id: cf
-        run: |
-          CF_IPS=$(curl -sS https://www.cloudflare.com/ips-v4 | sed 's/^/address:/' | tr '\n' ',' | sed 's/,$//')
-          echo "cf_http=$CF_IPS" >> "$GITHUB_OUTPUT"
-
-      - name: Update all firewalls
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v4
+      - name: Validate and add SSH access while preserving existing rules
         env:
-          MY_IP: ${{ steps.ip.outputs.ip }}
-          CF_HTTP: ${{ steps.cf.outputs.cf_http }}
-        run: |
-          echo "Updating firewalls to allow SSH from $MY_IP"
-          
-          # Production
-          doctl compute firewall update a4e42798-ab22-467f-a821-daa290f56655 \
-            --name pausatf-production-firewall \
-            --droplet-ids REDACTED_DROPLET_ID,REDACTED_DROPLET_ID \
-            --inbound-rules "protocol:tcp,ports:22,address:100.64.0.0/10,address:${MY_IP}/32 protocol:tcp,ports:80,${CF_HTTP} protocol:tcp,ports:443,${CF_HTTP} protocol:tcp,ports:7844,address:0.0.0.0/0 protocol:udp,ports:7844,address:0.0.0.0/0" \
-            --outbound-rules "protocol:tcp,ports:1-65535,address:0.0.0.0/0,address:::/0 protocol:udp,ports:1-65535,address:0.0.0.0/0,address:::/0 protocol:icmp,address:0.0.0.0/0,address:::/0"
-          
-          # Staging
-          doctl compute firewall update c12dfc7f-f43a-4b32-96c6-80ba34035b1a \
-            --name pausatf-staging \
-            --droplet-ids REDACTED_DROPLET_ID \
-            --inbound-rules "protocol:tcp,ports:22,address:100.64.0.0/10,address:${MY_IP}/32 protocol:tcp,ports:80,address:0.0.0.0/0 protocol:tcp,ports:443,address:0.0.0.0/0 protocol:tcp,ports:7844,address:0.0.0.0/0 protocol:udp,ports:7844,address:0.0.0.0/0 protocol:icmp,address:0.0.0.0/0" \
-            --outbound-rules "protocol:tcp,ports:1-65535,address:0.0.0.0/0,address:::/0 protocol:udp,ports:1-65535,address:0.0.0.0/0,address:::/0 protocol:icmp,address:0.0.0.0/0,address:::/0"
-          
-          # Dev
-          doctl compute firewall update 77eafd16-9a0f-4d1c-bf49-7408809b8d81 \
-            --name pausatf-dev \
-            --droplet-ids REDACTED_DROPLET_ID \
-            --inbound-rules "protocol:tcp,ports:22,address:100.64.0.0/10,address:${MY_IP}/32 protocol:tcp,ports:80,address:0.0.0.0/0 protocol:tcp,ports:443,address:0.0.0.0/0 protocol:tcp,ports:7844,address:0.0.0.0/0 protocol:udp,ports:7844,address:0.0.0.0/0 protocol:icmp,address:0.0.0.0/0" \
-            --outbound-rules "protocol:tcp,ports:1-65535,address:0.0.0.0/0,address:::/0 protocol:udp,ports:1-65535,address:0.0.0.0/0,address:::/0 protocol:icmp,address:0.0.0.0/0,address:::/0"
-          
-          echo "All firewalls updated for IP: $MY_IP"
+          DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DO_TOKEN }}
+          NEW_IP: ${{ inputs.new_ip }}
+        run: python3 scripts/firewall-maintenance.py --ssh-ip "$NEW_IP" --apply
