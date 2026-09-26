@@ -1,4 +1,11 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+<?php
+/**
+ * Legacy PAUSATF website source: batchRacess.php.
+ *
+ * @package PAUSATF_Legacy
+ */
+
+?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
           "http://www.w3.org/TR/2000/REC-xhtml1-20000126/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
@@ -7,6 +14,7 @@
 </head>
 <body>
 <?php
+
 // ----------------------------------------------------------------------------*
 // batchClubss                                                                   *
 // Created December 2005                                                       *
@@ -16,7 +24,7 @@
 // ----------------------------------------------------------------------------*
     require_once ('/home/pausat/dbss.php');
     
-   $query = "SELECT * FROM Teams // get all the teams from Race 1
+   $query = 'SELECT * FROM Teams';  // Get all the teams from Race 1.
 
     $result1 = @mysql_query ($query);  // execute the SELECT
 

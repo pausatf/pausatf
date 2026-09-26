@@ -1,4 +1,11 @@
-<div class="top<?php if($last) echo(" last"); ?>">
+<?php
+/**
+ * PAUSATF TheSource child theme source: recent-cat.php.
+ *
+ * @package PAUSATF_TheSource_Child
+ */
+
+?><div class="top<?php if($last) echo(" last"); ?>">
 <?php
 	$current_category = get_option( $cat_option );
 	$cat_option = is_numeric( $current_category ) ? get_cat_name( $current_category ) : $current_category;

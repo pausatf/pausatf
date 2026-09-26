@@ -199,24 +199,6 @@ ansible-playbook --syntax-check playbooks/your-playbook.yml
 
 ### Shell Script Standards
 
-### PHP Standards (themes/ and custom plugins)
-
-- Coding standard: WordPress-Core/Extra/Docs via PHPCS
-- PHP versions: 8.0–8.3 (project target)
-- Install PHPCS + WPCS locally (optional, CI enforces it):
-
-```bash
-composer global require squizlabs/php_codesniffer:^3 wp-coding-standards/wpcs:^3 phpcompatibility/php-compatibility:^9
-phpcs --config-set installed_paths ~/.composer/vendor/wp-coding-standards/wpcs,~/.composer/vendor/phpcompatibility/php-compatibility
-```
-
-- Run checks locally:
-
-```bash
-php -l themes/thesource-child/functions.php
-phpcs --standard=phpcs.xml.dist themes wp-content/plugins
-```
-
 - **ShellCheck**: All scripts must pass ShellCheck
 - **Shebang**: Use `#!/usr/bin/env bash` for portability
 - **Error handling**: Use `set -euo pipefail` for robust scripts
@@ -227,6 +209,25 @@ phpcs --standard=phpcs.xml.dist themes wp-content/plugins
 # Check before committing
 shellcheck your-script.sh
 bash -n your-script.sh  # Syntax check
+```
+
+### PHP Standards (maintained PHP sources)
+
+- Start each maintained PHP source file with a file-level PHPDoc block that briefly identifies its role and declares an `@package`. Keep PHPDoc inside PHP tags so it produces no output. Exclude generated files, upstream parent-theme/vendor code, empty files, and `.php` files containing only static HTML or JavaScript.
+- WordPress Coding Standards and PHPCompatibility run on changed PHP files. The check compares findings with the base version so existing legacy violations do not block changes; newly introduced violations remain blocking.
+- PHP versions: 8.0–8.3 (project target)
+- Install PHPCS + WPCS locally (optional, CI enforces it):
+
+```bash
+composer global config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
+composer global require dealerdirect/phpcodesniffer-composer-installer:^1 squizlabs/php_codesniffer:^3 wp-coding-standards/wpcs:^3 phpcompatibility/php-compatibility:^9
+```
+
+- Run checks locally:
+
+```bash
+php -l themes/thesource-child/functions.php
+python3 scripts/check_phpcs_changed_lines.py --base origin/main --phpcs "$(command -v phpcs)"
 ```
 
 ### Markdown Standards

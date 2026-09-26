@@ -1,4 +1,10 @@
 <?php
+/**
+ * Legacy PAUSATF website source: updatess1.php.
+ *
+ * @package PAUSATF_Legacy
+ */
+
 // ----------------------------------------------------------------------------*
 // updatess1.php                                                               *
 // Created December 2005                                                       *
@@ -83,6 +89,7 @@ if (isset($_POST['submit'])) { // This begins an IF that processes the form if e
 }  // end of if at top of page to see if the form is already entered or not
 
 // end of PHP script.  HTML form follows. Displays blank form if not already entered, sticky form for values if already entered.
+
 ?> 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
           "http://www.w3.org/TR/2000/REC-xhtml1-20000126/DTD/xhtml1-transitional.dtd">

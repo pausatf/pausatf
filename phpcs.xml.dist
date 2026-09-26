@@ -2,12 +2,24 @@
 <ruleset name="PAUSATF WordPress Standards">
   <description>WordPress Coding Standards for themes and custom plugins</description>
 
-  <file>themes</file>
+  <file>themes/thesource-child</file>
   <file>wp-content/plugins</file>
-
-  <exclude-pattern>themes/thesource/core/*</exclude-pattern>
-  <exclude-pattern>themes/thesource/epanel/*</exclude-pattern>
-  <exclude-pattern>themes/thesource/includes/*</exclude-pattern>
+  <file>wp-content/mu-plugins</file>
+  <file>wordpress/plugins</file>
+  <file>wordpress/mu-plugins</file>
+  <file>ansible/roles/wordpress/files/TheSource-child</file>
+  <file>ansible/roles/apache/files</file>
+  <file>content/PHP</file>
+  <file>content/data</file>
+  <file>content/calendar.php</file>
+  <file>content/clubprofiles.php</file>
+  <file>content/indexclubs.php</file>
+  <file>content/indexclubs2.php</file>
+  <file>content/indexclubsa.php</file>
+  <file>content/indexclubsaa.php</file>
+  <file>content/Copy of indexclubsa.php</file>
+  <file>teeters-php</file>
+  <file>pausatf-content-architecture.php</file>
 
   <rule ref="WordPress-Core"/>
   <rule ref="WordPress-Docs"/>
@@ -17,5 +29,5 @@
   <config name="testVersion" value="8.0-8.3"/>
 
   <arg name="extensions" value="php"/>
-  <arg value="-sp"/>
+  <arg value="sp"/>
 </ruleset>

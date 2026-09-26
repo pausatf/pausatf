@@ -1,4 +1,15 @@
 <?php
+/**
+ * PAUSATF TheSource child theme source: widget-ads.php.
+ *
+ * @package PAUSATF_TheSource_Child
+ */
+
+/**
+ * AdvWidget displays advertisement content.
+ *
+ * @package PAUSATF_TheSource_Child
+ */
 class AdvWidget extends WP_Widget {
 
     public function __construct() {

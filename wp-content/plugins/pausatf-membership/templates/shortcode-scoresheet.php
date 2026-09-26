@@ -7,6 +7,8 @@
  * Variables available:
  *   $clubs_query       (WP_Query)  — pausatf_club posts for the dropdown
  *   $submission_errors (string[])  — validation errors from a failed POST
+ *
+ * @package PAUSATF_Membership
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -23,6 +25,7 @@ $prev = array(
 	'result'       => sanitize_text_field( $_POST['result'] ?? '' ),
 	'submitted_by' => sanitize_email( $_POST['submitted_by'] ?? '' ),
 );
+
 ?>
 <div class="pausatf-scoresheet">
 

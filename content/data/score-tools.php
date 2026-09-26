@@ -1,4 +1,10 @@
 <?php
+/**
+ * Legacy PAUSATF website source: score-tools.php.
+ *
+ * @package PAUSATF_Legacy
+ */
+
   /* $Id: members.php,v 1.1 2007/03/07 17:52:37 Owner Exp $ */
   /* Script to help with scoring races.  Written by Jeff Teeters, January 2007 */
 
@@ -102,4 +108,5 @@ function download_members() {
 
   // call the main function to start everything
   main();
+
 ?>

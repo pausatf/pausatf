@@ -1,4 +1,10 @@
 <?php
+/**
+ * Legacy PAUSATF website source: update2.php.
+ *
+ * @package PAUSATF_Legacy
+ */
+
 // ----------------------------------------------------------------------------*
 // update2.php                                                                 *
 // Created August 2005                                                         *
@@ -126,6 +132,7 @@ if (!(strlen($_POST['pcontact'])) > 0) {  // Has screen been updated and returne
 }  // end of first if at top of page
 
 // end of PHP script.  HTML form follows. 
+
 ?> 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
           "http://www.w3.org/TR/2000/REC-xhtml1-20000126/DTD/xhtml1-transitional.dtd">

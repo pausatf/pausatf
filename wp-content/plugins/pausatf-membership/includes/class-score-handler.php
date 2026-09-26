@@ -5,6 +5,8 @@
  * Creates and manages the custom table {prefix}pausatf_scores.
  * Replaces the legacy ScoreSheet.php which used deprecated mysql_* calls
  * and had no CSRF protection or rate limiting.
+ *
+ * @package PAUSATF_Membership
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

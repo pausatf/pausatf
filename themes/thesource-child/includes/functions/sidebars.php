@@ -1,4 +1,10 @@
 <?php
+/**
+ * PAUSATF TheSource child theme source: sidebars.php.
+ *
+ * @package PAUSATF_TheSource_Child
+ */
+
 if ( function_exists('register_sidebar') )
     register_sidebar(array(
 		'name' => 'Sidebar Left Column',
@@ -52,4 +58,5 @@ if ( function_exists('register_sidebar') )
 		'before_title' => '<h4 class="widgettitle">',
 		'after_title' => '</h4>',
     ));
+
 ?>

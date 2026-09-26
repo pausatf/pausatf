@@ -7,6 +7,8 @@
  *
  * Submissions are saved to the {prefix}pausatf_scores custom table created
  * during plugin activation (see pausatf_membership_activate()).
+ *
+ * @package PAUSATF_Membership
  */
 
 declare( strict_types=1 );

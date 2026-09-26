@@ -1,4 +1,11 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<?php
+/**
+ * Legacy PAUSATF website source: youthindex5.php.
+ *
+ * @package PAUSATF_Legacy
+ */
+
+?><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
 <html>
 
@@ -17,6 +24,7 @@
 <td valign="top">
 
 <?php
+
   $current_flash = 3;  // assign a unique number to each flash content
   $cookie_name = 'SAW_FLASH';
   if($_COOKIE[$cookie_name] == $current_flash) {

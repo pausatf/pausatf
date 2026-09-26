@@ -3,6 +3,8 @@
  * Plugin Name: PAUSATF Content Architecture
  * Description: Dev-first structured content model, editor workflow, and SEO/query hooks.
  * Version: 0.2.1
+ *
+ * @package PAUSATF
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
