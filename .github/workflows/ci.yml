@@ -249,9 +249,6 @@ jobs:
           curl --fail --silent --show-error --location \
             "https://github.com/aquasecurity/tfsec/releases/download/${version}/tfsec-linux-amd64" \
             --output tfsec-linux-amd64
-          curl --fail --silent --show-error --location \
-            "https://github.com/aquasecurity/tfsec/releases/download/${version}/tfsec-linux-amd64" \
-            --output tfsec-linux-amd64
           echo 'a32d0799bbefababaa4fcd814da9f4d251cd932789590b99d1d5fcb89ace6f68  tfsec-linux-amd64' \
             | sha256sum --check --status
           chmod 0755 tfsec-linux-amd64

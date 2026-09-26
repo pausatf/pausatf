@@ -58,7 +58,7 @@ jobs:
       - name: Install PHPCS + WPCS
         run: |
           composer global config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
-          composer global require "squizlabs/php_codesniffer:^3" "wp-coding-standards/wpcs:^3" "phpcompatibility/php-compatibility:^9"
+          composer global require "squizlabs/php_codesniffer:^3" "dealerdirect/phpcodesniffer-composer-installer:^1" "wp-coding-standards/wpcs:^3" "phpcompatibility/php-compatibility:^9"
       - name: Run PHPCS
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
