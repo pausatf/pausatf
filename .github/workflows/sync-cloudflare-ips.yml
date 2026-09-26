@@ -50,6 +50,19 @@ jobs:
             exit 1
           fi
 
+          if printf '%s' "$FW" | jq -e '
+            .[0] as $fw
+            | (any($fw.inbound_rules[]?;
+                any((.sources // {}) | to_entries[]?;
+                    .key != "addresses" and ((.value | length) > 0))))
+              or (any($fw.outbound_rules[]?;
+                any((.destinations // {}) | to_entries[]?;
+                    .key != "addresses" and ((.value | length) > 0))))
+          ' >/dev/null; then
+            echo "::error::$PROD_FW_ID contains non-address scoped rules this workflow cannot serialize; refusing to replace it."
+            exit 1
+          fi
+
           # doctl's firewall update is a full replace: anything not restated here is
           # dropped. Carry the rules this job does not own (ICMP, SSH) through verbatim
           # so syncing the Cloudflare allowlist can never take SSH away.

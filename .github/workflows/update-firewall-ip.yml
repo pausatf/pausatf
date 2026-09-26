@@ -68,6 +68,19 @@ jobs:
               return 1
             fi
 
+            if printf '%s' "$fw" | jq -e '
+              .[0] as $fw
+              | (any($fw.inbound_rules[]?;
+                  any((.sources // {}) | to_entries[]?;
+                      .key != "addresses" and ((.value | length) > 0))))
+                or (any($fw.outbound_rules[]?;
+                  any((.destinations // {}) | to_entries[]?;
+                      .key != "addresses" and ((.value | length) > 0))))
+            ' >/dev/null; then
+              echo "::error::$fw_id contains non-address scoped rules this workflow cannot serialize; refusing to replace it."
+              return 1
+            fi
+
             keep=$(printf '%s' "$fw" | jq -r '
               .[0].inbound_rules
               | map(select((.protocol == "tcp" and .ports == "22") | not))
