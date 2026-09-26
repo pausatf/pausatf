@@ -49,6 +49,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
       - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2
         with:
           php-version: '8.3'
@@ -57,9 +59,16 @@ jobs:
         run: |
           composer global config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
           composer global require "squizlabs/php_codesniffer:^3" "dealerdirect/phpcodesniffer-composer-installer:^1" "wp-coding-standards/wpcs:^3" "phpcompatibility/php-compatibility:^9"
-      - name: Run PHPCS
+      - name: Run PHPCS on changed PHP files
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: |
-          ~/.composer/vendor/bin/phpcs -q --standard=phpcs.xml.dist --report=full
+          mapfile -t php_files < <(git diff --name-only --diff-filter=ACMR "$BASE_SHA" "$GITHUB_SHA" -- '*.php')
+          if (( ${#php_files[@]} == 0 )); then
+            echo "No changed PHP files to check."
+            exit 0
+          fi
+          ~/.composer/vendor/bin/phpcs -q --standard=phpcs.xml.dist --report=full "${php_files[@]}"
 
   actionlint:
     name: actionlint
