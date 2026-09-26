@@ -63,6 +63,11 @@
     name: fail2ban
     state: started
     enabled: true
+  when: fail2ban_manage_service | bool
+
+- name: Validate fail2ban configuration
+  ansible.builtin.command: fail2ban-client -t
+  changed_when: false
 
 # AbuseIPDB blocklist
 - name: Deploy AbuseIPDB blocklist script
