@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: user-ldap.php.
- *
- * @package PAUSATF_Calendar
- */
-
 if ( empty ( $PHP_SELF ) && ! empty ( $_SERVER ) &&
   ! empty ( $_SERVER['PHP_SELF'] ) ) {
   $PHP_SELF = $_SERVER['PHP_SELF'];
@@ -113,7 +107,7 @@ $ldap_admin_group_type = strtolower($ldap_admin_group_type);
 //   $dn - complete dn for the user (must be given by ref )
 // return:
 //   TRUE if the user is found, FALSE in other case
-function user_search_dn ( $login , &$dn ) {
+function user_search_dn ( $login ,$dn ) {
   global $error, $ds, $ldap_base_dn, $ldap_login_attr, $ldap_user_attr;
 
   $ret = false;
@@ -160,7 +154,7 @@ function user_valid_login ( $login, $password ) {
       }
     }
 
-    if ( user_search_dn ( $login, $dn ) ) {
+    if ( user_search_dn ( $login, &$dn) ) {
       $r = @ldap_bind ( $ds, $dn, $password );
       if (!$r) {
         $error = 'Invalid login';
@@ -428,6 +422,5 @@ function connect_and_bind() {
   }
   return $ret;
 }
-
 
 ?>

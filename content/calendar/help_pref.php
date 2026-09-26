@@ -1,13 +1,6 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: help_pref.php.
- *
- * @package PAUSATF_Calendar
- */
-
 include_once 'includes/init.php';
 print_header('','','',true);
-
 ?>
 
 <h2><?php etranslate("Help")?>: <?php etranslate("Preferences")?></h2>

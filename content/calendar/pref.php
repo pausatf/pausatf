@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: pref.php.
- *
- * @package PAUSATF_Calendar
- */
-
 include_once 'includes/init.php';
 
 if ($user != $login)
@@ -43,7 +37,6 @@ if ( $res ) {
 
 $INC = array('js/pref.php');
 print_header($INC);
-
 ?>
 
 <h2><?php

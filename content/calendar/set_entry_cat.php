@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: set_entry_cat.php.
- *
- * @package PAUSATF_Calendar
- */
-
 include_once 'includes/init.php';
 load_user_categories();
 
@@ -64,7 +58,6 @@ if ( ! empty ( $cat_id ) && empty ( $error ) ) {
 }
 
 print_header();
-
 ?>
 
 <?php if ( ! empty ( $error ) ) { ?>

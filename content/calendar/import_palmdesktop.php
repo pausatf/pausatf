@@ -1,9 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: import_palmdesktop.php.
- *
- * @package PAUSATF_Calendar
- */
 
 // Parse the datebook file and return the data hash.
 //
@@ -65,5 +60,4 @@ function ParseLine($line){
   if (($WeekNum == '5') && ($Entry['Repeat']['Interval'] == '3')) $Entry['Repeat']['Interval'] = '6';
   return $Entry;
 }
-
 ?>

@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: edit_user_handler.php.
- *
- * @package PAUSATF_Calendar
- */
-
 /* $Id */
 
 // There is the potential for a lot of mischief from users trying to
@@ -82,7 +76,6 @@ $nextURL = empty ( $is_admin ) ? "adminhome.php" : "users.php";
 
 if ( ! empty ( $error ) ) {
   print_header( '', '', '', true );
-
 
 ?>
 <h2><?php etranslate("Error")?></h2>

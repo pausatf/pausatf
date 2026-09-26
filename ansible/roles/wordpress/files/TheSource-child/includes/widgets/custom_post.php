@@ -5,7 +5,7 @@
  * @package PAUSATF_TheSource_Child
  */
 
- $thumb = '';
+$thumb = '';
 
 	$width = 74;
 	$height = 74;

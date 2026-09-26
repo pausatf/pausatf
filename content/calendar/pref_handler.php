@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: pref_handler.php.
- *
- * @package PAUSATF_Calendar
- */
-
 include_once 'includes/init.php';
 
 $error = "";
@@ -59,7 +53,6 @@ if ( empty ( $error ) ) {
   }
 }
 print_header();
-
 ?>
 
 <h2><?php etranslate("Error")?></h2>

@@ -9,7 +9,15 @@
   <file>wordpress/mu-plugins</file>
   <file>ansible/roles/wordpress/files/TheSource-child</file>
   <file>ansible/roles/apache/files</file>
-  <file>content</file>
+  <file>content/PHP</file>
+  <file>content/data</file>
+  <file>content/calendar.php</file>
+  <file>content/clubprofiles.php</file>
+  <file>content/indexclubs.php</file>
+  <file>content/indexclubs2.php</file>
+  <file>content/indexclubsa.php</file>
+  <file>content/indexclubsaa.php</file>
+  <file>content/Copy of indexclubsa.php</file>
   <file>teeters-php</file>
   <file>pausatf-content-architecture.php</file>
 

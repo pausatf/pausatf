@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: view_l.php.
- *
- * @package PAUSATF_Calendar
- */
-
 /*
  * $Id: view_l.php,v 1.33 2005/03/21 22:16:07 umcesrjones Exp $
  *
@@ -187,7 +181,6 @@ display_small_month ( $prevmonth, $prevyear, true, true, "prevmonth",
   "view_l.php?id=$id&amp;" );
 display_small_month ( $nextmonth, $nextyear, true, true, "nextmonth", 
   "view_l.php?id=$id&amp;" );
-
 ?>
 
 <div class="title">

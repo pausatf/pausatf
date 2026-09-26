@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: layers_toggle.php.
- *
- * @package PAUSATF_Calendar
- */
-
 /* $Id: layers_toggle.php,v 1.17.2.1 2005/12/02 21:45:15 cknudsen Exp $ */
 include_once 'includes/init.php';
 load_user_layers ();
@@ -42,6 +36,7 @@ $sql = "INSERT INTO webcal_user_pref " .
 if ( ! dbi_query ( $sql ) ) {
   $error = "Unable to update preference: " . dbi_error () .
     "<br /><br /><span style=\"font-weight:bold;\">SQL:</span> $sql";
+  break;
 }
 
 if ( empty ( $error ) ) {
@@ -49,7 +44,6 @@ if ( empty ( $error ) ) {
 }
 
 print_header();
-
 ?>
 
 <h2><?php etranslate("Error")?></h2>

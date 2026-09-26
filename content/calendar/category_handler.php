@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: category_handler.php.
- *
- * @package PAUSATF_Calendar
- */
-
 include_once 'includes/init.php';
 
 // does the category belong to the user?
@@ -86,7 +80,6 @@ if ( empty ( $error ) )
   do_redirect ( "category.php" );
 
 print_header();
-
 ?>
 <h2><?php etranslate("Error")?></h2>
 

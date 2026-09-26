@@ -1,9 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: user-app-postnuke.php.
- *
- * @package PAUSATF_Calendar
- */
 
 if ( empty ( $PHP_SELF ) && ! empty ( $_SERVER ) &&
   ! empty ( $_SERVER['PHP_SELF'] ) ) {
@@ -341,5 +336,4 @@ function user_add_user ( $user, $password, $firstname, $lastname, $email, $admin
   global $error;
   $error = 'User admin not supported.'; return false;
 }
-
 ?>

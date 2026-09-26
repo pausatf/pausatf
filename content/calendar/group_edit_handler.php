@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: group_edit_handler.php.
- *
- * @package PAUSATF_Calendar
- */
-
 include_once 'includes/init.php';
 
 if ( ! $is_admin ) {
@@ -58,7 +52,6 @@ if ( ! $is_admin ) {
 
 if ( ! empty ( $error ) ) {
   print_header( '', '', '', true );
-
 
 ?>
 <h2><?php etranslate("Error")?></h2>

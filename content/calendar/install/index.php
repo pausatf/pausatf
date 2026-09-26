@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: index.php.
- *
- * @package PAUSATF_Calendar
- */
-
 /*
  * $Id: index.php,v 1.17.2.3 2005/12/09 21:26:39 cknudsen Exp $
  *
@@ -336,7 +330,6 @@ if ( ! empty ( $fd ) ) {
 }
 
 echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">

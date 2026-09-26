@@ -1,12 +1,5 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: edit_entry.php.
- *
- * @package PAUSATF_Calendar
- */
-
 	global $groups_enabled,$WORK_DAY_START_HOUR,$WORK_DAY_END_HOUR;
-
 ?><script type="text/javascript">
 <!-- <![CDATA[
 // do a little form verifying

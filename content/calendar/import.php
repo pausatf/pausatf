@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: import.php.
- *
- * @package PAUSATF_Calendar
- */
-
 /*
  * $Id: import.php,v 1.28 2005/04/22 20:23:49 jhoov Exp $
  *
@@ -70,7 +64,6 @@ function print_user_list () {
     print "</td></tr>\n";
   }
 }
-
 ?>
 
 <h2><?php etranslate("Import")?>&nbsp;<img src="help.gif" alt="<?php etranslate("Help")?>" class="help" onclick="window.open ( 'help_import.php', 'cal_help', 'dependent,menubar,scrollbars,height=400,width=400');" /></h2>

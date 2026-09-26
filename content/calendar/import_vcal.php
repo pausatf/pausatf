@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: import_vcal.php.
- *
- * @package PAUSATF_Calendar
- */
-
 // Parse the vcal file and return the data hash.
 function parse_vcal($cal_file) {
   global $tz, $errormsg;
@@ -298,5 +292,4 @@ function rrule_endtime($int,$freq,$start,$end) {
   }
   return $endtime;
 }
-
 ?>

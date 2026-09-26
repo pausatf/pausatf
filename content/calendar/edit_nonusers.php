@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: edit_nonusers.php.
- *
- * @package PAUSATF_Calendar
- */
-
 include_once 'includes/init.php';
 print_header( '', '', '', true );
 
@@ -28,7 +22,6 @@ if (( ($add == '1') || (! empty ($nid)) ) && empty ($error)) {
   $userlist = get_my_users ();
   $button = translate("Add");
   $nid = clean_html($nid);
-
 ?>
 
 <form action="edit_nonusers_handler.php" method="post">

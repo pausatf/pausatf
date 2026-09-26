@@ -1,9 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: week_ssi.php.
- *
- * @package PAUSATF_Calendar
- */
 
 // This page is intended to be used as a server-side include
 // for another page.
@@ -88,7 +83,6 @@ for ( $i = 0; $i < 7; $i++ ) {
      month_short_name ( date ( "m", $days[$i] ) - 1 ) .
      " " . date ( "d", $days[$i] );
 }
-
 
 ?>
 

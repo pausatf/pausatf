@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: availability.php.
- *
- * @package PAUSATF_Calendar
- */
-
 /*
  * Page Description:
  *	Display a timebar view of a single day.
@@ -60,7 +54,6 @@ $next_url = $base_url."&amp;year=".  strftime('%Y', $time + 86400)
                      ."&amp;day=".   strftime('%d', $time + 86400);
 
 $users = explode(",",$users);
-
 ?>
 
 <div style="border-width:0px; width:99%;">

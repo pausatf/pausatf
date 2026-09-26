@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: nonusers.php.
- *
- * @package PAUSATF_Calendar
- */
-
 if ( ! $is_admin ) {
   echo "<h2>" . translate("Error") . "</h2>\n" . 
   		translate("You are not authorized") . ".\n";
@@ -18,7 +12,6 @@ if ( ! $NONUSER_PREFIX ) {
   exit;
 }
 $add = getValue ( "add" );
-
 ?>
 	<a name="tabnonusers"></a>
 	<div id="tabscontent_nonusers">

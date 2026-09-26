@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: site_extras.php.
- *
- * @package PAUSATF_Calendar
- */
-
 if ( empty ( $PHP_SELF ) && ! empty ( $_SERVER ) &&
   ! empty ( $_SERVER['PHP_SELF'] ) ) {
   $PHP_SELF = $_SERVER['PHP_SELF'];
@@ -173,5 +167,4 @@ $site_extras = array (
                          // arg 2: specifies reminder options bit-or
   )
 );
-
 ?>

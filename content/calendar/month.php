@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: month.php.
- *
- * @package PAUSATF_Calendar
- */
-
 include_once 'includes/init.php';
 
 if (($user != $login) && $is_nonuser_admin) {
@@ -61,7 +55,6 @@ display_small_month ( $prevmonth, $prevyear, true, true, "prevmonth",
   $monthURL );
 display_small_month ( $nextmonth, $nextyear, true, true, "nextmonth",
   $monthURL );
-
 ?>
 <div class="title">
 <span class="date"><br /><?php

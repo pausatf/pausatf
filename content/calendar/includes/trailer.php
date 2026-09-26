@@ -1,9 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: trailer.php.
- *
- * @package PAUSATF_Calendar
- */
 
 if ( empty ( $PHP_SELF ) && ! empty ( $_SERVER ) &&
   ! empty ( $_SERVER['PHP_SELF'] ) ) {
@@ -17,7 +12,6 @@ if ( ! empty ( $PHP_SELF ) && preg_match ( "/\/includes\//", $PHP_SELF ) ) {
 // in includes/init.php.  If you add a global variable somewhere in this
 // file, be sure to declare it global in the print_trialer function
 // or use $GLOBALS[].
-
 ?>
 
 <div id="trailer">

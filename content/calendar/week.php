@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: week.php.
- *
- * @package PAUSATF_Calendar
- */
-
 include_once 'includes/init.php';
 
 if (($user != $login) && $is_nonuser_admin) {
@@ -69,7 +63,6 @@ for ( $i = 0; $i < 7; $i++ ) {
   $header[$i] = $weekdays[$i] . "<br />\n" .
     date_to_str ( date ( "Ymd", $days[$i] ), $DATE_FORMAT_MD, false );
 }
-
 ?>
 
 <div class="title">

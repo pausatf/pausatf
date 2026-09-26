@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: view_t.php.
- *
- * @package PAUSATF_Calendar
- */
-
 /*
  * $Id: view_t.php,v 1.38 2005/03/06 23:06:21 umcesrjones Exp $
  *
@@ -181,7 +175,6 @@ if ( ! empty ( $error ) ) {
   print_trailer ();
   exit;
 }
-
 
 ?>
 

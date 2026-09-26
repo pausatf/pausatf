@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: purge.php.
- *
- * @package PAUSATF_Calendar
- */
-
 /*
  * $Id: purge.php,v 1.31 2005/02/22 01:29:58 cknudsen Exp $
  *
@@ -51,7 +45,6 @@ if ( ! empty ( $user ) ) {
 }
 
 print_header ( $INC, '', $BodyX );
-
 ?>
 
 <table style="border-width:0px;">

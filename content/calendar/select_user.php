@@ -1,13 +1,6 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: select_user.php.
- *
- * @package PAUSATF_Calendar
- */
-
 include_once 'includes/init.php';
 print_header();
-
 ?>
 
 <h2><?php etranslate("View Another User's Calendar"); ?></h2>

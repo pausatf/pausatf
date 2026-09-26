@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: del_layer.php.
- *
- * @package PAUSATF_Calendar
- */
-
 include_once 'includes/init.php';
 
 if ( $allow_view_other != 'Y' ) {
@@ -36,5 +30,4 @@ if ( $updating_public )
   do_redirect ( "layers.php?public=1" );
 else
   do_redirect ( "layers.php" );
-
 ?>

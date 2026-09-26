@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: get_events.php.
- *
- * @package PAUSATF_Calendar
- */
-
 /*
  * $Id: get_events.php,v 1.1 2004/06/24 02:18:30 cknudsen Exp $
  *
@@ -299,6 +293,5 @@ echo "</events>\n";
 
 if ( $debug )
   echo "Done.\n";
-
 
 ?>

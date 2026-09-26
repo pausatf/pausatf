@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: views_edit_handler.php.
- *
- * @package PAUSATF_Calendar
- */
-
 include_once 'includes/init.php';
 
 $error = "";
@@ -68,7 +62,6 @@ if ( $error == "" ) {
   do_redirect ( "views.php" );
 }
 print_header();
-
 ?>
 
 <h2><?php etranslate("Error")?></h2>

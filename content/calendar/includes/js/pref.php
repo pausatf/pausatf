@@ -1,12 +1,5 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: pref.php.
- *
- * @package PAUSATF_Calendar
- */
-
   global $allow_color_customization;
-
 ?>
 <script type="text/javascript">
 <!-- <![CDATA[

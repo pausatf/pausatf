@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: activity_log.php.
- *
- * @package PAUSATF_Calendar
- */
-
 include_once 'includes/init.php';
 include_once 'includes/site_extras.php';
 $PAGE_SIZE = 25;
@@ -78,7 +72,6 @@ if ( $res ) {
 } else {
   echo translate("Database error") . ": " . dbi_error ();
 }
-
 ?>
 </table><br />
 <div class="navigation">

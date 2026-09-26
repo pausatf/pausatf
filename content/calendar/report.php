@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: report.php.
- *
- * @package PAUSATF_Calendar
- */
-
 /*
  * $Id: report.php,v 1.27.2.4 2006/01/05 14:22:34 umcesrjones Exp $
  *
@@ -565,7 +559,6 @@ if ( ! empty ( $list ) || $report_include_header == 'Y'
 } else {
   print_trailer ( false );
 }
-
 
 ?>
 </body>

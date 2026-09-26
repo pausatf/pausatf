@@ -16,7 +16,6 @@
  * @version $Id: config.php,v 1.53.2.18 2007/03/04 16:12:05 cknudsen Exp $
  * @package WebCalendar
  */
-
 if ( empty ( $PHP_SELF ) && ! empty ( $_SERVER ) &&
   ! empty ( $_SERVER['PHP_SELF'] ) ) {
   $PHP_SELF = $_SERVER['PHP_SELF'];
@@ -326,6 +325,5 @@ if ( get_magic_quotes_gpc () == 0 ) {
     " to <span style=\"font-weight:bold;\">ON</span>.<br /><br />\n" .
     $loc );
 }
-
 
 ?>

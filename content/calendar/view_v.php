@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: view_v.php.
- *
- * @package PAUSATF_Calendar
- */
-
 /*
  * $Id: view_v.php,v 1.33 2005/03/06 23:26:35 umcesrjones Exp $
  *
@@ -95,7 +89,6 @@ for ( $i = 0; $i < 7; $i++ ) {
      month_short_name ( date ( "m", $days[$i] ) - 1 ) .
      " " . date ( "d", $days[$i] );
 }
-
 ?>
 
 <div style="border-width:0px; width:99%;">

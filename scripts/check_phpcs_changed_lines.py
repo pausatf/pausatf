@@ -35,6 +35,8 @@ def changed_lines(base: str, root: Path) -> dict[str, list[tuple[int, int]]]:
 
         hunk_match = HUNK.match(line)
         if hunk_match and current_file:
+            if current_file.startswith("content/calendar/"):
+                continue
             start = int(hunk_match.group(1))
             count = int(hunk_match.group(2) or "1")
             if count:

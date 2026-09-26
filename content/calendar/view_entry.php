@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: view_entry.php.
- *
- * @package PAUSATF_Calendar
- */
-
 /*
  * $Id: view_entry.php,v 1.68.2.2 2005/08/10 14:35:15 cknudsen Exp $
  *
@@ -446,7 +440,6 @@ if ( $categories_enabled == "Y" ) {
     dbi_free_result ( $res2 );
   }
 }
-
 ?>
 <h2><?php echo htmlspecialchars ( $name ); ?></h2>
 <table style="border-width:0px;">

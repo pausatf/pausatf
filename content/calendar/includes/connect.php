@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: connect.php.
- *
- * @package PAUSATF_Calendar
- */
-
 if ( empty ( $PHP_SELF ) && ! empty ( $_SERVER ) &&
   ! empty ( $_SERVER['PHP_SELF'] ) ) {
   $PHP_SELF = $_SERVER['PHP_SELF'];
@@ -259,6 +253,5 @@ if ( $not_auth ) {
   */
   do_redirect ( "week.php" );
 }
-
 
 ?>

@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: reject_entry.php.
- *
- * @package PAUSATF_Calendar
- */
-
 include_once 'includes/init.php';
 
 $error = "";
@@ -121,5 +115,4 @@ print_header ();
 echo "<h2>" . translate("Error") . "</h2>\n";
 echo "<p>" . $error . "</p>\n";
 print_trailer ();
-
 ?>

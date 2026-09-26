@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: day.php.
- *
- * @package PAUSATF_Calendar
- */
-
 include_once 'includes/init.php';
 
 if (($user != $login) && $is_nonuser_admin)
@@ -48,7 +42,6 @@ if ( $auto_refresh == "Y" && ! empty ( $auto_refresh_time ) ) {
 }
 $INC = array('js/popups.php');
 print_header($INC,$HeadX);
-
 ?>
 
 <?php

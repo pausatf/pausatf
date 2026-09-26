@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: export_handler.php.
- *
- * @package PAUSATF_Calendar
- */
-
 /*
  * $Id: export_handler.php,v 1.29.2.5 2006/01/28 22:40:51 umcesrjones Exp $
  *

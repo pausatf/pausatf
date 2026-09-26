@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: year.php.
- *
- * @package PAUSATF_Calendar
- */
-
 include_once 'includes/init.php';
 send_no_cache_header ();
 
@@ -99,7 +93,6 @@ if ( $user == "__public__" )
 <br />
 <a title="<?php 
 	etranslate("Generate printer-friendly version")
-
 ?>" class="printer" href="year.php?<?php
 	if ( $thisyear )
 		echo "year=$thisyear&amp;";

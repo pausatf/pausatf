@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: list_unapproved.php.
- *
- * @package PAUSATF_Calendar
- */
-
 include_once 'includes/init.php';
 send_no_cache_header ();
 
@@ -123,7 +117,6 @@ function list_unapproved ( $user ) {
     if ( ! empty ( $eventinfo ) ) echo $eventinfo;
   }
 }
-
 ?>
 
 <h2><?php 

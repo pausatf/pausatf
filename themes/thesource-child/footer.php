@@ -5,7 +5,7 @@
  * @package PAUSATF_TheSource_Child
  */
 
- $fullWidthPage = is_page_template('page-full.php'); ?>
+$fullWidthPage = is_page_template('page-full.php'); ?>
 
 			</div> <!-- end #main-content -->
 		</div> <!-- end #main-content-wrap -->

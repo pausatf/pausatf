@@ -51,6 +51,8 @@ jobs:
         run: |
           shopt -s globstar nullglob
           for f in themes/thesource-child/**/*.php wp-content/plugins/**/*.php wp-content/mu-plugins/**/*.php wordpress/plugins/**/*.php wordpress/mu-plugins/**/*.php ansible/roles/wordpress/files/TheSource-child/**/*.php ansible/roles/apache/files/**/*.php content/**/*.php teeters-php/**/*.php pausatf-content-architecture.php; do
+            # content/calendar is an upstream WebCalendar vendor tree, not maintained PAUSATF PHP.
+            [[ "$f" == content/calendar/* ]] && continue
             php -l "$f" || exit 1
           done
 

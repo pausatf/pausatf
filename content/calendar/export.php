@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: export.php.
- *
- * @package PAUSATF_Calendar
- */
-
 /*
  * Page Description:
  *	This page will present the user with forms for exporting calendar
@@ -24,7 +18,6 @@ if ( empty ( $login) || $login == "__public__" ) {
 
 $INC = array('js/export.php');
 print_header($INC);
-
 ?>
 
 <h2><?php etranslate("Export")?></h2>

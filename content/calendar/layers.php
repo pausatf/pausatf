@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: layers.php.
- *
- * @package PAUSATF_Calendar
- */
-
 include_once 'includes/init.php';
 send_no_cache_header ();
 
@@ -36,7 +30,6 @@ if ( $allow_view_other != 'Y') {
   echo "allow_view_other = $allow_view_other <br>";
   echo translate("You are not authorized");
 } else {
-
 ?>
 
 <h2><?php

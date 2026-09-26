@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: category.php.
- *
- * @package PAUSATF_Calendar
- */
-
 include_once 'includes/init.php';
 
 // load user and global cats
@@ -36,7 +30,6 @@ if ( ! empty ( $id ) ) {
 }
 
 print_header();
-
 ?>
 <h2><?php etranslate("Categories")?></h2>
 <a title="<?php etranslate("Admin") ?>" class="nav" href="adminhome.php">&laquo;&nbsp;<?php etranslate("Admin") ?></a><br /><br />

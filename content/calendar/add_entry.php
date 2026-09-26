@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: add_entry.php.
- *
- * @package PAUSATF_Calendar
- */
-
 include_once 'includes/init.php';
 load_user_categories();
 
@@ -56,5 +50,4 @@ if ( $id > 0 ) {
 
 send_to_preferred_view ();
 exit;
-
 ?>

@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: edit_entry_handler.php.
- *
- * @package PAUSATF_Calendar
- */
-
 include_once 'includes/init.php';
 include_once 'includes/site_extras.php';
 load_user_categories ();
@@ -812,7 +806,6 @@ if ( empty ( $error ) ) {
 
 print_header();
 if ( strlen ( $conflicts ) ) { 
-
 ?>
 <h2><?php etranslate("Scheduling Conflict")?></h2>
 

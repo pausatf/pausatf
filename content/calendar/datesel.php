@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: datesel.php.
- *
- * @package PAUSATF_Calendar
- */
-
 /* $Id: datesel.php,v 1.31 2005/03/11 13:59:51 cknudsen Exp $ */
 include_once 'includes/init.php';
 
@@ -37,7 +31,6 @@ $prev = mktime ( 3, 0, 0, $thismonth - 1, 1, $thisyear );
 $prevyear = date ( "Y", $prev );
 $prevmonth = date ( "m", $prev );
 $prevdate = date ( "Ym", $prev ) . "01";
-
 
 ?>
 

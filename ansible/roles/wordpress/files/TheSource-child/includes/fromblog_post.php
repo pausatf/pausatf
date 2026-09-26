@@ -5,6 +5,4 @@
  * @package PAUSATF_TheSource_Child
  */
 
-?><li><a href="<?php
-
- the_permalink(); ?>"><?php the_title();?></a></li>
+?><li><a href="<?php the_permalink(); ?>"><?php the_title();?></a></li>

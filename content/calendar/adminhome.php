@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: adminhome.php.
- *
- * @package PAUSATF_Calendar
- */
-
 /*
 	$Id: adminhome.php,v 1.15 2005/01/19 13:54:13 cknudsen Exp $
 
@@ -118,7 +112,6 @@ if ( $is_admin && ! empty ( $public_access ) && $public_access == 'Y' &&
 	$names[] = translate("Unapproved Public Events");
 	$links[] = "list_unapproved.php?user=__public__";
 }
-
 ?>
 
 <h2><?php etranslate("Administrative Tools")?></h2>

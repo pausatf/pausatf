@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: login.php.
- *
- * @package PAUSATF_Calendar
- */
-
 include "includes/config.php";
 include "includes/php-dbi.php";
 include "includes/functions.php";
@@ -137,7 +131,6 @@ load_user_preferences ();
 }
 $charset = ( ! empty ( $LANGUAGE )?translate("charset"): "iso-8859-1" );
 echo "<?xml version=\"1.0\" encoding=\"$charset\"?>" . "\n";
-
 ?>
 <!DOCTYPE html
     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "DTD/xhtml1-transitional.dtd">

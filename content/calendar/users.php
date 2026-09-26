@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: users.php.
- *
- * @package PAUSATF_Calendar
- */
-
 /*
 	NOTE:
 	There are THREE components that make up the functionality of users.php.
@@ -42,7 +36,6 @@ print_header($INC);
 //  echo "</body>\n</html>";
 //  exit;
 //}
-
 ?>
 <a title="<?php etranslate("Admin") ?>" class="nav" href="adminhome.php">&laquo;&nbsp;<?php etranslate("Admin") ?></a><br /><br />
 

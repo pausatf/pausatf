@@ -1,10 +1,4 @@
 <?php
-/**
- * Legacy PAUSATF event calendar source: search_handler.php.
- *
- * @package PAUSATF_Calendar
- */
-
 include_once 'includes/init.php';
 
 $error = "";
@@ -27,7 +21,6 @@ if ( $readonly == "Y" || $single_user == "Y" )
   $search_others = false;
 
 print_header();
-
 ?>
 
 <h2><?php etranslate("Search Results")?></h2>

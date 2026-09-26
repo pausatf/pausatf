@@ -24,7 +24,7 @@
 // ----------------------------------------------------------------------------*
     require_once ('/home/pausat/dbss.php');
     
-   $query = "SELECT * FROM Teams";  // get all the teams from Race 1
+   $query = 'SELECT * FROM Teams';  // Get all the teams from Race 1.
 
     $result1 = @mysql_query ($query);  // execute the SELECT
 

@@ -5,7 +5,7 @@
  * @package PAUSATF_TheSource_Child
  */
 
- get_header(); ?>
+get_header(); ?>
 	<?php if (get_option('thesource_integration_single_top') != '' && get_option('thesource_integrate_singletop_enable') == 'on') echo(get_option('thesource_integration_single_top')); ?>
 
 	<div id="main-content-wrap">
