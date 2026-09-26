@@ -6,6 +6,10 @@ on:
       - dev
   workflow_dispatch:
 
+concurrency:
+  group: deploy-development
+  cancel-in-progress: false
+
 permissions:
   contents: read
 

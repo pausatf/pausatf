@@ -1,0 +1,36 @@
+name: Setup Ansible
+description: Install Python and ansible-core, add shared Galaxy collections, and stub a CI vault password.
+
+inputs:
+  python-version:
+    description: Python version to install.
+    required: false
+    default: '3.11'
+  ansible-core-version:
+    description: ansible-core version to pin.
+    required: false
+    default: '2.17.5'
+  extra-packages:
+    description: Extra pip packages to install (space-separated), e.g. ansible-lint or molecule.
+    required: false
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Python
+      uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Install ansible-core and collections
+      shell: bash
+      run: |
+        pip install "ansible-core==${{ inputs.ansible-core-version }}" ${{ inputs.extra-packages }}
+        ansible-galaxy collection install community.general community.mysql ansible.posix
+
+    - name: Create dummy vault password for CI
+      shell: bash
+      run: |
+        printf '#!/bin/sh\necho ci-dummy-vault-password\n' > ansible/.vault_pass.sh
+        chmod +x ansible/.vault_pass.sh
