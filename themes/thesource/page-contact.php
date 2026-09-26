@@ -1,11 +1,4 @@
-<?php
-/**
- * PAUSATF TheSource theme source: page-contact.php.
- *
- * @package PAUSATF_TheSource
- */
-
- if ( ! isset( $_SESSION ) ) session_start();
+<?php if ( ! isset( $_SESSION ) ) session_start();
 /*
 Template Name: Contact Page
 */

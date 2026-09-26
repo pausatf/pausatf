@@ -1,10 +1,4 @@
 <?php
-/**
- * PAUSATF TheSource theme source: import_settings.php.
- *
- * @package PAUSATF_TheSource
- */
-
 add_action( 'admin_enqueue_scripts', 'import_epanel_javascript' );
 function import_epanel_javascript( $hook_suffix ) {
 	if ( 'admin.php' == $hook_suffix && isset( $_GET['import'] ) && isset( $_GET['step'] ) && 'wordpress' == $_GET['import'] && '1' == $_GET['step'] )

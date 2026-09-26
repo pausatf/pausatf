@@ -1,9 +1,6 @@
 <?php
 
-/********* Page Templates v.1.8 ***********
- *
- * @package PAUSATF_TheSource
- */
+/********* Page Templates v.1.8 ************/
 
 define( 'ET_PT_PATH', get_template_directory_uri() . '/includes/page_templates' );
 

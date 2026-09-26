@@ -4,10 +4,7 @@
  * Manages anti-spam provider class instances.
  *
  * @since 4.0.7
- *
- * @package PAUSATF_TheSource
  */
-
 class ET_Core_API_Spam_Providers {
 
 	private static $_instance;

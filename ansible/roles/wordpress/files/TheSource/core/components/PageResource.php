@@ -27,7 +27,6 @@
  *
  * @package ET\Core
  */
-
 class ET_Core_PageResource {
 
 	private static $_LOCK_FILE;

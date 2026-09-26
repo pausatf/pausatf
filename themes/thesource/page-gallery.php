@@ -1,10 +1,4 @@
 <?php
-/**
- * PAUSATF TheSource theme source: page-gallery.php.
- *
- * @package PAUSATF_TheSource
- */
-
 /*
 Template Name: Gallery Page
 */

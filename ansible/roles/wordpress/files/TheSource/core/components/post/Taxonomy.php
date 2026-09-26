@@ -1,10 +1,4 @@
 <?php
-/**
- * PAUSATF TheSource theme source: Taxonomy.php.
- *
- * @package PAUSATF_TheSource
- */
-
 
 
 abstract class ET_Core_Post_Taxonomy extends ET_Core_Post_Object {

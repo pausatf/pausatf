@@ -5,8 +5,6 @@
  * @package PAUSATF_Legacy
  */
 
-
-
 // This script is used by the new PA online race scoring program to upload result files
 // to the proper year directory (e.g. 2024, 2025, ...).  It was written by Jeff Teeters
 // on March 1, 2024.  This is used so the scorers do not have to upload files using the

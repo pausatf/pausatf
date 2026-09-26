@@ -1,10 +1,4 @@
 <?php
-/**
- * PAUSATF TheSource theme source: Logger.php.
- *
- * @package PAUSATF_TheSource
- */
-
 
 
 class ET_Core_Logger {

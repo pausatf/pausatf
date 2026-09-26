@@ -1,4 +1,10 @@
-<script type="text/javascript">
+<?php
+/**
+ * legacy PAUSATF event calendar source: edit_layer.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+?><script type="text/javascript">
 <!-- <![CDATA[
 function valid_color ( str ) {
   var ch, j;
@@ -22,11 +28,6 @@ function valid_form ( form ) {
   var err = "";
   if ( ! valid_color ( form.layercolor.value ) )
     err += "<?php
-/**
- * legacy PAUSATF event calendar source: edit_layer.php.
- *
- * @package PAUSATF_Calendar
- */
 
  etranslate("Invalid color")?>.\n";
 

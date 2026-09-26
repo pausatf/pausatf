@@ -1,11 +1,4 @@
-<?php
-/**
- * PAUSATF TheSource theme source: widget-adsense.php.
- *
- * @package PAUSATF_TheSource
- */
-
- class AdsenseWidget extends WP_Widget
+<?php class AdsenseWidget extends WP_Widget
 {
 	function __construct(){
 		$widget_ops = array( 'description' => 'Displays Adsense Ads' );

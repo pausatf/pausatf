@@ -1,10 +1,4 @@
 <?php
-/**
- * PAUSATF TheSource theme source: ElegantThemes.php.
- *
- * @package PAUSATF_TheSource
- */
-
 
 if ( ! class_exists( 'ET_Core_API_ElegantThemes' ) ):
 /**

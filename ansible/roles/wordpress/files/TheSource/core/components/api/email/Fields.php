@@ -1,10 +1,4 @@
 <?php
-/**
- * PAUSATF TheSource theme source: Fields.php.
- *
- * @package PAUSATF_TheSource
- */
-
 
 
 class ET_Core_API_Email_Fields {

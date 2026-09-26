@@ -1,11 +1,12 @@
-<div id="breadcrumbs">
-
-	<?php
+<?php
 /**
  * PAUSATF TheSource child theme source: breadcrumb.php.
  *
  * @package PAUSATF_TheSource_Child
  */
+?><div id="breadcrumbs">
+
+	<?php
 
  if(function_exists('bcn_display')) { bcn_display(); }
 		  else { ?>

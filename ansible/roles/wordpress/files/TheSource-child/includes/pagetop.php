@@ -1,11 +1,12 @@
-<div id="pagetop">
-	<h1>
-		<?php
+<?php
 /**
  * PAUSATF TheSource child theme source: pagetop.php.
  *
  * @package PAUSATF_TheSource_Child
  */
+?><div id="pagetop">
+	<h1>
+		<?php
 
  if (is_category()) single_cat_title();
 			  elseif (is_tag()) single_tag_title();

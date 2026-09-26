@@ -1,4 +1,10 @@
-<script type="text/javascript">
+<?php
+/**
+ * legacy PAUSATF event calendar source: admin.php.
+ *
+ * @package PAUSATF_Calendar
+ */
+?><script type="text/javascript">
 <!-- <![CDATA[
 // error check the colors
 function valid_color ( str ) {
@@ -12,11 +18,6 @@ function valid_form ( form ) {
 
   if ( form.admin_server_url.value == "" ) {
     err += "<?php
-/**
- * legacy PAUSATF event calendar source: admin.php.
- *
- * @package PAUSATF_Calendar
- */
 
  etranslate("Server URL is required")?>.\n";
     form.admin_server_url.select ();

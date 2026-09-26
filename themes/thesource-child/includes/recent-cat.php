@@ -1,9 +1,10 @@
-<div class="top<?php
+<?php
 /**
  * PAUSATF TheSource child theme source: recent-cat.php.
  *
  * @package PAUSATF_TheSource_Child
  */
+?><div class="top<?php
 
  if($last) echo(" last"); ?>">
 <?php

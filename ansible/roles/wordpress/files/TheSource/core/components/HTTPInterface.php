@@ -7,7 +7,6 @@
  *
  * @package ET\Core\HTTP
  */
-
 class ET_Core_HTTPRequest {
 
 	/**

@@ -8,7 +8,7 @@
 /**
  * TabbedWidget displays tabbed posts content.
  *
- * @package PAUSATF_TheSource
+ * @package PAUSATF_TheSource_Child
  */
 class TabbedWidget extends WP_Widget {
 

@@ -1,10 +1,4 @@
 <?php
-/**
- * PAUSATF TheSource theme source: Updates.php.
- *
- * @package PAUSATF_TheSource
- */
-
 
 if ( ! class_exists( 'ET_Core_Updates' ) ):
 /**

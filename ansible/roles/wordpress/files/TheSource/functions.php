@@ -1,10 +1,4 @@
 <?php
-/**
- * PAUSATF TheSource theme source: functions.php.
- *
- * @package PAUSATF_TheSource
- */
-
 add_action( 'after_setup_theme', 'et_setup_theme' );
 if ( ! function_exists( 'et_setup_theme' ) ){
 	function et_setup_theme(){

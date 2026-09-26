@@ -1,11 +1,4 @@
-<?php
-/**
- * PAUSATF TheSource theme source: footer.php.
- *
- * @package PAUSATF_TheSource
- */
-
- $fullWidthPage = is_page_template('page-full.php'); ?>
+<?php $fullWidthPage = is_page_template('page-full.php'); ?>
 
 			</div> <!-- end #main-content -->
 		</div> <!-- end #main-content-wrap -->

@@ -1,11 +1,4 @@
-<?php
-/**
- * PAUSATF TheSource theme source: header.php.
- *
- * @package PAUSATF_TheSource
- */
-
- global $default_colorscheme, $shortname, $category_menu, $exclude_pages, $exclude_cats, $hide, $strdepth, $strdepth2, $page_menu; ?>
+<?php global $default_colorscheme, $shortname, $category_menu, $exclude_pages, $exclude_cats, $hide, $strdepth, $strdepth2, $page_menu; ?>
 <?php $colorSchemePath = '';
 	  $colorScheme = get_option($shortname . '_color_scheme');
       if ($colorScheme <> $default_colorscheme) $colorSchemePath = strtolower($colorScheme) . '/'; ?>

@@ -5,7 +5,6 @@
  * @package PAUSATF_TheSource_Child
  */
 
-
 /*
 
 Template Name: Blog Page

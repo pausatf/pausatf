@@ -7,7 +7,6 @@
  *
  * @package ET\Core\API\Spam
  */
-
 abstract class ET_Core_API_Spam_Provider extends ET_Core_API_Service  {
 
 	/**

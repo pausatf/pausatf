@@ -1,10 +1,4 @@
 <?php
-/**
- * PAUSATF TheSource theme source: Object.php.
- *
- * @package PAUSATF_TheSource
- */
-
 
 
 abstract class ET_Core_Post_Object {

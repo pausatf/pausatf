@@ -1,10 +1,4 @@
 <?php
-/**
- * PAUSATF TheSource theme source: Network.php.
- *
- * @package PAUSATF_TheSource
- */
-
 
 
 abstract class ET_Core_API_SocialNetwork extends ET_Core_API_Service  {

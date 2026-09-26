@@ -5,7 +5,6 @@
  * @package PAUSATF_Calendar
  */
 
-
 // This page is intended to be used as a server-side include
 // for another page.
 // (Such as an intranet home page or something.)

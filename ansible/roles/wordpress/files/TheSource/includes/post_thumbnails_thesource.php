@@ -1,10 +1,4 @@
 <?php
-/**
- * PAUSATF TheSource theme source: post_thumbnails_thesource.php.
- *
- * @package PAUSATF_TheSource
- */
-
 	add_theme_support( 'post-thumbnails' );
 
 	global $et_theme_image_sizes;

@@ -1,10 +1,4 @@
 <?php
-/**
- * PAUSATF TheSource theme source: php_functions.php.
- *
- * @package PAUSATF_TheSource
- */
-
 
 if ( ! function_exists( 'array_replace' ) ) :
 function array_replace( array $array, array $array1 ) {

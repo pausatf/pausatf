@@ -1,11 +1,4 @@
-<?php
-/**
- * legacy PAUSATF event calendar source: popups.php.
- *
- * @package PAUSATF_Calendar
- */
-
- /* $Id: popups.php,v 1.8.2.1 2006/09/28 17:52:43 cknudsen Exp $  */ ?>
+<?php /* $Id: popups.php,v 1.8.2.1 2006/09/28 17:52:43 cknudsen Exp $  */ ?>
 <script type="text/javascript">
 <!-- <![CDATA[
 // The following code is used to support the small popups that

@@ -5,7 +5,6 @@
  * @package PAUSATF_Calendar
  */
 
-
 // Parse the datebook file and return the data hash.
 //
 function parse_palmdesktop ($file, $exc_private = 1) {

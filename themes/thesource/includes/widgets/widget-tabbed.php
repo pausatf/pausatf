@@ -1,16 +1,4 @@
-<?php
-/**
- * PAUSATF TheSource theme source: widget-tabbed.php.
- *
- * @package PAUSATF_TheSource
- */
-
-/**
- * TabbedWidget displays tabbed posts content.
- *
- * @package PAUSATF_TheSource
- */
- class TabbedWidget extends WP_Widget
+<?php class TabbedWidget extends WP_Widget
 {
     function __construct(){
 		$widget_ops = array('description' => 'Displays Tabbed Widget');

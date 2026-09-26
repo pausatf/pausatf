@@ -5,7 +5,6 @@
  * @package PAUSATF_Calendar
  */
 
-
 if ( empty ( $PHP_SELF ) && ! empty ( $_SERVER ) &&
   ! empty ( $_SERVER['PHP_SELF'] ) ) {
   $PHP_SELF = $_SERVER['PHP_SELF'];

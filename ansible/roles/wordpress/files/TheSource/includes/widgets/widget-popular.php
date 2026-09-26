@@ -1,16 +1,4 @@
-<?php
-/**
- * PAUSATF TheSource theme source: widget-popular.php.
- *
- * @package PAUSATF_TheSource
- */
-
-/**
- * PopularWidget displays popular posts content.
- *
- * @package PAUSATF_TheSource
- */
- class PopularWidget extends WP_Widget
+<?php class PopularWidget extends WP_Widget
 {
     function __construct(){
 		$widget_ops = array('description' => 'Displays Popular Posts');

@@ -5,7 +5,6 @@
  * @package PAUSATF_Calendar
  */
 
-
     $version = '1.0.5' ;
 
 ?>

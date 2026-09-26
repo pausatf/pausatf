@@ -8,7 +8,7 @@
 /**
  * AdsenseWidget displays AdSense content.
  *
- * @package PAUSATF_TheSource
+ * @package PAUSATF_TheSource_Child
  */
 class AdsenseWidget extends WP_Widget {
 

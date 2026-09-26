@@ -1,10 +1,4 @@
 <?php
-/**
- * PAUSATF TheSource theme source: comments.php.
- *
- * @package PAUSATF_TheSource
- */
-
 // Do not delete these lines
 	if (!empty($_SERVER['SCRIPT_FILENAME']) && 'comments.php' == basename($_SERVER['SCRIPT_FILENAME']))
 		die (esc_html__('Please do not load this page directly. Thanks!','TheSource'));

@@ -1,10 +1,4 @@
 <?php
-/**
- * PAUSATF TheSource theme source: SilentThemeUpgraderSkin.php.
- *
- * @package PAUSATF_TheSource
- */
-
 require_once( ABSPATH . 'wp-admin/includes/class-wp-upgrader.php' );
 
 if ( ! class_exists( 'ET_Core_LIB_SilentThemeUpgraderSkin' ) ):

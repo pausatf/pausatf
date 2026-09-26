@@ -1,11 +1,4 @@
-<?php
-/**
- * PAUSATF TheSource theme source: home.php.
- *
- * @package PAUSATF_TheSource
- */
-
- get_header(); ?>
+<?php get_header(); ?>
 
 <?php if (get_option('thesource_recent_fromcat_display') == 'on') { ?>
 	<div id="from-categories" class="clearfix">

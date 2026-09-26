@@ -7,7 +7,6 @@
  *
  * @package ET\Core\API\Email
  */
-
 class ET_Core_API_Email_GetResponse extends ET_Core_API_Email_Provider {
 
 	/**

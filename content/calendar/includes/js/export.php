@@ -25,14 +25,7 @@ function selectDate ( day, month, year, current, evt ) {
   var colorWindow = window.open(url,"DateSelection","width=300,height=200," + MyPosition);
 }
 
-<?php
-/**
- * legacy PAUSATF event calendar source: export.php.
- *
- * @package PAUSATF_Calendar
- */
-
- //see the showTab function in includes/js/visible.php for common code shared by all pages
+<?php //see the showTab function in includes/js/visible.php for common code shared by all pages
 	//using the tabbed GUI.
 ?>var tabs = new Array();
 tabs[0] = "import";

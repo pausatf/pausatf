@@ -1,10 +1,4 @@
 <?php
-/**
- * PAUSATF TheSource theme source: page-template-portfolio.php.
- *
- * @package PAUSATF_TheSource
- */
-
 /*
 Template Name: Portfolio Page
 */

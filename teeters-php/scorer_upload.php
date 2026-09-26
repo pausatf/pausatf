@@ -5,7 +5,6 @@
  * @package PAUSATF
  */
 
-
 declare(strict_types=1);
 
 /**

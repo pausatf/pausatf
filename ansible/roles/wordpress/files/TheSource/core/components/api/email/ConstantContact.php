@@ -7,7 +7,6 @@
  *
  * @package ET\Core\API\Email
  */
-
 class ET_Core_API_Email_ConstantContact extends ET_Core_API_Email_Provider {
 
 	/**

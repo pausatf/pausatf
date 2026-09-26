@@ -1,10 +1,4 @@
 <?php
-/**
- * PAUSATF TheSource theme source: VersionRollback.php.
- *
- * @package PAUSATF_TheSource
- */
-
 
 if ( ! class_exists( 'ET_Core_VersionRollback' ) ):
 /**

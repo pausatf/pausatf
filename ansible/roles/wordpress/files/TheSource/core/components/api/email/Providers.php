@@ -2,10 +2,7 @@
 
 /**
  * Manages email provider class instances.
- *
- * @package PAUSATF_TheSource
  */
-
 class ET_Core_API_Email_Providers {
 
 	private static $_instance;

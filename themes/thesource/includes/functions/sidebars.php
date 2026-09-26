@@ -1,10 +1,4 @@
 <?php
-/**
- * PAUSATF TheSource theme source: sidebars.php.
- *
- * @package PAUSATF_TheSource
- */
-
 if ( function_exists('register_sidebar') )
     register_sidebar(array(
 		'name' => 'Sidebar Left Column',

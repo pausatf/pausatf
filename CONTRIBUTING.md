@@ -201,7 +201,7 @@ ansible-playbook --syntax-check playbooks/your-playbook.yml
 
 ### PHP Standards (themes/ and custom plugins)
 
-- Start each PHP source file with a file-level PHPDoc block that briefly identifies its role and declares an `@package`. Keep PHPDoc inside PHP tags so it produces no output. Do not add PHP tags or PHPDoc to empty files or `.php` files containing only static HTML or JavaScript.
+- Start each maintained PHP source file with a file-level PHPDoc block that briefly identifies its role and declares an `@package`. Keep PHPDoc inside PHP tags so it produces no output. Exclude generated files, upstream parent-theme/vendor code, empty files, and `.php` files containing only static HTML or JavaScript.
 - Coding standard: WordPress-Core/Extra/Docs via PHPCS
 - PHP versions: 8.0–8.3 (project target)
 - Install PHPCS + WPCS locally (optional, CI enforces it):

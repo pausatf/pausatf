@@ -1,11 +1,4 @@
-<?php
-/**
- * PAUSATF TheSource theme source: widget-random.php.
- *
- * @package PAUSATF_TheSource
- */
-
- class RandomWidget extends WP_Widget
+<?php class RandomWidget extends WP_Widget
 {
     function __construct(){
 		$widget_ops = array('description' => 'Displays Random Posts');

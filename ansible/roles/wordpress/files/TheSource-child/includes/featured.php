@@ -1,13 +1,14 @@
-<!-- Start Featured -->
-<div id="featured">
-
-	<?php
+<?php
 /**
  * PAUSATF TheSource child theme source: featured.php.
  *
  * @package PAUSATF_TheSource_Child
  */
 
+?><!-- Start Featured -->
+<div id="featured">
+
+	<?php
 	$arr = array();
 	$i=1;
 
