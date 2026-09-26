@@ -31,7 +31,15 @@ jobs:
       - name: Install Ansible and ansible-lint
         run: |
           pip install ansible-core==2.17.5 ansible-lint==25.12.2
-          ansible-galaxy collection install community.general community.mysql ansible.posix
+          for attempt in 1 2 3; do
+            if ansible-galaxy collection install -r ansible/requirements.yml; then
+              exit 0
+            fi
+            if [ "$attempt" -lt 3 ]; then
+              sleep "$((attempt * 15))"
+            fi
+          done
+          exit 1
 
       - name: Create dummy vault password for CI
         run: |
@@ -80,7 +88,15 @@ jobs:
       - name: Install Ansible
         run: |
           pip install ansible-core==2.17.5
-          ansible-galaxy collection install community.general community.mysql ansible.posix
+          for attempt in 1 2 3; do
+            if ansible-galaxy collection install -r ansible/requirements.yml; then
+              exit 0
+            fi
+            if [ "$attempt" -lt 3 ]; then
+              sleep "$((attempt * 15))"
+            fi
+          done
+          exit 1
 
       - name: Create dummy vault password for CI
         run: |
