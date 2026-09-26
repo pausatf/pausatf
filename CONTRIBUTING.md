@@ -199,6 +199,18 @@ ansible-playbook --syntax-check playbooks/your-playbook.yml
 
 ### Shell Script Standards
 
+- **ShellCheck**: All scripts must pass ShellCheck
+- **Shebang**: Use `#!/usr/bin/env bash` for portability
+- **Error handling**: Use `set -euo pipefail` for robust scripts
+- **Functions**: Break complex scripts into functions
+- **Comments**: Document complex logic
+
+```bash
+# Check before committing
+shellcheck your-script.sh
+bash -n your-script.sh  # Syntax check
+```
+
 ### PHP Standards (maintained PHP sources)
 
 - Start each maintained PHP source file with a file-level PHPDoc block that briefly identifies its role and declares an `@package`. Keep PHPDoc inside PHP tags so it produces no output. Exclude generated files, upstream parent-theme/vendor code, empty files, and `.php` files containing only static HTML or JavaScript.
@@ -216,18 +228,6 @@ composer global require dealerdirect/phpcodesniffer-composer-installer:^1 squizl
 ```bash
 php -l themes/thesource-child/functions.php
 python3 scripts/check_phpcs_changed_lines.py --base origin/main --phpcs "$(command -v phpcs)"
-```
-
-- **ShellCheck**: All scripts must pass ShellCheck
-- **Shebang**: Use `#!/usr/bin/env bash` for portability
-- **Error handling**: Use `set -euo pipefail` for robust scripts
-- **Functions**: Break complex scripts into functions
-- **Comments**: Document complex logic
-
-```bash
-# Check before committing
-shellcheck your-script.sh
-bash -n your-script.sh  # Syntax check
 ```
 
 ### Markdown Standards

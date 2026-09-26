@@ -12,11 +12,11 @@ from pathlib import Path
 
 
 DIFF_FILE = re.compile(r"^diff --git a/.* b/(.*)$")
-HUNK = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@")
+HUNK = re.compile(r"^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@")
 
 
-def changed_lines(base: str, root: Path) -> dict[str, list[tuple[int, int]]]:
-    """Return added line ranges by repository-relative PHP path."""
+def changed_lines(base: str, root: Path) -> dict[str, list[tuple[int, int, int, int]]]:
+    """Return old/new line ranges for changed PHP lines by repository-relative path."""
     result = subprocess.run(
         ["git", "diff", "--no-ext-diff", "--unified=0", f"{base}...HEAD", "--", "*.php"],
         cwd=root,
@@ -25,7 +25,7 @@ def changed_lines(base: str, root: Path) -> dict[str, list[tuple[int, int]]]:
         text=True,
     )
 
-    files: dict[str, list[tuple[int, int]]] = {}
+    files: dict[str, list[tuple[int, int, int, int]]] = {}
     current_file: str | None = None
     for line in result.stdout.splitlines():
         file_match = DIFF_FILE.match(line)
@@ -37,10 +37,14 @@ def changed_lines(base: str, root: Path) -> dict[str, list[tuple[int, int]]]:
         if hunk_match and current_file:
             if current_file.startswith("content/calendar/"):
                 continue
-            start = int(hunk_match.group(1))
-            count = int(hunk_match.group(2) or "1")
-            if count:
-                files.setdefault(current_file, []).append((start, start + count - 1))
+            old_start = int(hunk_match.group(1))
+            old_count = int(hunk_match.group(2) or "1")
+            new_start = int(hunk_match.group(3))
+            new_count = int(hunk_match.group(4) or "1")
+            if new_count:
+                files.setdefault(current_file, []).append(
+                    (old_start, old_count, new_start, new_count)
+                )
 
     return files
 
@@ -53,11 +57,24 @@ def normalized_path(path: str, root: Path) -> str:
     return candidate.resolve().relative_to(root.resolve()).as_posix()
 
 
+def base_line_for_changed_line(
+    line: int, hunks: list[tuple[int, int, int, int]]
+) -> int | None:
+    """Map a changed line to its replaced base line, if the hunk has one."""
+    for old_start, old_count, new_start, new_count in hunks:
+        if new_start <= line < new_start + new_count:
+            offset = line - new_start
+            if offset < old_count:
+                return old_start + offset
+            return None
+    return None
+
+
 def baseline_violations(
     base: str, paths: list[str], phpcs: str, root: Path
-) -> dict[str, dict[tuple[str, str], int]]:
-    """Count existing violations from the base version of each changed file."""
-    result: dict[str, dict[tuple[str, str], int]] = {}
+) -> dict[str, dict[tuple[int, str, str], int]]:
+    """Index base violations by line, source, and message for each changed file."""
+    result: dict[str, dict[tuple[int, str, str], int]] = {}
     for path in paths:
         source = subprocess.run(
             ["git", "show", f"{base}:{path}"],
@@ -89,11 +106,15 @@ def baseline_violations(
         except json.JSONDecodeError:
             continue
 
-        counts: dict[tuple[str, str], int] = {}
+        counts: dict[tuple[int, str, str], int] = {}
         for file_data in data.get("files", {}).values():
             for item in file_data.get("messages", []):
-                fingerprint = (item.get("source", ""), item.get("message", ""))
-                counts[fingerprint] = counts.get(fingerprint, 0) + 1
+                finding = (
+                    int(item["line"]),
+                    item.get("source", ""),
+                    item.get("message", ""),
+                )
+                counts[finding] = counts.get(finding, 0) + 1
         result[path] = counts
     return result
 
@@ -130,18 +151,22 @@ def main() -> int:
     violations: list[tuple[str, int, str, str, str]] = []
     ignored = 0
     total_messages = 0
-    remaining_existing = {path: counts.copy() for path, counts in existing.items()}
     for reported_path, file_data in phpcs_report.get("files", {}).items():
         relative_path = normalized_path(reported_path, root)
-        ranges = changed.get(relative_path, [])
+        hunks = changed.get(relative_path, [])
         for item in file_data.get("messages", []):
             total_messages += 1
             line = int(item["line"])
-            if any(start <= line <= end for start, end in ranges):
-                fingerprint = (item.get("source", ""), item.get("message", ""))
-                previous = remaining_existing.get(relative_path, {}).get(fingerprint, 0)
+            base_line = base_line_for_changed_line(line, hunks)
+            if any(new_start <= line < new_start + new_count for _, _, new_start, new_count in hunks):
+                finding = (
+                    base_line if base_line is not None else -1,
+                    item.get("source", ""),
+                    item.get("message", ""),
+                )
+                previous = existing.get(relative_path, {}).get(finding, 0)
                 if previous:
-                    remaining_existing[relative_path][fingerprint] -= 1
+                    existing[relative_path][finding] -= 1
                     ignored += 1
                     continue
                 violations.append(
@@ -173,7 +198,7 @@ def main() -> int:
 
     print(
         f"PHPCS passed on {len(paths)} changed PHP file(s); "
-        f"{ignored} existing violation(s) matching the base version were not blocking."
+        f"{ignored} unchanged or location-matched baseline violation(s) were not blocking."
     )
     return 0
 
