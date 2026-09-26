@@ -12,3 +12,8 @@ php_max_execution_time: 300
 php_max_input_time: 300
 php_max_input_vars: 3000
 php_date_timezone: "America/Los_Angeles"
+php_fpm_max_children: 15
+php_fpm_start_servers: 3
+php_fpm_min_spare: 2
+php_fpm_max_spare: 5
+php_fpm_max_requests: 500
