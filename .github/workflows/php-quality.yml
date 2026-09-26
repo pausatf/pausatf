@@ -81,9 +81,9 @@ jobs:
             cp phpcs.xml.dist "$baseline_dir/phpcs.xml.dist"
 
             set +e
-            ~/.composer/vendor/bin/phpcs --standard=phpcs.xml.dist --report=json themes wp-content/plugins > "$RUNNER_TEMP/phpcs-current.json"
+            ~/.composer/vendor/bin/phpcs -q --standard=phpcs.xml.dist --report=json themes wp-content/plugins > "$RUNNER_TEMP/phpcs-current.json"
             current_status=$?
-            (cd "$baseline_dir" && ~/.composer/vendor/bin/phpcs --standard=phpcs.xml.dist --report=json themes wp-content/plugins) > "$RUNNER_TEMP/phpcs-baseline.json"
+            (cd "$baseline_dir" && ~/.composer/vendor/bin/phpcs -q --standard=phpcs.xml.dist --report=json themes wp-content/plugins) > "$RUNNER_TEMP/phpcs-baseline.json"
             baseline_status=$?
             set -e
             if ((current_status > 2 || baseline_status > 2)); then
