@@ -22,7 +22,7 @@ fi
 
 echo ""
 echo "Initializing Terraform..."
-terraform init
+terraform init -input=false -backend-config=../../backend.hcl
 
 echo ""
 echo "Importing resources..."
