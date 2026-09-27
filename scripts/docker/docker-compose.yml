@@ -43,7 +43,7 @@ services:
 
   # Prometheus monitoring
   prometheus:
-    image: prom/prometheus:v2.51.0  # pin: update deliberately, check release notes
+    image: prom/prometheus:v3.14.0  # pin: update deliberately, check release notes
     container_name: prometheus
     volumes:
       - ./monitoring/prometheus:/etc/prometheus:ro
