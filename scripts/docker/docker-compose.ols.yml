@@ -19,7 +19,7 @@ services:
     restart: unless-stopped
 
   db:
-    image: mariadb:13.0
+    image: mariadb:11.8
     environment:
       - MARIADB_DATABASE=${WORDPRESS_DB_NAME:-wordpress}
       - MARIADB_USER=${WORDPRESS_DB_USER:-wp}
