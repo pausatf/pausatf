@@ -36,3 +36,9 @@ Options -Indexes
 
 # Limit request body size (64MB for WordPress uploads)
 LimitRequestBody 67108864
+
+# Block plugin and theme readme/changelog files — they disclose version info
+# to scanners and have no purpose being publicly accessible.
+<LocationMatch "^/wp-content/(plugins|themes)/[^/]+/(readme\.txt|readme\.md|CHANGELOG\.md|changelog\.txt|LICENSE\.txt|license\.txt)$">
+    Require all denied
+</LocationMatch>

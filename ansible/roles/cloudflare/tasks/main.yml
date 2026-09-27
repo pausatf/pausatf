@@ -73,6 +73,44 @@
   when: (web_server | default('apache')) == 'apache'
   tags: cloudflare
 
+# Slurp the just-written files so UFW tasks in common/firewall.yml see live
+# ranges rather than the static fallback list in group_vars/all.yml.
+- name: Read fetched Cloudflare IPv4 ranges into fact
+  ansible.builtin.slurp:
+    src: /etc/apache2/cloudflare-ips-v4.txt
+  register: cf_ips_v4_content
+  when:
+    - (web_server | default('apache')) == 'apache'
+    - cf_ips_v4 is defined
+  tags: cloudflare
+
+- name: Set cloudflare_ipv4_ranges from fetched file
+  ansible.builtin.set_fact:
+    cloudflare_ipv4_ranges: >-
+      {{ (cf_ips_v4_content.content | b64decode | trim).split('\n') | select | list }}
+  when:
+    - cf_ips_v4_content is defined
+    - cf_ips_v4_content is not skipped
+  tags: cloudflare
+
+- name: Read fetched Cloudflare IPv6 ranges into fact
+  ansible.builtin.slurp:
+    src: /etc/apache2/cloudflare-ips-v6.txt
+  register: cf_ips_v6_content
+  when:
+    - (web_server | default('apache')) == 'apache'
+    - cf_ips_v6 is defined
+  tags: cloudflare
+
+- name: Set cloudflare_ipv6_ranges from fetched file
+  ansible.builtin.set_fact:
+    cloudflare_ipv6_ranges: >-
+      {{ (cf_ips_v6_content.content | b64decode | trim).split('\n') | select | list }}
+  when:
+    - cf_ips_v6_content is defined
+    - cf_ips_v6_content is not skipped
+  tags: cloudflare
+
 - name: Verify Cloudflare zone is active
   ansible.builtin.uri:
     url: "https://api.cloudflare.com/client/v4/zones/{{ cloudflare_zone_id }}"

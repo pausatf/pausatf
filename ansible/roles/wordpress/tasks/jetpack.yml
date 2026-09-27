@@ -1,0 +1,25 @@
+---
+# Jetpack module and feature configuration via WP-CLI.
+# Called from main.yml; guarded by per-feature vars so staging can skip.
+
+- name: Enable Jetpack Boost Defer JS
+  ansible.builtin.command:
+    cmd: >
+      wp option update jetpack_boost_status
+      '{"defer_js":{"enabled":true}}'
+      --format=json
+      --path={{ item.path | default('/var/www/html') }}
+      --allow-root
+  loop: "{{ wordpress_installs }}"
+  when: jetpack_boost_defer_js | default(false)
+  changed_when: false
+  tags: [wordpress, jetpack]
+
+- name: Enable Jetpack Photon (Image CDN)
+  ansible.builtin.command:
+    cmd: wp jetpack module activate photon --path={{ item.path | default('/var/www/html') }} --allow-root
+  loop: "{{ wordpress_installs }}"
+  when: jetpack_photon_enabled | default(false)
+  changed_when: false
+  failed_when: false
+  tags: [wordpress, jetpack]
