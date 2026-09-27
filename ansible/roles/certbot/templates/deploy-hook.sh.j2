@@ -1,0 +1,26 @@
+#!/bin/sh
+set -eu
+
+# Certbot calls deploy hooks with RENEWED_LINEAGE set to the renewed lineage.
+expected_lineage="/etc/letsencrypt/live/{{ certbot_lineage_name | default(certbot_domains[0]) }}"
+[ "${RENEWED_LINEAGE:-}" = "$expected_lineage" ] || exit 0
+{% if certbot_deploy_target_dir is defined %}
+target={{ certbot_deploy_target_dir | quote }}
+backup="/root/pausatf-certificate-previous"
+install -d -o root -g root -m 0700 "$backup"
+cp -p "$target/fullchain.pem" "$backup/fullchain.pem"
+cp -p "$target/privkey.pem" "$backup/privkey.pem"
+install -o root -g root -m 0644 "$RENEWED_LINEAGE/fullchain.pem" "$target/fullchain.pem.new"
+install -o root -g root -m 0600 "$RENEWED_LINEAGE/privkey.pem" "$target/privkey.pem.new"
+mv "$target/fullchain.pem.new" "$target/fullchain.pem"
+mv "$target/privkey.pem.new" "$target/privkey.pem"
+if docker exec {{ certbot_deploy_container_name | quote }} apache2ctl configtest; then
+    docker exec {{ certbot_deploy_container_name | quote }} apache2ctl graceful
+else
+    cp -p "$backup/fullchain.pem" "$target/fullchain.pem"
+    cp -p "$backup/privkey.pem" "$target/privkey.pem"
+    exit 1
+fi
+{% else %}
+systemctl reload {{ 'apache2' if web_server | default('apache') == 'apache' else 'lsws' }}
+{% endif %}
