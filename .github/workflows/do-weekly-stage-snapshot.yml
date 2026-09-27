@@ -1,0 +1,85 @@
+name: Weekly DO Snapshot (stage)
+
+on:
+  schedule:
+    - cron: '0 11 * * 0'  # Sunday 11AM UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stage-snapshot
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+
+      - name: Require DigitalOcean token
+        env:
+          DO_TOKEN: ${{ secrets.DO_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "$DO_TOKEN" ]; then
+            echo "::error::DO_TOKEN secret is required; refusing to report a successful backup without a snapshot."
+            exit 1
+          fi
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@3cb3953159719656269e044e0e24ca16dd2a690f  # v2
+        with:
+          token: ${{ secrets.DO_TOKEN }}
+
+      - name: Resolve stage droplet
+        id: droplet
+        env:
+          DROPLET_ID: ${{ secrets.DO_STAGE_DROPLET_ID }}
+          DROPLET_NAME: pausatf-stage-v2
+        run: |
+          set -euo pipefail
+          if [ -n "$DROPLET_ID" ]; then
+            resolved_name="$(doctl compute droplet get "$DROPLET_ID" --format Name --no-header 2>/dev/null || true)"
+            if [ "$resolved_name" = "$DROPLET_NAME" ]; then
+              echo "id=$DROPLET_ID" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "::warning::DO_STAGE_DROPLET_ID does not resolve to $DROPLET_NAME; looking up by name."
+          fi
+          resolved_id="$(doctl compute droplet list --format ID,Name --no-header | awk -v name="$DROPLET_NAME" '$2 == name { print $1; exit }')"
+          if [ -z "$resolved_id" ]; then
+            echo "::error::Could not resolve staging droplet $DROPLET_NAME; refusing to report a successful backup."
+            exit 1
+          fi
+          echo "id=$resolved_id" >> "$GITHUB_OUTPUT"
+
+      - name: Snapshot stage droplet
+        id: snapshot
+        env:
+          DROPLET_ID: ${{ steps.droplet.outputs.id }}
+        run: |
+          set -euo pipefail
+          snapshot_name="stage-weekly-$(date -u +%Y%m%d-%H%M%S)"
+          doctl compute droplet-action snapshot "$DROPLET_ID" --snapshot-name "$snapshot_name" --wait
+          echo "name=$snapshot_name" >> "$GITHUB_OUTPUT"
+
+      - name: Prune old snapshots (keep last 2)
+        env:
+          DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DO_TOKEN }}
+          DROPLET_ID: ${{ steps.droplet.outputs.id }}
+          SNAPSHOT_NAME: ${{ steps.snapshot.outputs.name }}
+        run: |
+          set -euo pipefail
+          doctl compute snapshot list --resource droplet --output json > snapshots.json
+          python3 scripts/snapshot-retention.py --droplet-id "$DROPLET_ID" \
+            --completed-name "$SNAPSHOT_NAME" --name-prefix stage-weekly --keep 2 \
+            < snapshots.json > prune.txt
+          while IFS= read -r snap_id; do
+            [ -n "$snap_id" ] || continue
+            doctl compute snapshot delete "$snap_id" --force
+          done < prune.txt

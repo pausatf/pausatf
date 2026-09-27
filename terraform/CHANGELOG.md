@@ -10,6 +10,7 @@ and this project adheres to semantic versioning.
 ## [Unreleased]
 
 ### Added
+- Weekly staging droplet snapshots through GitHub Actions, retaining two completed copies while the automatic Backups feature remains disabled
 - GitHub repository management module
 - GitHub environment configuration for managing all PAUSATF repositories
 - Automated branch protection rules with required GPG signing

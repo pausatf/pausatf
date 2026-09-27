@@ -84,7 +84,7 @@ Mirrors production topology at reduced cost for pre-release testing.
 
 | Resource | Name | Notes |
 |----------|------|-------|
-| `digitalocean_droplet` | pausatf-stage | No backups (cost saving); cloud-init via `cloud-init-openlitespeed.yml` |
+| `digitalocean_droplet` | pausatf-stage | Automatic Backups feature remains disabled; weekly GitHub Actions snapshots retain two completed staging snapshots. Live Docker runtime and Terraform drift remain under reconciliation. |
 | `digitalocean_database_cluster` | pausatf-stage-db | MySQL 8, single node, maintenance Saturday 02:00 |
 | `digitalocean_database_firewall` | staging | Restricts DB access to staging droplet only |
 | `digitalocean_firewall` | pausatf-staging-firewall | Allows 80, 443, 22, 7080 (OLS WebAdmin) |
