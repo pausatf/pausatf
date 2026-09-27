@@ -11,14 +11,15 @@ echo "PAUSATF Infrastructure - Production and Staging Import"
 echo "=========================================="
 echo ""
 echo "This script imports production and staging resources into Terraform state."
-echo "Cloudflare DNS import is intentionally skipped until issue #137 reconciliation is complete."
+echo "Central Cloudflare-zone import is intentionally skipped until issue #137 reconciliation is complete."
+echo "The staging state still owns stage.pausatf.org and uses the Cloudflare provider."
 echo ""
 
 # Check required environment variables
 MISSING_VARS=0
 
 if [ -z "${TF_VAR_cloudflare_api_token:-}" ]; then
-  echo "⚠ Missing: TF_VAR_cloudflare_api_token"
+  echo "⚠ Missing: TF_VAR_cloudflare_api_token (required by the staging Cloudflare DNS provider)"
   MISSING_VARS=1
 fi
 
@@ -43,10 +44,10 @@ if [ "$MISSING_VARS" -eq 1 ]; then
   echo "Environment Variables Required"
   echo "=========================================="
   echo ""
-  echo "Please set the following environment variables:"
-  echo ""
-  echo "  export TF_VAR_cloudflare_api_token='your-cloudflare-api-token'"
-  echo "  export TF_VAR_ssh_public_key=\"\$(cat ~/.ssh/id_ed25519.pub)\""
+echo "Please set the following environment variables:"
+echo ""
+echo "  export TF_VAR_cloudflare_api_token='your-cloudflare-api-token'"
+echo "  export TF_VAR_ssh_public_key=\"\$(cat ~/.ssh/id_ed25519.pub)\""
   echo "  export AWS_ACCESS_KEY_ID='your-do-spaces-key'"
   echo "  export AWS_SECRET_ACCESS_KEY='your-do-spaces-secret'"
   echo ""
@@ -88,8 +89,9 @@ echo "Step 3/3: Cloudflare DNS Import Skipped"
 echo "=========================================="
 echo ""
 
-echo "Cloudflare DNS declarations and state are still being reconciled in issue #137."
+echo "Central Cloudflare-zone declarations and state are still being reconciled in issue #137."
 echo "Do not import or apply Cloudflare resources until the inventory is verified."
+echo "The staging state also owns stage.pausatf.org; import that Tunnel CNAME before applying staging."
 
 echo ""
 echo "=========================================="
@@ -99,7 +101,8 @@ echo ""
 echo "Summary:"
 echo "  - Production: SSH key, project, droplet, firewall"
 echo "  - Staging: Droplet, database, firewall"
-echo "  - Cloudflare: skipped pending DNS and state reconciliation"
+echo "  - Central Cloudflare zone: skipped pending DNS and state reconciliation"
+echo "  - Staging DNS: stage.pausatf.org is configured in staging state; its import is pending"
 echo ""
 echo "Next steps:"
 echo ""
