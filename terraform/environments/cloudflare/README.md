@@ -30,7 +30,7 @@ variables. Do not commit credentials or Terraform state files.
 
 ```bash
 cd terraform/environments/cloudflare
-terraform init
+terraform init -backend-config=../../backend.hcl
 terraform validate
 terraform plan
 ```
