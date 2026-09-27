@@ -8,16 +8,21 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: production-snapshot
+  cancel-in-progress: false
+
 jobs:
   snapshot:
-    runs-on: ubuntu-latest
-    # No environment gate. Uses DO_TOKEN plus an optional DO_PROD_DROPLET_ID
-    # fallback; the production droplet is resolved by name at runtime so stale
-    # droplet IDs do not break scheduled snapshots.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    # No environment gate; DO_TOKEN is required and the droplet ID is verified or resolved by name.
     permissions:
       contents: read
     steps:
-      - name: Check required secrets
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v4
+
+      - name: Check required token
         id: check
         env:
           DO_TOKEN: ${{ secrets.DO_TOKEN }}
@@ -42,55 +47,45 @@ jobs:
           DROPLET_NAME: pausatf-prod
         run: |
           set -euo pipefail
-
           if [ -n "$DROPLET_ID" ]; then
             resolved_name="$(doctl compute droplet get "$DROPLET_ID" --format Name --no-header 2>/dev/null || true)"
             if [ "$resolved_name" = "$DROPLET_NAME" ]; then
               echo "id=$DROPLET_ID" >> "$GITHUB_OUTPUT"
               exit 0
             fi
+            echo "::warning::DO_PROD_DROPLET_ID does not resolve to $DROPLET_NAME; looking up by name."
           fi
-
-          if [ -n "$DROPLET_ID" ]; then
-            echo "::warning::DO_PROD_DROPLET_ID does not resolve to $DROPLET_NAME; looking up the production droplet by name."
-          fi
-
-          resolved_id="$(
-            doctl compute droplet list --format ID,Name --no-header \
-              | awk -v name="$DROPLET_NAME" '$2 == name { print $1; exit }'
-          )"
-
+          resolved_id="$(doctl compute droplet list --format ID,Name --no-header | awk -v name="$DROPLET_NAME" '$2 == name { print $1; exit }')"
           if [ -z "$resolved_id" ]; then
             echo "::warning::Could not resolve $DROPLET_NAME. Skipping snapshot."
             echo "skip=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-
           echo "id=$resolved_id" >> "$GITHUB_OUTPUT"
 
       - name: Snapshot prod droplet
+        id: snapshot
         if: steps.check.outputs.skip != 'true' && steps.droplet.outputs.skip != 'true'
         env:
           DROPLET_ID: ${{ steps.droplet.outputs.id }}
         run: |
           set -euo pipefail
-          doctl compute droplet-action snapshot "$DROPLET_ID" \
-            --snapshot-name "prod-nightly-$(date -u +%Y%m%d-%H%M%S)" \
-            --wait
+          snapshot_name="prod-nightly-$(date -u +%Y%m%d-%H%M%S)"
+          doctl compute droplet-action snapshot "$DROPLET_ID" --snapshot-name "$snapshot_name" --wait
+          echo "name=$snapshot_name" >> "$GITHUB_OUTPUT"
 
       - name: Prune old snapshots (keep last 7)
         if: steps.check.outputs.skip != 'true' && steps.droplet.outputs.skip != 'true'
         env:
           DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DO_TOKEN }}
+          DROPLET_ID: ${{ steps.droplet.outputs.id }}
+          SNAPSHOT_NAME: ${{ steps.snapshot.outputs.name }}
         run: |
-          # List all prod-nightly snapshots sorted by date, skip the 7 most recent
-          # head -n -7 is a GNU coreutils extension; safe on ubuntu-latest runners
-          doctl compute snapshot list --resource droplet --format ID,Name --no-header \
-            | grep "^[0-9].*prod-nightly-" \
-            | sort -t- -k3 -k4 \
-            | head -n -7 \
-            | awk '{print $1}' \
-            | while read -r snap_id; do
-                echo "Deleting snapshot $snap_id"
-                doctl compute snapshot delete "$snap_id" --force
-              done
+          set -euo pipefail
+          doctl compute snapshot list --resource droplet --output json > snapshots.json
+          python3 scripts/snapshot-retention.py --droplet-id "$DROPLET_ID" \
+            --completed-name "$SNAPSHOT_NAME" < snapshots.json > prune.txt
+          while IFS= read -r snap_id; do
+            [ -n "$snap_id" ] || continue
+            doctl compute snapshot delete "$snap_id" --force
+          done < prune.txt
