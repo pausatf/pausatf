@@ -54,6 +54,10 @@ on:
         default: false
         type: boolean
 
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
 permissions:
   contents: read
   issues: write
@@ -62,7 +66,7 @@ jobs:
   audit:
     name: Check for plugin updates
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - name: Probe widget logic recovery sources
         if: ${{ inputs.probe_widget_logic == true }}
