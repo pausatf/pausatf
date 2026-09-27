@@ -57,6 +57,12 @@ resource "cloudflare_zone_setting" "min_tls_version" {
   value      = "1.2"
 }
 
+resource "cloudflare_zone_setting" "tls_1_3" {
+  zone_id    = cloudflare_zone.pausatf.id
+  setting_id = "tls_1_3"
+  value      = "on"
+}
+
 resource "cloudflare_zone_setting" "brotli" {
   zone_id    = cloudflare_zone.pausatf.id
   setting_id = "brotli"

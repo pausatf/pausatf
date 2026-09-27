@@ -93,6 +93,16 @@ apparmor_apache_enforce: true
 
 # Certbot
 certbot_enabled: true
+certbot_lineage_name: pausatf.org
+# Certbot runs on the host. The active Apache runs in Docker with this
+# read-only bind mount, so deploy hooks copy renewed material here and reload it.
+certbot_deploy_target_dir: /etc/ssl/pausatf
+certbot_deploy_container_name: pausatf-wordpress
+tls_origin_certificate_issuer: letsencrypt
+tls_origin_certificate_renewal: certbot_dns_cloudflare
+tls_origin_certificate_domains:
+  - pausatf.org
+  - www.pausatf.org
 
 # This server is the active web server (controls wp-cron)
 is_active_web: true
@@ -123,8 +133,8 @@ wordpress_installs:
     'wp_version': '7.0', 'debug_mode': false,
     'wp_memory_limit': '256M', 'wp_max_memory_limit': '512M',
     'ssl_enabled': true,
-    'ssl_certificate': '/etc/letsencrypt/live/www.pausatf.org/fullchain.pem',
-    'ssl_certificate_key': '/etc/letsencrypt/live/www.pausatf.org/privkey.pem',
+    'ssl_certificate': '/etc/ssl/pausatf/fullchain.pem',
+    'ssl_certificate_key': '/etc/ssl/pausatf/privkey.pem',
     'manage_wp_config': false,
     'db_host': managed_db_host ~ ':' ~ (managed_db_port | string),
     'db_port': managed_db_port,

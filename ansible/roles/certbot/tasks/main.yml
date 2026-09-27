@@ -67,11 +67,10 @@
   when: certbot_enabled | default(true)
 
 - name: Deploy post-renewal hook to reload web server
-  ansible.builtin.copy:
+  ansible.builtin.template:
+    src: deploy-hook.sh.j2
     dest: /etc/letsencrypt/renewal-hooks/deploy/reload-webserver.sh
-    content: |
-      #!/bin/bash
-      systemctl reload {{ 'apache2' if web_server | default('apache') == 'apache' else 'lsws' }}
     owner: root
     group: root
     mode: "0755"
+  when: certbot_enabled | default(true)
