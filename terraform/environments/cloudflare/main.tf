@@ -119,16 +119,6 @@ resource "cloudflare_dns_record" "monitor" {
   comment = "Monitoring dashboard"
 }
 
-resource "cloudflare_dns_record" "dev" {
-  zone_id = cloudflare_zone.pausatf.id
-  name    = "dev"
-  content = "157.230.128.120"
-  type    = "A"
-  ttl     = 1
-  proxied = true
-  comment = "Development droplet"
-}
-
 resource "cloudflare_dns_record" "direct_ssh" {
   zone_id = cloudflare_zone.pausatf.id
   name    = "direct-ssh"
@@ -152,16 +142,6 @@ resource "cloudflare_dns_record" "runners" {
 # =============================================================================
 # DNS Records — Staging
 # =============================================================================
-
-resource "cloudflare_dns_record" "stage" {
-  zone_id = cloudflare_zone.pausatf.id
-  name    = "stage"
-  content = "cbbd07dc-3e97-4923-b582-1fafab43c01b.cfargotunnel.com"
-  type    = "CNAME"
-  ttl     = 1
-  proxied = true
-  comment = "Staging routed through the staging Cloudflare Tunnel"
-}
 
 resource "cloudflare_dns_record" "staging" {
   zone_id = cloudflare_zone.pausatf.id

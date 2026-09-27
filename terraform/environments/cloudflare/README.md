@@ -18,7 +18,13 @@ unreviewed DNS, setting, or ruleset changes. The legacy
 `import-dns-records.sh` script is obsolete and must not be run: it targets the
 old provider resource type and an incomplete, stale record map.
 
-The inventory contains 39 DNS records: 7 A, 14 CNAME, 5 MX, 6 TXT, and 7 CAA.
+The live inventory contains 39 DNS records: 7 A, 14 CNAME, 5 MX, 6 TXT, and 7
+CAA. This Cloudflare environment owns 37 records; `dev` is owned by the dev
+environment and `stage` by the staging environment. Keep those ownership
+boundaries intact so different remote states cannot overwrite the same DNS
+record. The staging state was empty when checked on 2026-09-27, so import its
+existing `stage` record before considering an apply.
+
 The `_acme-challenge.www` TXT value is time-sensitive; confirm it is still
 needed before importing or refreshing that record.
 
@@ -33,9 +39,10 @@ needed before importing or refreshing that record.
 | CAA | `@` (seven records for Google Trust Services, DigiCert, Let's Encrypt, and iodef) |
 
 The apex, `www`, `stage`, SSH tunnel aliases, and canary use Cloudflare Tunnel
-hostnames. `staging` and the direct A records retain their observed addresses;
-the Terraform values are an inventory snapshot, not a claim that those hosts
-are healthy or should remain pointed at those addresses.
+hostnames. `dev` and `stage` are configured in their dedicated environment
+states, not in this Cloudflare environment. `staging` and the direct A records
+retain their observed addresses; these values are an inventory snapshot, not a
+claim that those hosts are healthy or should remain pointed at those addresses.
 
 ## Backend and credentials
 

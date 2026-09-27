@@ -8,18 +8,18 @@ Complete infrastructure as code for PAUSATF (Pan African Ultimate Sports & Train
 
 ## 🏗️ Architecture Overview
 
-This Terraform configuration manages **39 cloud resources** across:
-- **DigitalOcean** - Compute, databases, networking (8 resources)
-- **Cloudflare** - DNS and CDN (30 resources)
-- **GitHub** - Repository and CI/CD (1 resource)
+This repository manages infrastructure through separate Terraform states for
+production, staging, development, Cloudflare, and GitHub. The Cloudflare state
+is currently empty and is being reconciled against the live DNS inventory; do
+not apply it until that reconciliation is complete.
 
 ```
 terraform/
 ├── environments/           # Environment-specific configurations
-│   ├── production/        # Production environment (4 resources)
-│   ├── staging/           # Staging environment (4 resources)
-│   ├── cloudflare/        # DNS management (30 resources)
-│   ├── github/            # Repository configuration (1 resource)
+│   ├── production/        # Production infrastructure
+│   ├── staging/           # Staging infrastructure and stage DNS
+│   ├── cloudflare/        # Zone, central DNS, settings, and rulesets
+│   ├── github/            # Repository configuration
 │   └── dev/               # Development environment
 ├── modules/               # Reusable Terraform modules
 │   ├── cloudflare/        # Cloudflare zone and DNS modules
@@ -32,15 +32,20 @@ terraform/
 └── README.md                      # This file
 ```
 
-## 📊 Resources Managed
+## 📊 State and resource ownership
 
-| Environment | Resources | Description |
-|-------------|-----------|-------------|
-| **Production** | 4 | Droplet (Apache + PHP 7.4), firewall, SSH key, project |
-| **Staging** | 4 | Droplet (OpenLiteSpeed + PHP 8.4 + caching), MySQL 8, firewalls |
-| **Cloudflare** | 30 | Zone + 29 DNS records (A, CNAME, MX, TXT, CAA) |
-| **GitHub** | 1 | Repository with branch protection and topics |
-| **Total** | **39** | All cloud resources managed as code |
+| Environment | State ownership |
+|-------------|-----------------|
+| **Production** | Production droplet, network, firewall, and database resources |
+| **Staging** | Staging droplet, network, firewall, database, and `stage.pausatf.org` Tunnel CNAME |
+| **Development** | Development resources and `dev.pausatf.org` A record |
+| **Cloudflare** | Zone, 37 central DNS records, 5 zone settings, and 4 rulesets; backend state is empty pending reconciliation |
+| **GitHub** | Repository settings and branch protection |
+
+The live Cloudflare zone has 39 DNS records. The `dev` and `stage` records are
+owned by their environment states and must not also be declared in the central
+Cloudflare environment. Import existing resources and require a reviewed
+no-change plan before applying to an empty state.
 
 ## 🚀 Quick Start
 
@@ -131,17 +136,19 @@ cd environments/production && terraform apply
 - LSCache plugin ready
 - WebAdmin on port 7080
 
-**DNS:** stage.pausatf.org, staging.pausatf.org
+**DNS:** `stage.pausatf.org` is a proxied CNAME to the staging Cloudflare
+Tunnel. The staging state is currently empty; import the existing record
+before applying a plan.
 
 ### Cloudflare (`environments/cloudflare/`)
 
-**Manages 30 resources:**
-- **Zone:** pausatf.org
-- **7 A records:** root, www (proxied), ftp, mail, monitor, stage, staging
-- **8 CNAME records:** prod, SendGrid email/DKIM
-- **5 MX records:** Google Workspace
-- **4 TXT records:** SPF, DMARC, DKIM, Google verification
-- **5 CAA records:** Let's Encrypt, DigiCert, iodef
+The central Cloudflare configuration declares 47 resources: the zone, 37 DNS
+records, 5 zone settings, and 4 rulesets. It excludes `dev.pausatf.org` and
+`stage.pausatf.org`, which are owned by the dev and staging states. The central
+Cloudflare state is empty, and the staging state was also empty when checked on
+2026-09-27. The ruleset and zone-setting declarations still need verification
+with a Cloudflare API token that can read them. See the
+[Cloudflare environment safety notes](environments/cloudflare/README.md).
 
 ### GitHub (`environments/github/`)
 
@@ -154,23 +161,20 @@ cd environments/production && terraform apply
 
 ## 🔧 Common Operations
 
-### Update Droplet IP
+### Update a DNS record
 
-```bash
-# Production
-cd environments/production
-terraform apply -var="production_ip=NEW_IP"
-
-# Update Cloudflare DNS
-cd ../cloudflare
-terraform apply -var="production_ip=NEW_IP"
-```
+Edit the resource in its owning environment, then review its Terraform plan.
+Production web traffic uses Cloudflare Tunnel CNAMEs; the staging and dev
+records have their own environment states. Direct A records are inventory
+values and should be changed only after confirming the destination and owner.
+Do not apply Cloudflare or staging plans until existing records are imported
+and the plan has no unreviewed changes.
 
 ### Add DNS Record
 
 ```bash
 cd environments/cloudflare
-# Edit main.tf to add cloudflare_record resource
+# Edit the owning environment's main.tf to add a cloudflare_dns_record resource
 terraform plan
 terraform apply
 ```
