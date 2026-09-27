@@ -58,7 +58,7 @@ services:
 
   # Grafana for visualization
   grafana:
-    image: grafana/grafana:11.0.0  # pin: update deliberately, check release notes
+    image: grafana/grafana:13.2.2  # pin: update deliberately, check release notes
     container_name: grafana
     environment:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
