@@ -9,12 +9,14 @@ terraform {
   }
 }
 
-#tfsec:ignore:github-repositories-private: PAUSATF is an intentionally public track and field club repository.
+# Vulnerability alerts are managed through the current dedicated provider resource.
+#tfsec:ignore:AVD-GIT-0003
 resource "github_repository" "repo" {
   #checkov:skip=CKV_GIT_1:pausatf repo is intentionally public (track & field club)
   name        = var.name
   description = var.description
-  visibility  = var.visibility
+  #tfsec:ignore:AVD-GIT-0001:PAUSATF is intentionally public for its running club community.
+  visibility = var.visibility
 
   # Features
   has_issues      = var.has_issues

@@ -122,8 +122,6 @@ moved {
 }
 
 # Firewall — HTTP/S source CIDRs are configurable (defaults to Cloudflare-only)
-#tfsec:ignore:digitalocean-compute-no-public-ingress
-#tfsec:ignore:digitalocean-compute-no-public-egress
 #checkov:skip=CKV_DIO_4:Ingress sources are computed from restricted Cloudflare and administrator CIDRs; Checkov cannot evaluate the dynamic rule blocks.
 # The only unrestricted inbound traffic is ICMP ping; web and SSH sources are restricted.
 #trivy:ignore:DIG-0001
@@ -150,7 +148,7 @@ resource "digitalocean_firewall" "this" {
 
   inbound_rule {
     protocol         = "icmp"
-    source_addresses = var.icmp_source_addresses
+    source_addresses = var.icmp_source_addresses #tfsec:ignore:AVD-DIG-0001
   }
 
   dynamic "inbound_rule" {
@@ -166,19 +164,19 @@ resource "digitalocean_firewall" "this" {
   # Keep rules protocol/port specific while allowing internet destinations.
   outbound_rule {
     protocol              = "icmp"
-    destination_addresses = ["0.0.0.0/0", "::/0"]
+    destination_addresses = ["0.0.0.0/0", "::/0"] #tfsec:ignore:AVD-DIG-0003
   }
 
   outbound_rule {
     protocol              = "tcp"
     port_range            = var.outbound_tcp_udp_port_range
-    destination_addresses = ["0.0.0.0/0", "::/0"]
+    destination_addresses = ["0.0.0.0/0", "::/0"] #tfsec:ignore:AVD-DIG-0003
   }
 
   outbound_rule {
     protocol              = "udp"
     port_range            = var.outbound_tcp_udp_port_range
-    destination_addresses = ["0.0.0.0/0", "::/0"]
+    destination_addresses = ["0.0.0.0/0", "::/0"] #tfsec:ignore:AVD-DIG-0003
   }
 
 }
