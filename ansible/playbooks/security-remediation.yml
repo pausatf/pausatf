@@ -41,7 +41,7 @@
       register: wp_user_delete
       changed_when: "'Deleted user' in wp_user_delete.stdout"
       failed_when: false
-      tags: [remediate]
+      tags: [never, remediate]
       vars:
         wp_site: "{{ wordpress_installs | selectattr('name', 'equalto', 'pausatf-main') | first }}"
 
@@ -56,7 +56,7 @@
         wp_site: "{{ wordpress_installs | selectattr('name', 'equalto', 'pausatf-main') | first }}"
       register: salt_rotation
       changed_when: true
-      tags: [remediate]
+      tags: [never, remediate]
 
     # -------------------------------------------------------------------------
     # 3. Audit admin accounts for additional persistence
@@ -128,7 +128,7 @@
       register: fmgr_deactivate
       changed_when: "'Plugin deactivated' in fmgr_deactivate.stdout"
       failed_when: false
-      tags: [remediate]
+      tags: [never, remediate]
 
     - name: Delete wp-file-manager-pro
       ansible.builtin.command: >
@@ -139,7 +139,7 @@
       register: fmgr_delete
       changed_when: "'Deleted' in fmgr_delete.stdout"
       failed_when: false
-      tags: [remediate]
+      tags: [never, remediate]
 
     - name: Confirm wp-file-manager-pro plugin directory is gone
       ansible.builtin.stat:
@@ -186,7 +186,7 @@
       when: jetpack_active.rc == 0
       register: jetpack_notif
       changed_when: "'Success' in jetpack_notif.stdout"
-      tags: [remediate]
+      tags: [never, remediate]
 
     # -------------------------------------------------------------------------
     # 5. Webshell scan — PHP files in uploads directories
