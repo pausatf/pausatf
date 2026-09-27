@@ -19,6 +19,8 @@ on:
     secrets:
       SSH_PRIVATE_KEY:
         required: false
+      TARGET_SERVER_IP:
+        required: true
       ANSIBLE_VAULT_PASSWORD:
         required: true
       ANSIBLE_VAULT_FILE:
@@ -75,7 +77,13 @@ jobs:
         working-directory: ansible
         env:
           ANSIBLE_LIMIT: ${{ inputs.ansible_limit }}
+          TARGET_SERVER_IP: ${{ secrets.TARGET_SERVER_IP }}
         run: |
+          if [ -z "$TARGET_SERVER_IP" ]; then
+            echo "ERROR: TARGET_SERVER_IP secret is required" >&2
+            exit 1
+          fi
+
           RUNNER_IP=$(curl -fsS https://api.ipify.org)
           if [ -z "$RUNNER_IP" ]; then
             echo "ERROR: Could not determine GitHub runner public IP" >&2
@@ -84,6 +92,8 @@ jobs:
 
           ansible-playbook -i inventory/hosts.yml site.yml \
             -l "$ANSIBLE_LIMIT" \
+            -e "ansible_host=$TARGET_SERVER_IP" \
+            -e "ansible_ssh_private_key_file=~/.ssh/deploy_key" \
             -e "ansible_controller_cidr=${RUNNER_IP}/32" \
             --vault-password-file ../vault.pass
 

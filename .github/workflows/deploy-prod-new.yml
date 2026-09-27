@@ -18,5 +18,6 @@ jobs:
       ansible_limit: production_new
     secrets:
       SSH_PRIVATE_KEY: ${{ secrets.PROD_NEW_SSH_PRIVATE_KEY }}
+      TARGET_SERVER_IP: ${{ secrets.PROD_NEW_SERVER_IP }}
       ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
       ANSIBLE_VAULT_FILE: ${{ secrets.ANSIBLE_VAULT_FILE }}

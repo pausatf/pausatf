@@ -60,9 +60,18 @@ jobs:
 
       - name: Dry-run playbook against staging
         working-directory: ansible
+        env:
+          STAGE_SERVER_IP: ${{ secrets.STAGE_SERVER_IP }}
         run: |
+          if [ -z "$STAGE_SERVER_IP" ]; then
+            echo "ERROR: STAGE_SERVER_IP secret is required" >&2
+            exit 1
+          fi
+
           ansible-playbook -i inventory/hosts.yml site.yml \
             -l staging \
+            -e "ansible_host=$STAGE_SERVER_IP" \
+            -e "ansible_ssh_private_key_file=~/.ssh/deploy_key" \
             --check \
             --vault-password-file ../vault.pass
 
@@ -80,5 +89,6 @@ jobs:
       healthcheck_host: "github-deploy@REDACTED_PROD_NEW_IP"
     secrets:
       SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+      TARGET_SERVER_IP: ${{ secrets.PROD_SERVER_IP }}
       ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
       ANSIBLE_VAULT_FILE: ${{ secrets.ANSIBLE_VAULT_FILE }}
