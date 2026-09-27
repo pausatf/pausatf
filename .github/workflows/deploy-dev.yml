@@ -6,6 +6,10 @@ on:
       - dev
   workflow_dispatch:
 
+concurrency:
+  group: deploy-development
+  cancel-in-progress: false
+
 permissions:
   contents: read
 
@@ -14,8 +18,10 @@ jobs:
     uses: ./.github/workflows/deploy.yml
     with:
       environment: development
-      ansible_limit: dev
+      ansible_limit: pausatf-dev
+      host_env_name: DEV_SERVER_IP
     secrets:
       SSH_PRIVATE_KEY: ${{ secrets.DEV_SSH_PRIVATE_KEY }}
+      TARGET_SERVER_IP: ${{ secrets.DEV_SERVER_IP }}
       ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
       ANSIBLE_VAULT_FILE: ${{ secrets.ANSIBLE_VAULT_FILE }}

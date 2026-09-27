@@ -60,10 +60,9 @@ module "wordpress" {
   })
 }
 
-# NOTE: stage.pausatf.org A record is also managed by the cloudflare environment.
-# If both environments are applied, the last apply wins. Consider removing this
-# module and managing all DNS centrally in the cloudflare environment.
-# Cloudflare DNS for staging
+# The staging environment is the sole Terraform owner of stage.pausatf.org.
+# The live record is a proxied Cloudflare Tunnel CNAME. This backend had no
+# state file on 2026-09-27, so import the live record before considering apply.
 module "cloudflare_dns_staging" {
   source  = "../../modules/cloudflare/dns"
   zone_id = var.cloudflare_zone_id
@@ -71,13 +70,18 @@ module "cloudflare_dns_staging" {
   dns_records = [
     {
       name    = "stage"
-      type    = "A"
-      value   = module.wordpress.droplet_ip
+      type    = "CNAME"
+      value   = "cbbd07dc-3e97-4923-b582-1fafab43c01b.cfargotunnel.com"
       ttl     = 1
       proxied = true
-      comment = "Staging web droplet"
+      comment = "Staging routed through the Cloudflare Tunnel"
     }
   ]
+}
+
+moved {
+  from = module.cloudflare_dns_staging.cloudflare_dns_record.this["A-stage"]
+  to   = module.cloudflare_dns_staging.cloudflare_dns_record.this["CNAME-stage"]
 }
 
 # State migration — zero-recreation move from inline resources to stack module
