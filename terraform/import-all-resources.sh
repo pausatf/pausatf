@@ -7,10 +7,11 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo "=========================================="
-echo "PAUSATF Infrastructure - Import All Resources"
+echo "PAUSATF Infrastructure - Production and Staging Import"
 echo "=========================================="
 echo ""
-echo "This script will import all existing cloud resources into Terraform state."
+echo "This script imports production and staging resources into Terraform state."
+echo "Cloudflare DNS import is intentionally skipped until issue #137 reconciliation is complete."
 echo ""
 
 # Check required environment variables
@@ -57,7 +58,7 @@ echo "✓ All required environment variables are set"
 echo ""
 
 # Confirmation prompt
-read -p "This will import 39 resources into Terraform state. Continue? (yes/no): " CONFIRM
+read -r -p "This will import production and staging resources into Terraform state. Continue? (yes/no): " CONFIRM
 if [ "$CONFIRM" != "yes" ]; then
   echo "Import cancelled."
   exit 0
@@ -83,22 +84,22 @@ bash import-resources.sh
 
 echo ""
 echo "=========================================="
-echo "Step 3/3: Import Cloudflare DNS Records"
+echo "Step 3/3: Cloudflare DNS Import Skipped"
 echo "=========================================="
 echo ""
 
-cd "${SCRIPT_DIR}/environments/cloudflare"
-bash import-dns-records.sh
+echo "Cloudflare DNS declarations and state are still being reconciled in issue #137."
+echo "Do not import or apply Cloudflare resources until the inventory is verified."
 
 echo ""
 echo "=========================================="
-echo "🎉 All Resources Imported Successfully!"
+echo "Production and staging import steps completed."
 echo "=========================================="
 echo ""
 echo "Summary:"
 echo "  - Production: SSH key, project, droplet, firewall"
 echo "  - Staging: Droplet, database, firewall"
-echo "  - Cloudflare: Zone + 29 DNS records"
+echo "  - Cloudflare: skipped pending DNS and state reconciliation"
 echo ""
 echo "Next steps:"
 echo ""
@@ -114,6 +115,6 @@ echo "   cd terraform/environments/github"
 echo "   terraform init"
 echo "   terraform apply"
 echo ""
-echo "4. Commit Terraform state to version control"
+echo "4. Keep Terraform state in the configured DigitalOcean Spaces backend; do not commit state files or backups."
 echo ""
-echo "All infrastructure is now managed by Terraform! 🚀"
+echo "Production and staging import steps are complete; Cloudflare and GitHub remain separate follow-up work."
