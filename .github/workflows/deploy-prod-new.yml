@@ -16,6 +16,7 @@ jobs:
     with:
       environment: production_new
       ansible_limit: pausatf-prod-new
+      host_env_name: PROD_NEW_SERVER_IP
     secrets:
       SSH_PRIVATE_KEY: ${{ secrets.PROD_NEW_SSH_PRIVATE_KEY }}
       TARGET_SERVER_IP: ${{ secrets.PROD_NEW_SERVER_IP }}

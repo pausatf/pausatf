@@ -19,6 +19,7 @@ jobs:
     with:
       environment: development
       ansible_limit: pausatf-dev
+      host_env_name: DEV_SERVER_IP
     secrets:
       SSH_PRIVATE_KEY: ${{ secrets.DEV_SSH_PRIVATE_KEY }}
       TARGET_SERVER_IP: ${{ secrets.DEV_SERVER_IP }}

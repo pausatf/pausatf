@@ -19,6 +19,7 @@ jobs:
     with:
       environment: staging
       ansible_limit: pausatf-stage
+      host_env_name: STAGE_SERVER_IP
     secrets:
       SSH_PRIVATE_KEY: ${{ secrets.STAGING_SSH_PRIVATE_KEY }}
       TARGET_SERVER_IP: ${{ secrets.STAGE_SERVER_IP }}
