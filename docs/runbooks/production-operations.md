@@ -182,10 +182,10 @@ ssh deploy@ftp.pausatf.org 'tail -20 /var/www/html/wp-content/debug.log'
    - Output: Commits to `ansible/group_vars/production/wordpress.yml`
    - Includes: 27 users (11 admins, 16 editors)
 
-2. **Legacy Directory Backup** (3:00 AM PT)
-   - Workflow: `.github/workflows/backup-legacy.yml`
-   - Syncs: `/var/www/legacy` → `backups/legacy/` in git
-   - Frequency: Daily
+2. **Encrypted Database and Legacy Backup**
+   - Timer: production `pausatf-db-backup.timer` (daily)
+   - Stores encrypted artifacts in private DigitalOcean Spaces; backup data is not committed to git.
+   - Runbook: `scripts/backup/README.md`
 
 3. **DigitalOcean Snapshot** (2:00 AM PT)
    - Workflow: `.github/workflows/do-nightly-snapshot.yml`

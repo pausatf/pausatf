@@ -462,11 +462,11 @@ ansible-playbook -i inventory/hosts.yml site.yml --ask-vault-pass
 
 Runs nightly to capture WordPress plugins/themes/config and commit to repo.
 
-### Nightly Legacy Backup
+### Production Database and Legacy Backup
 
-**GitHub Action:** `.github/workflows/backup-legacy.yml`
-
-Rsyncs `/var/www/legacy` to `backups/legacy/` in this repo nightly.
+The production systemd timer `pausatf-db-backup.timer` creates age-encrypted database and legacy-data backups
+and uploads them to private DigitalOcean Spaces. See [`scripts/backup/README.md`](../scripts/backup/README.md)
+for installation, credentials, retention, and verification. Backup data is not committed to git.
 
 ### DigitalOcean Snapshots
 

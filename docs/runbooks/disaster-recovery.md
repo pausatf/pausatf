@@ -63,7 +63,7 @@ Store securely in password manager:
 | Credential | Purpose | Location |
 |------------|---------|----------|
 | **DO_TOKEN** | DigitalOcean API | GitHub secret |
-| **DO_PROD_DROPLET_ID** | Production droplet ID | REDACTED_DROPLET_ID |
+| **DO_PROD_DROPLET_ID** | Optional production droplet ID override for nightly snapshots. If unset or inaccessible, the workflow resolves `pausatf-prod` by name. | GitHub Actions secret (optional) |
 | **CLOUDFLARE_API_TOKEN** | Cloudflare API | GitHub secret |
 | **PROD_SSH_PRIVATE_KEY** | Production SSH | GitHub secret / local |
 | **SPACES_ACCESS_KEY_ID** | Terraform state backend | GitHub secret |
@@ -88,11 +88,10 @@ Store securely in password manager:
    - Captures: Plugins, themes, configurations
    - Location: `ansible/group_vars/production/wordpress.yml` (committed to git)
 
-3. **Legacy Directory Backup**
-   - Workflow: `.github/workflows/backup-legacy.yml`
-   - Frequency: Daily
-   - Location: `backups/legacy/` (committed to git)
-   - Size: ~5GB
+3. **Encrypted Database and Legacy Backup**
+   - Timer: production `pausatf-db-backup.timer` (daily)
+   - Location: private, age-encrypted database and legacy-data objects under `s3://pausatf/backups/prod/`. The timer does not create deployment snapshots or verified recovery manifests.
+   - Restore requires the off-host age private key; see `scripts/backup/README.md`.
 
 ### On-Demand Backups
 

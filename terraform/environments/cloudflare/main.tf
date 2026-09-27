@@ -17,25 +17,6 @@ provider "cloudflare" {
   api_token = var.cloudflare_api_token
 }
 
-# Pull reserved IP from production state — single source of truth
-data "terraform_remote_state" "production" {
-  backend = "s3"
-  config = {
-    endpoints = {
-      s3 = "https://sfo2.digitaloceanspaces.com"
-    }
-    region                      = "us-west-1"
-    bucket                      = "pausatf-terraform-state"
-    key                         = "production/terraform.tfstate"
-    skip_credentials_validation = true
-    skip_metadata_api_check     = true
-  }
-}
-
-locals {
-  production_ip = data.terraform_remote_state.production.outputs.reserved_ip
-}
-
 # =============================================================================
 # Zone
 # =============================================================================
@@ -91,27 +72,27 @@ resource "cloudflare_zone_setting" "opportunistic_encryption" {
 resource "cloudflare_dns_record" "root" {
   zone_id = cloudflare_zone.pausatf.id
   name    = "@"
-  content = local.production_ip
-  type    = "A"
+  content = "3e83d690-bff7-4a26-aead-ca84cf0a2270.cfargotunnel.com"
+  type    = "CNAME"
   ttl     = 1
   proxied = true
-  comment = "Main site (production) — from terraform_remote_state"
+  comment = "Main site routed through the production Cloudflare Tunnel"
 }
 
 resource "cloudflare_dns_record" "www" {
   zone_id = cloudflare_zone.pausatf.id
   name    = "www"
-  content = local.production_ip
-  type    = "A"
+  content = "3e83d690-bff7-4a26-aead-ca84cf0a2270.cfargotunnel.com"
+  type    = "CNAME"
   ttl     = 1
   proxied = true
-  comment = "WWW redirect to main site"
+  comment = "WWW routed through the production Cloudflare Tunnel"
 }
 
 resource "cloudflare_dns_record" "ftp" {
   zone_id = cloudflare_zone.pausatf.id
   name    = "ftp"
-  content = local.production_ip
+  content = "165.22.153.191"
   type    = "A"
   ttl     = 1
   proxied = false
@@ -121,7 +102,7 @@ resource "cloudflare_dns_record" "ftp" {
 resource "cloudflare_dns_record" "mail" {
   zone_id = cloudflare_zone.pausatf.id
   name    = "mail"
-  content = local.production_ip
+  content = "165.22.153.191"
   type    = "A"
   ttl     = 1
   proxied = false
@@ -131,49 +112,45 @@ resource "cloudflare_dns_record" "mail" {
 resource "cloudflare_dns_record" "monitor" {
   zone_id = cloudflare_zone.pausatf.id
   name    = "monitor"
-  content = local.production_ip
+  content = "165.22.153.191"
   type    = "A"
   ttl     = 1
   proxied = false
   comment = "Monitoring dashboard"
 }
 
+resource "cloudflare_dns_record" "direct_ssh" {
+  zone_id = cloudflare_zone.pausatf.id
+  name    = "direct-ssh"
+  content = "165.22.153.191"
+  type    = "A"
+  ttl     = 1
+  proxied = false
+  comment = "Direct SSH endpoint"
+}
+
+resource "cloudflare_dns_record" "runners" {
+  zone_id = cloudflare_zone.pausatf.id
+  name    = "runners"
+  content = "165.227.114.184"
+  type    = "A"
+  ttl     = 1
+  proxied = false
+  comment = "GitHub Actions runner host"
+}
+
 # =============================================================================
 # DNS Records — Staging
 # =============================================================================
 
-resource "cloudflare_dns_record" "stage" {
-  zone_id = cloudflare_zone.pausatf.id
-  name    = "stage"
-  content = var.staging_ip
-  type    = "A"
-  ttl     = 1
-  proxied = false
-  comment = "Staging environment"
-}
-
 resource "cloudflare_dns_record" "staging" {
   zone_id = cloudflare_zone.pausatf.id
   name    = "staging"
-  content = var.staging_ip
-  type    = "A"
-  ttl     = 1
-  proxied = false
-  comment = "Staging environment (alias)"
-}
-
-# =============================================================================
-# DNS Records — Transit redirect (decommissioned)
-# =============================================================================
-
-resource "cloudflare_dns_record" "transit" {
-  zone_id = cloudflare_zone.pausatf.id
-  name    = "transit"
-  content = local.production_ip
+  content = "64.227.85.73"
   type    = "A"
   ttl     = 1
   proxied = true
-  comment = "Transit site (decommissioned — redirects to www.pausatf.org)"
+  comment = "Legacy staging endpoint (live DNS points to 64.227.85.73)"
 }
 
 resource "cloudflare_ruleset" "transit_redirect" {
@@ -215,6 +192,46 @@ resource "cloudflare_dns_record" "prod" {
   comment = "Production alias"
 }
 
+resource "cloudflare_dns_record" "ssh" {
+  zone_id = cloudflare_zone.pausatf.id
+  name    = "ssh"
+  content = "942e32fe-29b5-4ca2-b876-b3e3b3f0b9c6.cfargotunnel.com"
+  type    = "CNAME"
+  ttl     = 1
+  proxied = true
+  comment = "SSH Cloudflare Tunnel"
+}
+
+resource "cloudflare_dns_record" "ssh_stage_v2" {
+  zone_id = cloudflare_zone.pausatf.id
+  name    = "ssh-stage-v2"
+  content = "cbbd07dc-3e97-4923-b582-1fafab43c01b.cfargotunnel.com"
+  type    = "CNAME"
+  ttl     = 1
+  proxied = true
+  comment = "Staging SSH Cloudflare Tunnel"
+}
+
+resource "cloudflare_dns_record" "ssh_v2" {
+  zone_id = cloudflare_zone.pausatf.id
+  name    = "ssh-v2"
+  content = "3e83d690-bff7-4a26-aead-ca84cf0a2270.cfargotunnel.com"
+  type    = "CNAME"
+  ttl     = 1
+  proxied = true
+  comment = "Production SSH Cloudflare Tunnel v2"
+}
+
+resource "cloudflare_dns_record" "v2canary" {
+  zone_id = cloudflare_zone.pausatf.id
+  name    = "v2canary"
+  content = "3e83d690-bff7-4a26-aead-ca84cf0a2270.cfargotunnel.com"
+  type    = "CNAME"
+  ttl     = 1
+  proxied = true
+  comment = "Production canary Cloudflare Tunnel"
+}
+
 # =============================================================================
 # DNS Records — SendGrid
 # =============================================================================
@@ -229,14 +246,19 @@ resource "cloudflare_dns_record" "sendgrid_51871933" {
   comment = "SendGrid email tracking"
 }
 
-resource "cloudflare_dns_record" "sendgrid_REDACTED_SENDGRID" {
+resource "cloudflare_dns_record" "sendgrid_delivery" {
   zone_id = cloudflare_zone.pausatf.id
-  name    = "REDACTED_SENDGRID"
+  name    = "em5172"
   content = "u51871933.wl184.sendgrid.net"
   type    = "CNAME"
   ttl     = 1
   proxied = false
   comment = "SendGrid email delivery"
+}
+
+moved {
+  from = cloudflare_dns_record.sendgrid_REDACTED_SENDGRID
+  to   = cloudflare_dns_record.sendgrid_delivery
 }
 
 resource "cloudflare_dns_record" "sendgrid_url7068" {
@@ -371,10 +393,30 @@ resource "cloudflare_dns_record" "dmarc" {
 resource "cloudflare_dns_record" "dkim_cloudflare" {
   zone_id = cloudflare_zone.pausatf.id
   name    = "cf2024-1._domainkey"
-  content = "v=DKIM1; h=sha256; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiweykoi+o48IOGuP7GR3X0MOExCUDY/BCRHoWBnh3rChl7WhdyCxW3jgq1daEjPPqoi7sJvdg5hEQVsgVRQP4DcnQDVjGMbASQtrY4WmB1VebF+RPJB2ECPsEDTpeiI5ZyUAwJaVX7r6bznU67g7LvFq35yIo4sdlmtZGV+i0H4cpYH9+3JJ78km4KXwaf9xUJCWF6nxeD+qG6Fyruw1Qlbds2r85U9dkNDVAS3gioCvELryh1TxKGiVTkg4wqHTyHfWsp7KD3WQHYJn0RyfJJu6YEmL77zonn7p2SRMvTMP3ZEXibnC9gz3nnhR6wcYL8Q7zXypKTMD58bTixDSJwIDAQAB"
+  # Public DKIM key published by Cloudflare; this is not a private credential.
+  # pragma: allowlist secret
+  content = "v=DKIM1; h=sha256; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiweykoi+o48IOGuP7GR3X0MOExCUDY/BCRHoWBnh3rChl7WhdyCxW3jgq1daEjPPqoi7sJvdg5hEQVsgVRQP4DcnQDVjGMbASQtrY4WmB1VebF+RPJB2ECPsEDTpeiI5ZyUAwJaVX7r6bznU67g7LvFq35yIo4sdlmtZGV+i0H4cpYH9+3JJ78km4KXwaf9xUJCWF6nxeD+qG6Fyruw1Qlbds2r85U9dkNDVAS3gioCvELryh1TxKGiVTkg4wqHTyHfWsp7KD3WQHYJn0RyfJJu6YEmL77zonn7p2SRMvTMP3ZEXibnC9gz3nnhR6wcYL8Q7zXypKTMD58bTixDSJwIDAQAB" # pragma: allowlist secret
   type    = "TXT"
   ttl     = 1
   comment = "Cloudflare DKIM signature"
+}
+
+resource "cloudflare_dns_record" "dkim_mail" {
+  zone_id = cloudflare_zone.pausatf.id
+  name    = "mail._domainkey"
+  content = "v=DKIM1; h=sha256; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtI1RFbT2Q/l8jxNfidHBMpDaw6UxnO3NwbJo58DLyKJX0WfICTpvUxPopz+xOl6Lcu27hFSZwWKgSEnDjhTdE1ytMuNNgUJ7O+n82VQQdJ5USiYGEHoIGFmuqcm6Ctwl3xQKHLeDsY56E16ry0U20necZuBOMjaRL8IAkaSUNlNpR1okwG0UC/SI/8t/KN+3b63OI/m9SFZeWajhMER+f9P3yWxo6EnMirC6tkooWlCP1DpAvJCz1CMtTewbtPUahUqhURKLVJIVYyT9mxGY0+qxMOWGMl0GoZjKZ39C0vMlWTTXNkbakav4HVUK2F6a3n1pG1xg0IRkRTXdhbNTywIDAQAB" # pragma: allowlist secret
+  type    = "TXT"
+  ttl     = 1
+  comment = "Mail DKIM signature"
+}
+
+resource "cloudflare_dns_record" "acme_challenge_www" {
+  zone_id = cloudflare_zone.pausatf.id
+  name    = "_acme-challenge.www"
+  content = "JmQAJz96_x3ZwO5VqAfTMWAu5GMU7HXgGcaCpoRB2Cg" # pragma: allowlist secret
+  type    = "TXT"
+  ttl     = 120
+  comment = "Observed ACME validation record; verify ownership before refreshing"
 }
 
 # =============================================================================
@@ -451,6 +493,34 @@ resource "cloudflare_dns_record" "caa_iodef" {
   }
 }
 
+resource "cloudflare_dns_record" "caa_google_issue" {
+  zone_id = cloudflare_zone.pausatf.id
+  name    = "@"
+  type    = "CAA"
+  ttl     = 1
+  comment = "Allow Google Trust Services to issue certificates"
+
+  data = {
+    flags = 0
+    tag   = "issue"
+    value = "pki.goog"
+  }
+}
+
+resource "cloudflare_dns_record" "caa_google_issuewild" {
+  zone_id = cloudflare_zone.pausatf.id
+  name    = "@"
+  type    = "CAA"
+  ttl     = 1
+  comment = "Allow Google Trust Services to issue wildcard certificates"
+
+  data = {
+    flags = 0
+    tag   = "issuewild"
+    value = "pki.goog"
+  }
+}
+
 # =============================================================================
 # Cache Rules — static asset caching + WP admin/auth bypass
 # =============================================================================
@@ -514,7 +584,7 @@ resource "cloudflare_ruleset" "cache_rules" {
 }
 
 # =============================================================================
-# WAF — Block xmlrpc.php
+# WAF — Restrict xmlrpc.php to Jetpack/Automattic
 # =============================================================================
 
 resource "cloudflare_ruleset" "waf_custom" {
@@ -526,9 +596,9 @@ resource "cloudflare_ruleset" "waf_custom" {
   rules = [
     {
       action      = "block"
-      description = "Block xmlrpc.php access"
+      description = "Block non-Jetpack xmlrpc.php access"
       enabled     = true
-      expression  = "(http.request.uri.path eq \"/xmlrpc.php\")"
+      expression  = "(http.request.uri.path eq \"/xmlrpc.php\" and not (ip.src in {192.0.64.0/18 192.0.80.0/20 192.0.96.0/20 192.0.112.0/20 195.234.108.0/22 122.248.245.244 54.217.201.243 54.232.116.4}))"
     },
   ]
 }

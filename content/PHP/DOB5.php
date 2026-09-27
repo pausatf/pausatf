@@ -1,4 +1,10 @@
 <?php
+/**
+ * Legacy PAUSATF website source: DOB5.php.
+ *
+ * @package PAUSATF_Legacy
+ */
+
 // ----------------------------------------------------------------------------*
 // DOB5.php                                                                    *
 // Created January 2006                                                        *
@@ -263,6 +269,7 @@ if (isset($_POST['submit'])) {  //has the screen even been displayed for entry y
 }  // if not 2nd or 3rd pass, it is 1st pass; just drop through to display form (as all passes do):
                                                              // **** 1st pass just displays screen (below) ****
 // end of PHP script.  HTML form follows. Displays blank form if not already entered, sticky form for values if already entered.
+
 ?> 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
           "http://www.w3.org/TR/2000/REC-xhtml1-20000126/DTD/xhtml1-transitional.dtd">

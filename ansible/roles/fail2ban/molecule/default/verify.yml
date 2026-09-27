@@ -3,12 +3,30 @@
   hosts: all
   become: true
   tasks:
-    - name: Gather service facts
-      ansible.builtin.service_facts:
+    - name: Validate Fail2ban configuration
+      ansible.builtin.command: fail2ban-client -t
+      changed_when: false
 
-    - name: Assert fail2ban is running
-      ansible.builtin.assert:
-        that:
-          - "'fail2ban.service' in ansible_facts.services"
-          - "ansible_facts.services['fail2ban.service'].state == 'running'"
-        fail_msg: "fail2ban is not running"
+    - name: Verify rsyslog preserves individual authentication messages
+      ansible.builtin.command:
+        argv:
+          - grep
+          - -Fx
+          - '$RepeatedMsgReduction off'
+          - /etc/rsyslog.conf
+      changed_when: false
+
+    - name: Verify WordPress jails monitor the authentication log
+      ansible.builtin.command:
+        argv:
+          - awk
+          - |
+            /^\[wordpress-auth\]$/ { jail = "auth"; next }
+            /^\[wordpress-enum\]$/ { jail = "enum"; next }
+            /^\[wordpress-hard\]$/ { jail = "hard"; next }
+            /^\[wordpress-soft\]$/ { jail = "soft"; next }
+            /^\[/ { jail = "" }
+            /^logpath = \/var\/log\/auth\.log$/ && jail != "" { found[jail] = 1 }
+            END { exit !(found["auth"] && found["enum"] && found["hard"] && found["soft"]) }
+          - /etc/fail2ban/jail.local
+      changed_when: false

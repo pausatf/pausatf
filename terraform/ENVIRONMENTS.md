@@ -30,8 +30,8 @@ Manages the live PAUSATF website infrastructure.
 **State key**: `production/terraform.tfstate`
 
 **Providers**:
-- `digitalocean/digitalocean` ~> 2.47
-- `cloudflare/cloudflare` ~> 5.15
+- `digitalocean/digitalocean` ~> 2.76
+- `cloudflare/cloudflare` ~> 5.17
 
 **Terraform**: >= 1.10.0
 
@@ -75,10 +75,10 @@ Mirrors production topology at reduced cost for pre-release testing.
 **State key**: `staging/terraform.tfstate`
 
 **Providers**:
-- `digitalocean/digitalocean` ~> 2.0
-- `cloudflare/cloudflare` ~> 5.15
+- `digitalocean/digitalocean` ~> 2.76
+- `cloudflare/cloudflare` ~> 5.17
 
-**Terraform**: >= 1.6.0
+**Terraform**: >= 1.10.0
 
 **Resources managed**:
 
@@ -88,7 +88,7 @@ Mirrors production topology at reduced cost for pre-release testing.
 | `digitalocean_database_cluster` | pausatf-stage-db | MySQL 8, single node, maintenance Saturday 02:00 |
 | `digitalocean_database_firewall` | staging | Restricts DB access to staging droplet only |
 | `digitalocean_firewall` | pausatf-staging-firewall | Allows 80, 443, 22, 7080 (OLS WebAdmin) |
-| `module.cloudflare_dns_staging` | — | Creates `stage.pausatf.org` A record (proxied) |
+| `module.cloudflare_dns_staging` | — | Sole owner of `stage.pausatf.org`, a proxied CNAME to the staging Cloudflare Tunnel |
 
 **Key difference from production**: Uses OpenLiteSpeed instead of Apache.
 Database is a managed DO cluster rather than local MySQL.
@@ -102,10 +102,10 @@ Lightweight environment for development work. Mirrors staging structure.
 **State key**: `dev/terraform.tfstate`
 
 **Providers**:
-- `digitalocean/digitalocean` ~> 2.0
-- `cloudflare/cloudflare` ~> 5.15
+- `digitalocean/digitalocean` ~> 2.76
+- `cloudflare/cloudflare` ~> 5.17
 
-**Terraform**: >= 1.6.0
+**Terraform**: >= 1.10.0
 
 **Resources managed**:
 
@@ -116,35 +116,41 @@ Lightweight environment for development work. Mirrors staging structure.
 | `digitalocean_database_firewall` | dev | Restricts DB to dev droplet |
 | `digitalocean_vpc` | pausatf-dev-vpc | Dedicated VPC |
 | `digitalocean_firewall` | pausatf-dev-firewall | Allows 80, 443, 22 |
-| `module.cloudflare_dns_dev` | — | Creates `dev.pausatf.org` A record (proxied) |
+| `module.cloudflare_dns_dev` | — | Sole owner of `dev.pausatf.org` A record (proxied) |
 
 ---
 
 ### `environments/cloudflare/`
 
-Manages the entire `pausatf.org` Cloudflare zone — all DNS records, zone
-settings, and email configuration.
+Manages the `pausatf.org` zone, its central DNS records, zone settings, and
+rulesets. The `dev` and `stage` DNS records remain owned by their respective
+environment states and are excluded here to avoid duplicate Terraform owners.
 
 **State key**: `cloudflare/terraform.tfstate`
 
 **Providers**:
-- `cloudflare/cloudflare` ~> 5.0
+- `cloudflare/cloudflare` ~> 5.17
 
-**Terraform**: >= 1.6.0
+**Terraform**: >= 1.10.0
 
 **Resources managed**:
 
 | Type | Records | Notes |
 |------|---------|-------|
-| A (proxied) | `@`, `www` | Production site behind Cloudflare proxy |
-| A (unproxied) | `ftp`, `mail`, `monitor`, `stage`, `staging` | Direct server access |
-| CNAME | `prod`, SendGrid delivery/tracking (`REDACTED_SENDGRID`, `url7068`, `url7741`, `51871933`) | |
+| A | `direct-ssh`, `ftp`, `mail`, `monitor`, `runners`, `staging` | Observed direct endpoints; `staging` is proxied |
+| CNAME | `@`, `www` | Production Cloudflare Tunnel |
+| CNAME | `prod`, `ssh`, `ssh-stage-v2`, `ssh-v2`, `v2canary` | Production/staging tunnel aliases |
+| CNAME | `51871933`, `em5172`, `url7068`, `url7741` | SendGrid tracking and delivery |
 | CNAME | `s1._domainkey`, `s2._domainkey` | SendGrid DKIM |
 | MX (5) | `@` | Google Workspace, priorities 1/5/5/10/10 |
-| TXT | SPF | `include:_spf.google.com include:sendgrid.net ~all` |
-| TXT | DMARC | `_dmarc`, policy `p=none` (monitoring mode) |
-| TXT | Google verification, Cloudflare DKIM | |
-| CAA (5) | `@` | Let's Encrypt and DigiCert; iodef to `admin@pausatf.org` |
+| TXT (6) | `@`, `_dmarc`, `cf2024-1._domainkey`, `mail._domainkey`, `_acme-challenge.www` | SPF, Google verification, DMARC quarantine, DKIM, temporary ACME challenge |
+| CAA (7) | `@` | Google Trust Services, DigiCert, Let's Encrypt, and iodef |
+
+The live zone has 39 DNS records. This state declares 37; `dev` is owned by
+`environments/dev/` and `stage` by `environments/staging/`. The Cloudflare
+state is currently empty, so import existing records and review a no-change
+plan before any apply. Zone settings and rulesets still need verification with
+a Cloudflare token that has read access.
 
 **Variables** (set in `terraform.tfvars`):
 
@@ -152,11 +158,11 @@ settings, and email configuration.
 |----------|-------------|
 | `cloudflare_api_token` | Cloudflare API token |
 | `cloudflare_account_id` | Cloudflare account ID |
-| `production_ip` | Production droplet IP (`REDACTED_PROD_NEW_IP`) |
-| `staging_ip` | Staging droplet IP |
 
-**DNS change process**: Always edit `main.tf` and run `terraform apply` — do
-not make manual changes in the Cloudflare dashboard or state will drift.
+**DNS change process**: Edit the Terraform resource in the environment that
+owns the record, run a plan, and review it before applying. Do not apply while
+the Cloudflare or staging state is empty or until the issue #137 reconciliation
+is complete. Avoid declaring the same record in more than one state.
 
 ---
 

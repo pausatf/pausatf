@@ -1,11 +1,11 @@
 # MPM event configuration
-# Tuned for 4-vCPU / 8GB DigitalOcean droplet
+# Tuned for production droplet with PHP-FPM (3 ServerLimits x 25 threads)
 <IfModule mpm_event_module>
-    StartServers             3
-    MinSpareThreads         75
-    MaxSpareThreads        250
-    ThreadLimit             64
-    ThreadsPerChild         25
-    MaxRequestWorkers      400
-    MaxConnectionsPerChild   0
+    StartServers               {{ apache_mpm_event.start_servers | default(2) }}
+    MinSpareThreads            {{ apache_mpm_event.min_spare_threads | default(25) }}
+    MaxSpareThreads            {{ apache_mpm_event.max_spare_threads | default(50) }}
+    ThreadsPerChild            {{ apache_mpm_event.threads_per_child | default(25) }}
+    MaxRequestWorkers          {{ apache_mpm_event.max_request_workers | default(75) }}
+    ServerLimit                {{ apache_mpm_event.server_limit | default(3) }}
+    MaxConnectionsPerChild     {{ apache_mpm_event.max_connections_per_child | default(10000) }}
 </IfModule>
