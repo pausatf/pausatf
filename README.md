@@ -96,6 +96,7 @@ All servers: Ubuntu 20.04 LTS, DigitalOcean `sfo2`, MySQL 5.7 (prod local) / MyS
 | `deploy-staging.yml` | Push to `staging` branch | Runs `site.yml` against staging; healthchecks `https://stage.pausatf.org` |
 | `deploy-dev.yml` | Push to `dev` branch, manual dispatch | Runs `site.yml` against dev |
 | `do-nightly-snapshot.yml` | Daily 02:00 Pacific, manual dispatch | Creates timestamped DigitalOcean snapshot of prod droplet |
+| `do-weekly-stage-snapshot.yml` | Weekly Sunday 11:00 UTC, manual dispatch | Creates a completed DigitalOcean staging snapshot and retains the two newest |
 | systemd `pausatf-db-backup.timer` | Daily on production | Age-encrypted database and legacy-data artifacts uploaded to private DigitalOcean Spaces under `backups/prod/` |
 | `wordpress-update-check.yml` | Daily 09:17 UTC, manual dispatch | Read-only production check for WordPress core and plugin updates; opens or closes a tracking issue without applying updates |
 | `wp-plugin-audit.yml` | Manual dispatch | Production plugin/auth/WordPress diagnostics and explicitly requested remediation probes |
@@ -113,8 +114,9 @@ All servers: Ubuntu 20.04 LTS, DigitalOcean `sfo2`, MySQL 5.7 (prod local) / MyS
 | `PROD_SSH_PRIVATE_KEY` | deploy-prod, capture-prod-inventory, do-nightly-snapshot, wordpress-update-check | ED25519 private key authorized on `ftp.pausatf.org` as `github-deploy` |
 | `DEV_SSH_PRIVATE_KEY` | deploy-dev | Private key for dev host |
 | `ANSIBLE_VAULT_PASSWORD` | deploy-prod, deploy-staging, deploy-dev, capture-prod-inventory | Ansible vault decryption password |
-| `DO_TOKEN` | infra-staging, do-nightly-snapshot | DigitalOcean API token |
-| `DO_PROD_DROPLET_ID` | do-nightly-snapshot (optional) | Numeric production droplet ID; when unset or inaccessible, the workflow resolves `pausatf-prod` by name |
+| `DO_TOKEN` | infra-staging, do-nightly-snapshot, do-weekly-stage-snapshot | DigitalOcean API token with permission to create and prune droplet snapshots |
+| `DO_PROD_DROPLET_ID` | do-nightly-snapshot (optional) | Numeric production droplet ID; when unset or inaccessible, the workflow resolves `pausatf-prod-v2` by name |
+| `DO_STAGE_DROPLET_ID` | do-weekly-stage-snapshot (optional) | Numeric staging droplet ID; when unset or inaccessible, the workflow resolves `pausatf-stage-v2` by name |
 | `SPACES_ACCESS_KEY_ID` | infra-staging | DO Spaces key for Terraform state backend |
 | `SPACES_SECRET_ACCESS_KEY` | infra-staging | DO Spaces secret for Terraform state backend |
 | `CLOUDFLARE_API_TOKEN` | infra-staging | Cloudflare API token for Terraform |
