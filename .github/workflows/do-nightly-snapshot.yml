@@ -8,14 +8,21 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: production-snapshot
+  cancel-in-progress: false
+
 jobs:
   snapshot:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
     # No environment gate — uses DO_TOKEN and DO_PROD_DROPLET_ID repo secrets.
     # If those secrets are missing, doctl will fail with "token required".
     permissions:
       contents: read
     steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v4
+
       - name: Check required secrets
         id: check
         env:
@@ -35,27 +42,29 @@ jobs:
           token: ${{ secrets.DO_TOKEN }}
 
       - name: Snapshot prod droplet
+        id: snapshot
         if: steps.check.outputs.skip != 'true'
         env:
           DROPLET_ID: ${{ secrets.DO_PROD_DROPLET_ID }}
         run: |
           set -euo pipefail
+          snapshot_name="prod-nightly-$(date -u +%Y%m%d-%H%M%S)"
           doctl compute droplet-action snapshot "$DROPLET_ID" \
-            --snapshot-name "prod-nightly-$(date -u +%Y%m%d-%H%M%S)"
+            --snapshot-name "$snapshot_name" --wait
+          echo "name=$snapshot_name" >> "$GITHUB_OUTPUT"
 
       - name: Prune old snapshots (keep last 7)
         if: steps.check.outputs.skip != 'true'
         env:
           DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DO_TOKEN }}
+          DROPLET_ID: ${{ secrets.DO_PROD_DROPLET_ID }}
+          SNAPSHOT_NAME: ${{ steps.snapshot.outputs.name }}
         run: |
-          # List all prod-nightly snapshots sorted by date, skip the 7 most recent
-          # head -n -7 is a GNU coreutils extension; safe on ubuntu-latest runners
-          doctl compute snapshot list --resource droplet --format ID,Name --no-header \
-            | grep "^[0-9].*prod-nightly-" \
-            | sort -t- -k3 -k4 \
-            | head -n -7 \
-            | awk '{print $1}' \
-            | while read -r snap_id; do
-                echo "Deleting snapshot $snap_id"
-                doctl compute snapshot delete "$snap_id" --force
-              done
+          set -euo pipefail
+          doctl compute snapshot list --resource droplet --output json > snapshots.json
+          python3 scripts/snapshot-retention.py --droplet-id "$DROPLET_ID" \
+            --completed-name "$SNAPSHOT_NAME" < snapshots.json > prune.txt
+          while IFS= read -r snap_id; do
+            [ -n "$snap_id" ] || continue
+            doctl compute snapshot delete "$snap_id" --force
+          done < prune.txt
