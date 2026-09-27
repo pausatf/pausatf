@@ -241,6 +241,11 @@ resource "cloudflare_dns_record" "sendgrid_delivery" {
   comment = "SendGrid email delivery"
 }
 
+moved {
+  from = cloudflare_dns_record.sendgrid_REDACTED_SENDGRID
+  to   = cloudflare_dns_record.sendgrid_delivery
+}
+
 resource "cloudflare_dns_record" "sendgrid_url7068" {
   zone_id = cloudflare_zone.pausatf.id
   name    = "url7068"
