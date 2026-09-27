@@ -120,7 +120,8 @@ cd environments/production && terraform apply
 - **SSH Key:** m3 laptop (46721354)
 - **Project:** PAUSATF
 
-**DNS:** pausatf.org, www, ftp, mail, monitor (all → REDACTED_PROD_NEW_IP)
+**DNS:** `pausatf.org` and `www` route through the production Cloudflare Tunnel.
+Direct service records are listed in the [Cloudflare environment inventory](environments/cloudflare/README.md).
 
 ### Staging (`environments/staging/`)
 
