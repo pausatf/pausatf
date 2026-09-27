@@ -3,6 +3,8 @@
  * Plugin Name: Cloudflare Auto-Purge on Save
  * Description: Purges Cloudflare + Boost page cache when content is updated.
  * Version: 1.1.0
+ *
+ * @package PAUSATF_WordPress
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

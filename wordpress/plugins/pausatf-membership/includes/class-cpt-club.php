@@ -4,6 +4,8 @@
  *
  * Replaces legacy clubs.php (Teeters, 2007).
  * Shortcode: [pausatf_clubs]
+ *
+ * @package PAUSATF_Membership
  */
 
 declare( strict_types=1 );

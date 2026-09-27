@@ -1,6 +1,14 @@
 <?php
 /**
+ * PAUSATF TheSource child theme widget source.
+ *
+ * @package PAUSATF_TheSource_Child
+ */
+
+/**
  * About Me Widget for TheSource Child Theme
+ *
+ * @package PAUSATF_TheSource_Child
  */
 
 class AboutMeWidget extends WP_Widget {

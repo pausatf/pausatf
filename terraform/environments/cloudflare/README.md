@@ -1,230 +1,72 @@
-# Cloudflare Environment - pausatf.org DNS Management
+# Cloudflare Environment — `pausatf.org`
 
-This Terraform environment manages the Cloudflare zone and all DNS records for `pausatf.org`.
+This environment describes the Cloudflare zone, DNS records, zone settings, and
+rulesets for `pausatf.org`.
 
-## Resources Managed
+## Reconciliation safety
 
-### Zone
-- **pausatf.org** (ID: 67b87131144a68ad5ed43ebfd4e6d811)
-- Plan: Free
-- Account: c540729070ba913814ac4557c8974099
+The Cloudflare Terraform backend currently has no state file. The live DNS
+inventory was read from the Cloudflare API on 2026-09-26 and the declarations
+here were updated to match those records. The Cloudflare API token used for the
+inventory could not read zone settings or rulesets, so those declarations have
+not been checked against the live account.
 
-### DNS Records (29 total)
+Do not run `terraform apply` yet. First import the existing zone and DNS records
+into the correct remote state, verify zone settings and rulesets with an
+appropriately scoped Cloudflare API token, and require a plan that proposes no
+unreviewed DNS, setting, or ruleset changes. The legacy
+`import-dns-records.sh` script is obsolete and must not be run: it targets the
+old provider resource type and an incomplete, stale record map.
 
-#### A Records (7)
-- `pausatf.org` → REDACTED_PROD_NEW_IP (proxied)
-- `www.pausatf.org` → REDACTED_PROD_NEW_IP (proxied)
-- `ftp.pausatf.org` → REDACTED_PROD_NEW_IP (direct)
-- `mail.pausatf.org` → REDACTED_PROD_NEW_IP (direct)
-- `monitor.pausatf.org` → REDACTED_PROD_NEW_IP (direct)
-- `stage.pausatf.org` → REDACTED_STAGE_IP (direct)
-- `staging.pausatf.org` → REDACTED_STAGE_IP (direct)
+The live inventory contains 39 DNS records: 7 A, 14 CNAME, 5 MX, 6 TXT, and 7
+CAA. This Cloudflare environment owns 37 records; `dev` is owned by the dev
+environment and `stage` by the staging environment. Keep those ownership
+boundaries intact so different remote states cannot overwrite the same DNS
+record. The staging state was empty when checked on 2026-09-27, so import its
+existing `stage` record before considering an apply.
 
-#### CNAME Records (8)
-- `prod.pausatf.org` → ftp.pausatf.org
-- SendGrid email delivery (4 records)
-- SendGrid DKIM signatures (2 records)
+The `_acme-challenge.www` TXT value is time-sensitive; confirm it is still
+needed before importing or refreshing that record.
 
-#### MX Records (5)
-- Google Workspace mail servers (priority 1, 5, 5, 10, 10)
+## Live DNS inventory
 
-#### TXT Records (4)
-- SPF record (Google Workspace + SendGrid)
-- Google Search Console verification
-- DMARC policy
-- Cloudflare DKIM signature
-- ACME challenge (temporary)
+| Type | Names |
+| --- | --- |
+| A | `dev`, `direct-ssh`, `ftp`, `mail`, `monitor`, `runners`, `staging` |
+| CNAME | `@`, `www`, `stage`, `prod`, `ssh`, `ssh-stage-v2`, `ssh-v2`, `v2canary`, `51871933`, `em5172`, `url7068`, `url7741`, `s1._domainkey`, `s2._domainkey` |
+| MX | `@` (five Google Workspace records) |
+| TXT | `@` (SPF and Google verification), `_dmarc`, `cf2024-1._domainkey`, `mail._domainkey`, `_acme-challenge.www` |
+| CAA | `@` (seven records for Google Trust Services, DigiCert, Let's Encrypt, and iodef) |
 
-#### CAA Records (5)
-- Let's Encrypt (issue + issuewild)
-- DigiCert (issue + issuewild)
-- iodef notification email
+The apex, `www`, `stage`, SSH tunnel aliases, and canary use Cloudflare Tunnel
+hostnames. `dev` and `stage` are configured in their dedicated environment
+states, not in this Cloudflare environment. `staging` and the direct A records
+retain their observed addresses; these values are an inventory snapshot, not a
+claim that those hosts are healthy or should remain pointed at those addresses.
 
-## Initial Setup
+## Backend and credentials
 
-### 1. Set Environment Variables
+Terraform state is stored in DigitalOcean Spaces. Provide credentials through
+the standard AWS-compatible environment variables and the Cloudflare API token
+through `TF_VAR_cloudflare_api_token`; do not commit credentials or state files.
 
-```bash
-export TF_VAR_cloudflare_api_token="your-cloudflare-api-token"
-export AWS_ACCESS_KEY_ID="your-do-spaces-key"
-export AWS_SECRET_ACCESS_KEY="your-do-spaces-secret"
-```
-
-### 2. Initialize Terraform
+Initialize and validate with the repository's pinned Terraform version:
 
 ```bash
 cd terraform/environments/cloudflare
-terraform init
-```
-
-### 3. Import Existing Zone
-
-The zone already exists and needs to be imported:
-
-```bash
-terraform import cloudflare_zone.pausatf 67b87131144a68ad5ed43ebfd4e6d811
-```
-
-### 4. Import Existing DNS Records
-
-All DNS records already exist and need to be imported. Use the import script:
-
-```bash
-bash import-dns-records.sh
-```
-
-Or manually import each record (see "Import Commands" section below).
-
-### 5. Verify Plan
-
-```bash
+terraform init -backend-config=../../backend.hcl
+terraform validate
 terraform plan
 ```
 
-This should show no changes if all resources are imported correctly.
+The plan is for review only until the state and live configuration have been
+reconciled. Do not apply a plan that proposes to create existing DNS records or
+replace live tunnel records.
 
-## Import Commands
+## Related infrastructure
 
-<details>
-<summary>Click to expand full import commands</summary>
-
-```bash
-# Import zone (if not already imported)
-terraform import cloudflare_zone.pausatf 67b87131144a68ad5ed43ebfd4e6d811
-
-# Import DNS records
-# Note: Use 'curl' to get record IDs first:
-# curl -s "https://api.cloudflare.com/client/v4/zones/67b87131144a68ad5ed43ebfd4e6d811/dns_records" \
-#   -H "Authorization: Bearer $TF_VAR_cloudflare_api_token" | jq -r '.result[] | "\(.type) \(.name) = \(.id)"'
-
-# Example imports (replace RECORD_ID with actual IDs):
-terraform import cloudflare_record.root RECORD_ID
-terraform import cloudflare_record.www RECORD_ID
-terraform import cloudflare_record.ftp RECORD_ID
-# ... (repeat for all 29 records)
-```
-
-</details>
-
-## Making Changes
-
-### Update Production IP
-
-If the production droplet IP changes:
-
-```bash
-terraform apply -var="production_ip=NEW_IP_ADDRESS"
-```
-
-### Update Staging IP
-
-If the staging droplet IP changes:
-
-```bash
-terraform apply -var="staging_ip=NEW_IP_ADDRESS"
-```
-
-### Add New DNS Record
-
-1. Add the resource to `main.tf`
-2. Run `terraform plan` to preview
-3. Run `terraform apply` to create
-
-### Remove DNS Record
-
-1. Comment out or remove the resource from `main.tf`
-2. Run `terraform plan` to preview
-3. Run `terraform apply` to delete
-
-## Integration with Other Environments
-
-The production and staging environments reference these DNS records:
-
-**Production (`terraform/environments/production/`):**
-- Uses `ftp.pausatf.org` (REDACTED_PROD_NEW_IP)
-- Main site: `pausatf.org` and `www.pausatf.org` (proxied through Cloudflare)
-
-**Staging (`terraform/environments/staging/`):**
-- Uses `stage.pausatf.org` (REDACTED_STAGE_IP)
-- Also available as `staging.pausatf.org`
-
-## Security Notes
-
-- **Proxied records:** Root and www are proxied through Cloudflare for DDoS protection and caching
-- **Direct records:** All other records bypass Cloudflare proxy for direct access
-- **CAA records:** Restrict SSL certificate issuance to Let's Encrypt and DigiCert only
-- **SPF/DMARC:** Email authentication configured for Google Workspace and SendGrid
-
-## Email Configuration
-
-### Google Workspace
-- MX records point to Google's mail servers
-- SPF includes `_spf.google.com`
-- Primary MX: aspmx.l.google.com (priority 1)
-
-### SendGrid
-- DKIM signatures: s1 and s2
-- Link tracking: url7068, url7741
-- Email tracking: REDACTED_SENDGRID
-- SPF includes `sendgrid.net`
-
-## Troubleshooting
-
-### DNS Not Propagating
-
-```bash
-# Check Cloudflare DNS
-dig @curt.ns.cloudflare.com pausatf.org
-dig @eva.ns.cloudflare.com pausatf.org
-
-# Check public DNS
-dig pausatf.org
-nslookup pausatf.org
-```
-
-### Import Conflicts
-
-If Terraform detects drift after import:
-
-```bash
-# Show differences
-terraform plan
-
-# Pull current state
-terraform refresh
-
-# Force overwrite (use with caution)
-terraform apply -replace=cloudflare_record.RESOURCE_NAME
-```
-
-### Verify All Records
-
-```bash
-# List all managed records
-terraform state list | grep cloudflare_record
-
-# Show specific record
-terraform state show cloudflare_record.root
-```
-
-## Maintenance
-
-### Regular Tasks
-
-1. **Review DNS records quarterly** - Remove unused records
-2. **Update IP addresses** - When droplets are recreated
-3. **Rotate DKIM keys annually** - For email security
-4. **Monitor CAA records** - Ensure only authorized CAs can issue certificates
-
-### Backup
-
-DNS records are backed up via:
-- Terraform state in DigitalOcean Spaces
-- Cloudflare's built-in versioning
-- Git repository (this code)
-
-## Related Documentation
-
-- [Cloudflare API Documentation](https://developers.cloudflare.com/api/)
-- [Terraform Cloudflare Provider](https://registry.terraform.io/providers/cloudflare/cloudflare/latest/docs)
-- [Main Infrastructure Inventory](../../INFRASTRUCTURE_INVENTORY.md)
+- Production, staging, and development droplet definitions are in their
+  respective Terraform environments.
+- Mail is hosted through Google Workspace and SendGrid records.
+- `import-dns-records.sh` remains in the repository as historical code only; it
+  does not safely import the current provider configuration.
