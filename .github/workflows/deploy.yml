@@ -93,8 +93,7 @@ jobs:
             exit 1
           fi
 
-          printf -v "$TARGET_HOST_ENV_NAME" '%s' "$TARGET_SERVER_IP"
-          export "$TARGET_HOST_ENV_NAME"
+          export "$TARGET_HOST_ENV_NAME=$TARGET_SERVER_IP"
 
           RUNNER_IP=$(curl -fsS https://api.ipify.org)
           if [ -z "$RUNNER_IP" ]; then
