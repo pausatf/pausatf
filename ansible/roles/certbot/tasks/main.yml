@@ -73,4 +73,3 @@
     owner: root
     group: root
     mode: "0755"
-  when: certbot_enabled | default(true)
