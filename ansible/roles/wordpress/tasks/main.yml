@@ -120,9 +120,9 @@
   register: _plugin_install
   changed_when: "'Installing' in _plugin_install.stdout or 'Updating' in _plugin_install.stdout"
   failed_when: _plugin_install.rc != 0 and 'already installed' not in _plugin_install.stderr
-  loop: "{{ wp_main_plugins | default([]) | selectattr('slug', 'defined') | list }}"
+  loop: "{{ wp_managed_plugins | default(wp_main_plugins | default([])) | selectattr('slug', 'defined') | list }}"
   when:
-    - wp_main_plugins is defined
+    - wp_managed_plugins is defined or wp_main_plugins is defined
     - item.status | default('active') != 'inactive'
   tags: wp_plugins
 
@@ -135,9 +135,9 @@
   register: _plugin_activate
   changed_when: "'Plugin' in _plugin_activate.stdout and 'activated' in _plugin_activate.stdout"
   failed_when: false
-  loop: "{{ wp_main_plugins | default([]) | selectattr('slug', 'defined') | list }}"
+  loop: "{{ wp_managed_plugins | default(wp_main_plugins | default([])) | selectattr('slug', 'defined') | list }}"
   when:
-    - wp_main_plugins is defined
+    - wp_managed_plugins is defined or wp_main_plugins is defined
     - item.status | default('active') == 'active'
   tags: wp_plugins
 
@@ -150,9 +150,9 @@
   register: _plugin_deactivate
   changed_when: "'deactivated' in _plugin_deactivate.stdout"
   failed_when: false
-  loop: "{{ wp_main_plugins | default([]) | selectattr('slug', 'defined') | list }}"
+  loop: "{{ wp_managed_plugins | default(wp_main_plugins | default([])) | selectattr('slug', 'defined') | list }}"
   when:
-    - wp_main_plugins is defined
+    - wp_managed_plugins is defined or wp_main_plugins is defined
     - item.status | default('active') == 'inactive'
   tags: wp_plugins
 

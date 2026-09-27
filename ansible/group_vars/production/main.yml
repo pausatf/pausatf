@@ -145,7 +145,7 @@ additional_vhosts:
 # =============================================================================
 # WORDPRESS THEMES (production site)
 # =============================================================================
-wp_main_themes:
+wp_managed_themes:
   - name: "TheSource-child"
     status: "active"
     version: "0.2"
@@ -180,7 +180,7 @@ wp_main_themes:
 # =============================================================================
 # WORDPRESS PLUGINS (production site)
 # =============================================================================
-wp_main_plugins:
+wp_managed_plugins:
   # Active plugins
   - name: "accordions"
     slug: "accordions"
