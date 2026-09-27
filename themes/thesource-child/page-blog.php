@@ -1,10 +1,16 @@
 <?php
+/**
+ * PAUSATF TheSource child theme source: page-blog.php.
+ *
+ * @package PAUSATF_TheSource_Child
+ */
 
 /*
 
 Template Name: Blog Page
 
 */
+
 
 ?>
 

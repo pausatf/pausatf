@@ -1,4 +1,10 @@
 <?php
+/**
+ * PAUSATF WordPress extension source: pausatf-core.php.
+ *
+ * @package PAUSATF_WordPress
+ */
+
 /*
  * Plugin Name: PAUSATF Core
  * Description: Widget visibility override for pausatf.org

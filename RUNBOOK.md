@@ -469,23 +469,37 @@ terraform apply
    DigitalOcean firewall or enable Cloudflare "Under Attack" mode.
 2. **Assess** — Determine scope: unauthorized WP admin accounts, modified
    files, DB exfiltration, server-level compromise.
-3. **Rotate credentials** — Run the security remediation playbook:
+3. **Audit WordPress security state** — Run the playbook's read-only checks:
 
 ```bash
 cd ansible
 ansible-playbook -i inventory/hosts.yml playbooks/security-remediation.yml \
-  --vault-password-file ../vault.pass
+  --vault-password-file ../vault.pass --tags audit
 ```
 
-   The playbook removes accounts listed in `wp_users_remove`, rotates auth
-   keys/salts, audits remaining admin accounts, and enables Jetpack login
-   notifications.
+   Review the administrator, uploads, checksum, SSH key, and cron findings
+   before making changes. The playbook's default invocation does not run any
+   remediation tasks.
 
-4. **Rotate remaining secrets** — Update `vault_wp_main_db_password`,
+4. **Run approved WordPress remediation explicitly** — After reviewing the
+   audit and confirming the intended changes, run:
+
+```bash
+ansible-playbook -i inventory/hosts.yml playbooks/security-remediation.yml \
+  --vault-password-file ../vault.pass --tags remediate
+```
+
+   This explicitly runs the tasks that remove accounts listed in
+   `wp_users_remove`, rotate WordPress auth keys/salts, remove
+   `wp-file-manager-pro`, and enable Jetpack login notifications. These tasks
+   carry Ansible's `never` tag and will not run during default or audit-only
+   playbook execution.
+
+5. **Rotate remaining secrets** — Update `vault_wp_main_db_password`,
    `vault_digitalocean_api_token`, `vault_cloudflare_api_token`,
    `vault_newrelic_license_key` in the Ansible vault and re-deploy.
 
-5. **Patch** — Apply OS and WordPress updates:
+6. **Patch** — Apply OS and WordPress updates:
 
 ```bash
 # OS patches
@@ -498,7 +512,7 @@ ssh github-deploy@ftp.pausatf.org \
    sudo -u www-data wp plugin update --all --path=/var/www/html"
 ```
 
-6. **Verify** — Re-run the capture playbook to snapshot the current state:
+7. **Verify** — Re-run the capture playbook to snapshot the current state:
 
 ```bash
 ansible-playbook -i inventory/hosts.yml playbooks/capture-wp-inventory.yml \

@@ -406,8 +406,8 @@ Domain: pausatf.org
 ## REFERENCES
 
 **Google Workspace Documentation:**
-- DKIM Setup: https://support.google.com/a/answer/180504
-- SPF Setup: https://support.google.com/a/answer/33786
+- DKIM Setup: https://knowledge.workspace.google.com/admin/security/set-up-dkim
+- SPF Setup: https://knowledge.workspace.google.com/admin/security/set-up-spf
 - DMARC Setup: https://support.google.com/a/answer/2466580
 - Email Authentication Best Practices: https://support.google.com/a/answer/10583557
 

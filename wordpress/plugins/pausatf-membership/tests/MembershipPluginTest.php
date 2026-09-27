@@ -7,6 +7,8 @@
  * WordPress installation.  WordPress-API-dependent code paths (shortcode
  * rendering, WP-Cron scheduling) are excluded; those belong in integration
  * tests against a real WP install.
+ *
+ * @package PAUSATF_Membership
  */
 
 declare( strict_types=1 );

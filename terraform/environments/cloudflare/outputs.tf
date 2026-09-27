@@ -25,9 +25,9 @@ output "production_records" {
 }
 
 output "staging_records" {
-  description = "Staging DNS records"
+  description = "Staging DNS names; the stage Tunnel record is owned by the staging environment state"
   value = {
-    stage   = cloudflare_dns_record.stage.name
+    stage   = "stage.pausatf.org"
     staging = cloudflare_dns_record.staging.name
   }
 }

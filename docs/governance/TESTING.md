@@ -436,7 +436,7 @@ Track:
 
 - [Terraform-compliance Documentation](https://terraform-compliance.com/)
 - [Terratest Documentation](https://terratest.gruntwork.io/)
-- [Molecule Documentation](https://molecule.readthedocs.io/)
+- [Molecule Documentation](https://github.com/ansible/molecule/tree/main/docs)
 - [Pytest Documentation](https://docs.pytest.org/)
 - [Test README](tests/README.md) - Detailed test documentation
 

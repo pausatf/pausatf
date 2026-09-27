@@ -3,62 +3,89 @@ name: PHP Quality
 on:
   pull_request:
     paths:
-      - 'themes/**.php'
-      - 'themes/**/**.php'
+      - 'themes/thesource-child/**/*.php'
       - 'wp-content/plugins/**.php'
       - 'wp-content/plugins/**/**.php'
+      - 'wp-content/mu-plugins/**/*.php'
+      - 'wordpress/plugins/**/*.php'
+      - 'wordpress/mu-plugins/**/*.php'
+      - 'ansible/roles/wordpress/files/TheSource-child/**/*.php'
+      - 'ansible/roles/apache/files/**/*.php'
+      - 'content/**/*.php'
+      - 'teeters-php/**/*.php'
+      - 'pausatf-content-architecture.php'
       - 'phpcs.xml.dist'
+      - 'scripts/check_phpcs_changed_lines.py'
       - '.github/workflows/php-quality.yml'
   push:
     branches: [main]
     paths:
-      - 'themes/**.php'
-      - 'themes/**/**.php'
+      - 'themes/thesource-child/**/*.php'
       - 'wp-content/plugins/**.php'
       - 'wp-content/plugins/**/**.php'
+      - 'wp-content/mu-plugins/**/*.php'
+      - 'wordpress/plugins/**/*.php'
+      - 'wordpress/mu-plugins/**/*.php'
+      - 'ansible/roles/wordpress/files/TheSource-child/**/*.php'
+      - 'ansible/roles/apache/files/**/*.php'
+      - 'content/**/*.php'
+      - 'teeters-php/**/*.php'
+      - 'pausatf-content-architecture.php'
       - 'phpcs.xml.dist'
+      - 'scripts/check_phpcs_changed_lines.py'
 
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   php-lint:
     name: PHP Syntax Lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v4
-      - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
         with:
           php-version: '8.3'
           coverage: none
       - name: Lint PHP
         run: |
           shopt -s globstar nullglob
-          for f in themes/**/*.php wp-content/plugins/**/*.php; do
+          for f in themes/thesource-child/**/*.php wp-content/plugins/**/*.php wp-content/mu-plugins/**/*.php wordpress/plugins/**/*.php wordpress/mu-plugins/**/*.php ansible/roles/wordpress/files/TheSource-child/**/*.php ansible/roles/apache/files/**/*.php content/**/*.php teeters-php/**/*.php pausatf-content-architecture.php; do
+            # content/calendar is an upstream WebCalendar vendor tree, not maintained PAUSATF PHP.
+            [[ "$f" == content/calendar/* ]] && continue
             php -l "$f" || exit 1
           done
 
   phpcs:
     name: WordPress Coding Standards
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      PHPCS_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v4
-      - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
         with:
           php-version: '8.3'
           coverage: none
       - name: Install PHPCS + WPCS
         run: |
           composer global config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
-          composer global require "squizlabs/php_codesniffer:^3" "wp-coding-standards/wpcs:^3" "phpcompatibility/php-compatibility:^9"
-          ~/.composer/vendor/bin/phpcs --config-set installed_paths ~/.composer/vendor/wp-coding-standards/wpcs,~/.composer/vendor/phpcompatibility/php-compatibility
+          composer global require "dealerdirect/phpcodesniffer-composer-installer:^1" "squizlabs/php_codesniffer:^3" "wp-coding-standards/wpcs:^3" "phpcompatibility/php-compatibility:^9"
       - name: Run PHPCS
-        run: |
-          ~/.composer/vendor/bin/phpcs -q --standard=phpcs.xml.dist --report=full
+        run: python3 scripts/check_phpcs_changed_lines.py --base "$PHPCS_BASE_SHA" --phpcs ~/.composer/vendor/bin/phpcs
 
   actionlint:
     name: actionlint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: rhysd/actionlint@914e7df21a07ef503a81201c76d2b11c789d3fca # v1.7.12

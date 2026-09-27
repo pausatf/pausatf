@@ -1,7 +1,16 @@
-# Terraform Migration Complete ✅
+# Terraform Migration Notes (Historical)
 
 **Date:** 2025-12-27
 **Status:** All configuration captured in Terraform - imports pending
+
+> **Historical reference only.** The commands below document the 2025
+> migration and are not current operational instructions. Provider versions,
+> DNS records, resource ownership, and remote-state status have changed. In
+> particular, do not run the Cloudflare `cloudflare_record` imports or the
+> `production_ip` apply commands in this file. Follow
+> [ENVIRONMENTS.md](ENVIRONMENTS.md) and the current
+> [Cloudflare safety notes](environments/cloudflare/README.md); import only
+> after reconciling the live inventory and confirming the correct state owner.
 
 ## Summary
 
@@ -146,23 +155,10 @@ terraform import digitalocean_firewall.staging c12dfc7f-f43a-4b32-96c6-80ba34035
 
 #### Cloudflare Environment
 
-```bash
-cd terraform/environments/cloudflare
-terraform init
-
-# Import zone
-terraform import cloudflare_zone.pausatf 67b87131144a68ad5ed43ebfd4e6d811
-
-# Get all DNS record IDs
-curl -s "https://api.cloudflare.com/client/v4/zones/67b87131144a68ad5ed43ebfd4e6d811/dns_records" \
-  -H "Authorization: Bearer $TF_VAR_cloudflare_api_token" | \
-  jq -r '.result[] | "\(.type) \(.name) = terraform import cloudflare_record.RESOURCE_NAME \(.id)"'
-
-# Import each DNS record (29 total)
-# terraform import cloudflare_record.root RECORD_ID
-# terraform import cloudflare_record.www RECORD_ID
-# ... (see Cloudflare README for full list)
-```
+Cloudflare import commands from this migration are retired. They use the
+obsolete `cloudflare_record` resource type and predate the current DNS
+ownership split. The Cloudflare and staging states were empty when checked in
+September 2026; use the current environment documentation before importing.
 
 #### GitHub Environment
 
@@ -294,15 +290,11 @@ terraform show
 
 ### Updating Droplet IPs
 
-```bash
-# Production
-cd terraform/environments/production
-terraform apply -var="production_ip=NEW_IP"
-
-# Also update Cloudflare
-cd terraform/environments/cloudflare
-terraform apply -var="production_ip=NEW_IP"
-```
+The `production_ip` Terraform variable used by this historical example has
+been removed from the Cloudflare environment. Confirm the owning environment
+and current DNS record first; do not apply against an empty state. Production
+web traffic uses Cloudflare Tunnel CNAMEs, while dev and staging records are
+owned by their respective environment states.
 
 ## Next Steps (Optional Enhancements)
 
