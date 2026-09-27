@@ -254,6 +254,8 @@
   ansible.builtin.template:
     src: xmlrpc-protect.conf.j2
     dest: /etc/apache2/conf-available/block-xmlrpc.conf
+    owner: root
+    group: root
     mode: "0644"
   notify: Reload Apache
 

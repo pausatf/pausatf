@@ -27,7 +27,15 @@ runs:
       shell: bash
       run: |
         pip install "ansible-core==${{ inputs.ansible-core-version }}" ${{ inputs.extra-packages }}
-        ansible-galaxy collection install community.general community.mysql ansible.posix
+        for attempt in 1 2 3; do
+          if ansible-galaxy collection install -r ansible/requirements.yml; then
+            exit 0
+          fi
+          if [ "$attempt" -lt 3 ]; then
+            sleep "$((attempt * 15))"
+          fi
+        done
+        exit 1
 
     - name: Create dummy vault password for CI
       shell: bash
