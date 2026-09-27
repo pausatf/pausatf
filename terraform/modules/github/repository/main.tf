@@ -9,19 +9,20 @@ terraform {
   }
 }
 
-#tfsec:ignore:github-repositories-private: PAUSATF is an intentionally public track and field club repository.
+# Vulnerability alerts are managed through the current dedicated provider resource.
+#tfsec:ignore:AVD-GIT-0003
 resource "github_repository" "repo" {
   #checkov:skip=CKV_GIT_1:pausatf repo is intentionally public (track & field club)
   name        = var.name
   description = var.description
-  visibility  = var.visibility
+  #tfsec:ignore:AVD-GIT-0001:PAUSATF is intentionally public for its running club community.
+  visibility = var.visibility
 
   # Features
   has_issues      = var.has_issues
   has_wiki        = var.has_wiki
   has_projects    = var.has_projects
   has_discussions = var.has_discussions
-  has_downloads   = var.has_downloads
 
   # Settings
   allow_merge_commit     = var.allow_merge_commit
@@ -29,9 +30,7 @@ resource "github_repository" "repo" {
   allow_rebase_merge     = var.allow_rebase_merge
   allow_auto_merge       = var.allow_auto_merge
   delete_branch_on_merge = var.delete_branch_on_merge
-
-  # Security
-  vulnerability_alerts = var.vulnerability_alerts
+  topics                 = var.topics
 
   # Auto init
   auto_init          = var.auto_init
@@ -48,8 +47,14 @@ resource "github_repository" "repo" {
   }
 }
 
+resource "github_branch_default" "default" {
+  repository = github_repository.repo.name
+  branch     = var.default_branch
+}
+
 resource "github_branch_protection" "main" {
   #checkov:skip=CKV_GIT_5:small team; 1 reviewer sufficient
+  #checkov:skip=CKV_GIT_6:Signed commits are intentionally not required by the current repository policy; changing that policy needs separate contributor readiness work.
   count = var.enable_branch_protection ? 1 : 0
 
   repository_id = github_repository.repo.node_id
@@ -106,9 +111,7 @@ resource "github_repository_dependabot_security_updates" "repo" {
 }
 
 # Repository topics
-resource "github_repository_topics" "repo" {
-  count = length(var.topics) > 0 ? 1 : 0
-
+resource "github_repository_vulnerability_alerts" "repo" {
   repository = github_repository.repo.name
-  topics     = var.topics
+  enabled    = var.vulnerability_alerts
 }

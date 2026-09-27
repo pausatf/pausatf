@@ -12,8 +12,12 @@ terraform {
     }
   }
 
-  backend "s3" {
-    key = "staging/terraform.tfstate"
+  cloud {
+    organization = "pausatf"
+
+    workspaces {
+      name = "pausatf-staging"
+    }
   }
 }
 
@@ -36,33 +40,32 @@ module "wordpress" {
   database_size            = var.database_size
   ssh_key_fingerprints     = var.ssh_key_fingerprints
   enable_backups           = false
-  enable_monitoring        = true
+  enable_monitoring        = false
+  create_database          = false
   create_reserved_ip       = false
   create_vpc               = false # staging uses default networking; no VPC isolation
+  vpc_uuid_override        = "4ee39499-dc85-11e8-9f23-3cfdfea9fff1"
   enable_monitoring_alerts = false
+  droplet_name             = "pausatf-stage-v2"
+  firewall_name            = "pausatf-stage-v2-tunnel"
+  environment_tag          = "staging"
+  additional_tags          = ["migration-v2"]
+  icmp_source_addresses    = ["0.0.0.0/0", "::/0"]
 
-  # Staging uses Cloudflare-only (same as production)
+  # Staging serves traffic through its Cloudflare Tunnel, so direct web ingress is disabled.
+  enable_web_ingress         = false
   firewall_http_source_cidrs = null
   ssh_allowed_ips            = var.ssh_allowed_ips
 
-  # OLS WebAdmin port
-  extra_firewall_rules = [
-    {
-      protocol         = "tcp"
-      port_range       = "7080"
-      source_addresses = var.ssh_allowed_ips
-    }
-  ]
-
   cloud_init_content = templatefile("${path.module}/../../modules/droplet/cloud-init-openlitespeed.yml", {
     environment = "staging"
-    hostname    = "stage"
+    hostname    = "pausatf-stage-v2"
   })
 }
 
 # The staging environment is the sole Terraform owner of stage.pausatf.org.
-# The live record is a proxied Cloudflare Tunnel CNAME. This backend had no
-# state file on 2026-09-27, so import the live record before considering apply.
+# The live record is a proxied Cloudflare Tunnel CNAME and is imported into
+# the staging HCP Terraform workspace.
 module "cloudflare_dns_staging" {
   source  = "../../modules/cloudflare/dns"
   zone_id = var.cloudflare_zone_id
@@ -74,7 +77,7 @@ module "cloudflare_dns_staging" {
       value   = "cbbd07dc-3e97-4923-b582-1fafab43c01b.cfargotunnel.com"
       ttl     = 1
       proxied = true
-      comment = "Staging routed through the Cloudflare Tunnel"
+      comment = "cloudflared tunnel (stage-v2)"
     }
   ]
 }

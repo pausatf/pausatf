@@ -8,6 +8,6 @@ output "record_ids" {
 output "record_hostnames" {
   description = "Map of DNS record hostnames"
   value = {
-    for k, v in cloudflare_dns_record.this : k => v.hostname
+    for k, v in cloudflare_dns_record.this : k => v.name
   }
 }

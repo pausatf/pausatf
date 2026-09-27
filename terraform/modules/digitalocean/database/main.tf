@@ -31,10 +31,6 @@ resource "digitalocean_database_cluster" "this" {
 
   lifecycle {
     prevent_destroy = true
-    ignore_changes = [
-      name,
-      private_network_uuid,
-    ]
   }
 }
 

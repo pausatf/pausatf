@@ -28,25 +28,19 @@ resource "digitalocean_vpc" "this" {
   description = "${title(var.environment)} VPC for PAUSATF infrastructure"
 }
 
+data "digitalocean_vpc" "existing" {
+  count = var.create_vpc ? 0 : 1
+  id    = var.vpc_uuid_override
+}
+
 locals {
-  vpc_id = var.create_vpc ? digitalocean_vpc.this[0].id : var.vpc_uuid_override
+  vpc_id = var.create_vpc ? digitalocean_vpc.this[0].id : data.digitalocean_vpc.existing[0].id
   http_source_cidrs = var.firewall_http_source_cidrs != null ? var.firewall_http_source_cidrs : concat(
     data.cloudflare_ip_ranges.current.ipv4_cidrs,
     data.cloudflare_ip_ranges.current.ipv6_cidrs
   )
 
-  # SSH allowlist (port 22). Explicit IPs only; no broad ISP ranges.
-  # Last reviewed: 2026-03-18.
-  ssh_cidrs = [
-    # DigitalOcean internal / VPC
-    "100.128.0.0/9",
-    # Tailscale CGNAT range
-    "100.64.0.0/10",
-    # Admin static IP
-    "REDACTED_ADMIN_IP/32",
-    # Jeff Teeters (UC Berkeley campus)
-    "136.152.0.0/16",
-  ]
+  environment_tag = coalesce(var.environment_tag, var.environment)
 }
 
 # Reserved IP — survives droplet rebuilds
@@ -69,19 +63,14 @@ resource "digitalocean_reserved_ip_assignment" "this" {
 #tfsec:ignore:digitalocean-compute-use-ssh-keys
 resource "digitalocean_droplet" "this" {
   #checkov:skip=CKV_DIO_2:ssh_keys wired via var.ssh_key_fingerprints
-  name   = "pausatf-${var.environment}"
+  name   = coalesce(var.droplet_name, "pausatf-${var.environment}")
   region = var.region
   size   = var.droplet_size
   image  = var.droplet_image
 
   vpc_uuid = local.vpc_id
 
-  tags = [
-    "pausatf",
-    var.environment,
-    "web",
-    "wordpress"
-  ]
+  tags = concat(["pausatf", local.environment_tag, "web", "wordpress"], var.additional_tags)
 
   monitoring = var.enable_monitoring
   ipv6       = false
@@ -95,19 +84,17 @@ resource "digitalocean_droplet" "this" {
     create_before_destroy = true
     ignore_changes = [
       user_data,
-      image,
       ssh_keys,
-      monitoring,
-      name,
     ]
   }
 }
 
 # Managed Database — MySQL 8
 module "database" {
+  count  = var.create_database ? 1 : 0
   source = "../../modules/digitalocean/database"
 
-  name           = "pausatf-${var.environment}-db"
+  name           = coalesce(var.database_cluster_name, "pausatf-${var.environment}-db")
   engine         = "mysql"
   engine_version = "8"
   size           = var.database_size
@@ -126,35 +113,42 @@ module "database" {
   databases      = var.databases
   database_users = var.database_users
 
-  tags = ["pausatf", var.environment]
+  tags = ["pausatf", local.environment_tag]
+}
+
+moved {
+  from = module.database
+  to   = module.database[0]
 }
 
 # Firewall — HTTP/S source CIDRs are configurable (defaults to Cloudflare-only)
-#tfsec:ignore:digitalocean-compute-no-public-ingress
-#tfsec:ignore:digitalocean-compute-no-public-egress
+#checkov:skip=CKV_DIO_4:Ingress sources are computed from restricted Cloudflare and administrator CIDRs; Checkov cannot evaluate the dynamic rule blocks.
+# The only unrestricted inbound traffic is ICMP ping; web and SSH sources are restricted.
+#trivy:ignore:DIG-0001
+#trivy:ignore:DIG-0003
 resource "digitalocean_firewall" "this" {
-  name = "pausatf-${var.environment}-firewall"
+  name = coalesce(var.firewall_name, "pausatf-${var.environment}-firewall")
 
   droplet_ids = [digitalocean_droplet.this.id]
 
-  inbound_rule {
-    protocol         = "tcp"
-    port_range       = "80"
-    source_addresses = local.http_source_cidrs
+  dynamic "inbound_rule" {
+    for_each = var.enable_web_ingress ? ["80", "443"] : []
+    content {
+      protocol         = "tcp"
+      port_range       = inbound_rule.value
+      source_addresses = local.http_source_cidrs
+    }
   }
 
   inbound_rule {
     protocol         = "tcp"
-    port_range       = "443"
-    source_addresses = local.http_source_cidrs
+    port_range       = "22"
+    source_addresses = var.ssh_allowed_ips
   }
 
   inbound_rule {
-    protocol   = "tcp"
-    port_range = "22"
-    # Explicit allowlist takes precedence; default is ssh_cidrs.
-    # Set var.ssh_allowed_ips to ["0.0.0.0/0"] only for emergency break-glass.
-    source_addresses = length(var.ssh_allowed_ips) > 0 ? var.ssh_allowed_ips : local.ssh_cidrs
+    protocol         = "icmp"
+    source_addresses = var.icmp_source_addresses #tfsec:ignore:AVD-DIG-0001
   }
 
   dynamic "inbound_rule" {
@@ -166,20 +160,25 @@ resource "digitalocean_firewall" "this" {
     }
   }
 
-  # All outbound
+  # Outbound access supports OS/plugin updates, external API requests, and backups.
+  # Keep rules protocol/port specific while allowing internet destinations.
+  outbound_rule {
+    protocol              = "icmp"
+    destination_addresses = ["0.0.0.0/0", "::/0"] #tfsec:ignore:AVD-DIG-0003
+  }
+
   outbound_rule {
     protocol              = "tcp"
-    port_range            = "1-65535"
-    destination_addresses = ["0.0.0.0/0", "::/0"]
+    port_range            = var.outbound_tcp_udp_port_range
+    destination_addresses = ["0.0.0.0/0", "::/0"] #tfsec:ignore:AVD-DIG-0003
   }
 
   outbound_rule {
     protocol              = "udp"
-    port_range            = "1-65535"
-    destination_addresses = ["0.0.0.0/0", "::/0"]
+    port_range            = var.outbound_tcp_udp_port_range
+    destination_addresses = ["0.0.0.0/0", "::/0"] #tfsec:ignore:AVD-DIG-0003
   }
 
-  tags = [var.environment]
 }
 
 # Monitoring Alerts — disabled for non-production by default

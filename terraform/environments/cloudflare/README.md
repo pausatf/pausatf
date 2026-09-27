@@ -5,16 +5,16 @@ rulesets for `pausatf.org`.
 
 ## Reconciliation safety
 
-The Cloudflare Terraform backend had no state file at the last check. The live
-DNS inventory, zone settings, and rulesets were read from the authenticated
-Cloudflare dashboard on 2026-09-27. The declarations here describe that
-observed configuration; this code change does not modify Cloudflare or import
-resources into state.
+The live DNS inventory, zone settings, and rulesets were read from Cloudflare
+on 2026-09-27. The zone, 37 central DNS records, six settings, and two active
+rulesets have since been imported into HCP Terraform workspace
+`pausatf-cloudflare`. Dev and staging DNS records are imported into their own
+HCP workspaces. No Cloudflare apply has been run during this reconciliation.
 
-Do not run `terraform apply` yet. First import the existing zone and DNS records
-into the correct remote state, verify zone settings and rulesets with an
-appropriately scoped Cloudflare API token, and require a plan that proposes no
-unreviewed DNS, setting, or ruleset changes. The legacy
+The refreshed plan now reports no changes. The first plan exposed TTL,
+long-TXT-format, and record-comment differences that were adjusted in HCL to
+match the live values. Re-run and review the plan before any later apply.
+The legacy
 `import-dns-records.sh` script is obsolete and must not be run: it targets the
 old provider resource type and an incomplete, stale record map.
 
@@ -22,11 +22,11 @@ The live inventory contains 39 DNS records: 7 A, 14 CNAME, 5 MX, 6 TXT, and 7
 CAA. This Cloudflare environment owns 37 records; `dev` is owned by the dev
 environment and `stage` by the staging environment. Keep those ownership
 boundaries intact so different remote states cannot overwrite the same DNS
-record. The staging state was empty when checked on 2026-09-27, so import its
-existing `stage` record before considering an apply.
+record. The `dev` and `stage` records are now imported into their respective
+environment workspaces.
 
-The `_acme-challenge.www` TXT value is time-sensitive; confirm it is still
-needed before importing or refreshing that record.
+The `_acme-challenge.www` TXT value is time-sensitive; it is imported as-is.
+Confirm it is still needed before changing or renewing that challenge.
 
 ### Observed zone settings and rulesets
 
@@ -61,22 +61,22 @@ claim that those hosts are healthy or should remain pointed at those addresses.
 
 ## Backend and credentials
 
-Terraform state is stored in DigitalOcean Spaces. Provide credentials through
-the standard AWS-compatible environment variables and the Cloudflare API token
-through `TF_VAR_cloudflare_api_token`; do not commit credentials or state files.
-
-Initialize and validate with the repository's pinned Terraform version:
+State belongs to the HCP Terraform workspace `pausatf-cloudflare` in the
+`pausatf` organization. The live resources are imported and the current plan is
+clean. Use `terraform login`, then initialize
+with the repository's pinned Terraform version:
 
 ```bash
 cd terraform/environments/cloudflare
-terraform init -backend-config=../../backend.hcl
+terraform init
 terraform validate
 terraform plan
 ```
 
-The plan is for review only until the state and live configuration have been
-reconciled. Do not apply a plan that proposes to create existing DNS records or
-replace live tunnel records.
+Provide a narrowly scoped Cloudflare token as a sensitive environment value on
+the trusted runner. The existing zone, DNS records, settings, and rulesets are
+already imported. Do not apply a plan that proposes to recreate existing DNS
+records or replace live tunnel records.
 
 ## Related infrastructure
 

@@ -13,7 +13,6 @@ variable "cloudflare_api_token" {
 variable "cloudflare_zone_id" {
   description = "Cloudflare Zone ID for pausatf.org"
   type        = string
-  sensitive   = true
 }
 
 variable "region" {
@@ -41,7 +40,7 @@ variable "droplet_size" {
 variable "droplet_image" {
   description = "Droplet image/snapshot"
   type        = string
-  default     = "ubuntu-24-04-x64"
+  default     = "ubuntu-26-04-x64"
 
   validation {
     condition     = startswith(var.droplet_image, "ubuntu-")
@@ -67,7 +66,15 @@ variable "ssh_key_fingerprints" {
 }
 
 variable "ssh_allowed_ips" {
-  description = "IP addresses allowed SSH access"
+  description = "Explicit source CIDRs allowed to SSH to dev"
   type        = list(string)
-  default     = []
+
+  validation {
+    condition = (
+      length(var.ssh_allowed_ips) >= 2 &&
+      contains(var.ssh_allowed_ips, "100.64.0.0/10") &&
+      alltrue([for cidr in var.ssh_allowed_ips : can(cidrhost(cidr, 0)) && cidr != "0.0.0.0/0" && cidr != "::/0"])
+    )
+    error_message = "Set Tailscale plus at least one valid admin CIDR; unrestricted SSH is not allowed."
+  }
 }

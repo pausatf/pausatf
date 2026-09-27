@@ -12,8 +12,12 @@ terraform {
     }
   }
 
-  backend "s3" {
-    key = "dev/terraform.tfstate"
+  cloud {
+    organization = "pausatf"
+
+    workspaces {
+      name = "pausatf-dev"
+    }
   }
 }
 
@@ -35,19 +39,26 @@ module "wordpress" {
   droplet_image            = var.droplet_image
   database_size            = var.database_size
   ssh_key_fingerprints     = var.ssh_key_fingerprints
-  vpc_cidr                 = "10.30.0.0/16"
   enable_backups           = false
-  enable_monitoring        = true
+  enable_monitoring        = false
+  create_database          = false
   create_reserved_ip       = false
+  create_vpc               = false
+  vpc_uuid_override        = "4ee39499-dc85-11e8-9f23-3cfdfea9fff1"
   enable_monitoring_alerts = false
+  droplet_name             = "pausatf-dev-v2"
+  firewall_name            = "pausatf-nonprod-cf-lock"
+  environment_tag          = "development"
+  additional_tags          = ["migration-v2"]
+  icmp_source_addresses    = ["0.0.0.0/0", "::/0"]
 
-  # Dev uses open firewall (not CF-only)
-  firewall_http_source_cidrs = ["0.0.0.0/0", "::/0"]
+  # HTTP/S access is limited to Cloudflare's published ranges.
+  firewall_http_source_cidrs = null
   ssh_allowed_ips            = var.ssh_allowed_ips
 
   cloud_init_content = templatefile("${path.module}/../../modules/droplet/cloud-init-ubuntu-24.yml", {
     environment = "dev"
-    hostname    = "pausatf-dev"
+    hostname    = "pausatf-dev-v2"
   })
 }
 
@@ -63,7 +74,7 @@ module "cloudflare_dns_dev" {
       value   = module.wordpress.droplet_ip
       ttl     = 1
       proxied = true
-      comment = "Dev web droplet"
+      comment = "migrated to dev-v2 26.04 (was 157.245.176.229)"
     }
   ]
 }
@@ -77,19 +88,4 @@ moved {
 moved {
   from = digitalocean_firewall.dev
   to   = module.wordpress.digitalocean_firewall.this
-}
-
-moved {
-  from = digitalocean_vpc.dev
-  to   = module.wordpress.digitalocean_vpc.this[0]
-}
-
-moved {
-  from = digitalocean_database_cluster.dev
-  to   = module.wordpress.module.database.digitalocean_database_cluster.this
-}
-
-moved {
-  from = digitalocean_database_firewall.dev
-  to   = module.wordpress.module.database.digitalocean_database_firewall.this[0]
 }

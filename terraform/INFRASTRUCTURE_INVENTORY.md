@@ -1,240 +1,79 @@
 # PAUSATF Infrastructure Inventory
 
-**Generated:** 2025-12-27
-**Purpose:** Document actual cloud resources vs. Terraform-managed resources
+**Verified:** 2026-09-27
+**Source:** DigitalOcean API, HCP Terraform states, GitHub API, and Cloudflare inventory recorded in the reconciliation notes.
+**Purpose:** Track which PAUSATF resources exist, where their Terraform configuration lives, and whether HCP Terraform currently owns their state.
 
-## Summary
+## Ownership model
 
-This document compares the actual infrastructure running in DigitalOcean, Cloudflare, and GitHub against what is currently managed by Terraform.
+- Git source of truth: [`pausatf/pausatf`](https://github.com/pausatf/pausatf), under `terraform/`.
+- Terraform state service: HCP Terraform organization `pausatf`.
+- Runtime infrastructure: DigitalOcean and Cloudflare.
+- Current environment workspaces: `pausatf-production`, `pausatf-staging`, `pausatf-dev`, `pausatf-cloudflare`, `pausatf-github`, and `pausatf-hcp`.
+- The six active workspaces and three retired legacy workspaces use HCP-managed state with local execution. Provider credentials must be present in the trusted runner environment.
+- Production state was migrated from the versioned `pausatf-terraform-state` Space to HCP Terraform. The old S3 object is retained as a recovery copy; do not use it as an active backend.
 
-## DigitalOcean Resources
+## DigitalOcean
 
-### Droplets
+| Environment/resource | Live resource | Terraform configuration | HCP state | Notes |
+|---|---|---|---|---|
+| Production web | `pausatf-prod-v2`, droplet `586316413`, SFO2, `s-2vcpu-4gb`, Ubuntu 26.04 LTS | `environments/production` via `stacks/wordpress` | Imported | Firewall `pausatf-prod-v2-fw` (`5fb8b83b-12bb-4256-8ffc-ccf275f55a7e`) imported. |
+| Staging web | `pausatf-stage-v2`, droplet `586535212`, SFO2, `s-2vcpu-4gb`, Ubuntu 26.04 LTS | `environments/staging` via `stacks/wordpress` | Imported | Firewall `pausatf-stage-v2-tunnel` (`b17da40d-aac5-48d0-8553-160a77212e82`) imported. |
+| Development web | `pausatf-dev-v2`, droplet `586535214`, SFO2, `s-1vcpu-2gb`, Ubuntu 26.04 LTS | `environments/dev` via `stacks/wordpress` | Imported | Firewall `pausatf-nonprod-cf-lock` (`96d0d607-9071-4a7c-8c61-10614453f98c`) imported. |
+| Production database | `pausatf-prod-db`, MySQL 8, SFO2, `db-s-1vcpu-1gb`, one node; ID `ad2a900b-8181-4506-805d-d19eef90b337` | `environments/production` and `modules/digitalocean/database` | Imported | Trusted source is the production droplet. Daily database backups were present for eight consecutive days; confirm retention in the DO console/API. |
+| VPC | Shared `default-sfo2`, ID `4ee39499-dc85-11e8-9f23-3cfdfea9fff1` | Referenced as a data source in each DO environment | Read via data source | Shared default VPC is not owned or modified by this project. |
+| Project | `PAUSATF`, ID `8ddce7ba-f064-4611-8460-0771dd817342` | Production configuration | Imported | Project membership also contains resources that appear unrelated to PAUSATF; do not move/delete those without confirming ownership. |
+| SSH key | `m3 laptop`, ID `46721354` | Production configuration | Imported | Existing key reference. |
+| Spaces `pausatf` | SFO3, private | `environments/production/spaces.tf` | Imported | Versioning enabled; noncurrent versions expire after 60 days; production backups expire after 45 days, recovery images after 60 days, recovery sets after 45 days. |
+| Spaces `pausatf-static` | SFO3, private | `environments/production/spaces.tf` | Imported | Versioning enabled; noncurrent versions expire after 60 days; incomplete multipart uploads abort after 7 days. |
+| Spaces `pausatf-backups` | SFO2, private | `environments/production/spaces.tf` | Imported | Versioning enabled; noncurrent versions expire after 60 days; dev 30 days; production and staging 60 days. |
+| Spaces `pausatf-terraform-state` | SFO2, private | `environments/production/spaces.tf` | Imported | Versioning enabled; retained as a recovery archive after migration to HCP Terraform. |
 
-| Resource | Name | ID | IP | Image | Size | Region | Status | In Terraform? |
-|----------|------|----|----|-------|------|--------|--------|---------------|
-| Production | pausatf-prod | REDACTED_DROPLET_ID | REDACTED_PROD_NEW_IP | Ubuntu pausatf.org 2023-05-16 (custom snapshot) | s-4vcpu-8gb | sfo2 | ✅ Active | ✅ Yes (but wrong image) |
-| Staging | pausatf-stage | REDACTED_DROPLET_ID | REDACTED_STAGE_IP | Ubuntu OpenLiteSpeed WordPress 6.8.2 on Ubuntu 24.04 (marketplace) | s-2vcpu-4gb | sfo2 | ✅ Active | ✅ Yes (but wrong image) |
+The three current droplets, their firewalls, the production database, project, SSH key, and four Spaces buckets are represented in HCP state. A state-only apply persisted the four database resource address moves in production; it reported zero resources added, changed, or destroyed. No live DigitalOcean resources were modified. Droplet `user_data` and attached SSH key changes are ignored by lifecycle rules because the live systems have migration-managed state; review that policy before changing it.
 
-**Issues:**
-- Production uses custom snapshot, Terraform expects Ubuntu 24.04 base image with cloud-init
-- Staging uses marketplace image, Terraform expects Ubuntu 24.04 base image with cloud-init
-- Both reference old `cloud-init.yml` instead of `cloud-init-ubuntu-24.yml` and `cloud-init-openlitespeed.yml`
+Custom snapshot workflows are active: production nightly with seven retained snapshots and staging weekly with two. Native DigitalOcean droplet backup policies are not enabled. This is separate from the managed database's daily backups.
 
-### Databases
+The `PAUSATF` DigitalOcean project also lists a `trading-dashboard-backup` Space and a GLMR trading-data volume snapshot. They appear unrelated and are intentionally excluded from PAUSATF Terraform ownership pending ownership confirmation. Other account droplets are also outside this inventory.
 
-| Resource | Name | ID | Engine | Version | Size | Region | Nodes | Status | In Terraform? |
-|----------|------|----|--------|---------|------|--------|-------|--------|---------------|
-| Staging DB | pausatf-stage-db | 661fa8d4-077c-43d7-a47a-79bfc42737c8 | MySQL | 8 | db-s-1vcpu-1gb | sfo2 | 1 | ✅ Online | ✅ Yes |
-| Production DB | N/A | N/A | N/A | N/A | N/A | N/A | N/A | ❌ Does not exist | ⚠️ Defined in Terraform but not created |
+## Cloudflare
 
-**Issues:**
-- Terraform defines a production database that doesn't exist in reality
-- Production WordPress likely uses the staging database or an external database
+The `pausatf.org` zone (zone ID `67b87131144a68ad5ed43ebfd4e6d811`) and its DNS, zone settings, and security rules are declared in `environments/cloudflare`. The Cloudflare configuration was reconciled against the live account in PR #210, merged as `fcc9fa9850b2572e135cd07fe562828b1fb2d812`.
 
-### Firewalls
+The Cloudflare HCP workspace now owns the zone, 37 central DNS records, six zone settings, and two active rulesets. The dev and staging DNS records are imported to their dedicated states. The first refreshed plan found six metadata/content/TTL differences; configuration was aligned to live values, and the next plan reported no changes. No Cloudflare apply has been run.
 
-| Resource | Name | ID | Droplets | Rules | In Terraform? |
-|----------|------|----|----------|-------|---------------|
-| Production | pausatf-production | a4e42798-ab22-467f-a821-daa290f56655 | pausatf-prod | ICMP, SSH, HTTP, HTTPS | ⚠️ Defined but not imported |
-| Staging | pausatf-staging | c12dfc7f-f43a-4b32-96c6-80ba34035b1a | pausatf-stage | ICMP, SSH, HTTP, HTTPS | ⚠️ Defined but not imported |
+The dev and staging droplet/firewall state imports use Cloudflare's public IP ranges data source. This does not import or change Cloudflare account resources.
 
-**Issues:**
-- Firewalls exist and are defined in Terraform, but Terraform state doesn't manage them (manual creation)
-- Need to import into Terraform state
+## GitHub
 
-### VPCs
+The `pausatf/pausatf` repository and these settings are now imported into `pausatf-github`:
 
-| Resource | Name | ID | Region | IP Range | In Terraform? |
-|----------|------|----|--------|----------|---------------|
-| Default NYC1 | default-nyc1 | 12ddb0a1-322f-450b-8de5-3e33e8fcf456 | nyc1 | 10.116.0.0/20 | ❌ No |
-| Default SFO1 | default-sfo1 | 7c8a0e99-dd1d-4591-b956-2786d6cb5219 | sfo1 | 10.112.0.0/20 | ❌ No |
-| Default SFO2 | default-sfo2 | REDACTED_VPC_UUID | sfo2 | 10.138.0.0/16 | ❌ No |
-| Default SFO3 | default-sfo3 | 60a80fc6-4809-4fa4-b8fd-8863cfc1d70d | sfo3 | 10.124.0.0/20 | ❌ No |
-| Unused | unused | 338f2873-f4d1-439e-8479-0d3c550642cc | sfo2 | 10.0.0.0/24 | ❌ No |
-| Production VPC | N/A | N/A | N/A | 10.10.0.0/16 | ⚠️ Defined in Terraform but not created |
-| Staging VPC | N/A | N/A | N/A | 10.20.0.0/16 | ⚠️ Defined in Terraform but not created |
+- Repository settings
+- Default branch
+- Main branch protection
+- Dependabot security updates
+- Vulnerability alerts
+- Repository topics, managed as a `github_repository` attribute (no topics are currently set)
 
-**Issues:**
-- Terraform defines custom VPCs that don't exist in reality
-- Droplets are using default VPC
-- Should remove VPC definitions from Terraform or create them
+The configuration was updated to match the live settings: squash-only merge, auto-merge enabled, administrator-enforced branch protection, the current CI contexts, non-strict status checks, and zero required approving reviews. A fresh plan reports no changes. The generated inventory is in `environments/github/inventory.yml`.
 
-### SSH Keys
+## HCP Terraform and legacy state
 
-| Resource | Name | ID | Fingerprint | In Terraform? |
-|----------|------|----|-------------|---------------|
-| M3 Laptop | m3 laptop | 46721354 | f4:5c:52:bb:23:a2:ef:d0:09:e4:59:d4:b5:c7:a7:8a | ❌ No |
+| Workspace | State status | Follow-up |
+|---|---|---|
+| `pausatf-production` | Current production DO resources, database, and Spaces imported; migrated from S3 | Latest plan: no changes; database state addresses are migrated. |
+| `pausatf-staging` | Current staging droplet, firewall, and stage DNS imported | Latest plan: no changes. |
+| `pausatf-dev` | Current dev droplet, firewall, and dev DNS imported | Latest plan: no changes. |
+| `pausatf-cloudflare` | Zone, 37 central DNS records, six settings, and two rulesets imported | Latest plan: no changes. |
+| `pausatf-github` | Repository, default branch, branch protection, Dependabot, vulnerability alerts, and topics are tracked | Latest plan: no changes. |
+| `pausatf-hcp` | HCP workspace safety and execution settings for six active and three retired PAUSATF workspaces | All nine workspaces imported; latest plan: no changes. |
+| `pausatf`, `painfra`, `do-terraform` | Retired legacy workspaces; all state entries were removed after backing up their state, and no live DigitalOcean resources were destroyed | Workspace metadata and local execution are managed by `pausatf-hcp`; backups are in `/tmp/pausatf-legacy-state-20260927/`. |
 
-**Issues:**
-- SSH key used by droplets is not managed by Terraform
-- Should add to Terraform as data source or resource
+State-only removals were made from legacy workspaces after saving mode-600 state backups. The legacy `do-terraform` workspace's obsolete VPC references and requested domain entries were removed earlier; the remaining stale resources and duplicate references were then removed from all three legacy states. No live DigitalOcean resource was destroyed.
 
-### Projects
+## Remaining reconciliation
 
-| Resource | Name | ID | Purpose | Environment | Default | In Terraform? |
-|----------|------|----|---------|-------------|---------|---------------|
-| PAUSATF | PAUSATF | 8ddce7ba-f064-4611-8460-0771dd817342 | Website or blog | Production | ✅ Yes | ❌ No |
+1. Capture TLS settings and certificate renewal/termination responsibilities in Terraform/Ansible for dev, staging, and production.
+2. Audit supported software versions, especially managed database engine versions and DigitalOcean maintenance options.
+3. Reconcile and document database backup retention and restore testing, and retain a tested recovery copy of the pre-migration Terraform state.
 
-**Issues:**
-- Project exists but is not managed by Terraform
-- All PAUSATF resources should be associated with this project
-
-### Reserved IPs
-
-No reserved IPs currently in use.
-
-### Spaces (Object Storage)
-
-| Resource | Name | Usage | In Terraform? |
-|----------|------|-------|---------------|
-| Terraform State | pausatf-terraform-state | Backend storage | ⚠️ Backend only, not managed |
-
-**Issues:**
-- Space is used for Terraform backend but not managed as a resource
-
-## Cloudflare Resources
-
-### Zones
-
-| Resource | Name | ID | Account ID | Plan | Status | In Terraform? |
-|----------|------|----|------------|------|--------|---------------|
-| pausatf.org | pausatf.org | 67b87131144a68ad5ed43ebfd4e6d811 | c540729070ba913814ac4557c8974099 | Free | ✅ Active | ✅ Declared; not yet imported |
-
-The Cloudflare zone is declared in Terraform, but the Cloudflare backend state
-was empty when checked on 2026-09-26. Import existing resources only after the
-live inventory and ownership are reconciled.
-
-### Live DNS inventory (checked 2026-09-26)
-
-The zone has 39 DNS records: 7 A, 14 CNAME, 5 MX, 6 TXT, and 7 CAA. The
-`pausatf.org`, `www`, and `stage` hostnames route through Cloudflare Tunnels.
-The `dev` and `stage` records are declared in their dedicated environment
-states; the central Cloudflare state declares the remaining 37 records. The
-staging state was empty when checked on 2026-09-27.
-
-| Type | Names | Terraform owner |
-|------|-------|-----------------|
-| A | `dev`, `direct-ssh`, `ftp`, `mail`, `monitor`, `runners`, `staging` | `dev` in dev state; remaining records in Cloudflare state |
-| CNAME | `@`, `www`, `stage`, `prod`, `ssh`, `ssh-stage-v2`, `ssh-v2`, `v2canary`, `51871933`, `em5172`, `url7068`, `url7741`, `s1._domainkey`, `s2._domainkey` | `stage` in staging state; remaining records in Cloudflare state |
-| MX | `@` (five Google Workspace records) | Cloudflare state |
-| TXT | `@` (SPF and Google verification), `_dmarc`, `cf2024-1._domainkey`, `mail._domainkey`, `_acme-challenge.www` | Cloudflare state |
-| CAA | `@` (seven records for Google Trust Services, DigiCert, Let's Encrypt, and iodef) | Cloudflare state |
-
-Do not apply while the relevant state is empty. Import existing records into
-their single owning environment and require a reviewed no-change plan first.
-Zone settings and rulesets still need a Cloudflare token with read permission.
-See [Cloudflare environment safety notes](environments/cloudflare/README.md).
-
-## GitHub Resources
-
-### Repositories
-
-| Resource | Name | Visibility | Description | In Terraform? |
-|----------|------|------------|-------------|---------------|
-| Monorepo | pausatf | Public | PAUSATF Infrastructure Monorepo | ✅ Yes |
-
-**Issues:**
-- Repository exists in Terraform
-- Branch protection not enabled (defined but not applied)
-- Topics not set (defined but not applied)
-
-### Branch Protection
-
-| Branch | Required Reviews | Signed Commits | Status Checks | In Terraform? | Applied? |
-|--------|------------------|----------------|---------------|---------------|----------|
-| main | 1 | ✅ Required | terraform-validate, terraform-fmt, ansible-lint, shellcheck | ✅ Defined | ❌ Not applied |
-
-**Issues:**
-- Branch protection is defined in Terraform but not applied to repository
-- Need to run `terraform apply` to enable
-
-### Repository Settings
-
-| Setting | Configured Value | Actual Value | In Sync? |
-|---------|------------------|--------------|----------|
-| Has Issues | ✅ Enabled | ✅ Enabled | ✅ Yes |
-| Has Wiki | ✅ Enabled | ✅ Enabled | ✅ Yes |
-| Has Projects | ✅ Enabled | ✅ Enabled | ✅ Yes |
-| Has Discussions | ❌ Disabled | ❌ Disabled | ✅ Yes |
-
-### Topics
-
-**Defined in Terraform:**
-- infrastructure-as-code
-- terraform
-- ansible
-- wordpress
-- digitalocean
-- cloudflare
-- monorepo
-- devops
-- automation
-- configuration-management
-- scripts
-- documentation
-- runbooks
-
-**Actual Topics:** None
-
-**Issues:**
-- Topics defined in Terraform but not applied to repository
-
-## Action Items
-
-### High Priority
-
-1. **Update cloud-init template references**
-   - Production: Change from `cloud-init.yml` to `cloud-init-ubuntu-24.yml`
-   - Staging: Change from `cloud-init.yml` to `cloud-init-openlitespeed.yml`
-
-2. **Remove non-existent resources from Terraform**
-   - Remove production database cluster definition
-   - Remove custom VPC definitions (use default VPCs)
-
-3. **Apply GitHub configuration**
-   - Run `terraform apply` in `terraform/environments/github/` to enable branch protection and topics
-
-4. **Create Cloudflare zone management**
-   - Import pausatf.org zone into Terraform
-   - Add all critical DNS records to Terraform
-
-### Medium Priority
-
-5. **Import existing firewalls into Terraform state**
-   ```bash
-   terraform import digitalocean_firewall.production a4e42798-ab22-467f-a821-daa290f56655
-   terraform import digitalocean_firewall.staging c12dfc7f-f43a-4b32-96c6-80ba34035b1a
-   ```
-
-6. **Add SSH key to Terraform**
-   - Create data source or import existing SSH key resource
-
-7. **Add DigitalOcean project to Terraform**
-   - Create or import PAUSATF project resource
-   - Associate all resources with project
-
-### Low Priority
-
-8. **Consider creating production database**
-   - If needed, create the database defined in Terraform
-   - Or remove from Terraform if external database is preferred
-
-9. **Document snapshot management**
-   - Production uses custom snapshot instead of cloud-init
-   - Document process for creating/updating snapshots
-   - Or migrate to cloud-init based deployment
-
-## Terraform State Locations
-
-- **Production:** `s3://pausatf-terraform-state/production/terraform.tfstate` (DigitalOcean Spaces)
-- **Staging:** `s3://pausatf-terraform-state/staging/terraform.tfstate` (DigitalOcean Spaces)
-- **GitHub:** `s3://pausatf-terraform-state/github/terraform.tfstate` (DigitalOcean Spaces)
-- **Dev:** Local state (no backend configured)
-
-## Notes
-
-- Production droplet (pausatf-prod) uses a custom snapshot from 2023-05-16, which may contain WordPress data and configuration not captured in Terraform
-- Staging droplet (pausatf-stage) uses DigitalOcean's marketplace image, which includes pre-configured OpenLiteSpeed and WordPress
-- Both approaches bypass the cloud-init templates defined in Terraform
-- Consider standardizing on cloud-init templates for consistency and reproducibility
+**Safety:** Imports and state-only changes did not create, modify, or destroy live services. The sole apply persisted database resource address moves and reported zero resources added, changed, or destroyed. Review an environment plan and obtain the normal PR approval before any infrastructure apply.

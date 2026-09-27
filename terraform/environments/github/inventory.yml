@@ -1,5 +1,5 @@
 # GitHub Repository Inventory
-# Captured: 2025-12-28T06:03:00Z
+# Captured: 2026-09-27T22:20:23Z
 # Organization: pausatf
 # DO NOT EDIT MANUALLY - regenerate with capture-inventory.sh
 
@@ -11,14 +11,14 @@ repository:
   url: https://github.com/pausatf/pausatf
   homepage:
   created_at: 2025-12-22T07:05:31Z
-  updated_at: 2025-12-28T05:30:12Z
-  pushed_at: 2025-12-28T05:30:09Z
+  updated_at: 2026-09-27T21:24:11Z
+  pushed_at: 2026-09-27T21:24:09Z
   default_branch: main
   # Repository size and activity
-  size_kb: 149965
+  size_kb: 620267
   stars: 0
   forks: 0
-  open_issues: 0
+  open_issues: 5
   open_pull_requests: 0
   # Features
   features:
@@ -28,18 +28,18 @@ repository:
     discussions_enabled: false
   # Merge settings
   merge_settings:
-    allow_merge_commit: true
+    allow_merge_commit: false
     allow_squash_merge: true
-    allow_rebase_merge: true
-    delete_branch_on_merge: false
+    allow_rebase_merge: false
+    delete_branch_on_merge: true
   # License
   license: none
 # Repository topics
 topics: []
 # Collaborators and permissions
-collaborators: [{"login": "thomasvincent", "permissions": {"admin": true, "maintain": true, "push": true, "triage": true, "pull": true}}]
+collaborators: [{"login": "somethingwithproof", "permissions": {"admin": true, "maintain": true, "push": true, "triage": true, "pull": true}}]
 # Recent commits (last 10)
-recent_commits: [{"sha": "16e4b11", "message": "Fix nested docs/docs directory structure", "author": "Thomas Vincent", "date": "2025-12-28T05:30:04Z"}, {"sha": "00d6756", "message": "Add WordPress users and site configuration to inventory capture", "author": "Thomas Vincent", "date": "2025-12-28T05:27:34Z"}, {"sha": "995c90f", "message": "Update documentation with current production state", "author": "Thomas Vincent", "date": "2025-12-28T02:28:01Z"}, {"sha": "9f4b8f6", "message": "Add production migration and restore playbooks", "author": "Thomas Vincent", "date": "2025-12-28T02:18:33Z"}, {"sha": "5497ae2", "message": "Add theme configuration capture to inventory", "author": "Thomas Vincent", "date": "2025-12-28T02:16:28Z"}, {"sha": "10bea67", "message": "Capture prod WordPress inventory and configure deploy user", "author": "Thomas Vincent", "date": "2025-12-28T02:14:38Z"}, {"sha": "ff7bc20", "message": "chore(backups,capture): add nightly legacy rsync to repo; nightly DO snapshots; on-demand prod plugin/theme capture via GH Actions", "author": "Thomas Vincent", "date": "2025-12-28T02:02:22Z"}, {"sha": "74cc0af", "message": "feat(ols,terraform,ansible): adopt OpenLiteSpeed for non-prod; move DNS to Terraform; add dev/staging envs; refactor WP role; add capture playbooks and local OLS stack", "author": "Thomas Vincent", "date": "2025-12-28T01:57:21Z"}, {"sha": "015bcbf", "message": "fix: correct broken markdown links in documentation (#1)", "author": "Thomas Vincent", "date": "2025-12-23T04:57:07Z"}, {"sha": "ebfbf8d", "message": "docs: add comprehensive monorepo improvement recommendations", "author": "Thomas Vincent", "date": "2025-12-22T22:35:37Z"}]
+recent_commits: [{"sha": "fcc9fa9", "message": "fix(terraform): reconcile Cloudflare policy to live zone (#210)", "author": "Thomas Vincent", "date": "2026-09-27T21:24:06Z"}, {"sha": "21eebab", "message": "fix(terraform): use DigitalOcean Spaces signing region (#209)", "author": "Thomas Vincent", "date": "2026-09-27T18:57:38Z"}, {"sha": "ac731d6", "message": "fix(ci): export dynamic deployment host variable (#208)", "author": "Thomas Vincent", "date": "2026-09-27T18:16:08Z"}, {"sha": "fd34847", "message": "fix(terraform): align production inputs with live resources (#207)", "author": "Thomas Vincent", "date": "2026-09-27T17:41:18Z"}, {"sha": "796f5ce", "message": "fix(redis): enable memory overcommit on hosts (#206)", "author": "Thomas Vincent", "date": "2026-09-27T06:56:08Z"}, {"sha": "c3c4b08", "message": "feat(backup): add weekly staging snapshots (#203)", "author": "Thomas Vincent", "date": "2026-09-27T06:27:40Z"}, {"sha": "551ab85", "message": "fix(ci): fetch Jetpack IP list with accepted user agent (#202)", "author": "Thomas Vincent", "date": "2026-09-27T06:24:02Z"}, {"sha": "636c5ca", "message": "fix(backup): fail when the production snapshot target is missing (#201)", "author": "Thomas Vincent", "date": "2026-09-27T06:10:27Z"}, {"sha": "646ab84", "message": "chore(deps): bump grafana/grafana in /scripts/docker (#198)", "author": "dependabot[bot]", "date": "2026-09-27T06:00:07Z"}, {"sha": "7ff6117", "message": "chore(deps): bump github/codeql-action/upload-sarif (#200)", "author": "dependabot[bot]", "date": "2026-09-27T05:58:02Z"}]
 # Branch protection
 branch_protection:
-  enabled: false
+  enabled: true

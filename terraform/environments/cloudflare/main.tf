@@ -8,8 +8,12 @@ terraform {
     }
   }
 
-  backend "s3" {
-    key = "cloudflare/terraform.tfstate"
+  cloud {
+    organization = "pausatf"
+
+    workspaces {
+      name = "pausatf-cloudflare"
+    }
   }
 }
 
@@ -346,7 +350,7 @@ resource "cloudflare_dns_record" "spf" {
   name    = "@"
   content = "v=spf1 include:_spf.google.com include:sendgrid.net ~all"
   type    = "TXT"
-  ttl     = 1
+  ttl     = 3600
   comment = "SPF record for Google Workspace and SendGrid"
 }
 
@@ -355,7 +359,7 @@ resource "cloudflare_dns_record" "google_site_verification" {
   name    = "@"
   content = "google-site-verification=TNLNBt7i-pSApITlOVOAVH5MT9YH16jTAXIIwHrmCLg" # pragma: allowlist secret
   type    = "TXT"
-  ttl     = 1
+  ttl     = 600
 }
 
 resource "cloudflare_dns_record" "dmarc" {
@@ -372,7 +376,7 @@ resource "cloudflare_dns_record" "dkim_cloudflare" {
   name    = "cf2024-1._domainkey"
   # Public DKIM key published by Cloudflare; this is not a private credential.
   # pragma: allowlist secret
-  content = "v=DKIM1; h=sha256; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiweykoi+o48IOGuP7GR3X0MOExCUDY/BCRHoWBnh3rChl7WhdyCxW3jgq1daEjPPqoi7sJvdg5hEQVsgVRQP4DcnQDVjGMbASQtrY4WmB1VebF+RPJB2ECPsEDTpeiI5ZyUAwJaVX7r6bznU67g7LvFq35yIo4sdlmtZGV+i0H4cpYH9+3JJ78km4KXwaf9xUJCWF6nxeD+qG6Fyruw1Qlbds2r85U9dkNDVAS3gioCvELryh1TxKGiVTkg4wqHTyHfWsp7KD3WQHYJn0RyfJJu6YEmL77zonn7p2SRMvTMP3ZEXibnC9gz3nnhR6wcYL8Q7zXypKTMD58bTixDSJwIDAQAB" # pragma: allowlist secret
+  content = "\"v=DKIM1; h=sha256; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiweykoi+o48IOGuP7GR3X0MOExCUDY/BCRHoWBnh3rChl7WhdyCxW3jgq1daEjPPqoi7sJvdg5hEQVsgVRQP4DcnQDVjGMbASQtrY4WmB1VebF+RPJB2ECPsEDTpeiI5ZyUAwJaVX7r6bznU67g7LvFq35yIo4sdlmtZGV+i0H4cpYH9+3JJ78k\" \"m4KXwaf9xUJCWF6nxeD+qG6Fyruw1Qlbds2r85U9dkNDVAS3gioCvELryh1TxKGiVTkg4wqHTyHfWsp7KD3WQHYJn0RyfJJu6YEmL77zonn7p2SRMvTMP3ZEXibnC9gz3nnhR6wcYL8Q7zXypKTMD58bTixDSJwIDAQAB\"" # pragma: allowlist secret
   type    = "TXT"
   ttl     = 1
 }
@@ -382,7 +386,7 @@ resource "cloudflare_dns_record" "dkim_mail" {
   name    = "mail._domainkey"
   content = "v=DKIM1; h=sha256; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtI1RFbT2Q/l8jxNfidHBMpDaw6UxnO3NwbJo58DLyKJX0WfICTpvUxPopz+xOl6Lcu27hFSZwWKgSEnDjhTdE1ytMuNNgUJ7O+n82VQQdJ5USiYGEHoIGFmuqcm6Ctwl3xQKHLeDsY56E16ry0U20necZuBOMjaRL8IAkaSUNlNpR1okwG0UC/SI/8t/KN+3b63OI/m9SFZeWajhMER+f9P3yWxo6EnMirC6tkooWlCP1DpAvJCz1CMtTewbtPUahUqhURKLVJIVYyT9mxGY0+qxMOWGMl0GoZjKZ39C0vMlWTTXNkbakav4HVUK2F6a3n1pG1xg0IRkRTXdhbNTywIDAQAB" # pragma: allowlist secret
   type    = "TXT"
-  ttl     = 1
+  ttl     = 3600
 }
 
 resource "cloudflare_dns_record" "acme_challenge_www" {
@@ -402,7 +406,7 @@ resource "cloudflare_dns_record" "caa_letsencrypt_issue" {
   name    = "@"
   type    = "CAA"
   ttl     = 1
-  comment = "Allow Let's Encrypt to issue certificates"
+  comment = "Allow Let's Encrypt to issue SSL certificates"
 
   data = {
     flags = 0
@@ -416,7 +420,7 @@ resource "cloudflare_dns_record" "caa_letsencrypt_issuewild" {
   name    = "@"
   type    = "CAA"
   ttl     = 1
-  comment = "Allow Let's Encrypt to issue wildcard certificates"
+  comment = "Allow Let's Encrypt to issue wildcard SSL certificates"
 
   data = {
     flags = 0
