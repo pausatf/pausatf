@@ -12,8 +12,12 @@ terraform {
     }
   }
 
-  backend "s3" {
-    key = "production/terraform.tfstate"
+  cloud {
+    organization = "pausatf"
+
+    workspaces {
+      name = "pausatf-production"
+    }
   }
 }
 
@@ -35,7 +39,6 @@ resource "digitalocean_project" "pausatf" {
 
   resources = [
     module.wordpress.droplet_urn,
-    digitalocean_reserved_ip.production.urn,
     module.wordpress.database_urn,
   ]
 
@@ -56,42 +59,35 @@ resource "digitalocean_ssh_key" "m3_laptop" {
 module "wordpress" {
   source = "../../stacks/wordpress"
 
-  environment              = "production"
-  region                   = var.region
-  droplet_size             = var.droplet_size
-  droplet_image            = var.droplet_image
-  database_size            = var.database_size
-  ssh_key_fingerprints     = [digitalocean_ssh_key.m3_laptop.id]
-  alert_emails             = var.alert_email_addresses
-  enable_backups           = true
-  enable_monitoring        = true
-  enable_monitoring_alerts = length(var.alert_email_addresses) > 0
-  ssh_allowed_ips          = var.ssh_allowed_ips
+  environment                 = "production"
+  region                      = var.region
+  droplet_size                = var.droplet_size
+  droplet_image               = var.droplet_image
+  database_size               = var.database_size
+  ssh_key_fingerprints        = [digitalocean_ssh_key.m3_laptop.id]
+  alert_emails                = var.alert_email_addresses
+  enable_backups              = false
+  enable_monitoring           = true
+  enable_monitoring_alerts    = length(var.alert_email_addresses) > 0
+  ssh_allowed_ips             = var.ssh_allowed_ips
+  droplet_name                = "pausatf-prod-v2"
+  database_cluster_name       = "pausatf-prod-db"
+  firewall_name               = "pausatf-prod-v2-fw"
+  environment_tag             = "production"
+  additional_tags             = ["migration-v2"]
+  icmp_source_addresses       = ["0.0.0.0/0"]
+  outbound_tcp_udp_port_range = "1-65535"
+  create_database             = true
 
   create_vpc        = false
-  vpc_uuid_override = "REDACTED_VPC_UUID"
+  vpc_uuid_override = "4ee39499-dc85-11e8-9f23-3cfdfea9fff1"
 
   cloud_init_content = templatefile("${path.module}/../../modules/droplet/cloud-init-ubuntu-24.yml", {
     environment = "production"
-    hostname    = "pausatf-prod"
+    hostname    = "pausatf-prod-v2"
   })
 
   create_reserved_ip = false
-}
-
-# Alias for reserved IP (project resource reference needs direct resource)
-# The stack module creates the reserved IP; reference it for the project.
-resource "digitalocean_reserved_ip" "production" {
-  region = var.region
-
-  lifecycle {
-    prevent_destroy = true
-  }
-}
-
-resource "digitalocean_reserved_ip_assignment" "production" {
-  ip_address = digitalocean_reserved_ip.production.ip_address
-  droplet_id = module.wordpress.droplet_id
 }
 
 # moved blocks — zero-recreation migration from inline resources to stack module
@@ -128,14 +124,4 @@ moved {
 moved {
   from = digitalocean_monitor_alert.disk_high
   to   = module.wordpress.digitalocean_monitor_alert.disk_high
-}
-
-moved {
-  from = module.wordpress.digitalocean_reserved_ip.this[0]
-  to   = digitalocean_reserved_ip.production
-}
-
-moved {
-  from = module.wordpress.digitalocean_reserved_ip_assignment.this[0]
-  to   = digitalocean_reserved_ip_assignment.production
 }

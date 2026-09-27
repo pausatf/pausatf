@@ -43,12 +43,6 @@ variable "has_discussions" {
   default     = false
 }
 
-variable "has_downloads" {
-  description = "Enable downloads"
-  type        = bool
-  default     = true
-}
-
 variable "allow_merge_commit" {
   description = "Allow merge commits"
   type        = bool
@@ -127,6 +121,12 @@ variable "enable_branch_protection" {
 
 variable "protected_branch" {
   description = "Branch to protect"
+  type        = string
+  default     = "main"
+}
+
+variable "default_branch" {
+  description = "Repository's default branch"
   type        = string
   default     = "main"
 }

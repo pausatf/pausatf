@@ -40,5 +40,5 @@ output "repository_git_clone_url" {
 
 output "default_branch" {
   description = "Default branch name"
-  value       = github_repository.repo.default_branch
+  value       = github_branch_default.default.branch
 }

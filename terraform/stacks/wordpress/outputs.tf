@@ -20,57 +20,57 @@ output "droplet_urn" {
 
 output "database_host" {
   description = "Managed database host"
-  value       = module.database.host
+  value       = var.create_database ? module.database[0].host : null
   sensitive   = true
 }
 
 output "database_private_host" {
   description = "Managed database private host (VPC)"
-  value       = module.database.private_host
+  value       = var.create_database ? module.database[0].private_host : null
   sensitive   = true
 }
 
 output "database_port" {
   description = "Managed database port"
-  value       = module.database.port
+  value       = var.create_database ? module.database[0].port : null
 }
 
 output "database_uri" {
   description = "Managed database connection URI"
-  value       = module.database.uri
+  value       = var.create_database ? module.database[0].uri : null
   sensitive   = true
 }
 
 output "database_id" {
   description = "Managed database cluster ID"
-  value       = module.database.id
+  value       = var.create_database ? module.database[0].id : null
 }
 
 output "database_urn" {
   description = "Managed database cluster URN"
-  value       = module.database.urn
+  value       = var.create_database ? module.database[0].urn : null
 }
 
 output "database_user" {
   description = "Managed database admin username"
-  value       = module.database.user
+  value       = var.create_database ? module.database[0].user : null
   sensitive   = true
 }
 
 output "database_password" {
   description = "Managed database admin password"
-  value       = module.database.password
+  value       = var.create_database ? module.database[0].password : null
   sensitive   = true
 }
 
 output "database_name" {
   description = "Managed database default database name"
-  value       = module.database.database
+  value       = var.create_database ? module.database[0].database : null
 }
 
 output "vpc_id" {
   description = "VPC ID"
-  value       = var.create_vpc ? digitalocean_vpc.this[0].id : var.vpc_uuid_override
+  value       = var.create_vpc ? digitalocean_vpc.this[0].id : data.digitalocean_vpc.existing[0].id
 }
 
 output "firewall_id" {

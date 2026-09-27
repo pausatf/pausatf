@@ -1,298 +1,44 @@
 # Terraform Environments
 
-Reference for all Terraform environments and reusable modules in this
-repository.
+This file describes the current environment layout. Live resource IDs and reconciliation status are maintained in [INFRASTRUCTURE_INVENTORY.md](INFRASTRUCTURE_INVENTORY.md).
 
----
+## State and common settings
 
-## State Backend
+All six Terraform roots use HCP Terraform organization `pausatf`. Each root selects its own workspace in its `cloud` block. HCP stores state while workspace execution is local, allowing CLI runs to resolve shared modules outside an individual environment directory. Run `terraform login` and `terraform init` from the environment directory on a trusted runner with provider credentials set; the `hcp` root also needs `TFE_TOKEN`. Do not use the retired `backend.hcl` S3 configuration.
 
-All environments use DigitalOcean Spaces as an S3-compatible remote backend.
+Terraform requires version 1.10 or later. Use the repository's mise-pinned version. Inject provider credentials as sensitive environment values in trusted CLI or CI runners. Never commit API tokens, provider credentials, state files, or credential-filled tfvars files.
 
-| Setting | Value |
-|---------|-------|
-| Endpoint | `sfo2.digitaloceanspaces.com` |
-| Bucket | `pausatf-terraform-state` |
-| Region (dummy) | `us-west-1` |
-| Credentials | `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` env vars (DO Spaces keys) |
+| Directory | Workspace | Purpose | Current state |
+|---|---|---|---|
+| `environments/production/` | `pausatf-production` | Production DigitalOcean droplet/firewall, managed MySQL, project and SSH-key references, PAUSATF Spaces | Current resources imported, production state migrated from the versioned Spaces backend, and latest plan has no changes. |
+| `environments/staging/` | `pausatf-staging` | Staging DigitalOcean droplet/firewall and `stage.pausatf.org` DNS | Resources imported; latest plan has no changes. |
+| `environments/dev/` | `pausatf-dev` | Development DigitalOcean droplet/firewall and `dev.pausatf.org` DNS | Resources imported; latest plan has no changes. |
+| `environments/cloudflare/` | `pausatf-cloudflare` | `pausatf.org` zone, central DNS, zone settings, and rulesets | Resources imported; latest plan has no changes. |
+| `environments/github/` | `pausatf-github` | `pausatf/pausatf` repository settings, default branch, branch protection, Dependabot, alerts, and topics | Resources imported; latest plan has no changes. |
+| `environments/hcp/` | `pausatf-hcp` | HCP workspace settings for all PAUSATF workspaces | Six active and three retired workspaces imported and managed; latest plan has no changes. |
 
-Each environment writes to its own state key (see table below). State files are
-never shared between environments.
+## DigitalOcean design
 
----
+Production, staging, and dev web droplets use the shared WordPress stack in `stacks/wordpress`. All use the existing shared `default-sfo2` VPC as a data source; Terraform does not own or modify that VPC. The production environment owns the managed MySQL cluster and four Spaces buckets. Staging and dev do not have separately provisioned managed databases in the current live inventory.
 
-## Environments
+Firewall web ingress is limited to Cloudflare address ranges. SSH source CIDRs are explicit and include the Tailscale range; unrestricted SSH is rejected by variable validation. The production database firewall trusts the production droplet. Review the inventory for the current firewall and database IDs.
 
-### `environments/production/`
+## Cloudflare ownership
 
-Manages the live PAUSATF website infrastructure.
+The central Cloudflare root owns the zone, 37 central DNS records, settings, and rulesets. `dev.pausatf.org` belongs to the dev root and `stage.pausatf.org` to staging; never declare the same record in multiple states. These resources are imported in their respective workspaces, and all three roots currently plan with no changes.
 
-**State key**: `production/terraform.tfstate`
+## GitHub configuration
 
-**Providers**:
-- `digitalocean/digitalocean` ~> 2.76
-- `cloudflare/cloudflare` ~> 5.17
+The GitHub root manages the `pausatf/pausatf` repository using the reusable module in `modules/github/repository`. Repository settings, default branch, main branch protection, Dependabot updates, vulnerability alerts, and topics are imported into HCP state. The latest plan reports no changes. The current GitHub Actions infrastructure workflow still needs an HCP API token secret before it can initialize and plan against the HCP backend.
 
-**Terraform**: >= 1.10.0
+## Routine workflow
 
-**Resources managed**:
+```bash
+cd terraform/environments/<environment>
+terraform login
+terraform init
+terraform validate
+terraform plan
+```
 
-| Resource | Name | Notes |
-|----------|------|-------|
-| `digitalocean_project` | PAUSATF | Groups production resources |
-| `digitalocean_vpc` | pausatf-production-vpc | `10.10.0.0/16`, region `sfo2` |
-| `digitalocean_droplet` | pausatf-prod | `s-4vcpu-8gb`, Ubuntu, backups enabled, cloud-init via `cloud-init-ubuntu-24.yml` |
-| `digitalocean_reserved_ip` | production | Prevents IP change on rebuild |
-| `digitalocean_reserved_ip_assignment` | production | Attaches reserved IP to droplet |
-| `digitalocean_ssh_key` | m3 laptop | Public key from `var.ssh_public_key` |
-| `digitalocean_firewall` | pausatf-production-firewall | Allows 80, 443 from anywhere; 22 from `ssh_allowed_ips` |
-| `digitalocean_monitor_alert` | cpu_high | CPU > 80% for 5 min → email |
-| `digitalocean_monitor_alert` | memory_high | Memory > 85% for 5 min → email |
-| `digitalocean_monitor_alert` | disk_high | Disk > 75% → email |
-
-**Variables** (set in `terraform.tfvars`, never committed):
-
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `do_token` | yes | — | DigitalOcean API token |
-| `cloudflare_api_token` | yes | — | Cloudflare API token |
-| `ssh_public_key` | yes | — | SSH public key for droplet access |
-| `region` | no | `sfo2` | DigitalOcean region |
-| `droplet_size` | no | `s-1vcpu-1gb` | Droplet size slug |
-| `droplet_image` | no | `ubuntu-22-04-x64` | Base image |
-| `ssh_allowed_ips` | no | `[]` | IPs allowed to SSH |
-| `alert_email_addresses` | no | `[]` | Monitoring alert recipients |
-
-**Outputs**: `droplet_id`, `droplet_ip`, `droplet_urn`, `database_id`,
-`database_host` (sensitive), `database_uri` (sensitive), `vpc_id`, `firewall_id`
-
----
-
-### `environments/staging/`
-
-Mirrors production topology at reduced cost for pre-release testing.
-
-**State key**: `staging/terraform.tfstate`
-
-**Providers**:
-- `digitalocean/digitalocean` ~> 2.76
-- `cloudflare/cloudflare` ~> 5.17
-
-**Terraform**: >= 1.10.0
-
-**Resources managed**:
-
-| Resource | Name | Notes |
-|----------|------|-------|
-| `digitalocean_droplet` | pausatf-stage | Automatic Backups feature remains disabled; weekly GitHub Actions snapshots retain two completed staging snapshots. Live Docker runtime and Terraform drift remain under reconciliation. |
-| `digitalocean_database_cluster` | pausatf-stage-db | MySQL 8, single node, maintenance Saturday 02:00 |
-| `digitalocean_database_firewall` | staging | Restricts DB access to staging droplet only |
-| `digitalocean_firewall` | pausatf-staging-firewall | Allows 80, 443, 22, 7080 (OLS WebAdmin) |
-| `module.cloudflare_dns_staging` | — | Sole owner of `stage.pausatf.org`, a proxied CNAME to the staging Cloudflare Tunnel |
-
-**Key difference from production**: Uses OpenLiteSpeed instead of Apache.
-Database is a managed DO cluster rather than local MySQL.
-
----
-
-### `environments/dev/`
-
-Lightweight environment for development work. Mirrors staging structure.
-
-**State key**: `dev/terraform.tfstate`
-
-**Providers**:
-- `digitalocean/digitalocean` ~> 2.76
-- `cloudflare/cloudflare` ~> 5.17
-
-**Terraform**: >= 1.10.0
-
-**Resources managed**:
-
-| Resource | Name | Notes |
-|----------|------|-------|
-| `digitalocean_droplet` | pausatf-dev | No backups; cloud-init via `cloud-init.yml` |
-| `digitalocean_database_cluster` | pausatf-dev-db | MySQL 8, single node |
-| `digitalocean_database_firewall` | dev | Restricts DB to dev droplet |
-| `digitalocean_vpc` | pausatf-dev-vpc | Dedicated VPC |
-| `digitalocean_firewall` | pausatf-dev-firewall | Allows 80, 443, 22 |
-| `module.cloudflare_dns_dev` | — | Sole owner of `dev.pausatf.org` A record (proxied) |
-
----
-
-### `environments/cloudflare/`
-
-Manages the `pausatf.org` zone, its central DNS records, zone settings, and
-rulesets. The `dev` and `stage` DNS records remain owned by their respective
-environment states and are excluded here to avoid duplicate Terraform owners.
-
-**State key**: `cloudflare/terraform.tfstate`
-
-**Providers**:
-- `cloudflare/cloudflare` ~> 5.17
-
-**Terraform**: >= 1.10.0
-
-**Resources managed**:
-
-| Type | Records | Notes |
-|------|---------|-------|
-| A | `direct-ssh`, `ftp`, `mail`, `monitor`, `runners`, `staging` | Observed direct endpoints; `staging` is proxied |
-| CNAME | `@`, `www` | Production Cloudflare Tunnel |
-| CNAME | `prod`, `ssh`, `ssh-stage-v2`, `ssh-v2`, `v2canary` | Production/staging tunnel aliases |
-| CNAME | `51871933`, `em5172`, `url7068`, `url7741` | SendGrid tracking and delivery |
-| CNAME | `s1._domainkey`, `s2._domainkey` | SendGrid DKIM |
-| MX (5) | `@` | Google Workspace, priorities 1/5/5/10/10 |
-| TXT (6) | `@`, `_dmarc`, `cf2024-1._domainkey`, `mail._domainkey`, `_acme-challenge.www` | SPF, Google verification, DMARC quarantine, DKIM, temporary ACME challenge |
-| CAA (7) | `@` | Google Trust Services, DigiCert, Let's Encrypt, and iodef |
-
-The live zone has 39 DNS records. This state declares 37; `dev` is owned by
-`environments/dev/` and `stage` by `environments/staging/`. The Cloudflare
-state is currently empty, so import existing records and review a no-change
-plan before any apply. Zone settings and rulesets still need verification with
-a Cloudflare token that has read access.
-
-**Variables** (set in `terraform.tfvars`):
-
-| Variable | Description |
-|----------|-------------|
-| `cloudflare_api_token` | Cloudflare API token |
-| `cloudflare_account_id` | Cloudflare account ID |
-
-**DNS change process**: Edit the Terraform resource in the environment that
-owns the record, run a plan, and review it before applying. Do not apply while
-the Cloudflare or staging state is empty or until the issue #137 reconciliation
-is complete. Avoid declaring the same record in more than one state.
-
----
-
-### `environments/github/`
-
-Manages the `pausatf/pausatf` GitHub repository settings via Terraform.
-
-**State key**: `github/terraform.tfstate`
-
-**Providers**:
-- `integrations/github` ~> 6.0
-
-**Terraform**: >= 1.0
-
-**Resources managed** (via `modules/github/repository`):
-- Repository features: issues, wiki, projects enabled
-- Merge settings: merge commit, squash, rebase allowed; auto-merge off;
-  delete branch on merge on
-- Branch protection on `main`: signed commits required, force push blocked,
-  1 required review, stale review dismissal enabled
-- Required CI checks: `terraform-validate`, `terraform-fmt`, `ansible-lint`,
-  `shellcheck`
-- Dependabot and vulnerability alerts enabled
-
-**Variables** (set in `terraform.tfvars`):
-
-| Variable | Description |
-|----------|-------------|
-| `github_token` | GitHub personal access token |
-| `github_owner` | GitHub organization/owner (`pausatf`) |
-
----
-
-## Modules
-
-### `modules/digitalocean/droplet`
-
-Reusable DigitalOcean droplet with optional firewall.
-
-**Inputs**:
-
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `name` | yes | — | Droplet name (lowercase, numbers, hyphens) |
-| `environment` | yes | — | `production`, `staging`, or `development` |
-| `image` | yes | — | OS image or snapshot ID |
-| `region` | no | `sfo2` | DigitalOcean region |
-| `size` | no | `s-1vcpu-1gb` | Droplet size slug |
-| `ssh_key_ids` | no | `[]` | SSH key IDs |
-| `vpc_uuid` | no | null | VPC to attach |
-| `monitoring_enabled` | no | true | Enable DO monitoring |
-| `backups_enabled` | no | false | Enable automated backups |
-| `user_data` | no | null | Cloud-init script |
-| `tags` | no | `[]` | Tags |
-| `firewall_inbound_rules` | no | `[]` | Inbound firewall rules |
-| `firewall_outbound_rules` | no | `[]` | Outbound firewall rules |
-
-**Tests**: `modules/digitalocean/droplet/tests/droplet_test.go`
-
----
-
-### `modules/digitalocean/database`
-
-Reusable DigitalOcean managed database cluster (MySQL).
-
-**Inputs**: cluster name, engine, version, size, region, node count, tags,
-maintenance window, firewall rules.
-
----
-
-### `modules/cloudflare/zone`
-
-Manages a Cloudflare zone and its settings (SSL mode, TLS version, security
-level, caching, HTTP/2, HTTP/3, minification, DNSSEC).
-
-**Inputs**:
-
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `account_id` | yes | — | Cloudflare account ID |
-| `zone_name` | yes | — | Domain name |
-| `plan` | no | `free` | Zone plan |
-| `ssl_mode` | no | `strict` | SSL mode |
-| `min_tls_version` | no | `1.2` | Minimum TLS version |
-| `security_level` | no | `medium` | Security level |
-| `browser_cache_ttl` | no | `14400` | Browser cache TTL (seconds) |
-
----
-
-### `modules/cloudflare/dns`
-
-Creates a set of Cloudflare DNS records in a given zone.
-
-**Inputs**:
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `zone_id` | yes | Cloudflare zone ID |
-| `dns_records` | no | List of records: `name`, `type`, `value`, `ttl`, `proxied`, `priority`, `comment` |
-
-Used by `environments/staging` and `environments/dev` to create their
-respective subdomains.
-
----
-
-### `modules/github/repository`
-
-Manages a GitHub repository, branch protection, and merge settings.
-
-**Inputs**: name, description, visibility, feature flags (issues, wiki,
-projects, discussions), merge strategy settings, branch protection config,
-required status checks, required review counts, Dependabot toggle, topics.
-
----
-
-### `modules/droplet` (cloud-init templates)
-
-Cloud-init templates used as `user_data` when provisioning droplets.
-
-| File | Purpose |
-|------|---------|
-| `cloud-init-ubuntu-24.yml` | Production — Ubuntu 24.04, Apache + PHP stack |
-| `cloud-init-openlitespeed.yml` | Staging — OpenLiteSpeed stack |
-| `cloud-init-base.yml` | Base template (common packages) |
-| `cloud-init-nginx.yml.deprecated` | Deprecated — not in use |
-
----
-
-## Compliance Tests
-
-`terraform/tests/compliance/` contains BDD-style compliance tests (`.feature`
-files) for Cloudflare and DigitalOcean resource configurations. Run with a
-compatible Terraform testing tool (e.g., `terraform test` or Conftest).
+Import pre-existing resources before managing them. Back up state before state-only removals or workspace consolidation. Never apply against an empty or partially imported state, and inspect all proposed replacement or destroy actions before approval.

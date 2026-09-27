@@ -13,11 +13,6 @@ output "droplet_urn" {
   value       = module.wordpress.droplet_urn
 }
 
-output "reserved_ip" {
-  description = "Production reserved IP address"
-  value       = digitalocean_reserved_ip.production.ip_address
-}
-
 output "database_id" {
   description = "Production database cluster ID"
   value       = module.wordpress.database_id

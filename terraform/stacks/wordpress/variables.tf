@@ -8,6 +8,36 @@ variable "environment" {
   }
 }
 
+variable "environment_tag" {
+  description = "DigitalOcean tag for this environment"
+  type        = string
+  default     = null
+}
+
+variable "additional_tags" {
+  description = "Additional tags applied to the droplet and firewall"
+  type        = list(string)
+  default     = []
+}
+
+variable "droplet_name" {
+  description = "Explicit droplet name; defaults to pausatf-<environment>"
+  type        = string
+  default     = null
+}
+
+variable "database_cluster_name" {
+  description = "Explicit managed database cluster name; defaults to pausatf-<environment>-db"
+  type        = string
+  default     = null
+}
+
+variable "firewall_name" {
+  description = "Explicit firewall name; defaults to pausatf-<environment>-firewall"
+  type        = string
+  default     = null
+}
+
 variable "region" {
   description = "DigitalOcean region"
   type        = string
@@ -64,6 +94,12 @@ variable "database_size" {
   }
 }
 
+variable "create_database" {
+  description = "Whether this environment owns a DigitalOcean managed database cluster"
+  type        = bool
+  default     = true
+}
+
 variable "vpc_cidr" {
   description = "VPC IP range in CIDR notation"
   type        = string
@@ -112,6 +148,18 @@ variable "firewall_http_source_cidrs" {
   default     = null
 }
 
+variable "enable_web_ingress" {
+  description = "Create public web firewall rules. Disable when traffic reaches the droplet only through a tunnel."
+  type        = bool
+  default     = true
+}
+
+variable "outbound_tcp_udp_port_range" {
+  description = "TCP/UDP egress port range as represented by the existing DigitalOcean firewall."
+  type        = string
+  default     = "all"
+}
+
 variable "enable_monitoring_alerts" {
   description = "Create DigitalOcean monitoring alerts."
   type        = bool
@@ -119,9 +167,14 @@ variable "enable_monitoring_alerts" {
 }
 
 variable "ssh_allowed_ips" {
-  description = "IPs allowed SSH access via firewall. Empty list means no SSH rule."
+  description = "Explicit source CIDRs allowed to SSH to the droplet"
   type        = list(string)
-  default     = []
+}
+
+variable "icmp_source_addresses" {
+  description = "Source CIDRs allowed to send ICMP to the droplet"
+  type        = list(string)
+  default     = ["0.0.0.0/0", "::/0"]
 }
 
 variable "extra_firewall_rules" {
