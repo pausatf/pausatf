@@ -6,7 +6,7 @@ on:
     branches: [main]
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -26,27 +26,16 @@ jobs:
   ansible-lint:
     name: Ansible Lint
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 15
     if: "!contains(github.event.pull_request.title, 'chore(deps):')"
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
-      - name: Setup Python
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v5
+      - name: Setup Ansible
+        uses: ./.github/actions/setup-ansible
         with:
-          python-version: '3.11'
-
-      - name: Install Ansible and ansible-lint
-        run: |
-          pip install ansible-core==2.17.5 ansible-lint==25.12.2
-          ansible-galaxy collection install -r ansible/requirements.yml
-
-      - name: Create dummy vault password for CI
-        run: |
-          echo '#!/bin/sh' > ansible/.vault_pass.sh
-          echo 'echo ci-dummy-vault-password' >> ansible/.vault_pass.sh
-          chmod +x ansible/.vault_pass.sh
+          extra-packages: ansible-lint==25.12.2
 
       - name: Run ansible-lint
         run: ansible-lint --offline --strict
@@ -55,14 +44,14 @@ jobs:
   yamllint:
     name: YAML Lint
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 10
     if: "!contains(github.event.pull_request.title, 'chore(deps):')"
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
       - name: Setup Python
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v5
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0
         with:
           python-version: '3.11'
 
@@ -77,27 +66,14 @@ jobs:
   syntax-check:
     name: Ansible Syntax Check
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 15
     if: "!contains(github.event.pull_request.title, 'chore(deps):')"
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
-      - name: Setup Python
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v5
-        with:
-          python-version: '3.11'
-
-      - name: Install Ansible
-        run: |
-          pip install ansible-core==2.17.5
-          ansible-galaxy collection install -r ansible/requirements.yml
-
-      - name: Create dummy vault password for CI
-        run: |
-          echo '#!/bin/sh' > ansible/.vault_pass.sh
-          echo 'echo ci-dummy-vault-password' >> ansible/.vault_pass.sh
-          chmod +x ansible/.vault_pass.sh
+      - name: Setup Ansible
+        uses: ./.github/actions/setup-ansible
 
       - name: Check playbook syntax
         run: |
@@ -123,10 +99,10 @@ jobs:
   shellcheck:
     name: ShellCheck
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 10
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
       - name: Run ShellCheck
         uses: ludeeus/action-shellcheck@00b27aa7cb85167568cb48a3838b75f4265f2bca  # master
@@ -138,10 +114,10 @@ jobs:
   bash-syntax:
     name: Bash Syntax Check
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 10
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
       - name: Check bash syntax
         run: |
@@ -157,11 +133,11 @@ jobs:
   markdown-lint:
     name: Markdown Lint
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 10
     if: "!contains(github.event.pull_request.title, 'chore(deps):')"
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
       - name: Run markdownlint
         uses: nosborn/github-action-markdown-cli@508d6cefd8f0cc99eab5d2d4685b1d5f470042c1  # v3.5.0
@@ -173,11 +149,11 @@ jobs:
   link-check:
     name: Markdown Link Check
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 10
     if: "!contains(github.event.pull_request.title, 'chore(deps):')"
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
       - name: Check links
         uses: gaurav-nelson/github-action-markdown-link-check@5c5dfc0ac2e225883c0e5f03a85311ec2830d368  # v1
@@ -191,11 +167,11 @@ jobs:
   terraform-fmt:
     name: Terraform Format
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 10
     if: "!contains(github.event.pull_request.title, 'chore(deps):')"
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e  # v4.0.1
@@ -209,14 +185,14 @@ jobs:
   terraform-validate:
     name: Terraform Validate (${{ matrix.environment }})
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 15
     if: "!contains(github.event.pull_request.title, 'chore(deps):')"
     strategy:
       matrix:
         environment: [production, staging, github, dev, cloudflare]
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e  # v4.0.1
@@ -240,14 +216,14 @@ jobs:
   tfsec:
     name: TFSec
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 15
     permissions:
       contents: read
       security-events: write
     if: "!contains(github.event.pull_request.title, 'chore(deps):')"
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
       - name: Run tfsec
         run: |
@@ -262,8 +238,8 @@ jobs:
             --out results.sarif terraform
 
       - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@8aad20d150bbac5944a9f9d289da16a4b0d87c1e  # v4.36.2
-        if: ${{ always() && hashFiles('results.sarif') != '' }}
+        uses: github/codeql-action/upload-sarif@7188fc363630916deb702c7fdcf4e481b751f97a  # v4.37.1
+        if: always()
         with:
           sarif_file: results.sarif
           category: tfsec
@@ -271,11 +247,11 @@ jobs:
   tflint:
     name: TFLint
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 15
     if: "!contains(github.event.pull_request.title, 'chore(deps):')"
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
       - name: Setup TFLint
         uses: terraform-linters/setup-tflint@b480b8fcdaa6f2c577f8e4fa799e89e756bb7c93  # v6
