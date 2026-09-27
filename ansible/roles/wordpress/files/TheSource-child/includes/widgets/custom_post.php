@@ -1,4 +1,11 @@
-<?php $thumb = '';
+<?php
+/**
+ * PAUSATF TheSource child theme source: custom_post.php.
+ *
+ * @package PAUSATF_TheSource_Child
+ */
+
+$thumb = '';
 
 	$width = 74;
 	$height = 74;
@@ -7,6 +14,7 @@
 
 	$thumbnail = get_thumbnail($width,$height,$classtext,$titletext,$titletext);
 	$thumb = $thumbnail["thumb"];
+
 ?>
 
 <li class="clearfix">

@@ -4,6 +4,8 @@
  * Description: Deterministic widget visibility with code-defined overrides and editor-managed fallback. Replaces widget-logic plugin.
  * Version: 1.0.0
  * Author: PAUSATF Dev Team
+ *
+ * @package PAUSATF_WordPress
  */
 
 declare(strict_types=1);

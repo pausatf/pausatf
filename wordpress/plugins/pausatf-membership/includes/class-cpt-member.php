@@ -4,6 +4,8 @@
  *
  * Replaces legacy members.php (Teeters, 2007).
  * Shortcode: [pausatf_members] — login-required; filters by club.
+ *
+ * @package PAUSATF_Membership
  */
 
 declare( strict_types=1 );

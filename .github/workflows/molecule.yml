@@ -1,6 +1,6 @@
 name: Molecule Tests
 
-on:
+"on":
   pull_request:
     paths:
       - 'ansible/roles/**'
@@ -12,12 +12,12 @@ on:
       - 'ansible/roles/**'
       - '.github/workflows/molecule.yml'
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 permissions:
   contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   molecule:
@@ -31,6 +31,7 @@ jobs:
           - common
           - wordpress
           - php-fpm
+          - fail2ban
           - redis
           - certbot
           - modsecurity

@@ -8,6 +8,8 @@
  * Example wp-config.php additions (server-side only):
  *   define( 'CF_API_TOKEN', 'your-cache-purge-scoped-token' );
  *   define( 'CF_ZONE_ID',   'your-zone-id' );
+ *
+ * @package PAUSATF_WordPress
  */
 
 declare(strict_types=1);

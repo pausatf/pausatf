@@ -5,6 +5,7 @@ fail2ban_findtime: 600
 fail2ban_destemail: "admin@pausatf.org"
 fail2ban_sendername: "Fail2Ban"
 fail2ban_mta: "sendmail"
+fail2ban_manage_service: true
 
 # AbuseIPDB integration (report bans + pull blocklist)
 fail2ban_abuseipdb_enabled: true
