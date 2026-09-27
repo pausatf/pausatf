@@ -5,11 +5,11 @@ rulesets for `pausatf.org`.
 
 ## Reconciliation safety
 
-The Cloudflare Terraform backend currently has no state file. The live DNS
-inventory was read from the Cloudflare API on 2026-09-26 and the declarations
-here were updated to match those records. The Cloudflare API token used for the
-inventory could not read zone settings or rulesets, so those declarations have
-not been checked against the live account.
+The Cloudflare Terraform backend had no state file at the last check. The live
+DNS inventory, zone settings, and rulesets were read from the authenticated
+Cloudflare dashboard on 2026-09-27. The declarations here describe that
+observed configuration; this code change does not modify Cloudflare or import
+resources into state.
 
 Do not run `terraform apply` yet. First import the existing zone and DNS records
 into the correct remote state, verify zone settings and rulesets with an
@@ -27,6 +27,21 @@ existing `stage` record before considering an apply.
 
 The `_acme-challenge.www` TXT value is time-sensitive; confirm it is still
 needed before importing or refreshing that record.
+
+### Observed zone settings and rulesets
+
+The declared zone settings match the dashboard: Full (strict), Always Use
+HTTPS, minimum TLS 1.2, Brotli, opportunistic encryption, and HSTS
+(`max-age=15552000`, include subdomains, preload, and nosniff). The live cache
+ruleset bypasses caching for the apex and `/data/`, caches anonymous public
+pages for 7200 seconds at the edge and 300 seconds in browsers, and bypasses
+cache for WordPress admin and authenticated requests. The live login rate
+limit blocks five POST requests per ten seconds per source IP and Cloudflare
+colo, with a ten-second mitigation timeout.
+
+The live zone has no custom WAF ruleset or `transit` redirect ruleset. Those
+previously declared but absent rules have been removed from this desired-state
+configuration so an import and review plan will not propose creating them.
 
 ## Live DNS inventory
 

@@ -65,6 +65,20 @@ resource "cloudflare_zone_setting" "opportunistic_encryption" {
   value      = "on"
 }
 
+resource "cloudflare_zone_setting" "security_header" {
+  zone_id    = cloudflare_zone.pausatf.id
+  setting_id = "security_header"
+  value = {
+    strict_transport_security = {
+      enabled            = true
+      max_age            = 15552000
+      include_subdomains = true
+      preload            = true
+      nosniff            = true
+    }
+  }
+}
+
 # =============================================================================
 # DNS Records — Production
 # =============================================================================
@@ -76,7 +90,7 @@ resource "cloudflare_dns_record" "root" {
   type    = "CNAME"
   ttl     = 1
   proxied = true
-  comment = "Main site routed through the production Cloudflare Tunnel"
+  comment = "PROD cutover to prod-v2 tunnel (was A 165.22.153.191)"
 }
 
 resource "cloudflare_dns_record" "www" {
@@ -86,7 +100,7 @@ resource "cloudflare_dns_record" "www" {
   type    = "CNAME"
   ttl     = 1
   proxied = true
-  comment = "WWW routed through the production Cloudflare Tunnel"
+  comment = "PROD cutover to prod-v2 tunnel (was A 165.22.153.191)"
 }
 
 resource "cloudflare_dns_record" "ftp" {
@@ -126,7 +140,7 @@ resource "cloudflare_dns_record" "direct_ssh" {
   type    = "A"
   ttl     = 1
   proxied = false
-  comment = "Direct SSH endpoint"
+  comment = "Direct SSH access (DNS only, not proxied)"
 }
 
 resource "cloudflare_dns_record" "runners" {
@@ -136,7 +150,6 @@ resource "cloudflare_dns_record" "runners" {
   type    = "A"
   ttl     = 1
   proxied = false
-  comment = "GitHub Actions runner host"
 }
 
 # =============================================================================
@@ -150,32 +163,6 @@ resource "cloudflare_dns_record" "staging" {
   type    = "A"
   ttl     = 1
   proxied = true
-  comment = "Legacy staging endpoint (live DNS points to 64.227.85.73)"
-}
-
-resource "cloudflare_ruleset" "transit_redirect" {
-  zone_id = cloudflare_zone.pausatf.id
-  name    = "Redirect transit to www"
-  kind    = "zone"
-  phase   = "http_request_dynamic_redirect"
-
-  rules = [
-    {
-      action = "redirect"
-      action_parameters = {
-        from_value = {
-          preserve_query_string = true
-          status_code           = 301
-          target_url = {
-            value = "https://www.pausatf.org"
-          }
-        }
-      }
-      description = "Redirect transit.pausatf.org to www.pausatf.org"
-      enabled     = true
-      expression  = "(http.host eq \"transit.pausatf.org\")"
-    }
-  ]
 }
 
 # =============================================================================
@@ -189,7 +176,7 @@ resource "cloudflare_dns_record" "prod" {
   type    = "CNAME"
   ttl     = 1
   proxied = false
-  comment = "Production alias"
+  comment = "Production server alias"
 }
 
 resource "cloudflare_dns_record" "ssh" {
@@ -199,7 +186,6 @@ resource "cloudflare_dns_record" "ssh" {
   type    = "CNAME"
   ttl     = 1
   proxied = true
-  comment = "SSH Cloudflare Tunnel"
 }
 
 resource "cloudflare_dns_record" "ssh_stage_v2" {
@@ -209,7 +195,7 @@ resource "cloudflare_dns_record" "ssh_stage_v2" {
   type    = "CNAME"
   ttl     = 1
   proxied = true
-  comment = "Staging SSH Cloudflare Tunnel"
+  comment = "cloudflared tunnel SSH (stage-v2)"
 }
 
 resource "cloudflare_dns_record" "ssh_v2" {
@@ -219,7 +205,7 @@ resource "cloudflare_dns_record" "ssh_v2" {
   type    = "CNAME"
   ttl     = 1
   proxied = true
-  comment = "Production SSH Cloudflare Tunnel v2"
+  comment = "pausatf-prod-v2 tunnel (migration build)"
 }
 
 resource "cloudflare_dns_record" "v2canary" {
@@ -229,7 +215,7 @@ resource "cloudflare_dns_record" "v2canary" {
   type    = "CNAME"
   ttl     = 1
   proxied = true
-  comment = "Production canary Cloudflare Tunnel"
+  comment = "cloudflared tunnel (prod-v2 canary)"
 }
 
 # =============================================================================
@@ -243,7 +229,6 @@ resource "cloudflare_dns_record" "sendgrid_51871933" {
   type    = "CNAME"
   ttl     = 1
   proxied = false
-  comment = "SendGrid email tracking"
 }
 
 resource "cloudflare_dns_record" "sendgrid_delivery" {
@@ -253,7 +238,7 @@ resource "cloudflare_dns_record" "sendgrid_delivery" {
   type    = "CNAME"
   ttl     = 1
   proxied = false
-  comment = "SendGrid email delivery"
+  comment = "sendgrid"
 }
 
 moved {
@@ -268,7 +253,6 @@ resource "cloudflare_dns_record" "sendgrid_url7068" {
   type    = "CNAME"
   ttl     = 1
   proxied = false
-  comment = "SendGrid link tracking"
 }
 
 resource "cloudflare_dns_record" "sendgrid_url7741" {
@@ -278,7 +262,6 @@ resource "cloudflare_dns_record" "sendgrid_url7741" {
   type    = "CNAME"
   ttl     = 1
   proxied = false
-  comment = "SendGrid link tracking"
 }
 
 # =============================================================================
@@ -292,7 +275,7 @@ resource "cloudflare_dns_record" "sendgrid_dkim_s1" {
   type    = "CNAME"
   ttl     = 1
   proxied = false
-  comment = "SendGrid DKIM signature 1"
+  comment = "sendgrid"
 }
 
 resource "cloudflare_dns_record" "sendgrid_dkim_s2" {
@@ -302,7 +285,7 @@ resource "cloudflare_dns_record" "sendgrid_dkim_s2" {
   type    = "CNAME"
   ttl     = 1
   proxied = false
-  comment = "SendGrid DKIM signature 2"
+  comment = "sendgrid"
 }
 
 # =============================================================================
@@ -316,7 +299,6 @@ resource "cloudflare_dns_record" "mx_primary" {
   type     = "MX"
   priority = 1
   ttl      = 1
-  comment  = "Google Workspace MX (primary)"
 }
 
 resource "cloudflare_dns_record" "mx_alt1" {
@@ -326,7 +308,6 @@ resource "cloudflare_dns_record" "mx_alt1" {
   type     = "MX"
   priority = 5
   ttl      = 1
-  comment  = "Google Workspace MX (backup 1)"
 }
 
 resource "cloudflare_dns_record" "mx_alt2" {
@@ -336,7 +317,6 @@ resource "cloudflare_dns_record" "mx_alt2" {
   type     = "MX"
   priority = 5
   ttl      = 1
-  comment  = "Google Workspace MX (backup 2)"
 }
 
 resource "cloudflare_dns_record" "mx_alt3" {
@@ -346,7 +326,6 @@ resource "cloudflare_dns_record" "mx_alt3" {
   type     = "MX"
   priority = 10
   ttl      = 1
-  comment  = "Google Workspace MX (backup 3)"
 }
 
 resource "cloudflare_dns_record" "mx_alt4" {
@@ -356,7 +335,6 @@ resource "cloudflare_dns_record" "mx_alt4" {
   type     = "MX"
   priority = 10
   ttl      = 1
-  comment  = "Google Workspace MX (backup 4)"
 }
 
 # =============================================================================
@@ -378,7 +356,6 @@ resource "cloudflare_dns_record" "google_site_verification" {
   content = "google-site-verification=TNLNBt7i-pSApITlOVOAVH5MT9YH16jTAXIIwHrmCLg" # pragma: allowlist secret
   type    = "TXT"
   ttl     = 1
-  comment = "Google Search Console verification"
 }
 
 resource "cloudflare_dns_record" "dmarc" {
@@ -398,7 +375,6 @@ resource "cloudflare_dns_record" "dkim_cloudflare" {
   content = "v=DKIM1; h=sha256; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiweykoi+o48IOGuP7GR3X0MOExCUDY/BCRHoWBnh3rChl7WhdyCxW3jgq1daEjPPqoi7sJvdg5hEQVsgVRQP4DcnQDVjGMbASQtrY4WmB1VebF+RPJB2ECPsEDTpeiI5ZyUAwJaVX7r6bznU67g7LvFq35yIo4sdlmtZGV+i0H4cpYH9+3JJ78km4KXwaf9xUJCWF6nxeD+qG6Fyruw1Qlbds2r85U9dkNDVAS3gioCvELryh1TxKGiVTkg4wqHTyHfWsp7KD3WQHYJn0RyfJJu6YEmL77zonn7p2SRMvTMP3ZEXibnC9gz3nnhR6wcYL8Q7zXypKTMD58bTixDSJwIDAQAB" # pragma: allowlist secret
   type    = "TXT"
   ttl     = 1
-  comment = "Cloudflare DKIM signature"
 }
 
 resource "cloudflare_dns_record" "dkim_mail" {
@@ -407,7 +383,6 @@ resource "cloudflare_dns_record" "dkim_mail" {
   content = "v=DKIM1; h=sha256; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtI1RFbT2Q/l8jxNfidHBMpDaw6UxnO3NwbJo58DLyKJX0WfICTpvUxPopz+xOl6Lcu27hFSZwWKgSEnDjhTdE1ytMuNNgUJ7O+n82VQQdJ5USiYGEHoIGFmuqcm6Ctwl3xQKHLeDsY56E16ry0U20necZuBOMjaRL8IAkaSUNlNpR1okwG0UC/SI/8t/KN+3b63OI/m9SFZeWajhMER+f9P3yWxo6EnMirC6tkooWlCP1DpAvJCz1CMtTewbtPUahUqhURKLVJIVYyT9mxGY0+qxMOWGMl0GoZjKZ39C0vMlWTTXNkbakav4HVUK2F6a3n1pG1xg0IRkRTXdhbNTywIDAQAB" # pragma: allowlist secret
   type    = "TXT"
   ttl     = 1
-  comment = "Mail DKIM signature"
 }
 
 resource "cloudflare_dns_record" "acme_challenge_www" {
@@ -416,7 +391,6 @@ resource "cloudflare_dns_record" "acme_challenge_www" {
   content = "JmQAJz96_x3ZwO5VqAfTMWAu5GMU7HXgGcaCpoRB2Cg" # pragma: allowlist secret
   type    = "TXT"
   ttl     = 120
-  comment = "Observed ACME validation record; verify ownership before refreshing"
 }
 
 # =============================================================================
@@ -456,7 +430,7 @@ resource "cloudflare_dns_record" "caa_digicert_issue" {
   name    = "@"
   type    = "CAA"
   ttl     = 1
-  comment = "Allow DigiCert to issue certificates"
+  comment = "Allow DigiCert (Cloudflare) to issue SSL certificates"
 
   data = {
     flags = 0
@@ -470,7 +444,7 @@ resource "cloudflare_dns_record" "caa_digicert_issuewild" {
   name    = "@"
   type    = "CAA"
   ttl     = 1
-  comment = "Allow DigiCert to issue wildcard certificates"
+  comment = "Allow DigiCert (Cloudflare) to issue wildcard SSL certificates"
 
   data = {
     flags = 0
@@ -484,7 +458,7 @@ resource "cloudflare_dns_record" "caa_iodef" {
   name    = "@"
   type    = "CAA"
   ttl     = 1
-  comment = "Certificate issue notification email"
+  comment = "Email for CAA violation reports"
 
   data = {
     flags = 0
@@ -498,7 +472,6 @@ resource "cloudflare_dns_record" "caa_google_issue" {
   name    = "@"
   type    = "CAA"
   ttl     = 1
-  comment = "Allow Google Trust Services to issue certificates"
 
   data = {
     flags = 0
@@ -512,7 +485,6 @@ resource "cloudflare_dns_record" "caa_google_issuewild" {
   name    = "@"
   type    = "CAA"
   ttl     = 1
-  comment = "Allow Google Trust Services to issue wildcard certificates"
 
   data = {
     flags = 0
@@ -522,114 +494,83 @@ resource "cloudflare_dns_record" "caa_google_issuewild" {
 }
 
 # =============================================================================
-# Cache Rules — static asset caching + WP admin/auth bypass
+# Cache Rules — match the live Cloudflare ruleset
 # =============================================================================
 
 resource "cloudflare_ruleset" "cache_rules" {
   zone_id = cloudflare_zone.pausatf.id
-  name    = "PAUSATF cache rules"
+  name    = "pausatf cache rules"
   kind    = "zone"
   phase   = "http_request_cache_settings"
 
   rules = [
-    # Bypass cache for wp-admin and wp-login.php
     {
       action = "set_cache_settings"
       action_parameters = {
         cache = false
       }
-      description = "Bypass cache for WordPress admin"
+      description = "Apex is never cacheable so the apex->www 301 page rule always fires (fixes cached-200 at apex)"
       enabled     = true
-      expression  = "(starts_with(http.request.uri.path, \"/wp-admin\") or http.request.uri.path eq \"/wp-login.php\")"
+      expression  = "(http.host eq \"pausatf.org\")"
     },
-    # Bypass cache when WP auth cookies present
     {
       action = "set_cache_settings"
       action_parameters = {
         cache = false
       }
-      description = "Bypass cache for authenticated users"
+      description = "Bypass cache for /data (Jeff Teeters results, must be fresh)"
       enabled     = true
-      expression  = "(http.cookie contains \"wordpress_logged_in_\" or http.cookie contains \"wp-postpass_\")"
+      expression  = "(starts_with(http.request.uri.path, \"/data/\"))"
     },
-    # Bypass cache for preview requests
-    {
-      action = "set_cache_settings"
-      action_parameters = {
-        cache = false
-      }
-      description = "Bypass cache for preview requests"
-      enabled     = true
-      expression  = "(http.request.uri.query contains \"preview=true\")"
-    },
-    # Cache static assets aggressively
     {
       action = "set_cache_settings"
       action_parameters = {
         cache = true
-        edge_ttl = {
-          mode    = "override_origin"
-          default = 604800 # 7 days
-        }
         browser_ttl = {
+          default = 300
           mode    = "override_origin"
-          default = 86400 # 1 day
+        }
+        edge_ttl = {
+          default = 7200
+          mode    = "override_origin"
         }
       }
-      description = "Cache static assets (7d edge, 1d browser)"
+      description = "Cache public pages for anonymous visitors"
       enabled     = true
-      expression  = "(http.request.uri.path.extension in {\"css\" \"js\" \"jpg\" \"jpeg\" \"png\" \"gif\" \"ico\" \"woff\" \"woff2\" \"ttf\" \"svg\" \"webp\"})"
+      expression  = "(http.host eq \"www.pausatf.org\" and not starts_with(http.request.uri.path, \"/wp-admin\") and not starts_with(http.request.uri.path, \"/wp-login\") and not starts_with(http.request.uri.path, \"/wp-json\") and not starts_with(http.request.uri.path, \"/wp-cron\") and not starts_with(http.request.uri.path, \"/data/\") and not any(http.request.cookies[\"wordpress_logged_in_*\"][*] ne \"\"))"
     },
-  ]
-}
-
-# =============================================================================
-# WAF — Restrict xmlrpc.php to Jetpack/Automattic
-# =============================================================================
-
-resource "cloudflare_ruleset" "waf_custom" {
-  zone_id = cloudflare_zone.pausatf.id
-  name    = "PAUSATF WAF custom rules"
-  kind    = "zone"
-  phase   = "http_request_firewall_custom"
-
-  rules = [
     {
-      action      = "block"
-      description = "Block non-Jetpack xmlrpc.php access"
+      action = "set_cache_settings"
+      action_parameters = {
+        cache = false
+      }
+      description = "Bypass cache for admin and logged-in users"
       enabled     = true
-      expression  = "(http.request.uri.path eq \"/xmlrpc.php\" and not (ip.src in {192.0.64.0/18 192.0.80.0/20 192.0.96.0/20 192.0.112.0/20 195.234.108.0/22 122.248.245.244 54.217.201.243 54.232.116.4}))"
+      expression  = " starts_with(http.request.uri.path, \"/wp-admin\") or\n  starts_with(http.request.uri.path, \"/wp-login\") or\n  starts_with(http.request.uri.path, \"/wp-json\") or\n  http.cookie contains \"wordpress_logged_in_\" or\n  http.cookie contains \"wp-postpass_\" or\n  http.cookie contains \"comment_author_\""
     },
   ]
 }
 
 # =============================================================================
-# Rate Limiting — wp-login brute force protection
+# Rate Limiting — match the live wp-login brute-force rule
 # =============================================================================
 
 resource "cloudflare_ruleset" "rate_limit" {
   zone_id = cloudflare_zone.pausatf.id
-  name    = "PAUSATF rate limiting"
+  name    = "default"
   kind    = "zone"
   phase   = "http_ratelimit"
 
   rules = [
     {
       action = "block"
-      action_parameters = {
-        response = {
-          status_code  = 429
-          content      = "Rate limit exceeded."
-          content_type = "text/plain"
-        }
-      }
       ratelimit = {
-        characteristics     = ["ip.src"]
+        characteristics     = ["ip.src", "cf.colo.id"]
         period              = 10
         requests_per_period = 5
-        mitigation_timeout  = 3600
+        mitigation_timeout  = 10
       }
-      description = "Rate limit wp-login POST (5 req/10s per IP, block 1h)"
+      description = "wp-login brute-force rate limit"
       enabled     = true
       expression  = "(http.request.uri.path eq \"/wp-login.php\" and http.request.method eq \"POST\")"
     },
