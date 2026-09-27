@@ -36,7 +36,7 @@ molecule-plugins[docker]>=23.5.0
 molecule-docker>=2.1.0
 
 # Integration testing
-paramiko>=3.4.0
+paramiko>=5.0.0
 dnspython>=2.4.2
 
 # Cloud SDKs
