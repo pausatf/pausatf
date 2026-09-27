@@ -28,7 +28,7 @@ jobs:
         run: |
           set -euo pipefail
           RAW=$(curl -sSfL \
-            -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36" \
+            -A "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:142.0) Gecko/20100101 Firefox/142.0" \
             -e "https://jetpack.com/support/hosting-faq/" \
             https://jetpack.com/ips-v4.txt)
           IPS=$(printf '%s\n' "$RAW" | grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/[0-9]+$' | sort -u)
