@@ -5,7 +5,7 @@
     name: postfix
     state: restarted
 
-- name: Restart opendkim
+- name: Restart OpenDKIM
   listen: restart opendkim
   ansible.builtin.systemd:
     name: opendkim
