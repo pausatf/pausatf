@@ -74,38 +74,46 @@ export AWS_SECRET_ACCESS_KEY="your-do-spaces-secret"
 export TF_VAR_ssh_public_key="$(cat ~/.ssh/id_ed25519.pub)"
 ```
 
-### 2. Import Existing Resources
+### 2. Start the Production and Staging Imports
 
-If starting from existing infrastructure:
+The orchestration script imports the production and staging resources covered
+by its child scripts. It does not import the central Cloudflare inventory or
+GitHub resources. The Cloudflare zone and central DNS records, plus the staging
+`stage.pausatf.org` record, still need explicit reconciliation and import under
+issue #137. The staging provider needs the Cloudflare token above. The child
+scripts initialize the DigitalOcean Spaces backend from `backend.hcl`.
 
 ```bash
 cd terraform
 ./import-all-resources.sh
 ```
 
-This will import all 39 resources into Terraform state.
+Review each script's plan and import output. Do not interpret a successful run
+as a complete infrastructure import; confirm the resource list against the
+environment inventories and the actual remote states.
 
 ### 3. Verify Configuration
 
 ```bash
-# Check each environment
+# Read-only plans; review differences before making any changes.
 cd environments/production && terraform plan
 cd environments/staging && terraform plan
 cd environments/cloudflare && terraform plan
 cd environments/github && terraform plan
 ```
 
-### 4. Apply Configuration
+The Cloudflare and staging states were empty when last checked. Do not apply
+either configuration until all existing resources have been imported and the
+reviewed plan shows no unexplained changes. The root import script does not
+import GitHub resources; reconcile and import those separately before planning
+changes there.
 
-```bash
-# Apply GitHub configuration (branch protection, topics)
-cd environments/github
-terraform init
-terraform apply
+### 4. Apply Reviewed Changes
 
-# Production/staging/cloudflare (if changes needed)
-cd environments/production && terraform apply
-```
+Apply only after the relevant environment's state is reconciled, its plan has
+been reviewed, and the resource owner has approved the proposed changes. Never
+apply an empty or partially imported state: Terraform may create duplicates or
+change live infrastructure.
 
 ## 📁 Environments
 
