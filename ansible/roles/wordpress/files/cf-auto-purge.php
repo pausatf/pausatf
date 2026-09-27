@@ -3,7 +3,10 @@
  * Plugin Name: Cloudflare Auto-Purge on Save
  * Description: Purges Cloudflare cache for a page/post URL when content is updated.
  * Managed by Ansible - do not edit manually.
+ *
+ * @package PAUSATF_Infrastructure
  */
+
 add_action("save_post", function($post_id, $post) {
     if (defined("DOING_AUTOSAVE") && DOING_AUTOSAVE) return;
     if (wp_is_post_revision($post_id)) return;

@@ -3,20 +3,36 @@ name: PHP Quality
 on:
   pull_request:
     paths:
-      - 'themes/**.php'
-      - 'themes/**/**.php'
+      - 'themes/thesource-child/**/*.php'
       - 'wp-content/plugins/**.php'
       - 'wp-content/plugins/**/**.php'
+      - 'wp-content/mu-plugins/**/*.php'
+      - 'wordpress/plugins/**/*.php'
+      - 'wordpress/mu-plugins/**/*.php'
+      - 'ansible/roles/wordpress/files/TheSource-child/**/*.php'
+      - 'ansible/roles/apache/files/**/*.php'
+      - 'content/**/*.php'
+      - 'teeters-php/**/*.php'
+      - 'pausatf-content-architecture.php'
       - 'phpcs.xml.dist'
+      - 'scripts/check_phpcs_changed_lines.py'
       - '.github/workflows/php-quality.yml'
   push:
     branches: [main]
     paths:
-      - 'themes/**.php'
-      - 'themes/**/**.php'
+      - 'themes/thesource-child/**/*.php'
       - 'wp-content/plugins/**.php'
       - 'wp-content/plugins/**/**.php'
+      - 'wp-content/mu-plugins/**/*.php'
+      - 'wordpress/plugins/**/*.php'
+      - 'wordpress/mu-plugins/**/*.php'
+      - 'ansible/roles/wordpress/files/TheSource-child/**/*.php'
+      - 'ansible/roles/apache/files/**/*.php'
+      - 'content/**/*.php'
+      - 'teeters-php/**/*.php'
+      - 'pausatf-content-architecture.php'
       - 'phpcs.xml.dist'
+      - 'scripts/check_phpcs_changed_lines.py'
 
 permissions:
   contents: read
@@ -39,7 +55,9 @@ jobs:
       - name: Lint PHP
         run: |
           shopt -s globstar nullglob
-          for f in themes/**/*.php wp-content/plugins/**/*.php; do
+          for f in themes/thesource-child/**/*.php wp-content/plugins/**/*.php wp-content/mu-plugins/**/*.php wordpress/plugins/**/*.php wordpress/mu-plugins/**/*.php ansible/roles/wordpress/files/TheSource-child/**/*.php ansible/roles/apache/files/**/*.php content/**/*.php teeters-php/**/*.php pausatf-content-architecture.php; do
+            # content/calendar is an upstream WebCalendar vendor tree, not maintained PAUSATF PHP.
+            [[ "$f" == content/calendar/* ]] && continue
             php -l "$f" || exit 1
           done
 
@@ -47,6 +65,8 @@ jobs:
     name: WordPress Coding Standards
     runs-on: ubuntu-24.04
     timeout-minutes: 30
+    env:
+      PHPCS_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v4
         with:
@@ -58,56 +78,9 @@ jobs:
       - name: Install PHPCS + WPCS
         run: |
           composer global config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
-          composer global require "squizlabs/php_codesniffer:^3" "dealerdirect/phpcodesniffer-composer-installer:^1" "wp-coding-standards/wpcs:^3" "phpcompatibility/php-compatibility:^9"
+          composer global require "dealerdirect/phpcodesniffer-composer-installer:^1" "squizlabs/php_codesniffer:^3" "wp-coding-standards/wpcs:^3" "phpcompatibility/php-compatibility:^9"
       - name: Run PHPCS
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
-        run: |
-          if git diff --quiet "$BASE_SHA" "$GITHUB_SHA" -- phpcs.xml.dist; then
-            mapfile -d '' changed_php < <(git diff --diff-filter=ACMR --name-only -z "$BASE_SHA" "$GITHUB_SHA" -- '*.php')
-            existing_php=()
-            for file in "${changed_php[@]}"; do
-              [[ -f "$file" ]] && existing_php+=("$file")
-            done
-            if ((${#existing_php[@]} == 0)); then
-              echo 'No changed PHP files; skipping PHPCS.'
-              exit 0
-            fi
-            ~/.composer/vendor/bin/phpcs -q --standard=phpcs.xml.dist --report=full "${existing_php[@]}"
-          else
-            baseline_dir="$(mktemp -d)"
-            trap 'git worktree remove --force "$baseline_dir"; rm -rf "$baseline_dir"' EXIT
-            git worktree add --quiet --detach "$baseline_dir" "$BASE_SHA"
-            cp phpcs.xml.dist "$baseline_dir/phpcs.xml.dist"
-
-            set +e
-            ~/.composer/vendor/bin/phpcs -q --standard=phpcs.xml.dist --report=json themes wp-content/plugins > "$RUNNER_TEMP/phpcs-current.json"
-            current_status=$?
-            (cd "$baseline_dir" && ~/.composer/vendor/bin/phpcs -q --standard=phpcs.xml.dist --report=json themes wp-content/plugins) > "$RUNNER_TEMP/phpcs-baseline.json"
-            baseline_status=$?
-            set -e
-            if ((current_status > 2 || baseline_status > 2)); then
-              echo 'PHPCS could not complete with the current and baseline rulesets.' >&2
-              exit 1
-            fi
-
-            jq -c --arg root "$GITHUB_WORKSPACE" \
-              '[.files | to_entries[] as $file | $file.value.messages[] | [($file.key | sub("^" + $root + "/"; "")), .source, .message]] | sort' \
-              "$RUNNER_TEMP/phpcs-current.json" > "$RUNNER_TEMP/phpcs-current-findings.json"
-            jq -c --arg root "$baseline_dir" \
-              '[.files | to_entries[] as $file | $file.value.messages[] | [($file.key | sub("^" + $root + "/"; "")), .source, .message]] | sort' \
-              "$RUNNER_TEMP/phpcs-baseline.json" > "$RUNNER_TEMP/phpcs-baseline-findings.json"
-            comm -13 \
-              <(jq -r '.[] | @json' "$RUNNER_TEMP/phpcs-baseline-findings.json" | sort) \
-              <(jq -r '.[] | @json' "$RUNNER_TEMP/phpcs-current-findings.json" | sort) \
-              > "$RUNNER_TEMP/phpcs-new-findings.txt"
-            if [[ -s "$RUNNER_TEMP/phpcs-new-findings.txt" ]]; then
-              echo 'PHPCS found new violations under the updated ruleset:' >&2
-              cat "$RUNNER_TEMP/phpcs-new-findings.txt" >&2
-              exit 1
-            fi
-            echo 'PHPCS scanned all configured directories; no findings were added beyond the baseline.'
-          fi
+        run: python3 scripts/check_phpcs_changed_lines.py --base "$PHPCS_BASE_SHA" --phpcs ~/.composer/vendor/bin/phpcs
 
   actionlint:
     name: actionlint
