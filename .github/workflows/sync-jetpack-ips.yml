@@ -1,0 +1,121 @@
+name: Sync Jetpack IP allowlist
+
+on:
+  schedule:
+    - cron: '0 7 * * 1'  # Weekly Monday 7AM UTC
+  workflow_dispatch:
+
+concurrency:
+  group: pausatf-jetpack-ip-sync
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v4
+
+      - name: Fetch current Jetpack IPv4 ranges
+        id: jetpack
+        run: |
+          set -euo pipefail
+          RAW=$(curl -sSfL \
+            -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36" \
+            -e "https://jetpack.com/support/hosting-faq/" \
+            https://jetpack.com/ips-v4.txt)
+          IPS=$(printf '%s\n' "$RAW" | grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/[0-9]+$' | sort -u)
+          if [ -z "$IPS" ]; then
+            echo "fetched Jetpack IP list is empty, aborting" >&2
+            exit 1
+          fi
+          {
+            echo "ips<<EOF"
+            echo "$IPS"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Update jetpack_ip_ranges if changed
+        id: update
+        env:
+          NEW_IPS: ${{ steps.jetpack.outputs.ips }}
+        run: |
+          python3 <<'PYEOF'
+          import os
+          import re
+          import pathlib
+
+          new_ips = sorted(l.strip() for l in os.environ["NEW_IPS"].splitlines() if l.strip())
+          path = pathlib.Path("ansible/group_vars/all.yml")
+          text = path.read_text()
+
+          pattern = re.compile(r'(jetpack_ip_ranges:\n)((?:  - "[^"\n]+"\n)+)')
+          match = pattern.search(text)
+          if not match:
+              raise SystemExit("could not find jetpack_ip_ranges block in ansible/group_vars/all.yml")
+
+          current_ips = sorted(line.strip()[3:-1] for line in match.group(2).splitlines())
+          github_output = os.environ["GITHUB_OUTPUT"]
+          if current_ips == new_ips:
+              with open(github_output, "a") as f:
+                  f.write("changed=false\n")
+              raise SystemExit(0)
+
+          new_block = "".join(f'  - "{ip}"\n' for ip in new_ips)
+          text = text[:match.start()] + match.group(1) + new_block + text[match.end():]
+          path.write_text(text)
+          with open(github_output, "a") as f:
+              f.write("changed=true\n")
+          PYEOF
+
+      - name: Open PR with updated allowlist
+        if: steps.update.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          BRANCH="chore/sync-jetpack-ips"
+
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git checkout -b "$BRANCH"
+          git add ansible/group_vars/all.yml
+          git commit -m "chore(ansible): sync Jetpack IP allowlist from jetpack.com/ips-v4.txt"
+          git push origin "$BRANCH" --force
+
+          pr_number="$(gh pr list --repo pausatf/pausatf --head "$BRANCH" --state open --json number --jq '.[0].number // empty')"
+          if [ -z "$pr_number" ]; then
+            body_file="$(mktemp)"
+            cat > "$body_file" <<'EOF'
+          ## Intent
+          Update the Jetpack IPv4 allowlist used to protect the WordPress XML-RPC endpoint.
+
+          ## Scope
+          - Update `jetpack_ip_ranges` in `ansible/group_vars/all.yml` from Jetpack's published IPv4 list.
+          - This PR is generated only when the fetched list differs; it does not deploy changes.
+
+          ## Verification
+          The workflow rejects an empty response, validates IPv4 CIDR lines, and sorts and deduplicates the list. Review the diff before merging and deploying through the normal production approval gate.
+
+          Related to #180
+          EOF
+            gh pr create \
+              --repo pausatf/pausatf \
+              --head "$BRANCH" \
+              --base main \
+              --title "chore(ansible): sync Jetpack IP allowlist" \
+              --body-file "$body_file"
+            rm -f "$body_file"
+            pr_number="$(gh pr list --repo pausatf/pausatf --head "$BRANCH" --state open --json number --jq '.[0].number')"
+          fi
+          gh pr edit "$pr_number" --repo pausatf/pausatf \
+            --add-label ansible \
+            --add-label dependencies \
+            --add-label maintenance
