@@ -119,7 +119,7 @@
       changed_when: false
 
     - name: Export WordPress database
-      community.mysql.mysql_db:
+      ansible.mysql.mysql_db:
         name: "{{ wp_db_name.stdout }}"
         state: dump
         target: "{{ backup_root }}/wordpress-db.sql"

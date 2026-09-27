@@ -506,7 +506,7 @@ tar -czf /root/pausatf-legacy-backup-$(date +%Y%m%d-%H%M%S).tar.gz -C /var/www l
 
 **WordPress Security Documentation:**
 - https://wordpress.org/support/article/hardening-wordpress/
-- https://codex.wordpress.org/FAQ_My_site_was_hacked
+- https://wordpress.org/documentation/article/faq-my-site-was-hacked/
 
 **Security Plugins:**
 - Wordfence Security (installed)

@@ -15,10 +15,15 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   molecule:
     name: molecule / ${{ matrix.role }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -44,7 +49,7 @@ jobs:
       - name: Install Molecule and dependencies
         run: |
           pip install ansible-core==2.17.5 molecule molecule-plugins[docker]
-          ansible-galaxy collection install community.general community.mysql ansible.posix
+          ansible-galaxy collection install -r ansible/requirements.yml
 
       - name: Create dummy vault password for CI
         run: |
