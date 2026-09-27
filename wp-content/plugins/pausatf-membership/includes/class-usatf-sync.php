@@ -13,6 +13,8 @@
  *
  * To trigger a manual sync from WP-CLI:
  *   wp eval 'PAUSATF_USATF_Sync::sync();'
+ *
+ * @package PAUSATF_Membership
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
