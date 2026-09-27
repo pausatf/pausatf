@@ -18,7 +18,7 @@ jobs:
     uses: ./.github/workflows/deploy.yml
     with:
       environment: development
-      ansible_limit: dev
+      ansible_limit: pausatf-dev
     secrets:
       SSH_PRIVATE_KEY: ${{ secrets.DEV_SSH_PRIVATE_KEY }}
       TARGET_SERVER_IP: ${{ secrets.DEV_SERVER_IP }}

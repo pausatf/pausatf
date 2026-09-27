@@ -15,7 +15,7 @@ jobs:
     uses: ./.github/workflows/deploy.yml
     with:
       environment: production_new
-      ansible_limit: production_new
+      ansible_limit: pausatf-prod-new
     secrets:
       SSH_PRIVATE_KEY: ${{ secrets.PROD_NEW_SSH_PRIVATE_KEY }}
       TARGET_SERVER_IP: ${{ secrets.PROD_NEW_SERVER_IP }}

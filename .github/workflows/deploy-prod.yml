@@ -69,7 +69,7 @@ jobs:
           fi
 
           ansible-playbook -i inventory/hosts.yml site.yml \
-            -l staging \
+            -l pausatf-stage \
             -e "ansible_host=$STAGE_SERVER_IP" \
             -e "ansible_ssh_private_key_file=$HOME/.ssh/deploy_key" \
             --check \
@@ -85,7 +85,7 @@ jobs:
     uses: ./.github/workflows/deploy.yml
     with:
       environment: production
-      ansible_limit: production
+      ansible_limit: pausatf-prod
       healthcheck_host: "github-deploy@REDACTED_PROD_NEW_IP"
     secrets:
       SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
