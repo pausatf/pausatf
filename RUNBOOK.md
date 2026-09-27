@@ -298,6 +298,8 @@ environment variables (mapped to DO Spaces keys).
 # Set credentials
 export AWS_ACCESS_KEY_ID=<spaces-key>
 export AWS_SECRET_ACCESS_KEY=<spaces-secret>
+export AWS_REGION=us-east-1
+export AWS_DEFAULT_REGION=us-east-1
 export DIGITALOCEAN_TOKEN=<do-token>
 export CLOUDFLARE_API_TOKEN=<cf-token>
 

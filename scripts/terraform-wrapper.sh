@@ -110,6 +110,11 @@ release_lock() {
 run_terraform() {
     local tf_dir="$ROOT_DIR/terraform/environments/$ENVIRONMENT"
 
+    # DigitalOcean Spaces uses us-east-1 for S3 request signing. Override any
+    # ambient AWS region so backend calls use the same signing region.
+    export AWS_REGION=us-east-1
+    export AWS_DEFAULT_REGION=us-east-1
+
     echo -e "${GREEN}==>${NC} Running Terraform $ACTION for $ENVIRONMENT environment"
     echo -e "${GREEN}==>${NC} Working directory: $tf_dir"
 
