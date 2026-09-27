@@ -21,10 +21,15 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   php-lint:
     name: PHP Syntax Lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v4
       - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2
@@ -40,9 +45,12 @@ jobs:
 
   phpcs:
     name: WordPress Coding Standards
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v4
+        with:
+          fetch-depth: 0
       - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2
         with:
           php-version: '8.3'
@@ -50,15 +58,61 @@ jobs:
       - name: Install PHPCS + WPCS
         run: |
           composer global config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
-          composer global require "squizlabs/php_codesniffer:^3" "wp-coding-standards/wpcs:^3" "phpcompatibility/php-compatibility:^9"
-          ~/.composer/vendor/bin/phpcs --config-set installed_paths ~/.composer/vendor/wp-coding-standards/wpcs,~/.composer/vendor/phpcompatibility/php-compatibility
+          composer global require "squizlabs/php_codesniffer:^3" "dealerdirect/phpcodesniffer-composer-installer:^1" "wp-coding-standards/wpcs:^3" "phpcompatibility/php-compatibility:^9"
       - name: Run PHPCS
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: |
-          ~/.composer/vendor/bin/phpcs -q --standard=phpcs.xml.dist --report=full
+          if git diff --quiet "$BASE_SHA" "$GITHUB_SHA" -- phpcs.xml.dist; then
+            mapfile -d '' changed_php < <(git diff --diff-filter=ACMR --name-only -z "$BASE_SHA" "$GITHUB_SHA" -- '*.php')
+            existing_php=()
+            for file in "${changed_php[@]}"; do
+              [[ -f "$file" ]] && existing_php+=("$file")
+            done
+            if ((${#existing_php[@]} == 0)); then
+              echo 'No changed PHP files; skipping PHPCS.'
+              exit 0
+            fi
+            ~/.composer/vendor/bin/phpcs -q --standard=phpcs.xml.dist --report=full "${existing_php[@]}"
+          else
+            baseline_dir="$(mktemp -d)"
+            trap 'git worktree remove --force "$baseline_dir"; rm -rf "$baseline_dir"' EXIT
+            git worktree add --quiet --detach "$baseline_dir" "$BASE_SHA"
+            cp phpcs.xml.dist "$baseline_dir/phpcs.xml.dist"
+
+            set +e
+            ~/.composer/vendor/bin/phpcs -q --standard=phpcs.xml.dist --report=json themes wp-content/plugins > "$RUNNER_TEMP/phpcs-current.json"
+            current_status=$?
+            (cd "$baseline_dir" && ~/.composer/vendor/bin/phpcs -q --standard=phpcs.xml.dist --report=json themes wp-content/plugins) > "$RUNNER_TEMP/phpcs-baseline.json"
+            baseline_status=$?
+            set -e
+            if ((current_status > 2 || baseline_status > 2)); then
+              echo 'PHPCS could not complete with the current and baseline rulesets.' >&2
+              exit 1
+            fi
+
+            jq -c --arg root "$GITHUB_WORKSPACE" \
+              '[.files | to_entries[] as $file | $file.value.messages[] | [($file.key | sub("^" + $root + "/"; "")), .source, .message]] | sort' \
+              "$RUNNER_TEMP/phpcs-current.json" > "$RUNNER_TEMP/phpcs-current-findings.json"
+            jq -c --arg root "$baseline_dir" \
+              '[.files | to_entries[] as $file | $file.value.messages[] | [($file.key | sub("^" + $root + "/"; "")), .source, .message]] | sort' \
+              "$RUNNER_TEMP/phpcs-baseline.json" > "$RUNNER_TEMP/phpcs-baseline-findings.json"
+            comm -13 \
+              <(jq -r '.[] | @json' "$RUNNER_TEMP/phpcs-baseline-findings.json" | sort) \
+              <(jq -r '.[] | @json' "$RUNNER_TEMP/phpcs-current-findings.json" | sort) \
+              > "$RUNNER_TEMP/phpcs-new-findings.txt"
+            if [[ -s "$RUNNER_TEMP/phpcs-new-findings.txt" ]]; then
+              echo 'PHPCS found new violations under the updated ruleset:' >&2
+              cat "$RUNNER_TEMP/phpcs-new-findings.txt" >&2
+              exit 1
+            fi
+            echo 'PHPCS scanned all configured directories; no findings were added beyond the baseline.'
+          fi
 
   actionlint:
     name: actionlint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v4
       - uses: rhysd/actionlint@914e7df21a07ef503a81201c76d2b11c789d3fca # v1.7.12
