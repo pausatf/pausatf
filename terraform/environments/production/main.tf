@@ -58,7 +58,7 @@ module "wordpress" {
 
   environment              = "production"
   region                   = var.region
-  droplet_size             = "s-4vcpu-8gb"
+  droplet_size             = var.droplet_size
   droplet_image            = var.droplet_image
   database_size            = var.database_size
   ssh_key_fingerprints     = [digitalocean_ssh_key.m3_laptop.id]
