@@ -147,7 +147,7 @@
       vars:
         wp_site: "{{ wordpress_installs | selectattr('name', 'equalto', 'pausatf-main') | first }}"
       register: fmgr_dir
-      tags: [audit]
+      tags: [audit, remediate]
 
     - name: Warn if wp-file-manager-pro directory still exists
       ansible.builtin.debug:
@@ -159,7 +159,19 @@
       vars:
         wp_site: "{{ wordpress_installs | selectattr('name', 'equalto', 'pausatf-main') | first }}"
       when: fmgr_dir.stat.exists
-      tags: [audit]
+      tags: [audit, remediate]
+
+    - name: Fail if wp-file-manager-pro remains after remediation
+      ansible.builtin.assert:
+        that: not fmgr_dir.stat.exists
+        fail_msg: >-
+          wp-file-manager-pro still exists at
+          {{ wp_site.path }}/wp-content/plugins/wp-file-manager-pro after
+          remediation. Investigate and remove it manually.
+      vars:
+        wp_site: "{{ wordpress_installs | selectattr('name', 'equalto', 'pausatf-main') | first }}"
+      when: fmgr_dir.stat.exists
+      tags: [never, remediate]
 
     # -------------------------------------------------------------------------
     # 6. Enable Jetpack login notifications for admins
