@@ -69,6 +69,8 @@ export TF_VAR_github_token="your-github-personal-access-token"
 # DigitalOcean Spaces (for Terraform backend)
 export AWS_ACCESS_KEY_ID="your-do-spaces-key"
 export AWS_SECRET_ACCESS_KEY="your-do-spaces-secret"
+export AWS_REGION="us-east-1"
+export AWS_DEFAULT_REGION="us-east-1"
 
 # Production SSH Key
 export TF_VAR_ssh_public_key="$(cat ~/.ssh/id_ed25519.pub)"

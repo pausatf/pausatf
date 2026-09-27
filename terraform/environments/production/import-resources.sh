@@ -4,6 +4,10 @@
 
 set -euo pipefail
 
+# DigitalOcean Spaces S3 requests must use us-east-1 for signing.
+export AWS_REGION=us-east-1
+export AWS_DEFAULT_REGION=us-east-1
+
 echo "=========================================="
 echo "Production Environment - Resource Import"
 echo "=========================================="
