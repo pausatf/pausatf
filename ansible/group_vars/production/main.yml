@@ -145,7 +145,7 @@ additional_vhosts:
 # =============================================================================
 # WORDPRESS THEMES (production site)
 # =============================================================================
-wp_managed_themes:
+wp_main_themes:
   - name: "TheSource-child"
     status: "active"
     version: "0.2"
