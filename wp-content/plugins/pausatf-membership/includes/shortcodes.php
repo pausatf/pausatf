@@ -5,6 +5,8 @@
  * [pausatf_members]    — private member roster (login required)
  * [pausatf_clubs]      — public club directory
  * [pausatf_scoresheet] — scoresheet submission form
+ *
+ * @package PAUSATF_Membership
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

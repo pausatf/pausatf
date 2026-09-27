@@ -22,7 +22,7 @@ fi
 
 echo ""
 echo "Initializing Terraform..."
-terraform init
+terraform init -input=false -backend-config=../../backend.hcl
 
 echo ""
 echo "Importing resources..."
@@ -102,7 +102,7 @@ echo ""
 echo "Next steps:"
 echo "  1. Review changes: terraform plan"
 echo "  2. If changes look correct: terraform apply"
-echo "  3. Commit state to version control"
+echo "  3. Keep state in the remote backend; do not commit state files"
 echo ""
 echo "Note: Production droplet uses a custom snapshot from 2023-05-16."
 echo "To use the new cloud-init template, you'll need to recreate the droplet."

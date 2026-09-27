@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * Legacy PAUSATF website source: scorer_upload_orig.php.
+ *
+ * @package PAUSATF_Legacy
+ */
 
 // This script is used by the new PA online race scoring program to upload result files
 // to the proper year directory (e.g. 2024, 2025, ...).  It was written by Jeff Teeters
@@ -93,5 +97,6 @@ class Scorer_upload {
 
 $su = new Scorer_upload();
 echo $su->report;
+
 
 ?>

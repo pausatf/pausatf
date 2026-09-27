@@ -99,34 +99,32 @@ No reserved IPs currently in use.
 
 | Resource | Name | ID | Account ID | Plan | Status | In Terraform? |
 |----------|------|----|------------|------|--------|---------------|
-| pausatf.org | pausatf.org | 67b87131144a68ad5ed43ebfd4e6d811 | c540729070ba913814ac4557c8974099 | Free | ✅ Active | ❌ No |
+| pausatf.org | pausatf.org | 67b87131144a68ad5ed43ebfd4e6d811 | c540729070ba913814ac4557c8974099 | Free | ✅ Active | ✅ Declared; not yet imported |
 
-**Issues:**
-- Zone exists but is not managed by Terraform
-- Should import or create zone resource
+The Cloudflare zone is declared in Terraform, but the Cloudflare backend state
+was empty when checked on 2026-09-26. Import existing resources only after the
+live inventory and ownership are reconciled.
 
-### DNS Records
+### Live DNS inventory (checked 2026-09-26)
 
-| Type | Name | Content | Proxied | Purpose | In Terraform? |
-|------|------|---------|---------|---------|---------------|
-| A | pausatf.org | REDACTED_PROD_NEW_IP | ✅ Yes | Main site | ❌ No |
-| A | www.pausatf.org | REDACTED_PROD_NEW_IP | ✅ Yes | WWW redirect | ❌ No |
-| A | ftp.pausatf.org | REDACTED_PROD_NEW_IP | ❌ No | Production droplet | ❌ No |
-| A | mail.pausatf.org | REDACTED_PROD_NEW_IP | ❌ No | Mail server | ❌ No |
-| A | monitor.pausatf.org | REDACTED_PROD_NEW_IP | ❌ No | Monitoring | ❌ No |
-| A | stage.pausatf.org | REDACTED_STAGE_IP | ❌ No | Staging | ✅ Yes |
-| A | staging.pausatf.org | REDACTED_STAGE_IP | ❌ No | Staging alias | ❌ No |
-| CNAME | prod.pausatf.org | ftp.pausatf.org | ❌ No | Production alias | ❌ No |
-| MX | pausatf.org | Google Workspace (5 records) | ❌ No | Email | ❌ No |
-| TXT | pausatf.org | SPF, Google verification | ❌ No | Email, verification | ❌ No |
-| TXT | _dmarc.pausatf.org | DMARC policy | ❌ No | Email security | ❌ No |
-| CNAME | SendGrid records | Multiple SendGrid CNAMEs | ❌ No | Email delivery | ❌ No |
-| CAA | pausatf.org | Let's Encrypt, DigiCert | ❌ No | SSL certificate authority | ❌ No |
+The zone has 39 DNS records: 7 A, 14 CNAME, 5 MX, 6 TXT, and 7 CAA. The
+`pausatf.org`, `www`, and `stage` hostnames route through Cloudflare Tunnels.
+The `dev` and `stage` records are declared in their dedicated environment
+states; the central Cloudflare state declares the remaining 37 records. The
+staging state was empty when checked on 2026-09-27.
 
-**Issues:**
-- Only `stage.pausatf.org` A record is managed by Terraform
-- All other DNS records are manually configured
-- Should import all critical DNS records into Terraform
+| Type | Names | Terraform owner |
+|------|-------|-----------------|
+| A | `dev`, `direct-ssh`, `ftp`, `mail`, `monitor`, `runners`, `staging` | `dev` in dev state; remaining records in Cloudflare state |
+| CNAME | `@`, `www`, `stage`, `prod`, `ssh`, `ssh-stage-v2`, `ssh-v2`, `v2canary`, `51871933`, `em5172`, `url7068`, `url7741`, `s1._domainkey`, `s2._domainkey` | `stage` in staging state; remaining records in Cloudflare state |
+| MX | `@` (five Google Workspace records) | Cloudflare state |
+| TXT | `@` (SPF and Google verification), `_dmarc`, `cf2024-1._domainkey`, `mail._domainkey`, `_acme-challenge.www` | Cloudflare state |
+| CAA | `@` (seven records for Google Trust Services, DigiCert, Let's Encrypt, and iodef) | Cloudflare state |
+
+Do not apply while the relevant state is empty. Import existing records into
+their single owning environment and require a reviewed no-change plan first.
+Zone settings and rulesets still need a Cloudflare token with read permission.
+See [Cloudflare environment safety notes](environments/cloudflare/README.md).
 
 ## GitHub Resources
 
