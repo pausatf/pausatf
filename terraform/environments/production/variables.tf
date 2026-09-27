@@ -21,10 +21,21 @@ variable "region" {
   }
 }
 
+variable "droplet_size" {
+  description = "Production DigitalOcean droplet size slug"
+  type        = string
+  default     = "s-2vcpu-4gb"
+
+  validation {
+    condition     = startswith(var.droplet_size, "s-")
+    error_message = "Production droplet size must be a shared-CPU s- size slug."
+  }
+}
+
 variable "droplet_image" {
   description = "Droplet base image"
   type        = string
-  default     = "ubuntu-24-04-x64"
+  default     = "ubuntu-26-04-x64"
 
   validation {
     condition     = startswith(var.droplet_image, "ubuntu-")
@@ -44,9 +55,20 @@ variable "alert_email_addresses" {
 }
 
 variable "ssh_allowed_ips" {
-  description = "IPs allowed SSH access (CIDR notation)"
+  description = "Explicit production SSH source CIDRs, including Tailscale and an admin source"
   type        = list(string)
-  default     = []
+
+  validation {
+    condition = (
+      length(var.ssh_allowed_ips) >= 2 &&
+      contains(var.ssh_allowed_ips, "100.64.0.0/10") &&
+      alltrue([
+        for cidr in var.ssh_allowed_ips :
+        can(cidrhost(cidr, 0)) && cidr != "0.0.0.0/0" && cidr != "::/0"
+      ])
+    )
+    error_message = "Set Tailscale plus at least one valid admin CIDR; unrestricted SSH is not allowed."
+  }
 }
 
 variable "database_size" {

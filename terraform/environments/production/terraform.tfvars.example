@@ -10,15 +10,17 @@ cloudflare_api_token = "your-cloudflare-api-token-here"
 
 # Production Configuration
 region        = "sfo2"
-droplet_size  = "s-4vcpu-8gb"
-database_size = "db-s-2vcpu-4gb"
+droplet_size  = "s-2vcpu-4gb"
+droplet_image = "ubuntu-26-04-x64"
+database_size = "db-s-1vcpu-1gb"
 
 # SSH Configuration
 ssh_public_key = "ssh-ed25519 AAAA... your-public-key-here"
 
 ssh_allowed_ips = [
-  # Replace with your IP address(es) — never use 0.0.0.0/0 in production
-  # "198.51.100.1/32"   # example: office static IP
+  "100.64.0.0/10", # Tailscale; keep this for admin access through the tailnet.
+  # Add the current administrator source CIDR from the production DO firewall.
+  # The production configuration rejects an empty list and unrestricted CIDRs.
 ]
 
 # Monitoring alerts
