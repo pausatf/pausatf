@@ -235,11 +235,11 @@ SPF: PASS
 DMARC: PASS (after DMARC upgrade)
 ```
 
-### 2. Use Google Workspace Toolbox
+### 2. Use MXToolbox
 
 **Check MX Records:**
 ```
-https://toolbox.googleapps.com/apps/checkmx/
+https://mxtoolbox.com/emailhealth/
 Domain: pausatf.org
 ```
 
@@ -247,9 +247,7 @@ Domain: pausatf.org
 
 **Check SPF:**
 ```
-https://toolbox.googleapps.com/apps/dig/
-Query: pausatf.org
-Type: TXT
+https://dns.google/query?name=pausatf.org&type=TXT
 ```
 
 **Expected:** Shows SPF record with include:_spf.google.com
@@ -419,7 +417,7 @@ Domain: pausatf.org
 - DMARC Standard (RFC 7489): https://tools.ietf.org/html/rfc7489
 
 **Testing Tools:**
-- Google Admin Toolbox: https://toolbox.googleapps.com/
+- MXToolbox Email Health: https://mxtoolbox.com/emailhealth/
 - MXToolbox: https://mxtoolbox.com/
 - DMARC Analyzer: https://dmarcian.com/
 - Port25 Email Verifier: check-auth@verifier.port25.com

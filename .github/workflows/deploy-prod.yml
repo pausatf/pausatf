@@ -14,13 +14,83 @@ permissions:
   contents: read
 
 jobs:
+  staging-validate:
+    runs-on: ubuntu-latest
+    environment: staging
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
+
+      - name: Setup Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Ansible deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible-core==2.17.5 cloudflare requests
+          ansible-galaxy collection install -r ansible/requirements.yml
+
+      - name: Setup SSH key
+        env:
+          SSH_KEY: ${{ secrets.STAGING_SSH_PRIVATE_KEY }}
+        run: |
+          if [ -n "$SSH_KEY" ]; then
+            install -m 700 -d ~/.ssh
+            printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+            chmod 600 ~/.ssh/deploy_key
+          fi
+
+      - name: Decrypt vault file
+        env:
+          ANSIBLE_VAULT_FILE: ${{ secrets.ANSIBLE_VAULT_FILE }}
+          ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
+        run: |
+          if [ -z "$ANSIBLE_VAULT_PASSWORD" ] || [ -z "$ANSIBLE_VAULT_FILE" ]; then
+            echo "ERROR: ANSIBLE_VAULT_PASSWORD and ANSIBLE_VAULT_FILE secrets are required" >&2
+            exit 1
+          fi
+          printf '%s' "$ANSIBLE_VAULT_FILE" | base64 -d > ansible/group_vars/vault.yml
+          echo "$ANSIBLE_VAULT_PASSWORD" > vault.pass
+          chmod 600 vault.pass ansible/group_vars/vault.yml
+
+      - name: Dry-run playbook against staging
+        working-directory: ansible
+        env:
+          STAGE_SERVER_IP: ${{ secrets.STAGE_SERVER_IP }}
+        run: |
+          if [ -z "$STAGE_SERVER_IP" ]; then
+            echo "ERROR: STAGE_SERVER_IP secret is required" >&2
+            exit 1
+          fi
+
+          export STAGE_SERVER_IP
+
+          ansible-playbook -i inventory/hosts.yml site.yml \
+            -l pausatf-stage \
+            -e "ansible_ssh_private_key_file=$HOME/.ssh/deploy_key" \
+            --check \
+            --vault-password-file ../vault.pass
+
+      - name: Cleanup secrets
+        if: always()
+        run: |
+          rm -f vault.pass ansible/group_vars/vault.yml ~/.ssh/deploy_key
+
   deploy:
+    needs: staging-validate
     uses: ./.github/workflows/deploy.yml
     with:
       environment: production
-      ansible_limit: production
+      ansible_limit: pausatf-prod
+      host_env_name: PROD_SERVER_IP
       healthcheck_host: "github-deploy@REDACTED_PROD_NEW_IP"
     secrets:
       SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+      TARGET_SERVER_IP: ${{ secrets.PROD_SERVER_IP }}
       ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
       ANSIBLE_VAULT_FILE: ${{ secrets.ANSIBLE_VAULT_FILE }}
