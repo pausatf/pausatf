@@ -25,7 +25,7 @@ bandit>=1.7.5
 
 # Testing framework
 pytest>=7.4.3
-pytest-cov>=4.1.0
+pytest-cov>=7.1.0
 pytest-xdist>=3.8.0
 pytest-ansible>=12.2.0
 pytest-timeout>=2.2.0
