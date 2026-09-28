@@ -46,4 +46,4 @@ cloudflare>=5.7.0
 # Documentation
 mkdocs>=1.5.3
 mkdocs-material>=9.4.14
-mkdocs-mermaid2-plugin>=1.1.1
+mkdocs-mermaid2-plugin>=1.2.3
