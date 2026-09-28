@@ -24,7 +24,7 @@ module "mysql_db" {
 
   name            = "pausatf-db"
   engine          = "mysql"
-  engine_version  = "8"
+  engine_version  = "8.4"
   size            = "db-s-1vcpu-1gb"
   region          = "sfo3"
   node_count      = 1
@@ -198,7 +198,7 @@ module "wordpress_db" {
 
   name            = "pausatf-prod-db"
   engine          = "mysql"
-  engine_version  = "8"
+  engine_version  = "8.4"
   size            = "db-s-2vcpu-4gb"
   region          = "sfo3"
   node_count      = 1

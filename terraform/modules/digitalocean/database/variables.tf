@@ -17,7 +17,7 @@ variable "engine" {
 variable "engine_version" {
   description = "Version of the database engine"
   type        = string
-  default     = "8"
+  default     = "8.4"
 }
 
 variable "size" {

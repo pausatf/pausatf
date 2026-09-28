@@ -89,14 +89,14 @@ resource "digitalocean_droplet" "this" {
   }
 }
 
-# Managed Database — MySQL 8
+# Managed Database — MySQL 8.4 LTS
 module "database" {
   count  = var.create_database ? 1 : 0
   source = "../../modules/digitalocean/database"
 
   name           = coalesce(var.database_cluster_name, "pausatf-${var.environment}-db")
   engine         = "mysql"
-  engine_version = "8"
+  engine_version = "8.4"
   size           = var.database_size
   region         = var.region
   environment    = var.environment
