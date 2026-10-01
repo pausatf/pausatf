@@ -6,6 +6,11 @@ service command to run `pausatf-recovery-backup`. That wrapper first runs the en
 backup, then archives deployment files, selected host configuration, and container images. It uploads the archives and
 a recovery manifest to private DigitalOcean Spaces objects under `s3://pausatf/backups/recovery/`.
 
+The database script supplies an invocation-specific receipt containing the exact uploaded database and legacy
+objects, sizes, and hashes. The wrapper uses that receipt even when image archiving takes over an hour; it never
+selects artifacts by newest modification time. Content-addressed recovery images have no current-version expiration:
+new recovery sets can reference an old image. Remove unreferenced images only after checking all retained manifests.
+
 The database and legacy artifacts are uploaded under `s3://pausatf/backups/prod/`. Their age private key stays
 off-host. The recovery wrapper uses the public recipients from `/etc/pausatf-backup-recipients.txt`; keep that file
 root-owned and provisioned out of band. The host-configuration archive includes sensitive files such as TLS private

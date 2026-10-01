@@ -13,7 +13,7 @@ mkdir -p "$STATE"
 install -d -o root -g root -m 0700 /var/backups/pausatf
 work=$(mktemp -d /var/backups/pausatf/recovery.XXXXXX)
 trap 'rm -rf -- "$work"' EXIT
-/usr/local/sbin/pausatf-db-backup.sh
+BACKUP_RECEIPT="$work/database-receipt.json" /usr/local/sbin/pausatf-db-backup.sh
 stamp=$(date -u +%Y%m%dT%H%M%SZ)
 # Uploads are in versioned Spaces, not this archive. Do not traverse their FUSE mount.
 mkdir "$work/deployment"
@@ -45,12 +45,9 @@ export stamp DEST STATE work
 python3 - <<'PY'
 import hashlib,json,os,time
 from pathlib import Path
-root=Path('/var/backups/pausatf')
-artifacts={}
-for kind,pattern in [('database','prod-db-*.sql.gz.age'),('legacy','prod-legacy-*.tar.gz.age')]:
-    p=max(root.glob(pattern),key=lambda p:p.stat().st_mtime)
-    if time.time()-p.stat().st_mtime>3600: raise SystemExit('Database or legacy artifact stale')
-    artifacts[kind]={'uri':'s3://pausatf/backups/prod/'+p.name,'bytes':p.stat().st_size,'sha256':hashlib.file_digest(p.open('rb'),'sha256').hexdigest()}
+artifacts=json.loads((Path(os.environ['work'])/'database-receipt.json').read_text())
+if set(artifacts) != {'database', 'legacy'}:
+    raise SystemExit('Database backup did not provide both invocation artifacts')
 for name in ['deployment.tar.gz.age','host-config.tar.gz.age']:
     p=Path(os.environ['work'])/name
     artifacts[name]={'uri':os.environ['DEST']+'/sets/'+os.environ['stamp']+'/'+name,'bytes':p.stat().st_size,'sha256':hashlib.file_digest(p.open('rb'),'sha256').hexdigest()}
