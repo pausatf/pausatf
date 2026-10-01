@@ -38,13 +38,14 @@ sudo install -o root -g root -m 0644 \
   scripts/backup/pausatf-db-backup.service.d/recovery.conf \
   /etc/systemd/system/pausatf-db-backup.service.d/recovery.conf
 sudo systemctl daemon-reload
-sudo systemctl enable --now pausatf-db-backup.timer
+sudo systemctl enable pausatf-db-backup.timer
 ```
 
 Provision `/etc/pausatf-backup-recipients.txt` and `/root/.s3cfg` out of band before starting the service. Confirm the
 timer and service after deployment:
 
 ```bash
+sudo systemctl start pausatf-db-backup.timer
 sudo systemctl list-timers pausatf-db-backup.timer
 sudo systemctl start pausatf-db-backup.service
 sudo systemctl status pausatf-db-backup.service
@@ -54,6 +55,8 @@ sudo cat /var/lib/pausatf-ops/backup-success.json
 ```
 
 The wrapper publishes `backup-success.json` only after it has uploaded the artifacts and manifest and confirmed the
-objects are readable through Spaces metadata requests. The manifest records artifact sizes and SHA-256 hashes. Check
+deployment and host-configuration objects are readable through Spaces metadata requests. Database/legacy uploads,
+new image uploads, and the manifest rely on successful upload commands; the wrapper does not independently
+verify every referenced object with a metadata request. The manifest records artifact sizes and SHA-256 hashes. Check
 the service journal and latest manifest after every backup code change. Keep the age private key off-host and test
 restoration periodically; a backup is not proven recoverable until decrypted and restored in an isolated environment.
