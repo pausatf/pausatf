@@ -94,8 +94,8 @@ apparmor_apache_enforce: true
 # Certbot
 certbot_enabled: true
 certbot_lineage_name: pausatf.org
-# Certbot runs on the host. The active Apache runs in Docker with this
-# read-only bind mount, so deploy hooks copy renewed material here and reload it.
+# Certbot and the Apache service provisioned by site.yml run on the host.
+# Deploy hooks copy renewed material here, validate, and reload host Apache.
 certbot_deploy_target_dir: /etc/ssl/pausatf
 # site.yml provisions host Apache. Container deployment is an explicit override
 # for separately managed Docker origins, not this inventory's provisioning path.
