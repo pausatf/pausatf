@@ -148,7 +148,7 @@ services:
   db:
     image: mariadb:11.8
     healthcheck:
-      test: ["CMD-SHELL", 'MYSQL_PWD="$$MARIADB_ROOT_PASSWORD" mariadb -h127.0.0.1 -uroot -e "SELECT 1"']
+      test: ["CMD-SHELL", 'MYSQL_PWD="\$\$MARIADB_ROOT_PASSWORD" mariadb -h127.0.0.1 -uroot -e "SELECT 1"']
     environment:
       MARIADB_AUTO_UPGRADE: ""
 volumes:
