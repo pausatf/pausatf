@@ -81,7 +81,10 @@ All CI checks must pass before merging.
 1. Branch from `main` using naming convention: `feature/*`, `fix/*`, `docs/*`, `chore/*`
 2. Ensure pre-commit hooks pass locally (`pre-commit run --all-files`)
 3. Test changes locally before pushing
-4. All PRs require approval from @thomasvincent
+4. Follow the review process in `CONTRIBUTING.md`: @somethingwithproof may authorize
+   merging their own PRs with a current-head decision recorded in a PR comment or
+   COMMENTED review. Other authors require the maintainer's GitHub approval. Honor
+   branch protections, resolve actionable feedback and request re-review after fixes.
 5. Use "Squash and merge" or "Rebase and merge"
 
 ## WordPress Themes
