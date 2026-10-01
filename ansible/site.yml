@@ -171,6 +171,18 @@
           ansible.builtin.fail:
             msg: "Deployment failed. Web server recovery attempted. Review errors above."
 
+      always:
+        - name: Restore automatic certificate retries after provisioning or task failure
+          ansible.builtin.systemd:
+            name: "{{ item }}"
+            daemon_reload: true
+            enabled: true
+            state: started
+          loop:
+            - certbot.timer
+            - pausatf-certbot-deploy.timer
+          when: certbot_provisioning_timers_paused | default(false)
+
 - name: Run discovery
   hosts: webservers
   gather_facts: true

@@ -57,7 +57,7 @@ mv "$target/privkey.pem.new" "$target/privkey.pem"
 # A separately provisioned Docker origin may not exist on initial issuance.
 container_ready=0
 if command -v docker >/dev/null 2>&1; then
-    containers=$(docker container ls -a --format '{% raw %}{{.Names}}{% endraw %}')
+    containers=$(docker container ls --format '{% raw %}{{.Names}}{% endraw %}')
     if printf '%s\n' "$containers" | grep -Fx -- {{ certbot_deploy_container_name | quote }} >/dev/null; then
         container_ready=1
     fi

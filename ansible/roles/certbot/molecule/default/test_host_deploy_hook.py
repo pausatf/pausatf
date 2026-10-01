@@ -49,7 +49,7 @@ class HostHookTests(module.DeployHookTests):
         finally:
             module.HOOK=original
         self.command('apache2ctl', '#!/bin/sh\necho "$*" >> "$DOCKER_LOG"\n[ "${FAIL_CONFIG:-0}" = 0 ]\n')
-        self.command('systemctl', '#!/bin/sh\necho "$*" >> "$DOCKER_LOG"\ncase "$1" in\nis-active) [ "${NO_CONTAINER:-0}" = 0 ] ;;\nreload) echo graceful >> "$DOCKER_LOG"; [ "${FAIL_RELOAD:-0}" = 0 ] ;;\n*) exit 2 ;;\nesac\n')
+        self.command('systemctl', '#!/bin/sh\necho "$*" >> "$DOCKER_LOG"\ncase "$1" in\nis-active) [ "${NO_CONTAINER:-0}" = 0 ] && [ "${STOPPED_CONTAINER:-0}" = 0 ] ;;\nreload) echo graceful >> "$DOCKER_LOG"; [ "${FAIL_RELOAD:-0}" = 0 ] ;;\n*) exit 2 ;;\nesac\n')
     def test_docker_query_failure_is_not_treated_as_absent_container(self):
         result=self.run_hook(FAIL_LIST='1')
         self.assertEqual(result.returncode, 0, result.stderr)

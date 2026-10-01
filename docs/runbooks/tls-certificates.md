@@ -29,6 +29,12 @@ validation and reload in the second phase. Staging mode is passed only to those
 initial task invocations through `CERTBOT_STAGE_ONLY=1`; it is never rendered
 into the installed hook. Renewal and timer invocations therefore validate and
 reload normally even if the playbook stops before its second Certbot phase.
+Automatic renewal and synchronization jobs are stopped before staging, and
+resumed after post-web-server synchronization. The playbook's `always` cleanup
+resumes both timers even when provisioning tasks fail, preventing timer retries
+from undoing files during migration. If the controller is forcibly terminated
+before cleanup, rerun provisioning or explicitly start `certbot.timer` and
+`pausatf-certbot-deploy.timer` after inspecting the migration state.
 
 In normal validation mode, the hook
 copies certificates to `/etc/ssl/pausatf`, validates host Apache configuration,

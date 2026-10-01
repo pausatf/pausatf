@@ -36,8 +36,8 @@ class DeployHookTests(unittest.TestCase):
                      f'os.execv({install!r}, [{install!r}]+a)\n')
         self.command('docker', '#!/bin/sh\nprintf "%s\\n" "$*" >> "$DOCKER_LOG"\n'
                      'case "$*" in\n'
-                     '  *"container ls -a"*) [ "${FAIL_LIST:-0}" = 0 ] || exit 1; '
-                     '[ "${NO_CONTAINER:-0}" = 1 ] || echo "$CONTAINER_NAME" ;;\n'
+                     '  *"container ls --format"*) [ "${FAIL_LIST:-0}" = 0 ] || exit 1; '
+                     '[ "${NO_CONTAINER:-0}" = 1 ] || [ "${STOPPED_CONTAINER:-0}" = 1 ] || echo "$CONTAINER_NAME" ;;\n'
                      '  *configtest) [ "${FAIL_CONFIG:-0}" = 0 ] ;;\n'
                      '  *graceful) [ "${FAIL_RELOAD:-0}" = 0 ] ;;\n'
                      '  *) exit 2 ;;\nesac\n')
@@ -71,6 +71,16 @@ class DeployHookTests(unittest.TestCase):
         self.assertEqual((self.target / 'privkey.pem').stat().st_mode & 0o777, 0o600)
         self.assertIn('configtest', (self.root / 'docker.log').read_text())
         self.assertIn('graceful', (self.root / 'docker.log').read_text())
+
+    def test_stopped_server_retains_staged_files_until_running(self):
+        self.seed()
+        self.assertEqual(self.run_hook(STOPPED_CONTAINER='1').returncode, 0)
+        self.assert_current('new-')
+        self.assertTrue((self.target / '.reload-pending').exists())
+        self.assertNotIn('configtest', (self.root / 'docker.log').read_text())
+        self.assertEqual(self.run_hook().returncode, 0)
+        self.assertFalse((self.target / '.reload-pending').exists())
+        self.assertFalse((self.target / '.last-known-good').exists())
 
     def test_retained_snapshot_requires_validation_even_without_pending_marker(self):
         self.seed()

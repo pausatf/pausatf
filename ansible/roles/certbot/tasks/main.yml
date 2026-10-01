@@ -74,15 +74,28 @@
       WantedBy=timers.target
   when: certbot_deploy_target_dir is defined
 
-- name: Enable independent certificate synchronization retries
-  ansible.builtin.systemd:
-    name: pausatf-certbot-deploy.timer
-    daemon_reload: true
-    enabled: true
-    state: started
+- name: Record automatic TLS jobs paused for web-server provisioning
+  ansible.builtin.set_fact:
+    certbot_provisioning_timers_paused: true
   when:
     - certbot_enabled | default(true)
     - certbot_deploy_target_dir is defined
+    - certbot_deploy_stage_only | default(false)
+
+- name: Pause automatic TLS jobs before staging web-server certificates
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    daemon_reload: true
+    state: stopped
+  loop:
+    - pausatf-certbot-deploy.timer
+    - certbot.timer
+    - pausatf-certbot-deploy.service
+    - certbot.service
+  when:
+    - certbot_enabled | default(true)
+    - certbot_deploy_target_dir is defined
+    - certbot_deploy_stage_only | default(false)
 
 - name: Check if certificate already exists
   ansible.builtin.stat:
@@ -106,13 +119,6 @@
   changed_when: "'Certificate not yet due for renewal' not in certbot_result.stdout"
   when: (certbot_enabled | default(true)) and not certbot_cert_exists.stat.exists
 
-- name: Ensure certbot systemd timer is enabled
-  ansible.builtin.systemd:
-    name: certbot.timer
-    state: started
-    enabled: true
-  when: certbot_enabled | default(true)
-
 - name: Synchronize initial or existing certificate into the origin certificate directory
   ansible.builtin.command: /etc/letsencrypt/renewal-hooks/deploy/reload-webserver.sh
   environment:
@@ -122,3 +128,23 @@
   when:
     - certbot_enabled | default(true)
     - certbot_deploy_target_dir is defined
+
+- name: Enable independent certificate synchronization after validation
+  ansible.builtin.systemd:
+    name: pausatf-certbot-deploy.timer
+    daemon_reload: true
+    enabled: true
+    state: started
+  when:
+    - certbot_enabled | default(true)
+    - certbot_deploy_target_dir is defined
+    - not (certbot_deploy_stage_only | default(false))
+
+- name: Ensure certbot systemd timer is enabled after provisioning
+  ansible.builtin.systemd:
+    name: certbot.timer
+    state: started
+    enabled: true
+  when:
+    - certbot_enabled | default(true)
+    - not (certbot_deploy_stage_only | default(false))
