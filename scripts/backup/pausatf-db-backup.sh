@@ -45,7 +45,7 @@ STAMP=$(date -u +%Y%m%dT%H%M%SZ)
 DB_OUT="$BACKUP_DIR/prod-db-$STAMP.sql.gz.age"
 LEGACY_OUT="$BACKUP_DIR/prod-legacy-$STAMP.tar.gz.age"
 
-docker run --rm --env-file "$DB_ENV_FILE" mysql:8 \
+docker run --rm --env-file "$DB_ENV_FILE" mysql:8.4 \
   mysqldump --host="$DB_HOST" --port="$DB_PORT" --user="$DB_USER" \
   --ssl-mode=REQUIRED --single-transaction --quick --set-gtid-purged=OFF \
   --no-tablespaces --databases "$DB_NAME" \

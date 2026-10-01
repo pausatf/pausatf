@@ -24,7 +24,7 @@ module "mysql_db" {
 
   name            = "pausatf-db"
   engine          = "mysql"
-  engine_version  = "8"
+  engine_version  = "8.4"
   size            = "db-s-1vcpu-1gb"
   region          = "sfo3"
   node_count      = 1
@@ -126,7 +126,7 @@ module "redis_cache" {
 | Name | Description | Type | Default |
 |------|-------------|------|---------|
 | engine | Database engine (mysql, pg, redis, mongodb, kafka, opensearch) | `string` | `"mysql"` |
-| engine_version | Version of the database engine | `string` | `"8"` |
+| engine_version | Version of the database engine | `string` | `"8.4"` |
 | size | Database cluster size/tier | `string` | `"db-s-1vcpu-1gb"` |
 | region | DigitalOcean region | `string` | `"sfo2"` |
 | node_count | Number of nodes in the cluster (1, 2, or 3) | `number` | `1` |
@@ -198,7 +198,7 @@ module "wordpress_db" {
 
   name            = "pausatf-prod-db"
   engine          = "mysql"
-  engine_version  = "8"
+  engine_version  = "8.4"
   size            = "db-s-2vcpu-4gb"
   region          = "sfo3"
   node_count      = 1
