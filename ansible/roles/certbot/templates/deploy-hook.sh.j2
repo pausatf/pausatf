@@ -11,7 +11,8 @@ install -d -o root -g root -m 0700 "$target"
 exec 9>"$target/.deploy.lock"
 flock -n 9 || exit 1
 if cmp -s "$RENEWED_LINEAGE/fullchain.pem" "$target/fullchain.pem" &&
-    cmp -s "$RENEWED_LINEAGE/privkey.pem" "$target/privkey.pem"; then
+    cmp -s "$RENEWED_LINEAGE/privkey.pem" "$target/privkey.pem" &&
+    [ ! -e "$target/.reload-pending" ]; then
     exit 0
 fi
 backup=$(mktemp -d "$target/.previous.XXXXXX")
@@ -44,12 +45,28 @@ install -o root -g root -m 0600 "$RENEWED_LINEAGE/privkey.pem" "$target/privkey.
 restore_required=1
 mv "$target/fullchain.pem.new" "$target/fullchain.pem"
 mv "$target/privkey.pem.new" "$target/privkey.pem"
+# Certbot precedes Docker/WordPress provisioning on a fresh host. Stage the
+# mount now, but keep a pending marker until the actual container is validated.
+container_ready=0
+if command -v docker >/dev/null 2>&1; then
+    containers=$(docker container ls -a --format '{% raw %}{{.Names}}{% endraw %}')
+    if printf '%s\n' "$containers" | grep -Fx -- {{ certbot_deploy_container_name | quote }} >/dev/null; then
+        container_ready=1
+    fi
+fi
+if [ "$container_ready" = 0 ]; then
+    : > "$target/.reload-pending"
+    restore_required=0
+    echo "Certificate staged; container validation and reload are pending"
+    exit 0
+fi
 if ! docker exec {{ certbot_deploy_container_name | quote }} apache2ctl configtest; then
     exit 1
 fi
 if ! docker exec {{ certbot_deploy_container_name | quote }} apache2ctl graceful; then
     exit 1
 fi
+rm -f -- "$target/.reload-pending"
 restore_required=0
 {% else %}
 systemctl reload {{ 'apache2' if web_server | default('apache') == 'apache' else 'lsws' }}

@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 import re
 import shutil
+import shlex
 import subprocess
 import sys
 import tempfile
@@ -35,13 +36,16 @@ class DeployHookTests(unittest.TestCase):
                      f'os.execv({install!r}, [{install!r}]+a)\n')
         self.command('docker', '#!/bin/sh\nprintf "%s\\n" "$*" >> "$DOCKER_LOG"\n'
                      'case "$*" in\n'
+                     '  *"container ls -a"*) [ "${FAIL_LIST:-0}" = 0 ] || exit 1; '
+                     '[ "${NO_CONTAINER:-0}" = 1 ] || echo "$CONTAINER_NAME" ;;\n'
                      '  *configtest) [ "${FAIL_CONFIG:-0}" = 0 ] ;;\n'
                      '  *graceful) [ "${FAIL_RELOAD:-0}" = 0 ] ;;\n'
                      '  *) exit 2 ;;\nesac\n')
         if not shutil.which('flock'):
             self.command('flock', '#!/bin/sh\nexit 0\n')
         self.env = dict(os.environ, PATH=str(self.bin) + os.pathsep + os.environ['PATH'],
-                        RENEWED_LINEAGE=str(self.lineage), DOCKER_LOG=str(self.root / 'docker.log'))
+                        RENEWED_LINEAGE=str(self.lineage), DOCKER_LOG=str(self.root / 'docker.log'),
+                        CONTAINER_NAME=shlex.split(re.search(r'docker exec (.*?) apache2ctl', HOOK)[1])[0])
 
     def command(self, name, content):
         p = self.bin / name
@@ -99,6 +103,21 @@ class DeployHookTests(unittest.TestCase):
         self.assertEqual(self.run_hook(RENEWED_LINEAGE='/unrelated').returncode, 0)
         self.assertFalse(self.target.exists())
         self.assertFalse((self.root / 'docker.log').exists())
+
+    def test_fresh_host_stages_mount_until_container_exists(self):
+        result = self.run_hook(NO_CONTAINER='1')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assert_current('new-')
+        self.assertTrue((self.target / '.reload-pending').exists())
+        self.assertNotIn('configtest', (self.root / 'docker.log').read_text())
+        self.assertEqual(self.run_hook().returncode, 0)
+        self.assertIn('configtest', (self.root / 'docker.log').read_text())
+        self.assertFalse((self.target / '.reload-pending').exists())
+
+    def test_docker_query_failure_is_not_treated_as_absent_container(self):
+        self.seed()
+        self.assertNotEqual(self.run_hook(FAIL_LIST='1').returncode, 0)
+        self.assert_current('old-')
 
 
 if __name__ == '__main__':

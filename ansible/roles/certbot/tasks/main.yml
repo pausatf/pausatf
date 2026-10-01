@@ -68,7 +68,8 @@
       Description=Retry synchronization of the current Certbot lineage
       [Timer]
       OnBootSec=5min
-      OnUnitActiveSec=15min
+      OnCalendar=*:0/15
+      Persistent=true
       [Install]
       WantedBy=timers.target
   when: certbot_deploy_target_dir is defined

@@ -29,6 +29,13 @@ Apache. Inspect `journalctl -u pausatf-certbot-deploy.service` and the mounted
 certificate expiry when diagnosing failed deployment. This keeps renewal
 independent of a host Apache service.
 
+On a fresh host, Certbot runs before Docker and the WordPress container are
+provisioned. The hook seeds the certificate mount and leaves `.reload-pending`
+when Docker or the container does not exist yet. The timer later validates and
+reloads the created container even if the mounted files already match. Docker
+query errors and config-test/reload failures still fail and roll back; the
+pending marker is removed only after successful container validation and reload.
+
 ## Live inventory checked 2026-09-27
 
 | Environment | Origin certificate | Renewal owner | Observed origin expiry |
