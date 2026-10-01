@@ -16,11 +16,25 @@ resource replacement before applying it. Do not combine the major upgrade
 with other production database changes.
 
 No database upgrade was run as part of this change. Before the production
-apply, confirm a recent managed backup and a successful offsite encrypted
-recovery set. Both were current when checked on 2026-09-27: DigitalOcean had
-daily managed backups through that date, and the host recovery timer completed
-successfully with its recovery manifest and encrypted objects uploaded to
-Spaces. Verify the maintenance window in DigitalOcean before applying.
+apply, complete and record these gates:
+
+1. Check MySQL 8.4 compatibility, including removed features, authentication
+   plugins, SQL modes, and the WordPress database client and active plugins.
+   Run the MySQL Shell upgrade checker and resolve reported incompatibilities.
+2. Confirm a recent managed backup and offsite age-encrypted database and legacy
+   artifacts. The database backup script uploads `prod-db-*.sql.gz.age` and
+   `prod-legacy-*.tar.gz.age` under `s3://pausatf/backups/prod/`; it does not
+   produce a recovery manifest. If the recovery wrapper from PR #217 is installed,
+   separately inspect its manifest and every referenced object.
+3. Decrypt and restore the selected database backup in an isolated environment,
+   then test WordPress reads and writes with MySQL 8.4. Record artifact names,
+   hashes, restore results, and a rollback plan before approving production apply.
+4. Verify the DigitalOcean maintenance window and review an upgrade-only HCP
+   Terraform plan with no database replacement or unrelated changes.
+
+The 2026-09-27 backup observations do not prove recoverability or current freshness;
+repeat these checks before applying. The production upgrade remains blocked until
+the compatibility and restore gates pass.
 
 After the upgrade, verify the cluster is online and reports MySQL 8.4, check
 WordPress can read and write the production database, and confirm the next
