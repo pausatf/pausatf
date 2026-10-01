@@ -10,6 +10,7 @@ KEYSET=$(sha256sum "$RECIPIENTS" | cut -c1-16)
 readonly DEST=s3://pausatf/backups/recovery
 readonly STATE=/var/lib/pausatf-ops
 mkdir -p "$STATE"
+install -d -o root -g root -m 0700 /var/backups/pausatf
 work=$(mktemp -d /var/backups/pausatf/recovery.XXXXXX)
 trap 'rm -rf -- "$work"' EXIT
 /usr/local/sbin/pausatf-db-backup.sh
