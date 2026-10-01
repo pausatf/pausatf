@@ -38,8 +38,10 @@ ssh -o StrictHostKeyChecking=accept-new "$REMOTE" \
 DOCKER_BUILDKIT=1 "${compose[@]}" up -d
 
 # Import DB
-zcat /tmp/pausatf-stage.sql.gz | docker exec -i "$(docker ps -qf name=db)" \
-  MYSQL_PWD="${WORDPRESS_DB_PASSWORD:-wp_password}" mysql -u"${WORDPRESS_DB_USER:-wp}" "${WORDPRESS_DB_NAME:-wordpress}"
+# Expand credentials inside the service container, never in the invoking shell.
+# shellcheck disable=SC2016
+gzip -dc /tmp/pausatf-stage.sql.gz | "${compose[@]}" exec -T db sh -c \
+  'MYSQL_PWD="$MARIADB_PASSWORD" exec mariadb -u"$MARIADB_USER" "$MARIADB_DATABASE"'
 
 # Sync uploads
 rsync -az --delete -e "ssh -o StrictHostKeyChecking=accept-new" "$REMOTE:$SITE_PATH/wp-content/uploads/" \
