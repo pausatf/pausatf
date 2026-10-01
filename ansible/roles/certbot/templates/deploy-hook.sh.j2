@@ -10,7 +10,9 @@ target={{ certbot_deploy_target_dir | quote }}
 install -d -o root -g root -m 0700 "$target"
 # Serialize renewal and independent synchronization attempts for this target.
 exec 9>"$target/.deploy.lock"
-flock -n 9 || exit 1
+# Timer and synchronous provisioning may overlap; wait for the active run.
+# Bound the wait so a stuck deployment still fails and leaves retries enabled.
+flock -w 60 9 || exit 1
 if cmp -s "$RENEWED_LINEAGE/fullchain.pem" "$target/fullchain.pem" &&
     cmp -s "$RENEWED_LINEAGE/privkey.pem" "$target/privkey.pem" &&
     [ ! -e "$target/.reload-pending" ]; then
