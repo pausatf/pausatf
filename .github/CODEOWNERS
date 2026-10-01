@@ -1,7 +1,7 @@
 # Default owner for everything
-* @thomasvincent @github-copilot
+* @somethingwithproof
 
-# Security-sensitive paths require explicit review
-terraform/ @thomasvincent
-.github/workflows/ @thomasvincent
-ansible/ @thomasvincent
+# Security-sensitive paths use the maintainer review policy in CONTRIBUTING.md
+terraform/ @somethingwithproof
+.github/workflows/ @somethingwithproof
+ansible/ @somethingwithproof

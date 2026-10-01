@@ -340,10 +340,26 @@ How were these changes tested?
 ### Review Process
 
 1. Automated CI/CD checks must pass
-2. At least one approval required from @thomasvincent
-3. Address review comments
-4. Squash commits if needed
-5. Merge using "Squash and merge" or "Rebase and merge"
+2. Obtain a merge decision from the maintainer, @somethingwithproof. The maintainer
+   may review and authorize merging their own pull requests; a separate approval
+   is not required by this repository policy for those pull requests.
+3. Record an author-maintainer decision in a pull request comment or COMMENTED
+   review identifying the current head commit and verification evidence. This
+   records merge authorization; it is not a GitHub APPROVED review. Other authors
+   must obtain the maintainer's approval through GitHub's review workflow.
+4. Address all actionable feedback and resolve its review threads after verifying
+   the fixes. Request re-review after changes; a new head needs a new merge decision.
+5. Honor all branch protections and any additional required independent reviews.
+   This policy does not permit bypassing protections or submitting a self-approval.
+6. Squash commits if needed, then use "Squash and merge" or "Rebase and merge".
+
+GitHub [does not allow authors to approve their own pull requests][author-reviews].
+
+[author-reviews]: https://docs.github.com/en/pull-requests/how-tos/review-pull-requests/approving-a-pull-request-with-required-reviews
+A maintainer's recorded decision follows the author workflow above instead.
+Automated review helps identify feedback but does not supply a human approval.
+This review policy also governs the component contribution guides; production
+plan review, backup/restore validation and deployment gates still apply.
 
 ### After Merging
 
@@ -426,14 +442,14 @@ If you accidentally commit a secret:
 
 1. **DO NOT** just remove it in a new commit
 2. Rotate/revoke the secret immediately
-3. Contact @thomasvincent for history rewrite if needed
+3. Contact @somethingwithproof for history rewrite if needed
 
 ## Getting Help
 
 - **Documentation**: Check component-specific READMEs
 - **Issues**: Open a GitHub issue for bugs or questions
 - **Discussions**: Use GitHub Discussions for general questions
-- **Contact**: Reach out to @thomasvincent
+- **Contact**: Reach out to @somethingwithproof
 
 ## License
 
