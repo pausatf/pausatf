@@ -104,6 +104,9 @@ tls_origin_certificate_renewal: certbot_dns_cloudflare
 tls_origin_certificate_domains:
   - pausatf.org
   - www.pausatf.org
+tls_origin_certificate_path: /etc/ssl/pausatf/fullchain.pem
+tls_origin_private_key_path: /etc/ssl/pausatf/privkey.pem
+tls_origin_minimum_protocol: TLSv1.2
 
 # This server is the active web server (controls wp-cron)
 is_active_web: true
