@@ -34,15 +34,8 @@ resource "digitalocean_spaces_bucket" "pausatf" {
     }
   }
 
-  lifecycle_rule {
-    id      = "pausatf-recovery-images-60d"
-    prefix  = "backups/recovery/images/"
-    enabled = true
-
-    expiration {
-      days = 60
-    }
-  }
+  # Content-addressed images may be referenced by new recovery sets indefinitely.
+  # Do not expire current versions; garbage collection must inspect live manifests.
 
   lifecycle_rule {
     id      = "pausatf-recovery-sets-45d"

@@ -61,12 +61,30 @@ LEGACY_SIZE=$(stat -c%s "$LEGACY_OUT")
 s3cmd --config="$S3CMD_CONFIG" put --acl-private "$DB_OUT" "$DEST/prod-db-$STAMP.sql.gz.age" >/dev/null
 s3cmd --config="$S3CMD_CONFIG" put --acl-private "$LEGACY_OUT" "$DEST/prod-legacy-$STAMP.tar.gz.age" >/dev/null
 
+# Optional invocation receipt: exact uploaded artifacts, independent of runtime.
+if [ -n "${BACKUP_RECEIPT:-}" ]; then
+  export DB_OUT LEGACY_OUT DEST BACKUP_RECEIPT
+  python3 - <<'PY'
+import hashlib, json, os
+from pathlib import Path
+artifacts = {}
+for kind, variable in [('database', 'DB_OUT'), ('legacy', 'LEGACY_OUT')]:
+    p = Path(os.environ[variable])
+    with p.open('rb') as source:
+        digest = hashlib.file_digest(source, 'sha256').hexdigest()
+    artifacts[kind] = {'uri': os.environ['DEST'] + '/' + p.name,
+                       'bytes': p.stat().st_size, 'sha256': digest}
+Path(os.environ['BACKUP_RECEIPT']).write_text(json.dumps(artifacts))
+PY
+fi
+
 # Keep the newest three local and BACKUP_KEEP remote copies of each artifact type.
 # Filenames are generated from fixed prefixes and UTC timestamps, so whitespace is impossible.
 # shellcheck disable=SC2012
 ls -1t "$BACKUP_DIR"/prod-db-*.sql.gz.age 2>/dev/null | tail -n +4 | xargs -r rm -f
 # shellcheck disable=SC2012
 ls -1t "$BACKUP_DIR"/prod-legacy-*.tar.gz.age 2>/dev/null | tail -n +4 | xargs -r rm -f
+if [ "${BACKUP_PRUNE_REMOTE:-true}" = true ]; then
 for artifact_prefix in 'prod-db-' 'prod-legacy-'; do
   mapfile -t old_objects < <(
     s3cmd --config="$S3CMD_CONFIG" ls "$DEST/" \
@@ -78,5 +96,6 @@ for artifact_prefix in 'prod-db-' 'prod-legacy-'; do
     [ -n "$object" ] && s3cmd --config="$S3CMD_CONFIG" del "$object" >/dev/null
   done
 done
+fi
 
 echo "OK $STAMP db_size=$DB_SIZE legacy_size=$LEGACY_SIZE uploaded=$DEST/"

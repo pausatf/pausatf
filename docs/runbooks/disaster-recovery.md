@@ -1,7 +1,7 @@
 # Disaster Recovery Runbook
 
-**Document Version:** 2.0
-**Last Updated:** December 28, 2025
+**Document Version:** 2.1
+**Last Updated:** September 27, 2026
 **Owner:** Thomas Vincent
 **Review Frequency:** Quarterly
 
@@ -73,14 +73,13 @@ Store securely in password manager:
 
 ### Automated Backups
 
-**Nightly Backups (All run at 2-3 AM PT):**
+**Automated backups:**
 
 1. **DigitalOcean Snapshots**
    - Workflow: `.github/workflows/do-nightly-snapshot.yml`
-   - Frequency: Daily
-   - Retention: 7 days (DigitalOcean managed)
-   - Size: ~40GB
-   - Recovery Time: 10-15 minutes
+   - Frequency: Daily through `.github/workflows/do-nightly-snapshot.yml`
+   - Retention: Seven snapshots managed by the workflow
+   - Recovery Time: Typically 10-15 minutes to create a droplet from a snapshot, plus DNS and validation
 
 2. **WordPress Inventory**
    - Workflow: `.github/workflows/capture-prod-inventory.yml`
@@ -88,10 +87,21 @@ Store securely in password manager:
    - Captures: Plugins, themes, configurations
    - Location: `ansible/group_vars/production/wordpress.yml` (committed to git)
 
-3. **Encrypted Database and Legacy Backup**
+3. **DigitalOcean Managed Database Backups**
+   - Frequency: Managed by DigitalOcean for the production MySQL cluster
+   - Retention: Seven days, with point-in-time recovery availability subject to DigitalOcean's service window
+   - Use DigitalOcean's database restore workflow; these backups are separate from the droplet backup timer
+
+4. **Encrypted Database, Legacy, and Recovery Set**
    - Timer: production `pausatf-db-backup.timer` (daily)
-   - Location: private, age-encrypted database and legacy-data objects under `s3://pausatf/backups/prod/`. The timer does not create deployment snapshots or verified recovery manifests.
-   - Restore requires the off-host age private key; see `scripts/backup/README.md`.
+   - Location: private age-encrypted database and legacy-data objects under `s3://pausatf/backups/prod/`, plus deployment and host-configuration archives, container images, and a manifest under `s3://pausatf/backups/recovery/`
+   - Production's systemd drop-in runs the recovery wrapper, which invokes the database/legacy backup before creating and uploading the recovery set
+   - `/var/lib/pausatf-ops/backup-success.json` is updated only after uploads and remote metadata checks succeed
+   - Restore requires the off-host age private key; see `scripts/backup/README.md`
+
+5. **Static Upload Versioning**
+   - WordPress uploads live in the versioned `pausatf-static` Spaces bucket
+   - Noncurrent object versions are retained for 60 days; versioning is not an independent copy and does not replace a recovery backup
 
 ### On-Demand Backups
 
