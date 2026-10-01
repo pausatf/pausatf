@@ -10,6 +10,8 @@ The database script supplies an invocation-specific receipt containing the exact
 objects, sizes, and hashes. The wrapper uses that receipt even when image archiving takes over an hour; it never
 selects artifacts by newest modification time. Content-addressed recovery images have no current-version expiration:
 new recovery sets can reference an old image. Remove unreferenced images only after checking all retained manifests.
+The recovery wrapper disables the standalone database script's count-based remote pruning: database objects and
+recovery sets use the 45-day Spaces lifecycle, so newer retained sets keep their referenced database objects.
 
 The database and legacy artifacts are uploaded under `s3://pausatf/backups/prod/`. Their age private key stays
 off-host. The recovery wrapper uses the public recipients from `/etc/pausatf-backup-recipients.txt`; keep that file

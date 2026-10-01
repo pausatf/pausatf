@@ -13,7 +13,9 @@ mkdir -p "$STATE"
 install -d -o root -g root -m 0700 /var/backups/pausatf
 work=$(mktemp -d /var/backups/pausatf/recovery.XXXXXX)
 trap 'rm -rf -- "$work"' EXIT
-BACKUP_RECEIPT="$work/database-receipt.json" /usr/local/sbin/pausatf-db-backup.sh
+# Recovery sets and their database objects share the 45-day Spaces lifecycle.
+# Count-based pruning could delete objects still referenced by retained sets.
+BACKUP_PRUNE_REMOTE=false BACKUP_RECEIPT="$work/database-receipt.json" /usr/local/sbin/pausatf-db-backup.sh
 stamp=$(date -u +%Y%m%dT%H%M%SZ)
 # Uploads are in versioned Spaces, not this archive. Do not traverse their FUSE mount.
 mkdir "$work/deployment"

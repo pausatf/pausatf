@@ -84,6 +84,7 @@ fi
 ls -1t "$BACKUP_DIR"/prod-db-*.sql.gz.age 2>/dev/null | tail -n +4 | xargs -r rm -f
 # shellcheck disable=SC2012
 ls -1t "$BACKUP_DIR"/prod-legacy-*.tar.gz.age 2>/dev/null | tail -n +4 | xargs -r rm -f
+if [ "${BACKUP_PRUNE_REMOTE:-true}" = true ]; then
 for artifact_prefix in 'prod-db-' 'prod-legacy-'; do
   mapfile -t old_objects < <(
     s3cmd --config="$S3CMD_CONFIG" ls "$DEST/" \
@@ -95,5 +96,6 @@ for artifact_prefix in 'prod-db-' 'prod-legacy-'; do
     [ -n "$object" ] && s3cmd --config="$S3CMD_CONFIG" del "$object" >/dev/null
   done
 done
+fi
 
 echo "OK $STAMP db_size=$DB_SIZE legacy_size=$LEGACY_SIZE uploaded=$DEST/"
