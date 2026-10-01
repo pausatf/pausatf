@@ -1,5 +1,6 @@
 import importlib.util
 import os
+import re
 from pathlib import Path
 import sys
 import unittest
@@ -7,6 +8,17 @@ spec=importlib.util.spec_from_file_location('container_tests', sys.argv.pop(1))
 module=importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
 class HostHookTests(module.DeployHookTests):
+    def test_active_host_stages_before_invalid_vhost_migration(self):
+        original = self.hook.read_text()
+        self.hook.write_text(re.sub(r'^stage_only=.*$', 'stage_only=1', original, flags=re.M))
+        self.assertEqual(self.run_hook(FAIL_CONFIG='1').returncode, 0)
+        self.assert_current('new-')
+        self.assertTrue((self.target / '.reload-pending').exists())
+        self.assertFalse((self.root / 'docker.log').exists())
+        self.hook.write_text(original)
+        self.assertEqual(self.run_hook().returncode, 0)
+        self.assertFalse((self.target / '.reload-pending').exists())
+
     def setUp(self):
         # Parent fixture obtains a container name; the host hook needs no Docker.
         original=module.HOOK
