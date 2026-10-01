@@ -111,7 +111,7 @@
     enabled: true
   when: certbot_enabled | default(true)
 
-- name: Synchronize initial or existing certificate into the container mount
+- name: Synchronize initial or existing certificate into the origin certificate directory
   ansible.builtin.command: /etc/letsencrypt/renewal-hooks/deploy/reload-webserver.sh
   environment:
     RENEWED_LINEAGE: "/etc/letsencrypt/live/{{ certbot_lineage_name | default(certbot_domains[0]) }}"

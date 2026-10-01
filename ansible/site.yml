@@ -46,6 +46,11 @@
             - web_server | default('apache') == 'apache'
             - modsecurity_enabled | default(true)
 
+        - name: Include Certbot role
+          ansible.builtin.include_role:
+            name: certbot
+          when: certbot_enabled | default(false)
+
         - name: Include Apache role
           ansible.builtin.include_role:
             name: apache
@@ -60,11 +65,6 @@
           ansible.builtin.include_role:
             name: openlitespeed
           when: web_server | default('apache') == 'openlitespeed'
-
-        - name: Include Certbot role
-          ansible.builtin.include_role:
-            name: certbot
-          when: certbot_enabled | default(false)
 
         - name: Include MySQL role
           ansible.builtin.include_role:

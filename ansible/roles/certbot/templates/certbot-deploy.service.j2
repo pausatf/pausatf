@@ -1,7 +1,9 @@
 [Unit]
-Description=Synchronize current Certbot certificate into the web container
+Description=Synchronize current Certbot certificate into the web origin
+{% if certbot_deploy_container_name is defined %}
 After=docker.service
 Requires=docker.service
+{% endif %}
 
 [Service]
 Type=oneshot

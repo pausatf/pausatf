@@ -12,29 +12,28 @@ origin using Full (strict) validation.
   lineage (`pausatf.org`), domains, on-host certificate mount, and renewal
   method. Certbot runs on the production host using the Cloudflare DNS-01
   plugin.
-- `ansible/group_vars/staging.yml` and `ansible/group_vars/dev.yml` record the
-  Cloudflare Origin CA certificate issuer, hostname, mounted paths, and TLS
-  1.2 minimum for the Apache origin containers. Their origin certificates are
-  provisioned outside Ansible; private keys must not be committed.
+- `ansible/group_vars/staging.yml` and `ansible/group_vars/dev.yml` record
+  observed Cloudflare Origin CA inventory. These `tls_origin_*` variables are
+  descriptive metadata; web-server roles do not consume them. The tracked
+  staging playbook selects host OpenLiteSpeed and dev selects host Apache.
 
-The production Certbot deploy hook installs renewed files into
-`/etc/ssl/pausatf`, which is mounted read-only in `pausatf-wordpress`. It runs
-Apache's config test before a graceful reload and restores the prior files if
-the test or reload fails. The role installs the hook before issuance and also
-synchronizes existing lineages on deployment, including an empty target directory.
-The `pausatf-certbot-deploy.timer` retries synchronization every 15 minutes
-independently of renewal eligibility, so a failed deployment can recover after
-Certbot has already renewed its lineage. Unchanged certificates do not reload
-Apache. Inspect `journalctl -u pausatf-certbot-deploy.service` and the mounted
-certificate expiry when diagnosing failed deployment. This keeps renewal
-independent of a host Apache service.
+## Provisioning and renewal
 
-On a fresh host, Certbot runs before Docker and the WordPress container are
-provisioned. The hook seeds the certificate mount and leaves `.reload-pending`
-when Docker or the container does not exist yet. The timer later validates and
-reloads the created container even if the mounted files already match. Docker
-query errors and config-test/reload failures still fail and roll back; the
-pending marker is removed only after successful container validation and reload.
+`ansible/site.yml` provisions host Apache in production, not Docker. It obtains
+the Certbot lineage before configuring Apache SSL vhosts. The production hook
+copies certificates to `/etc/ssl/pausatf`, validates host Apache configuration,
+and reloads the host service. Initial issuance stages the files with a pending
+marker if Apache is not running yet. The independent synchronization timer
+validates and reloads after provisioning; failures restore prior files, and
+unchanged certificates without a pending marker do not reload Apache.
+
+The observed live Docker deployment is separately managed and is not created by
+this playbook. For that origin, explicitly set `certbot_deploy_container_name:
+pausatf-wordpress` when applying the Certbot role alone, and ensure the container
+mounts `/etc/ssl/pausatf` read-only. Do not apply the host web-stack playbook to
+that deployment as though it provisions Docker. The container hook validates
+and gracefully reloads Apache inside the named container and retries pending
+deployments every 15 minutes. Inspect `journalctl -u pausatf-certbot-deploy.service`.
 
 ## Live inventory checked 2026-09-27
 
@@ -53,7 +52,9 @@ When rotating a dev or staging Origin CA certificate, deploy the certificate
 and key to `/etc/ssl/pausatf/fullchain.pem` and
 `/etc/ssl/pausatf/privkey.pem`, verify hostname coverage and validity, then run
 `apache2ctl configtest` and gracefully reload Apache in the matching WordPress
-container. Keep both files root-owned and the private key mode `0600`.
+container for the observed Docker deployment. For host Apache or OpenLiteSpeed
+provisioned by Ansible, validate and reload the actual host web service and use
+the certificate paths configured by its role. Keep both files root-owned and the private key mode `0600`.
 
 ## Validation
 

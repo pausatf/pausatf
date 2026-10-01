@@ -45,8 +45,8 @@ install -o root -g root -m 0600 "$RENEWED_LINEAGE/privkey.pem" "$target/privkey.
 restore_required=1
 mv "$target/fullchain.pem.new" "$target/fullchain.pem"
 mv "$target/privkey.pem.new" "$target/privkey.pem"
-# Certbot precedes Docker/WordPress provisioning on a fresh host. Stage the
-# mount now, but keep a pending marker until the actual container is validated.
+{% if certbot_deploy_container_name is defined %}
+# A separately provisioned Docker origin may not exist on initial issuance.
 container_ready=0
 if command -v docker >/dev/null 2>&1; then
     containers=$(docker container ls -a --format '{% raw %}{{.Names}}{% endraw %}')
@@ -66,8 +66,23 @@ fi
 if ! docker exec {{ certbot_deploy_container_name | quote }} apache2ctl graceful; then
     exit 1
 fi
+{% else %}
+# site.yml obtains certificates before configuring host Apache SSL vhosts.
+# Stage on bootstrap; validate and reload once the host service is running.
+if ! systemctl is-active --quiet apache2; then
+    : > "$target/.reload-pending"
+    restore_required=0
+    echo "Certificate staged; host Apache validation and reload are pending"
+    exit 0
+fi
+apache2ctl configtest || exit 1
+systemctl reload apache2 || exit 1
+{% endif %}
 rm -f -- "$target/.reload-pending"
 restore_required=0
 {% else %}
-systemctl reload {{ 'apache2' if web_server | default('apache') == 'apache' else 'lsws' }}
+# Initial DNS-01 issuance can precede web-server installation.
+if systemctl is-active --quiet {{ 'apache2' if web_server | default('apache') == 'apache' else 'lsws' }}; then
+    systemctl reload {{ 'apache2' if web_server | default('apache') == 'apache' else 'lsws' }}
+fi
 {% endif %}

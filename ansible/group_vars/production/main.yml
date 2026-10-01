@@ -97,7 +97,8 @@ certbot_lineage_name: pausatf.org
 # Certbot runs on the host. The active Apache runs in Docker with this
 # read-only bind mount, so deploy hooks copy renewed material here and reload it.
 certbot_deploy_target_dir: /etc/ssl/pausatf
-certbot_deploy_container_name: pausatf-wordpress
+# site.yml provisions host Apache. Container deployment is an explicit override
+# for separately managed Docker origins, not this inventory's provisioning path.
 tls_origin_certificate_issuer: letsencrypt
 tls_origin_certificate_renewal: certbot_dns_cloudflare
 tls_origin_certificate_domains:
