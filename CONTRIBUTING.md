@@ -340,7 +340,7 @@ How were these changes tested?
 ### Review Process
 
 1. Automated CI/CD checks must pass
-2. At least one approval required from @thomasvincent
+2. At least one approval required from @somethingwithproof
 3. Address review comments
 4. Squash commits if needed
 5. Merge using "Squash and merge" or "Rebase and merge"
@@ -426,14 +426,14 @@ If you accidentally commit a secret:
 
 1. **DO NOT** just remove it in a new commit
 2. Rotate/revoke the secret immediately
-3. Contact @thomasvincent for history rewrite if needed
+3. Contact @somethingwithproof for history rewrite if needed
 
 ## Getting Help
 
 - **Documentation**: Check component-specific READMEs
 - **Issues**: Open a GitHub issue for bugs or questions
 - **Discussions**: Use GitHub Discussions for general questions
-- **Contact**: Reach out to @thomasvincent
+- **Contact**: Reach out to @somethingwithproof
 
 ## License
 
