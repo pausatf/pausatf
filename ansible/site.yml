@@ -49,6 +49,8 @@
         - name: Include Certbot role
           ansible.builtin.include_role:
             name: certbot
+          vars:
+            certbot_deploy_stage_only: true
           when: certbot_enabled | default(false)
 
         - name: Include Apache role
@@ -65,6 +67,13 @@
           ansible.builtin.include_role:
             name: openlitespeed
           when: web_server | default('apache') == 'openlitespeed'
+
+        - name: Validate and synchronize certificates after web-server configuration
+          ansible.builtin.include_role:
+            name: certbot
+          vars:
+            certbot_deploy_stage_only: false
+          when: certbot_enabled | default(false)
 
         - name: Include MySQL role
           ansible.builtin.include_role:

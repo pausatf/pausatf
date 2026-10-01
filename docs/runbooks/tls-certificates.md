@@ -21,6 +21,13 @@ origin using Full (strict) validation.
 
 `ansible/site.yml` provisions host Apache in production, not Docker. It obtains
 the Certbot lineage before configuring Apache SSL vhosts. The production hook
+uses staging-only mode in this first phase, including on active hosts with old
+vhost paths. After the web-server role rewrites and validates those paths, the
+playbook reapplies Certbot in normal validation mode. This prevents an old
+invalid lineage from blocking its own migration; pending files still require
+validation and reload in the second phase.
+
+In normal validation mode, the hook
 copies certificates to `/etc/ssl/pausatf`, validates host Apache configuration,
 and reloads the host service. Initial issuance stages the files with a pending
 marker if Apache is not running yet. The independent synchronization timer

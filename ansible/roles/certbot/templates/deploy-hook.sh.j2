@@ -69,7 +69,7 @@ fi
 {% else %}
 # site.yml obtains certificates before configuring host Apache SSL vhosts.
 # Stage on bootstrap; validate and reload once the host service is running.
-if ! systemctl is-active --quiet apache2; then
+if [ {{ '1' if certbot_deploy_stage_only | default(false) else '0' }} = 1 ] || ! systemctl is-active --quiet apache2; then
     : > "$target/.reload-pending"
     restore_required=0
     echo "Certificate staged; host Apache validation and reload are pending"
@@ -82,7 +82,8 @@ rm -f -- "$target/.reload-pending"
 restore_required=0
 {% else %}
 # Initial DNS-01 issuance can precede web-server installation.
-if systemctl is-active --quiet {{ 'apache2' if web_server | default('apache') == 'apache' else 'lsws' }}; then
+if [ {{ '1' if certbot_deploy_stage_only | default(false) else '0' }} = 0 ] &&
+    systemctl is-active --quiet {{ 'apache2' if web_server | default('apache') == 'apache' else 'lsws' }}; then
     systemctl reload {{ 'apache2' if web_server | default('apache') == 'apache' else 'lsws' }}
 fi
 {% endif %}
