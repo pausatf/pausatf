@@ -196,7 +196,7 @@ pre-commit run --all-files
    - GitHub Actions workflows
 
 3. **Request review**
-   - At least one approval required
+   - Follow the [repository review policy](../../CONTRIBUTING.md#review-process) for the maintainer merge decision
    - Address review feedback promptly
 
 4. **Merge**

@@ -1,7 +1,7 @@
 # Default owner for everything
 * @somethingwithproof
 
-# Security-sensitive paths require explicit review
+# Security-sensitive paths use the maintainer review policy in CONTRIBUTING.md
 terraform/ @somethingwithproof
 .github/workflows/ @somethingwithproof
 ansible/ @somethingwithproof

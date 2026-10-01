@@ -57,7 +57,7 @@ git push origin feature/your-feature-name
 ### 6. PR Requirements
 
 - ✅ All CI checks passing
-- ✅ 1 approval required
+- ✅ Maintainer merge decision under the [repository review policy](../CONTRIBUTING.md#review-process)
 - ✅ Plan output reviewed
 - ✅ No security issues
 - ✅ Documentation updated
