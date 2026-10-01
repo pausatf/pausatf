@@ -35,7 +35,11 @@ copies certificates to `/etc/ssl/pausatf`, validates host Apache configuration,
 and reloads the host service. Initial issuance stages the files with a pending
 marker if Apache is not running yet. The independent synchronization timer
 validates and reloads after provisioning; failures restore prior files, and
-unchanged certificates without a pending marker do not reload Apache.
+unchanged certificates without a pending marker or retained snapshot do not
+reload Apache.
+The first prior-file snapshot persists across repeated staging runs and failed
+validation/reload attempts. It is removed only after successful validation and
+reload, so an interrupted playbook can still restore the last known good files.
 
 The observed live Docker deployment is separately managed and is not created by
 this playbook. For that origin, explicitly set `certbot_deploy_container_name:

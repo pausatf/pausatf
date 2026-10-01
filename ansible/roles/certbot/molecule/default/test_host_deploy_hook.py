@@ -7,6 +7,27 @@ spec=importlib.util.spec_from_file_location('container_tests', sys.argv.pop(1))
 module=importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
 class HostHookTests(module.DeployHookTests):
+    def check_repeated_staging_rollback(self, failure):
+        self.seed()
+        self.assertEqual(self.run_hook(CERTBOT_STAGE_ONLY='1').returncode, 0)
+        for name in ('fullchain.pem', 'privkey.pem'):
+            (self.lineage / name).write_text('newer-' + name)
+        self.assertEqual(self.run_hook(CERTBOT_STAGE_ONLY='1').returncode, 0)
+        self.assert_current('newer-')
+        self.assertNotEqual(self.run_hook(**{failure: '1'}).returncode, 0)
+        self.assert_current('old-')
+        self.assertTrue((self.target / '.last-known-good').is_dir())
+        self.assertEqual(self.run_hook().returncode, 0)
+        self.assert_current('newer-')
+        self.assertFalse((self.target / '.last-known-good').exists())
+        self.assertFalse((self.target / '.reload-pending').exists())
+
+    def test_repeated_staging_preserves_last_good_on_config_failure(self):
+        self.check_repeated_staging_rollback('FAIL_CONFIG')
+
+    def test_repeated_staging_preserves_last_good_on_reload_failure(self):
+        self.check_repeated_staging_rollback('FAIL_RELOAD')
+
     def test_active_host_stages_before_invalid_vhost_migration(self):
         self.assertEqual(self.run_hook(CERTBOT_STAGE_ONLY='1', FAIL_CONFIG='1').returncode, 0)
         self.assert_current('new-')

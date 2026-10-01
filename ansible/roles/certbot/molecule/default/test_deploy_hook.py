@@ -72,6 +72,17 @@ class DeployHookTests(unittest.TestCase):
         self.assertIn('configtest', (self.root / 'docker.log').read_text())
         self.assertIn('graceful', (self.root / 'docker.log').read_text())
 
+    def test_retained_snapshot_requires_validation_even_without_pending_marker(self):
+        self.seed()
+        self.assertEqual(self.run_hook(NO_CONTAINER='1').returncode, 0)
+        # A crash can leave copied files and the snapshot before a marker is set.
+        (self.target / '.reload-pending').unlink()
+        self.assertNotEqual(self.run_hook(FAIL_CONFIG='1').returncode, 0)
+        self.assert_current('old-')
+        self.assertEqual(self.run_hook().returncode, 0)
+        self.assert_current('new-')
+        self.assertFalse((self.target / '.last-known-good').exists())
+
     def test_config_failure_rolls_back_and_independent_retry_succeeds(self):
         self.seed()
         self.assertNotEqual(self.run_hook(FAIL_CONFIG='1').returncode, 0)

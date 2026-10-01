@@ -13,18 +13,24 @@ exec 9>"$target/.deploy.lock"
 # Timer and synchronous provisioning may overlap; wait for the active run.
 # Bound the wait so a stuck deployment still fails and leaves retries enabled.
 flock -w 60 9 || exit 1
+backup="$target/.last-known-good"
 if cmp -s "$RENEWED_LINEAGE/fullchain.pem" "$target/fullchain.pem" &&
     cmp -s "$RENEWED_LINEAGE/privkey.pem" "$target/privkey.pem" &&
-    [ ! -e "$target/.reload-pending" ]; then
+    [ ! -e "$target/.reload-pending" ] && [ ! -d "$backup" ]; then
     exit 0
 fi
-backup=$(mktemp -d "$target/.previous.XXXXXX")
-trap 'rm -rf -- "$backup"; rm -f -- "$target/fullchain.pem.new" "$target/privkey.pem.new"' EXIT
-for name in fullchain.pem privkey.pem; do
-    if [ -f "$target/$name" ]; then
-        cp -p "$target/$name" "$backup/$name"
-    fi
-done
+# Keep the first snapshot across staging runs, failures, and later retries.
+# Publish it atomically before replacing any files; clear only after reload.
+if [ ! -d "$backup" ]; then
+    snapshot=$(mktemp -d "$target/.previous.XXXXXX")
+    trap 'rm -rf -- "$snapshot"' EXIT
+    for name in fullchain.pem privkey.pem; do
+        if [ -f "$target/$name" ]; then
+            cp -p "$target/$name" "$snapshot/$name"
+        fi
+    done
+    mv "$snapshot" "$backup"
+fi
 rollback() {
     for name in fullchain.pem privkey.pem; do
         if [ -f "$backup/$name" ]; then
@@ -39,7 +45,6 @@ cleanup() {
     if [ "$restore_required" = 1 ]; then
         rollback
     fi
-    rm -rf -- "$backup"
     rm -f -- "$target/fullchain.pem.new" "$target/privkey.pem.new"
 }
 trap cleanup EXIT
@@ -83,6 +88,7 @@ systemctl reload apache2 || exit 1
 {% endif %}
 rm -f -- "$target/.reload-pending"
 restore_required=0
+rm -rf -- "$backup"
 {% else %}
 # Initial DNS-01 issuance can precede web-server installation.
 if [ "$stage_only" = 0 ] &&
