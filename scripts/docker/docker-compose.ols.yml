@@ -15,11 +15,18 @@ services:
       - "8443:443"
       - "7080:7080" # OLS admin
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     restart: unless-stopped
 
   db:
     image: mariadb:13.0
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 30s
+      interval: 5s
+      timeout: 5s
+      retries: 24
     environment:
       - MARIADB_AUTO_UPGRADE=1
       - MARIADB_DATABASE=${WORDPRESS_DB_NAME:-wordpress}
@@ -40,7 +47,8 @@ services:
     ports:
       - "8081:80"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
 volumes:
   wp-data:

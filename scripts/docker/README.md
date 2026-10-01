@@ -8,7 +8,10 @@ volume for rollback; do not start 11.8 against a volume already upgraded by 13.0
 The stack sets `MARIADB_AUTO_UPGRADE=1` so the official image runs the required
 system-table upgrade when an existing database is opened. After startup, inspect
 the database logs and verify WordPress reads and writes before removing backups.
-This upgrades only the local development stack.
+This upgrades only the local development stack. The image healthcheck requires
+network connections and initialized InnoDB before Compose starts the application.
+A socket-only SQL check can succeed against the temporary initialization server
+before WordPress can connect; use the TCP checks below.
 
 ## Back up and prove restoration before starting 13.0
 
@@ -27,15 +30,18 @@ cat > "$bootstrap_override" <<'YAML'
 services:
   db:
     image: mariadb:11.8
+    healthcheck:
+      test: ["CMD-SHELL", 'MYSQL_PWD="$$MARIADB_ROOT_PASSWORD" mariadb -h127.0.0.1 -uroot -e "SELECT 1"']
     environment:
       MARIADB_AUTO_UPGRADE: ""
 YAML
 docker compose --env-file scripts/docker/.env -f scripts/docker/docker-compose.ols.yml \
-  -f "$bootstrap_override" up -d --no-deps db
+  -f "$bootstrap_override" up -d --wait --wait-timeout 180 --no-deps db
 rm -f "$bootstrap_override"
 ```
 
-Wait for database readiness, then verify `SELECT VERSION()` reports 11.8 before
+The 11.8 overrides use an authenticated TCP check because older volumes may lack
+the official image healthcheck account. Wait for database readiness, then verify `SELECT VERSION()` reports 11.8 before
 the backup steps below. The sync helper refuses any existing volume whose
 database is not running verified 13.0; perform this documented upgrade first.
 
@@ -51,7 +57,7 @@ database_volume=$(docker inspect "$database_container" --format \
   '{{range .Mounts}}{{if eq .Destination "/var/lib/mysql"}}{{.Name}}{{end}}{{end}}')
 test -n "$database_volume"
 db_version=$(docker exec "$database_container" sh -c \
-  'MYSQL_PWD="$MARIADB_ROOT_PASSWORD" mariadb -uroot -Nse "SELECT VERSION()"')
+  'MYSQL_PWD="$MARIADB_ROOT_PASSWORD" mariadb -h127.0.0.1 -uroot -Nse "SELECT VERSION()"')
 [[ "$db_version" == 11.8.* ]]
 "${compose[@]}" stop web phpmyadmin
 docker exec "$database_container" sh -c \
@@ -84,7 +90,7 @@ docker run --rm -d --name "$restore_name" --env-file scripts/docker/.env \
 ready=0
 for _attempt in {1..60}; do
   if docker exec "$restore_name" sh -c \
-    'MYSQL_PWD="$MARIADB_ROOT_PASSWORD" mariadb -uroot -e "SELECT 1"' >/dev/null 2>&1; then
+    'MYSQL_PWD="$MARIADB_ROOT_PASSWORD" mariadb -h127.0.0.1 -uroot -e "SELECT 1"' >/dev/null 2>&1; then
     ready=1
     break
   fi
@@ -92,11 +98,11 @@ for _attempt in {1..60}; do
 done
 test "$ready" = 1
 gzip -dc "$backup_dir/all-databases.sql.gz" | docker exec -i "$restore_name" sh -c \
-  'MYSQL_PWD="$MARIADB_ROOT_PASSWORD" exec mariadb -uroot'
+  'MYSQL_PWD="$MARIADB_ROOT_PASSWORD" exec mariadb -h127.0.0.1 -uroot'
 docker exec "$restore_name" sh -c \
   'MYSQL_PWD="$MARIADB_ROOT_PASSWORD" mariadb-check -uroot --all-databases'
 docker exec "$restore_name" sh -c \
-  'MYSQL_PWD="$MARIADB_ROOT_PASSWORD" mariadb -uroot -e \
+  'MYSQL_PWD="$MARIADB_ROOT_PASSWORD" mariadb -h127.0.0.1 -uroot -e \
    "SELECT TABLE_SCHEMA,TABLE_NAME,TABLE_ROWS FROM information_schema.tables \
     WHERE TABLE_SCHEMA NOT IN (\"mysql\",\"sys\",\"information_schema\",\"performance_schema\")"'
 docker stop "$restore_name"
@@ -109,10 +115,10 @@ start only the database, inspect its upgrade log and version, and start the
 application after the database checks succeed:
 
 ```bash
-"${compose[@]}" up -d db
+"${compose[@]}" up -d --wait --wait-timeout 180 db
 "${compose[@]}" logs db
 "${compose[@]}" exec -T db sh -c \
-  'MYSQL_PWD="$MARIADB_ROOT_PASSWORD" mariadb -uroot -Nse "SELECT VERSION()"'
+  'MYSQL_PWD="$MARIADB_ROOT_PASSWORD" mariadb -h127.0.0.1 -uroot -Nse "SELECT VERSION()"'
 "${compose[@]}" exec -T db sh -c \
   'MYSQL_PWD="$MARIADB_ROOT_PASSWORD" mariadb-check -uroot --all-databases'
 "${compose[@]}" up -d web phpmyadmin
@@ -141,6 +147,8 @@ cat > "$backup_dir/rollback.yml" <<YAML
 services:
   db:
     image: mariadb:11.8
+    healthcheck:
+      test: ["CMD-SHELL", 'MYSQL_PWD="$$MARIADB_ROOT_PASSWORD" mariadb -h127.0.0.1 -uroot -e "SELECT 1"']
     environment:
       MARIADB_AUTO_UPGRADE: ""
 volumes:
@@ -148,10 +156,10 @@ volumes:
     external: true
     name: "$rollback_volume"
 YAML
-"${compose[@]}" -f "$backup_dir/rollback.yml" up -d db
+"${compose[@]}" -f "$backup_dir/rollback.yml" up -d --wait --wait-timeout 180 db
 "${compose[@]}" -f "$backup_dir/rollback.yml" logs db
 "${compose[@]}" -f "$backup_dir/rollback.yml" exec -T db sh -c \
-  'MYSQL_PWD="$MARIADB_ROOT_PASSWORD" mariadb -uroot -Nse "SELECT VERSION()"'
+  'MYSQL_PWD="$MARIADB_ROOT_PASSWORD" mariadb -h127.0.0.1 -uroot -Nse "SELECT VERSION()"'
 "${compose[@]}" -f "$backup_dir/rollback.yml" exec -T db sh -c \
   'MYSQL_PWD="$MARIADB_ROOT_PASSWORD" mariadb-check -uroot --all-databases'
 "${compose[@]}" -f "$backup_dir/rollback.yml" up -d web phpmyadmin
@@ -164,3 +172,5 @@ Compose mapping only when ready for the upgrade. Use the override on subsequent
 rollback starts so Compose cannot silently reopen the upgraded volume.
 
 See the [official image environment variables](https://mariadb.com/docs/server/server-management/automated-mariadb-deployment-and-administration/docker-and-mariadb/mariadb-server-docker-official-image-environment-variables).
+
+See the [official image healthcheck documentation](https://mariadb.com/docs/server/server-management/automated-mariadb-deployment-and-administration/docker-and-mariadb/using-healthcheck-sh).
