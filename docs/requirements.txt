@@ -2,7 +2,7 @@
 # Used by Dependabot to track Python dependency updates
 
 # Ansible and related tools
-ansible>=12.2.0,<9.0.0
+ansible>=12.2.0,<13.0.0
 ansible-lint>=26.9.0
 ansible-core>=2.15.0
 
