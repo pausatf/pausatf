@@ -3,7 +3,7 @@ set -eu
 
 # Certbot calls deploy hooks with RENEWED_LINEAGE set to the renewed lineage.
 expected_lineage="/etc/letsencrypt/live/{{ certbot_lineage_name | default(certbot_domains[0]) }}"
-stage_only={{ '1' if certbot_deploy_stage_only | default(false) else '0' }}
+stage_only=${CERTBOT_STAGE_ONLY:-0}
 [ "${RENEWED_LINEAGE:-}" = "$expected_lineage" ] || exit 0
 {% if certbot_deploy_target_dir is defined %}
 target={{ certbot_deploy_target_dir | quote }}

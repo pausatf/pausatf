@@ -25,7 +25,10 @@ uses staging-only mode in this first phase, including on active hosts with old
 vhost paths. After the web-server role rewrites and validates those paths, the
 playbook reapplies Certbot in normal validation mode. This prevents an old
 invalid lineage from blocking its own migration; pending files still require
-validation and reload in the second phase.
+validation and reload in the second phase. Staging mode is passed only to those
+initial task invocations through `CERTBOT_STAGE_ONLY=1`; it is never rendered
+into the installed hook. Renewal and timer invocations therefore validate and
+reload normally even if the playbook stops before its second Certbot phase.
 
 In normal validation mode, the hook
 copies certificates to `/etc/ssl/pausatf`, validates host Apache configuration,

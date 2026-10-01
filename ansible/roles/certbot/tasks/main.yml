@@ -101,6 +101,8 @@
     -m "{{ certbot_email }}"
     --keep-until-expiring
   register: certbot_result
+  environment:
+    CERTBOT_STAGE_ONLY: "{{ '1' if certbot_deploy_stage_only | default(false) else '0' }}"
   changed_when: "'Certificate not yet due for renewal' not in certbot_result.stdout"
   when: (certbot_enabled | default(true)) and not certbot_cert_exists.stat.exists
 
@@ -115,6 +117,7 @@
   ansible.builtin.command: /etc/letsencrypt/renewal-hooks/deploy/reload-webserver.sh
   environment:
     RENEWED_LINEAGE: "/etc/letsencrypt/live/{{ certbot_lineage_name | default(certbot_domains[0]) }}"
+    CERTBOT_STAGE_ONLY: "{{ '1' if certbot_deploy_stage_only | default(false) else '0' }}"
   changed_when: false
   when:
     - certbot_enabled | default(true)
