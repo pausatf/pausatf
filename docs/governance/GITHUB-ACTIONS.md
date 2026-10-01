@@ -1,5 +1,23 @@
 # GitHub Actions Workflows Documentation
 
+## Current workflow sources
+
+The workflow inventory below was written for the pre-monorepo documentation repository.
+Use `.github/workflows/` at the repository root as the current source of triggers, permissions and runtime pins.
+The active quality gate is `ci.yml`, with separate `codeql.yml`, `molecule.yml` and `php-quality.yml` checks.
+It includes Markdown lint and link checks; separate `markdown-lint.yml`, `ansible-lint.yml`, `shellcheck.yml` and
+`terraform-validate.yml` files are not present in the current monorepo.
+
+`deploy-prod.yml` runs on pushes to main and manual dispatch, checks staging in Ansible check mode, then invokes
+the reusable `deploy.yml` workflow for production. Repository merge approval does not authorize execution.
+Preserve environment gates and cancel queued deployment runs when production is held.
+Read the [deployment](../runbooks/deployment.md), [database](../runbooks/database-upgrades.md) and
+[TLS](../runbooks/tls-certificates.md) runbooks before dispatching deployment.
+
+Production encrypted backups are host systemd jobs. The tracked timer schedules 09:20 UTC daily with up to
+20 minutes random delay. The recovery drop-in and installed command must be verified on the host;
+see the [backup runbook](../../scripts/backup/README.md). CI does not prove a production restore.
+
 **Version:** 1.0
 **Last Updated:** 2025-12-21
 **Repository:** pausatf-infrastructure-docs

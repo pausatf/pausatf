@@ -1,5 +1,10 @@
 # Disaster Recovery Runbook
 
+Verify the installed service/drop-in and restore evidence before relying on the recovery paths below.
+The October 1 repository merges did not deploy or restore production.
+Use the [backup runbook](../../scripts/backup/README.md) for exact receipts and image retention: referenced
+content-addressed images have no current-version expiry and require manifest-aware cleanup.
+
 **Document Version:** 2.1
 **Last Updated:** September 27, 2026
 **Owner:** Thomas Vincent
@@ -96,7 +101,7 @@ Store securely in password manager:
    - Timer: production `pausatf-db-backup.timer` (daily)
    - Location: private age-encrypted database and legacy-data objects under `s3://pausatf/backups/prod/`, plus deployment and host-configuration archives, container images, and a manifest under `s3://pausatf/backups/recovery/`
    - Production's systemd drop-in runs the recovery wrapper, which invokes the database/legacy backup before creating and uploading the recovery set
-   - `/var/lib/pausatf-ops/backup-success.json` is updated only after uploads and remote metadata checks succeed
+   - `/var/lib/pausatf-ops/backup-success.json` follows successful uploads plus metadata checks of deployment/configuration objects; it does not independently verify every referenced object
    - Restore requires the off-host age private key; see `scripts/backup/README.md`
 
 5. **Static Upload Versioning**
@@ -608,7 +613,7 @@ Preventive Measures:
 Next Steps:
 [Any follow-up actions]
 
-Contact: Thomas Vincent (@thomasvincent)
+Contact: Thomas Vincent (@somethingwithproof)
 ```
 
 ## Testing and Validation
@@ -673,5 +678,5 @@ Contact: Thomas Vincent (@thomasvincent)
 ---
 
 **Next Review Date:** March 2026
-**Document Owner:** Thomas Vincent (@thomasvincent)
+**Document Owner:** Thomas Vincent (@somethingwithproof)
 **Classification:** Internal - Critical

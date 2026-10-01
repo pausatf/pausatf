@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-10-01 — merged configuration and compatibility updates
+
+- Recovery wrapper uses exact database invocation receipts and preserves referenced image/database artifacts.
+- Managed production MySQL target and dump client move to 8.4; compatibility, restore and HCP plan gates remain.
+- TLS provisioning synchronizes host certificates, retains last-known-good rollback and retries pending deployment.
+- Local OpenLiteSpeed MariaDB 13.0 includes automatic upgrade, readiness and an isolated 11.8 recovery procedure.
+- Prometheus monitoring image moves to 3.15.0; Python tooling floors and the Ansible upper bound are reconciled.
+- Maintainer review identity is @somethingwithproof; the root contribution policy defines author merge decisions.
+- Active guides now distinguish tracked configuration, historical observations and verified deployment.
+
+These entries describe repository merges. Production deployment runs were cancelled; no production upgrade or
+end-to-end recovery rehearsal was performed by this review task.
+
 All notable changes to the PAUSATF.org infrastructure and documentation are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),

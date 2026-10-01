@@ -238,7 +238,7 @@ run relevant checks based on which files you modified.
 If you have questions about the monorepo migration or need help updating your workflow:
 
 - Open a GitHub issue in the pausatf/pausatf repository
-- Contact @thomasvincent
+- Contact @somethingwithproof
 - Check the main [README.md](../README.md) for general monorepo documentation
 
 ## Technical Details
@@ -270,4 +270,4 @@ This approach ensures:
 ---
 
 **Last Updated**: December 21, 2025
-**Maintained By**: @thomasvincent
+**Maintained By**: @somethingwithproof

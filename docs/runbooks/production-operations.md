@@ -1,5 +1,10 @@
 # Production Operations Runbook
 
+For the October 1 merged changes, follow the [deployment gates](deployment.md),
+[MySQL upgrade](database-upgrades.md), [TLS ownership](tls-certificates.md) and
+[recovery backup](../../scripts/backup/README.md) runbooks. Installed production behavior and recoverability
+require separate evidence; historical plugin lists below are not a fresh inventory.
+
 **Document Version:** 1.0
 **Last Updated:** December 28, 2025
 **Environment:** Production (pausatf.org)
@@ -598,7 +603,7 @@ ssh deploy@ftp.pausatf.org 'sudo grep "DB_" /var/www/html/wp-config.php'
 
 **Level 2: Team review**
 - Create GitHub issue
-- Tag @thomasvincent
+- Tag @somethingwithproof
 - Include relevant logs
 
 **Level 3: Emergency**
@@ -610,7 +615,7 @@ ssh deploy@ftp.pausatf.org 'sudo grep "DB_" /var/www/html/wp-config.php'
 
 **Primary Contact:**
 - Name: Thomas Vincent
-- GitHub: @thomasvincent
+- GitHub: @somethingwithproof
 - For: All infrastructure issues
 
 **Service Providers:**

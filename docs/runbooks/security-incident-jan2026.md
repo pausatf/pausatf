@@ -134,4 +134,4 @@ The following require manual action and are tracked as GitHub issues:
 
 ## Contact
 
-For questions about this incident: @thomasvincent
+For questions about this incident: @somethingwithproof

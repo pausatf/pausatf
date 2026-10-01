@@ -545,7 +545,7 @@ See README.md for planned scripts in each category.
 For questions or issues with any scripts:
 - [Open an issue](https://github.com/pausatf/pausatf-infrastructure-docs/issues)
 - [Start a discussion](https://github.com/pausatf/pausatf-infrastructure-docs/discussions)
-- Contact: @thomasvincent
+- Contact: @somethingwithproof
 
 ---
 

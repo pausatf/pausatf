@@ -1,7 +1,8 @@
 # Production backup
 
-The production droplet runs a daily systemd backup timer because GitHub-hosted runners cannot reach the origin through
-the Cloudflare Access boundary. The timer invokes `pausatf-db-backup.service`, whose production drop-in overrides the
+The tracked production backup timer schedules 09:20 UTC daily with up to 20 minutes randomized delay.
+GitHub-hosted runners cannot reach the origin through the Cloudflare Access boundary.
+The timer invokes `pausatf-db-backup.service`, whose tracked production drop-in overrides the
 service command to run `pausatf-recovery-backup`. That wrapper first runs the encrypted database and legacy-data
 backup, then archives deployment files, selected host configuration, and container images. It uploads the archives and
 a recovery manifest to private DigitalOcean Spaces objects under `s3://pausatf/backups/recovery/`.
@@ -25,8 +26,10 @@ script passes it explicitly to `s3cmd`; the recovery wrapper runs as root and us
 ## Tracked service files
 
 The repository contains the database backup script and systemd unit, the recovery wrapper, and the production service
-drop-in. The drop-in is needed because the base unit runs only the database/legacy backup; production runs the full
-recovery wrapper instead.
+drop-in. The base unit runs only the database/legacy backup; the drop-in selects the recovery wrapper.
+A repository merge does not confirm those files are installed. Inspect `systemctl cat pausatf-db-backup.service`
+and its journal before claiming the wrapper is active. The database dump client is pinned to `mysql:8.4`;
+verify client/server compatibility and an isolated restore before production deployment.
 
 To install or refresh the managed files on the production droplet:
 

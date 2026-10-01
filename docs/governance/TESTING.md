@@ -1,5 +1,14 @@
 # Testing Infrastructure
 
+## Current tooling and evidence
+
+Select language runtimes through mise and use the [dependency compatibility guide](../guides/dependency-compatibility.md).
+`docs/requirements.txt` declares tooling floors; CI and pre-commit retain separate pins.
+The combined Python 3.12.12 resolver dry run does not establish installed Molecule/application correctness.
+The examples below include inherited test layouts: verify the current runner and available suites before execution.
+`scripts/backup/tests/test_manifest.py` exercises manifest fixtures, not a production backup/restore cycle.
+Production compatibility and recovery validation remain separate gates even when CI passes.
+
 Comprehensive guide to testing infrastructure as code.
 
 ## Overview

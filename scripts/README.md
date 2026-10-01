@@ -1,5 +1,15 @@
 # PAUSATF Automation Scripts
 
+## Current backup and local-stack entry points
+
+- [Production recovery backup](backup/README.md): tracked systemd service/drop-in, exact database invocation receipts,
+  encrypted archives, manifest and retention safeguards. Verify the installed command and an isolated restore.
+- [Local OpenLiteSpeed database](docker/README.md): MariaDB 11.8 backup/restore checks before 13.0 startup.
+- `local/sync-from-stage.sh`: refuses existing volumes unless the running database reports 13.0, and uses
+  credentials inside the Compose database container. It is a data-sync operation requiring local overwrite review.
+
+The planned script names below are proposals, not installed commands. Use the actual script and its runbook.
+
 **Operational scripts and automation tools for pausatf.org infrastructure**
 
 [![Shell Script](https://img.shields.io/badge/Shell-Bash-4EAA25?logo=gnu-bash)](https://www.gnu.org/software/bash/)
@@ -115,7 +125,7 @@ export CLOUDFLARE_API_TOKEN="your-token"
 chmod +x script-name.sh
 
 # Run with appropriate permissions
-./backup/backup-wordpress.sh
+bash -n backup/pausatf-db-backup.sh
 
 # Or use bash directly
 bash deployment/deploy-to-staging.sh

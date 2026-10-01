@@ -37,4 +37,4 @@ These themes are typically deployed as part of the WordPress installation on the
 
 ## Support
 
-For questions about theme customization or issues, please open a GitHub issue or contact @thomasvincent.
+For questions about theme customization or issues, please open a GitHub issue or contact @somethingwithproof.
