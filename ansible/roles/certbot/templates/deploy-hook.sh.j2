@@ -6,21 +6,51 @@ expected_lineage="/etc/letsencrypt/live/{{ certbot_lineage_name | default(certbo
 [ "${RENEWED_LINEAGE:-}" = "$expected_lineage" ] || exit 0
 {% if certbot_deploy_target_dir is defined %}
 target={{ certbot_deploy_target_dir | quote }}
-backup="/root/pausatf-certificate-previous"
-install -d -o root -g root -m 0700 "$backup"
-cp -p "$target/fullchain.pem" "$backup/fullchain.pem"
-cp -p "$target/privkey.pem" "$backup/privkey.pem"
+install -d -o root -g root -m 0700 "$target"
+# Serialize renewal and independent synchronization attempts for this target.
+exec 9>"$target/.deploy.lock"
+flock -n 9 || exit 1
+if cmp -s "$RENEWED_LINEAGE/fullchain.pem" "$target/fullchain.pem" &&
+    cmp -s "$RENEWED_LINEAGE/privkey.pem" "$target/privkey.pem"; then
+    exit 0
+fi
+backup=$(mktemp -d "$target/.previous.XXXXXX")
+trap 'rm -rf -- "$backup"; rm -f -- "$target/fullchain.pem.new" "$target/privkey.pem.new"' EXIT
+for name in fullchain.pem privkey.pem; do
+    if [ -f "$target/$name" ]; then
+        cp -p "$target/$name" "$backup/$name"
+    fi
+done
+rollback() {
+    for name in fullchain.pem privkey.pem; do
+        if [ -f "$backup/$name" ]; then
+            cp -p "$backup/$name" "$target/$name"
+        else
+            rm -f -- "$target/$name"
+        fi
+    done
+}
+restore_required=0
+cleanup() {
+    if [ "$restore_required" = 1 ]; then
+        rollback
+    fi
+    rm -rf -- "$backup"
+    rm -f -- "$target/fullchain.pem.new" "$target/privkey.pem.new"
+}
+trap cleanup EXIT
 install -o root -g root -m 0644 "$RENEWED_LINEAGE/fullchain.pem" "$target/fullchain.pem.new"
 install -o root -g root -m 0600 "$RENEWED_LINEAGE/privkey.pem" "$target/privkey.pem.new"
+restore_required=1
 mv "$target/fullchain.pem.new" "$target/fullchain.pem"
 mv "$target/privkey.pem.new" "$target/privkey.pem"
-if docker exec {{ certbot_deploy_container_name | quote }} apache2ctl configtest; then
-    docker exec {{ certbot_deploy_container_name | quote }} apache2ctl graceful
-else
-    cp -p "$backup/fullchain.pem" "$target/fullchain.pem"
-    cp -p "$backup/privkey.pem" "$target/privkey.pem"
+if ! docker exec {{ certbot_deploy_container_name | quote }} apache2ctl configtest; then
     exit 1
 fi
+if ! docker exec {{ certbot_deploy_container_name | quote }} apache2ctl graceful; then
+    exit 1
+fi
+restore_required=0
 {% else %}
 systemctl reload {{ 'apache2' if web_server | default('apache') == 'apache' else 'lsws' }}
 {% endif %}

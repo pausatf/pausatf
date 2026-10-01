@@ -1,0 +1,9 @@
+[Unit]
+Description=Synchronize current Certbot certificate into the web container
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+Environment="RENEWED_LINEAGE=/etc/letsencrypt/live/{{ certbot_lineage_name | default(certbot_domains[0]) }}"
+ExecStart=/etc/letsencrypt/renewal-hooks/deploy/reload-webserver.sh

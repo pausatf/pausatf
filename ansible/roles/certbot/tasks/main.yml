@@ -40,9 +40,52 @@
     group: root
     mode: "0600"
 
+- name: Deploy post-renewal hook to reload web server
+  ansible.builtin.template:
+    src: deploy-hook.sh.j2
+    dest: /etc/letsencrypt/renewal-hooks/deploy/reload-webserver.sh
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Deploy independent certificate synchronization service
+  ansible.builtin.template:
+    src: certbot-deploy.service.j2
+    dest: /etc/systemd/system/pausatf-certbot-deploy.service
+    owner: root
+    group: root
+    mode: "0644"
+  when: certbot_deploy_target_dir is defined
+
+- name: Deploy independent certificate synchronization timer
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/pausatf-certbot-deploy.timer
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      [Unit]
+      Description=Retry synchronization of the current Certbot lineage
+      [Timer]
+      OnBootSec=5min
+      OnUnitActiveSec=15min
+      [Install]
+      WantedBy=timers.target
+  when: certbot_deploy_target_dir is defined
+
+- name: Enable independent certificate synchronization retries
+  ansible.builtin.systemd:
+    name: pausatf-certbot-deploy.timer
+    daemon_reload: true
+    enabled: true
+    state: started
+  when:
+    - certbot_enabled | default(true)
+    - certbot_deploy_target_dir is defined
+
 - name: Check if certificate already exists
   ansible.builtin.stat:
-    path: "/etc/letsencrypt/live/{{ certbot_domains[0] }}/fullchain.pem"
+    path: "/etc/letsencrypt/live/{{ certbot_lineage_name | default(certbot_domains[0]) }}/fullchain.pem"
   register: certbot_cert_exists
 
 - name: Obtain SSL certificate via DNS-01 challenge
@@ -50,6 +93,7 @@
     certbot certonly
     --dns-cloudflare
     --dns-cloudflare-credentials /etc/letsencrypt/cloudflare.ini
+    --cert-name {{ certbot_lineage_name | default(certbot_domains[0]) | quote }}
     {{ certbot_domains | map('regex_replace', '^', '-d ') | join(' ') }}
     --non-interactive
     --agree-tos
@@ -66,10 +110,11 @@
     enabled: true
   when: certbot_enabled | default(true)
 
-- name: Deploy post-renewal hook to reload web server
-  ansible.builtin.template:
-    src: deploy-hook.sh.j2
-    dest: /etc/letsencrypt/renewal-hooks/deploy/reload-webserver.sh
-    owner: root
-    group: root
-    mode: "0755"
+- name: Synchronize initial or existing certificate into the container mount
+  ansible.builtin.command: /etc/letsencrypt/renewal-hooks/deploy/reload-webserver.sh
+  environment:
+    RENEWED_LINEAGE: "/etc/letsencrypt/live/{{ certbot_lineage_name | default(certbot_domains[0]) }}"
+  changed_when: false
+  when:
+    - certbot_enabled | default(true)
+    - certbot_deploy_target_dir is defined

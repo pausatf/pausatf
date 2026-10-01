@@ -20,7 +20,14 @@ origin using Full (strict) validation.
 The production Certbot deploy hook installs renewed files into
 `/etc/ssl/pausatf`, which is mounted read-only in `pausatf-wordpress`. It runs
 Apache's config test before a graceful reload and restores the prior files if
-the test fails. This keeps renewal independent of a host Apache service.
+the test or reload fails. The role installs the hook before issuance and also
+synchronizes existing lineages on deployment, including an empty target directory.
+The `pausatf-certbot-deploy.timer` retries synchronization every 15 minutes
+independently of renewal eligibility, so a failed deployment can recover after
+Certbot has already renewed its lineage. Unchanged certificates do not reload
+Apache. Inspect `journalctl -u pausatf-certbot-deploy.service` and the mounted
+certificate expiry when diagnosing failed deployment. This keeps renewal
+independent of a host Apache service.
 
 ## Live inventory checked 2026-09-27
 
