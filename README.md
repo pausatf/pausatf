@@ -140,8 +140,8 @@ All servers: Ubuntu 20.04 LTS, DigitalOcean `sfo2`, MySQL 5.7 (prod local) / MyS
 1. Create a feature branch from `main`
 2. Make your changes
 3. Ensure all CI checks pass
-4. Request review from @thomasvincent
-5. Merge after approval
+4. Follow the [maintainer review process](CONTRIBUTING.md#review-process)
+5. Merge after the required current-head maintainer decision and passing checks
 
 ### CI/CD
 
@@ -202,4 +202,4 @@ For questions or issues:
 
 - Open a [GitHub issue](https://github.com/pausatf/pausatf/issues)
 - Check the [Migration Guide](docs/MIGRATION.md) for common questions
-- Contact @thomasvincent
+- Contact @somethingwithproof

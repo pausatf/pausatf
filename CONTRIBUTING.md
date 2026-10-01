@@ -353,7 +353,9 @@ How were these changes tested?
    This policy does not permit bypassing protections or submitting a self-approval.
 6. Squash commits if needed, then use "Squash and merge" or "Rebase and merge".
 
-GitHub [does not allow authors to approve their own pull requests](https://docs.github.com/en/pull-requests/how-tos/review-pull-requests/approving-a-pull-request-with-required-reviews).
+GitHub [does not allow authors to approve their own pull requests][author-reviews].
+
+[author-reviews]: https://docs.github.com/en/pull-requests/how-tos/review-pull-requests/approving-a-pull-request-with-required-reviews
 A maintainer's recorded decision follows the author workflow above instead.
 Automated review helps identify feedback but does not supply a human approval.
 This review policy also governs the component contribution guides; production
