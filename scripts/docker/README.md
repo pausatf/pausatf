@@ -17,6 +17,28 @@ still running 11.8. Provision the ignored `scripts/docker/.env` first. Keep the
 backup directory outside the repository: the dump contains application data and
 must never be committed. Keep application writers stopped through the upgrade.
 
+If the existing 11.8 database is stopped, start only that service with an
+explicit 11.8 override first; do not run the 13.0 Compose file directly:
+
+```bash
+umask 077
+bootstrap_override=$(mktemp /tmp/pausatf-ols-11.8.XXXXXX.yml)
+cat > "$bootstrap_override" <<'YAML'
+services:
+  db:
+    image: mariadb:11.8
+    environment:
+      MARIADB_AUTO_UPGRADE: ""
+YAML
+docker compose --env-file scripts/docker/.env -f scripts/docker/docker-compose.ols.yml \
+  -f "$bootstrap_override" up -d --no-deps db
+rm -f "$bootstrap_override"
+```
+
+Wait for database readiness, then verify `SELECT VERSION()` reports 11.8 before
+the backup steps below. The sync helper refuses any existing volume whose
+database is not running verified 13.0; perform this documented upgrade first.
+
 ```bash
 set -euo pipefail
 umask 077
