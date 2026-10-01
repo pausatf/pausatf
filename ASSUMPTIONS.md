@@ -65,16 +65,21 @@ Items marked **ACTION REQUIRED** need manual steps before or during cutover.
     `/etc/letsencrypt/cloudflare.ini` is mode `0600 root:root`.
 
 14. The certbot systemd timer handles automatic renewal. A post-renewal deploy
-    hook at `/etc/letsencrypt/renewal-hooks/deploy/reload-apache.sh` reloads
-    Apache after certificate renewal.
+    hook at `/etc/letsencrypt/renewal-hooks/deploy/reload-webserver.sh` copies
+    the configured lineage into `/etc/ssl/pausatf`, validates host Apache and
+    reloads it. Failed validation/reload restores prior files; the independent
+    `pausatf-certbot-deploy.timer` retries pending synchronization every 15 minutes.
+    A separately managed Docker origin requires an explicit container override.
 
 15. Cloudflare SSL mode is set to `Full (Strict)`, requiring a valid certificate
     on the origin server. This means certbot must succeed before Cloudflare will
     proxy traffic without errors.
 
 16. The old SSL certificates (`/etc/ssl/private/6025999182103-cert.crt` and key)
-    are not used on the new droplet. The vhost template conditionally uses
-    Let's Encrypt paths when `apache_mpm == 'event'`.
+    are not used on the new droplet. Production vhosts use the synchronized
+    `/etc/ssl/pausatf/fullchain.pem` and `/etc/ssl/pausatf/privkey.pem` files.
+    Initial provisioning stages these before configuring SSL vhosts, then
+    validates and reloads them; normal renewal/timer invocations always validate.
 
 ## Web Server
 

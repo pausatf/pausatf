@@ -1,0 +1,98 @@
+#!/bin/sh
+set -eu
+
+# Certbot calls deploy hooks with RENEWED_LINEAGE set to the renewed lineage.
+expected_lineage="/etc/letsencrypt/live/{{ certbot_lineage_name | default(certbot_domains[0]) }}"
+stage_only=${CERTBOT_STAGE_ONLY:-0}
+[ "${RENEWED_LINEAGE:-}" = "$expected_lineage" ] || exit 0
+{% if certbot_deploy_target_dir is defined %}
+target={{ certbot_deploy_target_dir | quote }}
+install -d -o root -g root -m 0700 "$target"
+# Serialize renewal and independent synchronization attempts for this target.
+exec 9>"$target/.deploy.lock"
+# Timer and synchronous provisioning may overlap; wait for the active run.
+# Bound the wait so a stuck deployment still fails and leaves retries enabled.
+flock -w 60 9 || exit 1
+backup="$target/.last-known-good"
+if cmp -s "$RENEWED_LINEAGE/fullchain.pem" "$target/fullchain.pem" &&
+    cmp -s "$RENEWED_LINEAGE/privkey.pem" "$target/privkey.pem" &&
+    [ ! -e "$target/.reload-pending" ] && [ ! -d "$backup" ]; then
+    exit 0
+fi
+# Keep the first snapshot across staging runs, failures, and later retries.
+# Publish it atomically before replacing any files; clear only after reload.
+if [ ! -d "$backup" ]; then
+    snapshot=$(mktemp -d "$target/.previous.XXXXXX")
+    trap 'rm -rf -- "$snapshot"' EXIT
+    for name in fullchain.pem privkey.pem; do
+        if [ -f "$target/$name" ]; then
+            cp -p "$target/$name" "$snapshot/$name"
+        fi
+    done
+    mv "$snapshot" "$backup"
+fi
+rollback() {
+    for name in fullchain.pem privkey.pem; do
+        if [ -f "$backup/$name" ]; then
+            cp -p "$backup/$name" "$target/$name"
+        else
+            rm -f -- "$target/$name"
+        fi
+    done
+}
+restore_required=0
+cleanup() {
+    if [ "$restore_required" = 1 ]; then
+        rollback
+    fi
+    rm -f -- "$target/fullchain.pem.new" "$target/privkey.pem.new"
+}
+trap cleanup EXIT
+install -o root -g root -m 0644 "$RENEWED_LINEAGE/fullchain.pem" "$target/fullchain.pem.new"
+install -o root -g root -m 0600 "$RENEWED_LINEAGE/privkey.pem" "$target/privkey.pem.new"
+restore_required=1
+mv "$target/fullchain.pem.new" "$target/fullchain.pem"
+mv "$target/privkey.pem.new" "$target/privkey.pem"
+{% if certbot_deploy_container_name is defined %}
+# A separately provisioned Docker origin may not exist on initial issuance.
+container_ready=0
+if command -v docker >/dev/null 2>&1; then
+    containers=$(docker container ls --format '{% raw %}{{.Names}}{% endraw %}')
+    if printf '%s\n' "$containers" | grep -Fx -- {{ certbot_deploy_container_name | quote }} >/dev/null; then
+        container_ready=1
+    fi
+fi
+if [ "$container_ready" = 0 ]; then
+    : > "$target/.reload-pending"
+    restore_required=0
+    echo "Certificate staged; container validation and reload are pending"
+    exit 0
+fi
+if ! docker exec {{ certbot_deploy_container_name | quote }} apache2ctl configtest; then
+    exit 1
+fi
+if ! docker exec {{ certbot_deploy_container_name | quote }} apache2ctl graceful; then
+    exit 1
+fi
+{% else %}
+# site.yml obtains certificates before configuring host Apache SSL vhosts.
+# Stage on bootstrap; validate and reload once the host service is running.
+if [ "$stage_only" = 1 ] || ! systemctl is-active --quiet apache2; then
+    : > "$target/.reload-pending"
+    restore_required=0
+    echo "Certificate staged; host Apache validation and reload are pending"
+    exit 0
+fi
+apache2ctl configtest || exit 1
+systemctl reload apache2 || exit 1
+{% endif %}
+rm -f -- "$target/.reload-pending"
+restore_required=0
+rm -rf -- "$backup"
+{% else %}
+# Initial DNS-01 issuance can precede web-server installation.
+if [ "$stage_only" = 0 ] &&
+    systemctl is-active --quiet {{ 'apache2' if web_server | default('apache') == 'apache' else 'lsws' }}; then
+    systemctl reload {{ 'apache2' if web_server | default('apache') == 'apache' else 'lsws' }}
+fi
+{% endif %}

@@ -93,6 +93,20 @@ apparmor_apache_enforce: true
 
 # Certbot
 certbot_enabled: true
+certbot_lineage_name: pausatf.org
+# Certbot and the Apache service provisioned by site.yml run on the host.
+# Deploy hooks copy renewed material here, validate, and reload host Apache.
+certbot_deploy_target_dir: /etc/ssl/pausatf
+# site.yml provisions host Apache. Container deployment is an explicit override
+# for separately managed Docker origins, not this inventory's provisioning path.
+tls_origin_certificate_issuer: letsencrypt
+tls_origin_certificate_renewal: certbot_dns_cloudflare
+tls_origin_certificate_domains:
+  - pausatf.org
+  - www.pausatf.org
+tls_origin_certificate_path: /etc/ssl/pausatf/fullchain.pem
+tls_origin_private_key_path: /etc/ssl/pausatf/privkey.pem
+tls_origin_minimum_protocol: TLSv1.2
 
 # This server is the active web server (controls wp-cron)
 is_active_web: true
@@ -123,8 +137,8 @@ wordpress_installs:
     'wp_version': '7.0', 'debug_mode': false,
     'wp_memory_limit': '256M', 'wp_max_memory_limit': '512M',
     'ssl_enabled': true,
-    'ssl_certificate': '/etc/letsencrypt/live/www.pausatf.org/fullchain.pem',
-    'ssl_certificate_key': '/etc/letsencrypt/live/www.pausatf.org/privkey.pem',
+    'ssl_certificate': '/etc/ssl/pausatf/fullchain.pem',
+    'ssl_certificate_key': '/etc/ssl/pausatf/privkey.pem',
     'manage_wp_config': false,
     'db_host': managed_db_host ~ ':' ~ (managed_db_port | string),
     'db_port': managed_db_port,

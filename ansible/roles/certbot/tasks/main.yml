@@ -40,9 +40,66 @@
     group: root
     mode: "0600"
 
+- name: Deploy post-renewal hook to reload web server
+  ansible.builtin.template:
+    src: deploy-hook.sh.j2
+    dest: /etc/letsencrypt/renewal-hooks/deploy/reload-webserver.sh
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Deploy independent certificate synchronization service
+  ansible.builtin.template:
+    src: certbot-deploy.service.j2
+    dest: /etc/systemd/system/pausatf-certbot-deploy.service
+    owner: root
+    group: root
+    mode: "0644"
+  when: certbot_deploy_target_dir is defined
+
+- name: Deploy independent certificate synchronization timer
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/pausatf-certbot-deploy.timer
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      [Unit]
+      Description=Retry synchronization of the current Certbot lineage
+      [Timer]
+      OnBootSec=5min
+      OnCalendar=*:0/15
+      Persistent=true
+      [Install]
+      WantedBy=timers.target
+  when: certbot_deploy_target_dir is defined
+
+- name: Record automatic TLS jobs paused for web-server provisioning
+  ansible.builtin.set_fact:
+    certbot_provisioning_timers_paused: true
+  when:
+    - certbot_enabled | default(true)
+    - certbot_deploy_target_dir is defined
+    - certbot_deploy_stage_only | default(false)
+
+- name: Pause automatic TLS jobs before staging web-server certificates
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    daemon_reload: true
+    state: stopped
+  loop:
+    - pausatf-certbot-deploy.timer
+    - certbot.timer
+    - pausatf-certbot-deploy.service
+    - certbot.service
+  when:
+    - certbot_enabled | default(true)
+    - certbot_deploy_target_dir is defined
+    - certbot_deploy_stage_only | default(false)
+
 - name: Check if certificate already exists
   ansible.builtin.stat:
-    path: "/etc/letsencrypt/live/{{ certbot_domains[0] }}/fullchain.pem"
+    path: "/etc/letsencrypt/live/{{ certbot_lineage_name | default(certbot_domains[0]) }}/fullchain.pem"
   register: certbot_cert_exists
 
 - name: Obtain SSL certificate via DNS-01 challenge
@@ -50,28 +107,44 @@
     certbot certonly
     --dns-cloudflare
     --dns-cloudflare-credentials /etc/letsencrypt/cloudflare.ini
+    --cert-name {{ certbot_lineage_name | default(certbot_domains[0]) | quote }}
     {{ certbot_domains | map('regex_replace', '^', '-d ') | join(' ') }}
     --non-interactive
     --agree-tos
     -m "{{ certbot_email }}"
     --keep-until-expiring
   register: certbot_result
+  environment:
+    CERTBOT_STAGE_ONLY: "{{ '1' if certbot_deploy_stage_only | default(false) else '0' }}"
   changed_when: "'Certificate not yet due for renewal' not in certbot_result.stdout"
   when: (certbot_enabled | default(true)) and not certbot_cert_exists.stat.exists
 
-- name: Ensure certbot systemd timer is enabled
+- name: Synchronize initial or existing certificate into the origin certificate directory
+  ansible.builtin.command: /etc/letsencrypt/renewal-hooks/deploy/reload-webserver.sh
+  environment:
+    RENEWED_LINEAGE: "/etc/letsencrypt/live/{{ certbot_lineage_name | default(certbot_domains[0]) }}"
+    CERTBOT_STAGE_ONLY: "{{ '1' if certbot_deploy_stage_only | default(false) else '0' }}"
+  changed_when: false
+  when:
+    - certbot_enabled | default(true)
+    - certbot_deploy_target_dir is defined
+
+- name: Enable independent certificate synchronization after validation
+  ansible.builtin.systemd:
+    name: pausatf-certbot-deploy.timer
+    daemon_reload: true
+    enabled: true
+    state: started
+  when:
+    - certbot_enabled | default(true)
+    - certbot_deploy_target_dir is defined
+    - not (certbot_deploy_stage_only | default(false))
+
+- name: Ensure certbot systemd timer is enabled after provisioning
   ansible.builtin.systemd:
     name: certbot.timer
     state: started
     enabled: true
-  when: certbot_enabled | default(true)
-
-- name: Deploy post-renewal hook to reload web server
-  ansible.builtin.copy:
-    dest: /etc/letsencrypt/renewal-hooks/deploy/reload-webserver.sh
-    content: |
-      #!/bin/bash
-      systemctl reload {{ 'apache2' if web_server | default('apache') == 'apache' else 'lsws' }}
-    owner: root
-    group: root
-    mode: "0755"
+  when:
+    - certbot_enabled | default(true)
+    - not (certbot_deploy_stage_only | default(false))

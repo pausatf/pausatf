@@ -3,6 +3,47 @@
   hosts: all
   gather_facts: true
   tasks:
+    - name: Render Docker deploy hook for controlled tests
+      ansible.builtin.template:
+        src: "{{ playbook_dir | dirname | dirname }}/templates/deploy-hook.sh.j2"
+        dest: /tmp/certbot-docker-deploy-hook.sh
+        mode: "0700"
+      vars:
+        certbot_domains: [molecule-fixture]
+        certbot_deploy_target_dir: /tmp/certbot-fixture-target
+        certbot_deploy_container_name: molecule-fixture
+
+    - name: Copy deploy hook behavior tests
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/test_deploy_hook.py"
+        dest: /tmp/test-certbot-deploy-hook.py
+        mode: "0700"
+
+    - name: Verify initial deployment rollback and independent retries
+      ansible.builtin.command: python3 /tmp/test-certbot-deploy-hook.py /tmp/certbot-docker-deploy-hook.sh
+      changed_when: false
+
+    - name: Render host Apache deploy hook for controlled tests
+      ansible.builtin.template:
+        src: "{{ playbook_dir | dirname | dirname }}/templates/deploy-hook.sh.j2"
+        dest: /tmp/certbot-host-deploy-hook.sh
+        mode: "0700"
+      vars:
+        certbot_domains: [molecule-fixture]
+        certbot_deploy_target_dir: /tmp/certbot-fixture-target
+
+    - name: Copy host Apache deploy hook tests
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/test_host_deploy_hook.py"
+        dest: /tmp/test-host-certbot-deploy-hook.py
+        mode: "0700"
+
+    - name: Verify host Apache bootstrap rollback and independent retries
+      ansible.builtin.command: >-
+        python3 /tmp/test-host-certbot-deploy-hook.py
+        /tmp/test-certbot-deploy-hook.py /tmp/certbot-host-deploy-hook.sh
+      changed_when: false
+
     - name: Check certbot package is installed
       package:
         name: certbot

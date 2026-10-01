@@ -46,6 +46,13 @@
             - web_server | default('apache') == 'apache'
             - modsecurity_enabled | default(true)
 
+        - name: Include Certbot role
+          ansible.builtin.include_role:
+            name: certbot
+          vars:
+            certbot_deploy_stage_only: true
+          when: certbot_enabled | default(false)
+
         - name: Include Apache role
           ansible.builtin.include_role:
             name: apache
@@ -61,9 +68,11 @@
             name: openlitespeed
           when: web_server | default('apache') == 'openlitespeed'
 
-        - name: Include Certbot role
+        - name: Validate and synchronize certificates after web-server configuration
           ansible.builtin.include_role:
             name: certbot
+          vars:
+            certbot_deploy_stage_only: false
           when: certbot_enabled | default(false)
 
         - name: Include MySQL role
@@ -161,6 +170,18 @@
         - name: Fail the play after rescue
           ansible.builtin.fail:
             msg: "Deployment failed. Web server recovery attempted. Review errors above."
+
+      always:
+        - name: Restore automatic certificate retries after provisioning or task failure
+          ansible.builtin.systemd:
+            name: "{{ item }}"
+            daemon_reload: true
+            enabled: true
+            state: started
+          loop:
+            - certbot.timer
+            - pausatf-certbot-deploy.timer
+          when: certbot_provisioning_timers_paused | default(false)
 
 - name: Run discovery
   hosts: webservers

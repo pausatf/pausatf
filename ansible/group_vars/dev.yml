@@ -10,6 +10,18 @@ mysql_managed: true # DO Managed MySQL; skip mysql dependency in wordpress role
 wp_environment_type: "development"
 is_active_web: false
 
+# Origin TLS is a Cloudflare Origin CA certificate mounted into the Apache
+# WordPress container at /etc/ssl/pausatf. Cloudflare manages the public edge
+# certificate; Origin CA renewal is a separately scheduled operational task.
+tls_origin_certificate_issuer: cloudflare_origin_ca
+tls_origin_certificate_renewal: manual
+tls_origin_certificate_domains:
+  - dev.pausatf.org
+tls_origin_certificate_path: /etc/ssl/pausatf/fullchain.pem
+tls_origin_private_key_path: /etc/ssl/pausatf/privkey.pem
+tls_origin_minimum_protocol: TLSv1.2
+certbot_enabled: false
+
 # WordPress — dev overrides merged with defaults from all.yml
 wordpress_installs:
   - >-
