@@ -28,7 +28,7 @@ CI and pre-commit use their own pinned tooling; changing this manifest does not 
 ## WordPress JavaScript tooling
 
 The separate [results-manager](https://github.com/pausatf/pausatf-results-manager) and
-[WordPress source](https://github.com/pausatf/pausatf-wordpress) repositories retain React/React DOM 18.3.1 and
+WordPress source (`pausatf/pausatf-wordpress`, private repository) repositories retain React/React DOM 18.3.1 and
 ESLint 9.39.5 constraints. React 19 and ESLint 10 were incompatible with the reviewed dependency graphs.
 Targeted Dependabot ignores cover only `19.x` for React/React DOM and `10.x` for ESLint; supported minor/patch
 updates remain enabled. Revisit those ignores after the affected peer dependencies support the new majors.
@@ -44,5 +44,5 @@ Read each package's current scripts before running checks; the packages expose d
 The monorepo's OpenLiteSpeed development stack uses MariaDB 13.0 with explicit automatic upgrade and TCP/InnoDB
 readiness. Existing 11.8 volumes must follow the [backup and rollback procedure](../../scripts/docker/README.md).
 Its monitoring stack pins Prometheus 3.15.0.
-The separate [deployment repository](https://github.com/pausatf/pausatf-deployment) still pins local MySQL 8.0;
+The separate deployment repository (`pausatf/pausatf-deployment`, private repository) still pins local MySQL 8.0;
 the production managed MySQL 8.4 target and local MariaDB upgrade do not change that separate stack.

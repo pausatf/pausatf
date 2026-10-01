@@ -95,7 +95,7 @@ selects host Apache with event MPM/PHP-FPM for production and dev, and host Open
 All three inventories select PHP 8.4 and SSH user `somethingwithproof`. Production uses managed MySQL;
 Terraform targets MySQL 8.4, but the upgrade requires the [database gates](docs/runbooks/database-upgrades.md).
 The separately maintained Docker production stack lives in
-[pausatf-deployment](https://github.com/pausatf/pausatf-deployment). Inspect the actual target before deployment.
+pausatf-deployment (`pausatf/pausatf-deployment`, private repository). Inspect the actual target before deployment.
 
 ### Key tech stack
 

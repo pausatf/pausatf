@@ -447,7 +447,7 @@ Track:
 - [Terratest Documentation](https://terratest.gruntwork.io/)
 - [Molecule Documentation](https://github.com/ansible/molecule/tree/main/docs)
 - [Pytest Documentation](https://docs.pytest.org/)
-- [Test README](tests/README.md) - Detailed test documentation
+- [Workflow inventory](../../.github/workflows) - Current test runners and configuration
 
 ## Maintenance
 

@@ -15,7 +15,7 @@ Before execution, record the source commit, actual target, intended changes, mai
 Inspect the inventory and rendered variables before running a playbook.
 `ansible/site.yml` provisions host Apache for production/dev and host OpenLiteSpeed for staging;
 the separately managed Docker stack is owned by
-[pausatf-deployment](https://github.com/pausatf/pausatf-deployment).
+pausatf-deployment (`pausatf/pausatf-deployment`, private repository).
 Do not apply the host web-stack playbook to a Docker origin as though it manages that container stack.
 
 ## Infrastructure and managed database changes
