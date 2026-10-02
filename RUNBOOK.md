@@ -1,5 +1,10 @@
 # PAUSATF Operations Runbook
 
+Use the [deployment gates](docs/runbooks/deployment.md), [managed MySQL upgrade procedure](docs/runbooks/database-upgrades.md),
+[TLS ownership/retry runbook](docs/runbooks/tls-certificates.md) and [encrypted recovery backup](scripts/backup/README.md)
+for current operations. Historical host-local commands below apply only to hosts that still use that layout.
+Repository merges do not confirm deployment or production restore validation.
+
 Practical reference for day-to-day and incident operations. For architecture
 and onboarding, see [README.md](README.md).
 
@@ -156,36 +161,19 @@ DNS propagation through Cloudflare proxy is near-instant.
 
 ### Manual DB backup
 
-Run on the production server as root:
-
-```bash
-mysqldump --defaults-extra-file=/etc/mysql/debian.cnf wordpress \
-  > /var/backups/wordpress/wordpress-$(date +%Y%m%d-%H%M%S).sql
-```
-
-Automated daily backups run at 02:00 local time to `/var/backups/wordpress/`
-and are retained for 30 days (configured in `ansible/group_vars/all.yml`
-`backup_*` vars).
+Production uses managed MySQL. Use the encrypted database/recovery service described in
+[scripts/backup/README.md](scripts/backup/README.md), with credentials provisioned out of band.
+Inspect the installed service and journal, then verify the exact receipt, manifest and referenced artifacts.
+The tracked timer runs at 09:20 UTC with up to 20 minutes random delay. Production database objects and recovery
+sets use 45-day Spaces retention; referenced image objects require manifest-aware cleanup.
+Local `/etc/mysql/debian.cnf` and localhost-only accounts do not describe the managed production connection.
 
 ### Rotate DB password
 
-1. Generate a new password and encrypt it in the vault:
-
-```bash
-cd ansible
-# Edit vault file
-ansible-vault edit group_vars/all/vault.yml
-# Update vault_wp_main_db_password
-```
-
-2. Apply via Ansible (updates MySQL user and wp-config.php):
-
-```bash
-ansible-playbook -i inventory/hosts.yml site.yml -l production \
-  --tags wordpress --vault-password-file ../vault.pass
-```
-
-3. Verify WordPress can connect: `curl -fsS https://www.pausatf.org`
+Follow the [managed database password rotation procedure](docs/procedures/database-password-rotation.md).
+Verify the credential consumer and actual host/container first. Do not assume a host-local MySQL user or vault
+variable updates the managed database and deployed container. Preserve working credentials until the new
+connection is verified, and never print configuration secrets in diagnostics.
 
 ### DB users and permissions
 

@@ -404,4 +404,4 @@ crontab -e
 For issues or questions:
 - [Open an issue](https://github.com/pausatf/pausatf-infrastructure-docs/issues)
 - [Start a discussion](https://github.com/pausatf/pausatf-infrastructure-docs/discussions)
-- Contact: @thomasvincent
+- Contact: @somethingwithproof

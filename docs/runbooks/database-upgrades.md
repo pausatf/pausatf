@@ -4,8 +4,8 @@
 
 The production `pausatf-prod-db` cluster was checked on 2026-09-27. It was
 online on MySQL 8, Standard Edition, a single `db-s-1vcpu-1gb` node in `sfo2`.
-DigitalOcean listed MySQL 8.4 as the only available MySQL version. Its current
-maintenance window is Sunday at 02:00 UTC.
+DigitalOcean listed MySQL 8.4 as the only available MySQL version. The maintenance
+window observed on that date was Sunday at 02:00 UTC; verify it again before execution.
 
 DigitalOcean announced that it will begin forced upgrades of Managed MySQL 8.0
 clusters to 8.4 on 2026-10-30. MySQL 8.4 is the supported LTS line. The
@@ -24,7 +24,7 @@ apply, complete and record these gates:
 2. Confirm a recent managed backup and offsite age-encrypted database and legacy
    artifacts. The database backup script uploads `prod-db-*.sql.gz.age` and
    `prod-legacy-*.tar.gz.age` under `s3://pausatf/backups/prod/`; it does not
-   produce a recovery manifest. If the recovery wrapper from PR #217 is installed,
+   produce a recovery manifest. If the merged recovery wrapper is installed (verify the systemd drop-in and journal),
    separately inspect its manifest and every referenced object.
 3. Decrypt and restore the selected database backup in an isolated environment,
    then test WordPress reads and writes with MySQL 8.4. Record artifact names,

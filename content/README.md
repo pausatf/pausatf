@@ -205,30 +205,24 @@ Consider removing:
 - System files (.DS_Store, Thumbs.db)
 - Editor files (.swp, *~)
 
-## Related Repositories
+## Related components and documentation
 
-This repository is part of the PAUSATF infrastructure ecosystem:
+This content is tracked in the PAUSATF infrastructure repository. Component guidance:
 
-- [pausatf-infrastructure-docs](https://github.com/pausatf/pausatf-infrastructure-docs) - Documentation
-- [pausatf-terraform](https://github.com/pausatf/pausatf-terraform) - Infrastructure provisioning
-- [pausatf-ansible](https://github.com/pausatf/pausatf-ansible) - Configuration management
-- [pausatf-scripts](https://github.com/pausatf/pausatf-scripts) - Automation scripts
-- [pausatf-theme-thesource](https://github.com/pausatf/pausatf-theme-thesource) - WordPress parent theme
-- [pausatf-theme-thesource-child](https://github.com/pausatf/pausatf-theme-thesource-child) - WordPress child theme
-
-## Documentation
-
-For more information:
-- [Infrastructure Documentation](https://github.com/pausatf/pausatf-infrastructure-docs)
-- [Server Migration Guide](https://github.com/pausatf/pausatf-infrastructure-docs/blob/main/docs/guides/05-server-migration-guide.md)
-- [Operational Procedures](https://github.com/pausatf/pausatf-infrastructure-docs/blob/main/docs/guides/10-operational-procedures.md)
+- [Infrastructure documentation](../docs/README.md)
+- [Terraform provisioning](../terraform/README.md)
+- [Ansible configuration](../ansible/README.md)
+- [Automation scripts](../scripts/README.md)
+- [WordPress themes](../themes/README.md)
+- [Server migration guide](../docs/guides/05-server-migration-guide.md)
+- [Operational procedures](../docs/guides/10-operational-procedures.md)
 
 ## Contact
 
 **For questions about legacy content:**
-- Review: [Infrastructure Documentation](https://github.com/pausatf/pausatf-infrastructure-docs)
-- Discuss: [GitHub Discussions](https://github.com/pausatf/pausatf-infrastructure-docs/discussions)
-- Contact: @thomasvincent
+- Review: [Infrastructure Documentation](https://github.com/pausatf/pausatf/tree/main/docs)
+- Questions: [Repository issues](https://github.com/pausatf/pausatf/issues)
+- Contact: @somethingwithproof
 
 ## License
 

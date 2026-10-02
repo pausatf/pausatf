@@ -67,12 +67,12 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 ## CI/CD Workflows
 
-Path-based triggers run only relevant checks:
-
-- **Terraform** – `terraform-validate.yml`: format, validate, TFSec, TFLint
-- **Ansible** – `ansible-lint.yml`: ansible-lint, yamllint, syntax checks
-- **Scripts** – `shellcheck.yml`: ShellCheck, bash syntax validation
-- **Markdown** – `markdown-lint.yml`: markdownlint, link checking
+`ci.yml` runs on pull requests and pushes to main, with Ansible/YAML, Terraform,
+ShellCheck/Bash, Markdown/link and maintenance safety checks. Some jobs skip
+dependency-titled PRs; verify actual current-head job results rather than assuming all ran.
+Separate CodeQL, Molecule and PHP quality workflows have their own triggers.
+`deploy-prod.yml` queues on main pushes, including docs-only merges. Production
+authorization and operational gates remain separate from repository merge approval.
 
 All CI checks must pass before merging.
 

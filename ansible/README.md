@@ -1,5 +1,11 @@
 # PAUSATF Ansible Configuration Management
 
+The tables describe tracked host provisioning, not observed Docker deployments. Resolve inventory variables
+and review the actual target before applying. Production/dev use host Apache; staging uses host OpenLiteSpeed.
+The separately managed Docker origin requires an explicit Certbot container override.
+See [TLS synchronization](../docs/runbooks/tls-certificates.md), [database gates](../docs/runbooks/database-upgrades.md)
+and [recovery backup](../scripts/backup/README.md). Merged changes were not deployed by the review task.
+
 Comprehensive Ansible playbooks and roles for managing PAUSATF WordPress infrastructure across production, staging, and development environments.
 
 ## Table of Contents
@@ -17,17 +23,17 @@ Comprehensive Ansible playbooks and roles for managing PAUSATF WordPress infrast
 
 | Component | Production | Staging | Development |
 |-----------|------------|---------|-------------|
-| **Provider** | DigitalOcean | DigitalOcean | Local Docker |
+| **Provider** | DigitalOcean | DigitalOcean | Inventory host from `DEV_SERVER_IP` |
 | **Hostname** | ftp.pausatf.org | stage.pausatf.org | dev.pausatf.org |
-| **IP Address** | (GitHub Secret) | (GitHub Secret) | localhost |
+| **IP Address** | `PROD_SERVER_IP` | `STAGE_SERVER_IP` | `DEV_SERVER_IP` |
 | **Droplet ID** | (GitHub Secret) | (GitHub Secret) | N/A |
 | **Size** | 8GB / 4 vCPU | 4GB / 2 vCPU | N/A |
-| **Web Server** | Apache 2.4 | OpenLiteSpeed 1.8 | OpenLiteSpeed |
-| **PHP** | 7.4 | 8.4 | 8.4 |
-| **WordPress** | 6.9 | 6.9 | 6.9 |
+| **Web Server** | Host Apache with PHP-FPM | Host OpenLiteSpeed | Host Apache with PHP-FPM |
+| **PHP** | 8.4 | 8.4 | 8.4 |
+| **WordPress** | Verify role variables and current inventory | Verify role variables and current inventory | Verify role variables and current inventory |
 | **Document Root** | /var/www/html | /var/www/html | /var/www/html |
 | **Legacy Path** | /var/www/legacy | N/A | N/A |
-| **SSH User** | deploy | root | N/A |
+| **SSH User** | somethingwithproof | somethingwithproof | somethingwithproof |
 
 ## Environment Inventory
 
@@ -35,17 +41,17 @@ Comprehensive Ansible playbooks and roles for managing PAUSATF WordPress infrast
 ```yaml
 pausatf-prod:
   ansible_host: ftp.pausatf.org
-  ansible_user: deploy                    # Non-root deploy user
+  ansible_user: somethingwithproof
   ansible_ssh_private_key_file: ~/.ssh/pausatf-prod
   ansible_python_interpreter: /usr/bin/python3
   wordpress_path: /var/www/html
   legacy_path: /var/www/legacy/public_html
   web_server: apache
-  php_version: "7.4"
+  php_version: "8.4"
 ```
 
 **Production Access:**
-- SSH: `ssh -i ~/.ssh/pausatf-prod deploy@ftp.pausatf.org`
+- SSH: `ssh -i ~/.ssh/pausatf-prod somethingwithproof@ftp.pausatf.org`
 - Deploy user is member of `www-data` and `sudo` groups
 - WordPress operations require `sg www-data -c "wp ..."` wrapper
 - Read-only operations for inventory capture
@@ -54,7 +60,7 @@ pausatf-prod:
 ```yaml
 pausatf-stage:
   ansible_host: stage.pausatf.org
-  ansible_user: root
+  ansible_user: somethingwithproof
   ansible_python_interpreter: /usr/bin/python3
   wordpress_path: /var/www/html
   web_server: openlitespeed
@@ -65,10 +71,10 @@ pausatf-stage:
 ```yaml
 pausatf-dev:
   ansible_host: dev.pausatf.org
-  ansible_user: root
+  ansible_user: somethingwithproof
   ansible_python_interpreter: /usr/bin/python3
   wordpress_path: /var/www/html
-  web_server: openlitespeed
+  web_server: apache
   php_version: "8.4"
 ```
 
@@ -343,7 +349,7 @@ terraform apply
 # ansible/inventory/hosts.yml
 pausatf-prod:
   ansible_host: NEW_DROPLET_IP  # Update this
-  ansible_user: root            # Initial setup as root
+  ansible_user: somethingwithproof            # Provision this authorized account before running
   # ... rest of config
 ```
 
@@ -377,25 +383,25 @@ curl -I http://NEW_DROPLET_IP/
 
 **List plugins:**
 ```bash
-ssh -i ~/.ssh/pausatf-prod deploy@ftp.pausatf.org \
+ssh -i ~/.ssh/pausatf-prod somethingwithproof@ftp.pausatf.org \
   'sg www-data -c "wp plugin list --path=/var/www/html"'
 ```
 
 **List themes:**
 ```bash
-ssh -i ~/.ssh/pausatf-prod deploy@ftp.pausatf.org \
+ssh -i ~/.ssh/pausatf-prod somethingwithproof@ftp.pausatf.org \
   'sg www-data -c "wp theme list --path=/var/www/html"'
 ```
 
 **Check WordPress version:**
 ```bash
-ssh -i ~/.ssh/pausatf-prod deploy@ftp.pausatf.org \
+ssh -i ~/.ssh/pausatf-prod somethingwithproof@ftp.pausatf.org \
   'sg www-data -c "wp core version --path=/var/www/html"'
 ```
 
 **Get site info:**
 ```bash
-ssh -i ~/.ssh/pausatf-prod deploy@ftp.pausatf.org \
+ssh -i ~/.ssh/pausatf-prod somethingwithproof@ftp.pausatf.org \
   'sg www-data -c "wp option get home --path=/var/www/html"'
 ```
 
@@ -403,9 +409,9 @@ ssh -i ~/.ssh/pausatf-prod deploy@ftp.pausatf.org \
 
 ### SSH Access
 
-**Production access via deploy user:**
+**Production access via the inventory account:**
 - SSH key: `~/.ssh/pausatf-prod`
-- User: `deploy` (member of www-data, sudo)
+- User: `somethingwithproof`; verify `www-data` group membership and required sudo permissions on the target
 - Key stored in GitHub secret: `PROD_SSH_PRIVATE_KEY`
 
 **Key generation (reference):**
@@ -417,7 +423,7 @@ ssh-keygen -t ed25519 -C "pausatf-prod-20251228" \
 
 **Add key to server:**
 ```bash
-ssh-copy-id -i ~/.ssh/pausatf-prod.pub deploy@ftp.pausatf.org
+ssh-copy-id -i ~/.ssh/pausatf-prod.pub somethingwithproof@ftp.pausatf.org
 ```
 
 ### Ansible Vault
@@ -460,7 +466,7 @@ ansible-playbook -i inventory/hosts.yml site.yml --ask-vault-pass
 
 **GitHub Action:** `.github/workflows/capture-prod-inventory.yml`
 
-Runs nightly to capture WordPress plugins/themes/config and commit to repo.
+Runs on manual dispatch to capture WordPress plugins/themes/config and commit to the repository.
 
 ### Production Database and Legacy Backup
 
@@ -474,27 +480,28 @@ for installation, credentials, retention, and verification. Backup data is not c
 
 Creates nightly droplet snapshots with timestamp.
 
-**Required GitHub Secrets:**
-- `PROD_SSH_PRIVATE_KEY` - Deploy user SSH key
+**Required GitHub Secret:**
 - `DO_TOKEN` - DigitalOcean API token
-- `DO_PROD_DROPLET_ID` - Production droplet ID (REDACTED_DROPLET_ID)
+
+**Optional repository secret:**
+- `DO_PROD_DROPLET_ID` - Production droplet ID; the workflow falls back to resolving `pausatf-prod-v2` by name. No SSH key is consumed by this snapshot workflow.
 
 ## Troubleshooting
 
 ### Common Issues
 
-**Permission denied for deploy user:**
+**Permission denied for the inventory account:**
 ```bash
-# Verify deploy user in www-data group
-ssh root@ftp.pausatf.org 'id deploy'
+# Verify the production inventory account is in www-data
+ssh root@ftp.pausatf.org 'id somethingwithproof'
 
 # If not, add to group
-ssh root@ftp.pausatf.org 'usermod -a -G www-data deploy'
+ssh root@ftp.pausatf.org 'usermod -a -G www-data somethingwithproof'
 ```
 
 **WP-CLI fails with permission error:**
 ```bash
-# Always use sg wrapper for deploy user
+# Use the sg wrapper for the host inventory account
 sg www-data -c "wp plugin list --path=/var/www/html"
 ```
 
@@ -506,11 +513,13 @@ sg www-data -c "wp plugin list --path=/var/www/html"
 
 **Database connection error:**
 ```bash
-# Check MySQL is running
-ssh root@ftp.pausatf.org 'systemctl status mysql'
+# Production uses a managed database: inspect its provider health, not a local mysqld.
+# Host WordPress: preserve the www-data group context and never print credentials.
+ssh -i ~/.ssh/pausatf-prod somethingwithproof@ftp.pausatf.org \
+  'sg www-data -c "wp db check --path=/var/www/html"'
 
-# Check wp-config.php credentials
-ssh deploy@ftp.pausatf.org 'grep DB_ /var/www/html/wp-config.php'
+# For a separately managed Docker origin, use its verified WordPress container
+# and application user instead; host paths and group wrappers may not apply.
 ```
 
 ### Debug Mode

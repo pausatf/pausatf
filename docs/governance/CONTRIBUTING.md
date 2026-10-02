@@ -23,8 +23,8 @@ Thank you for contributing to our infrastructure repository! This document provi
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/thomasvincent/infrastructure-as-code.git
-   cd infrastructure-as-code
+   git clone https://github.com/pausatf/pausatf.git
+   cd pausatf
    ```
 
 2. **Install pre-commit hooks**
