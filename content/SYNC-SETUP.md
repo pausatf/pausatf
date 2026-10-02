@@ -397,7 +397,7 @@ crontab -e
 
 - [Legacy Content README](README.md)
 - [Infrastructure Documentation](https://github.com/pausatf/pausatf/tree/main/docs)
-- [Scripts Repository](https://github.com/pausatf/pausatf-scripts)
+- [Automation scripts](../scripts/README.md)
 
 ## Support
 

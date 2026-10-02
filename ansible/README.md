@@ -483,7 +483,7 @@ Creates nightly droplet snapshots with timestamp.
 **Required GitHub Secret:**
 - `DO_TOKEN` - DigitalOcean API token
 
-**Optional repository variable:**
+**Optional repository secret:**
 - `DO_PROD_DROPLET_ID` - Production droplet ID; the workflow falls back to resolving `pausatf-prod-v2` by name. No SSH key is consumed by this snapshot workflow.
 
 ## Troubleshooting
