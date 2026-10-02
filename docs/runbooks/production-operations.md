@@ -3,7 +3,35 @@
 For the October 1 merged changes, follow the [deployment gates](deployment.md),
 [MySQL upgrade](database-upgrades.md), [TLS ownership](tls-certificates.md) and
 [recovery backup](../../scripts/backup/README.md) runbooks. Installed production behavior and recoverability
-require separate evidence; historical plugin lists below are not a fresh inventory.
+require separate evidence.
+
+## Current operational entry points
+
+Use the linked runbooks above for current execution and approval requirements.
+The tracked production inventory selects `somethingwithproof`, host Apache and
+`/var/www/html`; confirm the actual target and whether WordPress runs on that host
+or in the separately managed Docker stack before choosing commands.
+Production database health belongs to the managed database provider. A host-local
+`mysql` service check does not verify that database. Never print `DB_*` values or
+copy `wp-config.php` into diagnostics.
+
+For the verified host WordPress context, retain the group wrapper:
+
+```bash
+ssh -i ~/.ssh/pausatf-prod somethingwithproof@ftp.pausatf.org \
+  'sg www-data -c "wp db check --path=/var/www/html"'
+```
+
+For Docker WordPress, use the deployment repository's verified container and
+application-user context instead. Repository merges do not authorize these operations.
+
+## Historical December 2025 operations reference
+
+**Everything below this heading is an inherited December 28, 2025 reference,
+including its accounts, versions, paths and operational commands. It is not a
+current execution procedure or installed-state inventory. Do not execute its
+mutating commands as current guidance.** Use the current entry points above and
+verify installed state before selecting any procedure.
 
 **Document Version:** 1.0
 **Last Updated:** December 28, 2025
@@ -590,8 +618,8 @@ ssh deploy@ftp.pausatf.org \
 # Verify MySQL is running
 ssh deploy@ftp.pausatf.org 'sudo systemctl status mysql'
 
-# Check credentials in wp-config.php
-ssh deploy@ftp.pausatf.org 'sudo grep "DB_" /var/www/html/wp-config.php'
+# Credential diagnostics must not print configuration values.
+# Verify application connectivity in the current target context instead.
 ```
 
 ### Escalation Path

@@ -396,12 +396,12 @@ crontab -e
 ## Related Documentation
 
 - [Legacy Content README](README.md)
-- [Infrastructure Documentation](https://github.com/pausatf/pausatf-infrastructure-docs)
+- [Infrastructure Documentation](https://github.com/pausatf/pausatf/tree/main/docs)
 - [Scripts Repository](https://github.com/pausatf/pausatf-scripts)
 
 ## Support
 
 For issues or questions:
-- [Open an issue](https://github.com/pausatf/pausatf-infrastructure-docs/issues)
-- [Start a discussion](https://github.com/pausatf/pausatf-infrastructure-docs/discussions)
-- Contact: @thomasvincent
+- [Open an issue](https://github.com/pausatf/pausatf/issues)
+- [Read the current documentation](https://github.com/pausatf/pausatf/tree/main/docs)
+- Contact: @somethingwithproof

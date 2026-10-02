@@ -129,7 +129,7 @@ pausatf-deployment (`pausatf/pausatf-deployment`, private repository). Inspect t
 
 | Secret | Used by | Description |
 |--------|---------|-------------|
-| `PROD_SSH_PRIVATE_KEY` | deploy-prod, capture-prod-inventory, do-nightly-snapshot, wordpress-update-check | Production SSH private key; verify the user selected by each workflow and inventory |
+| `PROD_SSH_PRIVATE_KEY` | deploy-prod, capture-prod-inventory, wordpress-update-check, prod-widgets-log-probe, wp-plugin-audit, integration-tests, migrate-server (production selection) | Production SSH private key; verify the user selected by each workflow and inventory |
 | `STAGING_SSH_PRIVATE_KEY` | deploy-prod staging validation | SSH key for the staging check-mode job |
 | `DEV_SSH_PRIVATE_KEY` | deploy-dev | Private key for dev host |
 | `ANSIBLE_VAULT_PASSWORD` | deploy-prod, deploy-staging, deploy-dev, capture-prod-inventory | Ansible vault decryption password |

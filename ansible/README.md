@@ -409,9 +409,9 @@ ssh -i ~/.ssh/pausatf-prod somethingwithproof@ftp.pausatf.org \
 
 ### SSH Access
 
-**Production access via deploy user:**
+**Production access via the inventory account:**
 - SSH key: `~/.ssh/pausatf-prod`
-- User: `deploy` (member of www-data, sudo)
+- User: `somethingwithproof`; verify `www-data` group membership and required sudo permissions on the target
 - Key stored in GitHub secret: `PROD_SSH_PRIVATE_KEY`
 
 **Key generation (reference):**
@@ -466,7 +466,7 @@ ansible-playbook -i inventory/hosts.yml site.yml --ask-vault-pass
 
 **GitHub Action:** `.github/workflows/capture-prod-inventory.yml`
 
-Runs nightly to capture WordPress plugins/themes/config and commit to repo.
+Runs on manual dispatch to capture WordPress plugins/themes/config and commit to the repository.
 
 ### Production Database and Legacy Backup
 
@@ -480,27 +480,28 @@ for installation, credentials, retention, and verification. Backup data is not c
 
 Creates nightly droplet snapshots with timestamp.
 
-**Required GitHub Secrets:**
-- `PROD_SSH_PRIVATE_KEY` - Deploy user SSH key
+**Required GitHub Secret:**
 - `DO_TOKEN` - DigitalOcean API token
-- `DO_PROD_DROPLET_ID` - Production droplet ID (REDACTED_DROPLET_ID)
+
+**Optional repository variable:**
+- `DO_PROD_DROPLET_ID` - Production droplet ID; the workflow falls back to resolving `pausatf-prod-v2` by name. No SSH key is consumed by this snapshot workflow.
 
 ## Troubleshooting
 
 ### Common Issues
 
-**Permission denied for deploy user:**
+**Permission denied for the inventory account:**
 ```bash
-# Verify deploy user in www-data group
-ssh root@ftp.pausatf.org 'id deploy'
+# Verify the production inventory account is in www-data
+ssh root@ftp.pausatf.org 'id somethingwithproof'
 
 # If not, add to group
-ssh root@ftp.pausatf.org 'usermod -a -G www-data deploy'
+ssh root@ftp.pausatf.org 'usermod -a -G www-data somethingwithproof'
 ```
 
 **WP-CLI fails with permission error:**
 ```bash
-# Always use sg wrapper for deploy user
+# Use the sg wrapper for the host inventory account
 sg www-data -c "wp plugin list --path=/var/www/html"
 ```
 
@@ -512,12 +513,13 @@ sg www-data -c "wp plugin list --path=/var/www/html"
 
 **Database connection error:**
 ```bash
-# Check MySQL is running
-ssh root@ftp.pausatf.org 'systemctl status mysql'
+# Production uses a managed database: inspect its provider health, not a local mysqld.
+# Host WordPress: preserve the www-data group context and never print credentials.
+ssh -i ~/.ssh/pausatf-prod somethingwithproof@ftp.pausatf.org \
+  'sg www-data -c "wp db check --path=/var/www/html"'
 
-# Verify application connectivity without printing wp-config.php secrets
-# Run in the actual target WordPress host/container context
-wp db check --path=/var/www/html
+# For a separately managed Docker origin, use its verified WordPress container
+# and application user instead; host paths and group wrappers may not apply.
 ```
 
 ### Debug Mode

@@ -209,7 +209,7 @@ Consider removing:
 
 This repository is part of the PAUSATF infrastructure ecosystem:
 
-- [pausatf-infrastructure-docs](https://github.com/pausatf/pausatf-infrastructure-docs) - Documentation
+- [pausatf-infrastructure-docs](https://github.com/pausatf/pausatf/tree/main/docs) - Documentation
 - [pausatf-terraform](https://github.com/pausatf/pausatf-terraform) - Infrastructure provisioning
 - [pausatf-ansible](https://github.com/pausatf/pausatf-ansible) - Configuration management
 - [pausatf-scripts](https://github.com/pausatf/pausatf-scripts) - Automation scripts
@@ -219,16 +219,16 @@ This repository is part of the PAUSATF infrastructure ecosystem:
 ## Documentation
 
 For more information:
-- [Infrastructure Documentation](https://github.com/pausatf/pausatf-infrastructure-docs)
-- [Server Migration Guide](https://github.com/pausatf/pausatf-infrastructure-docs/blob/main/docs/guides/05-server-migration-guide.md)
-- [Operational Procedures](https://github.com/pausatf/pausatf-infrastructure-docs/blob/main/docs/guides/10-operational-procedures.md)
+- [Infrastructure Documentation](https://github.com/pausatf/pausatf/tree/main/docs)
+- [Server Migration Guide](https://github.com/pausatf/pausatf/tree/main/docs/blob/main/docs/guides/05-server-migration-guide.md)
+- [Operational Procedures](https://github.com/pausatf/pausatf/tree/main/docs/blob/main/docs/guides/10-operational-procedures.md)
 
 ## Contact
 
 **For questions about legacy content:**
-- Review: [Infrastructure Documentation](https://github.com/pausatf/pausatf-infrastructure-docs)
-- Discuss: [GitHub Discussions](https://github.com/pausatf/pausatf-infrastructure-docs/discussions)
-- Contact: @thomasvincent
+- Review: [Infrastructure Documentation](https://github.com/pausatf/pausatf/tree/main/docs)
+- Questions: [Repository issues](https://github.com/pausatf/pausatf/issues)
+- Contact: @somethingwithproof
 
 ## License
 

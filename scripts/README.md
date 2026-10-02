@@ -124,7 +124,7 @@ export CLOUDFLARE_API_TOKEN="your-token"
 # Make executable
 chmod +x script-name.sh
 
-# Run with appropriate permissions
+# Validate syntax only; this does not execute a backup or prove recovery
 bash -n backup/pausatf-db-backup.sh
 
 # Or use bash directly
