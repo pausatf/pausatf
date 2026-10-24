@@ -44,6 +44,6 @@ python-digitalocean>=1.17.0
 cloudflare>=5.7.0
 
 # Documentation
-mkdocs>=1.5.3
+mkdocs>=1.6.1
 mkdocs-material>=9.4.14
 mkdocs-mermaid2-plugin>=1.2.3
