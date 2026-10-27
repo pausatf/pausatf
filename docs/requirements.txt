@@ -4,7 +4,7 @@
 # Ansible and related tools
 ansible>=12.2.0,<13.0.0
 ansible-lint>=26.9.0
-ansible-core>=2.21.5
+ansible-core>=2.19.14,<2.20.0
 
 # Pre-commit and linting
 pre-commit>=4.7.0
