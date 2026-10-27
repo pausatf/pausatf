@@ -11,6 +11,9 @@ updates:
     labels:
       - "dependencies"
     groups:
+      codeql:
+        patterns:
+          - "github/codeql-action*"
       actions:
         patterns:
           - "actions/*"
@@ -119,6 +122,9 @@ updates:
     labels:
       - "dependencies"
     groups:
+      codeql:
+        patterns:
+          - "github/codeql-action*"
       actions:
         patterns:
           - "actions/*"
@@ -133,6 +139,9 @@ updates:
     labels:
       - "dependencies"
     groups:
+      codeql:
+        patterns:
+          - "github/codeql-action*"
       actions:
         patterns:
           - "actions/*"
@@ -147,6 +156,9 @@ updates:
     labels:
       - "dependencies"
     groups:
+      codeql:
+        patterns:
+          - "github/codeql-action*"
       actions:
         patterns:
           - "actions/*"
