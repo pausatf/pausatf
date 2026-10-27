@@ -43,7 +43,7 @@ services:
 
   # Prometheus monitoring
   prometheus:
-    image: prom/prometheus:v3.15.0  # pin: update deliberately, check release notes
+    image: prom/prometheus:v3.15.1  # pin: update deliberately, check release notes
     container_name: prometheus
     volumes:
       - ./monitoring/prometheus:/etc/prometheus:ro
@@ -58,7 +58,7 @@ services:
 
   # Grafana for visualization
   grafana:
-    image: grafana/grafana:13.2.3  # pin: update deliberately, check release notes
+    image: grafana/grafana:13.2.4  # pin: update deliberately, check release notes
     container_name: grafana
     environment:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
