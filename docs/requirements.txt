@@ -17,7 +17,7 @@ terraform-compliance>=1.15.1
 # Utilities
 jinja2>=3.1.6
 requests>=2.34.2
-pyyaml>=6.0.1
+pyyaml>=6.0.3
 
 # Security scanning
 safety>=2.3.5
