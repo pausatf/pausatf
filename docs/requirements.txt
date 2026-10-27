@@ -20,7 +20,7 @@ requests>=2.34.2
 pyyaml>=6.0.3
 
 # Security scanning
-safety>=2.3.5
+safety>=3.8.1
 bandit>=1.7.5
 
 # Testing framework
