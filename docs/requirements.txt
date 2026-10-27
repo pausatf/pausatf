@@ -7,7 +7,7 @@ ansible-lint>=26.9.0
 ansible-core>=2.15.0
 
 # Pre-commit and linting
-pre-commit>=4.6.2
+pre-commit>=4.7.0
 yamllint>=1.33.0
 
 # Terraform tooling
