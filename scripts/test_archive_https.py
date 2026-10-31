@@ -1,5 +1,6 @@
 """Execute historical analytics selectors under both document protocols."""
 import json
+import os
 from pathlib import Path
 import re
 import subprocess
@@ -29,8 +30,15 @@ process.stdout.write(JSON.stringify({ selectors: selectors.length, checks }));
 
 class ArchiveHttpsTests(unittest.TestCase):
     def test_shipped_selectors_require_https_for_http_and_https_documents(self):
+        indexed = subprocess.run(['git', 'ls-files', '-z', '--', 'content'], cwd=ROOT,
+                                 capture_output=True, check=True)
+        paths = [ROOT / os.fsdecode(name) for name in indexed.stdout.split(b'\0') if name]
+        missing = [str(path.relative_to(ROOT)) for path in paths
+                   if not path.exists() and not path.is_symlink()]
+        self.assertEqual(len(missing), 0,
+                         f'Complete tracked archive checkout required; missing examples: {missing[:5]}')
         selectors = []
-        for path in sorted((ROOT / 'content').rglob('*')):
+        for path in sorted(paths):
             if path.is_file() and not path.is_symlink():
                 data = path.read_bytes()
                 if b'google-analytics.com/ga.js' in data:
