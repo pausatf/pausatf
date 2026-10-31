@@ -27,7 +27,7 @@ jobs:
         id: jetpack
         run: |
           set -euo pipefail
-          RAW=$(curl -sSfL \
+          RAW=$(curl -sSfL --proto '=https' --proto-redir '=https' \
             -A "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:142.0) Gecko/20100101 Firefox/142.0" \
             -e "https://jetpack.com/support/hosting-faq/" \
             https://jetpack.com/ips-v4.txt)
