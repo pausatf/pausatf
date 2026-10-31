@@ -17,12 +17,15 @@ HUNK = re.compile(r"^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@")
 
 def changed_lines(base: str, root: Path) -> dict[str, list[tuple[int, int, int, int]]]:
     """Return old/new line ranges for changed PHP lines by repository-relative path."""
+    # Deleted archive lines can use legacy encodings; preserve them while parsing headers.
     result = subprocess.run(
         ["git", "diff", "--no-ext-diff", "--unified=0", f"{base}...HEAD", "--", "*.php"],
         cwd=root,
         check=True,
         capture_output=True,
         text=True,
+        encoding="utf-8",
+        errors="surrogateescape",
     )
 
     files: dict[str, list[tuple[int, int, int, int]]] = {}
@@ -80,11 +83,11 @@ def baseline_violations(
     """Index base violations by line, source, and message for each changed file."""
     result: dict[str, dict[tuple[int, str, str], int]] = {}
     for path in paths:
+        # PHPCS must inspect the original bytes rather than a transcoded baseline.
         source = subprocess.run(
             ["git", "show", f"{base}:{path}"],
             cwd=root,
             capture_output=True,
-            text=True,
             check=False,
         )
         if source.returncode:
@@ -102,7 +105,6 @@ def baseline_violations(
             cwd=root,
             input=source.stdout,
             capture_output=True,
-            text=True,
             check=False,
         )
         try:
