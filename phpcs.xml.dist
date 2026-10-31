@@ -8,6 +8,7 @@
   <file>wordpress/plugins</file>
   <file>wordpress/mu-plugins</file>
   <file>ansible/roles/wordpress/files/TheSource-child</file>
+  <file>ansible/roles/wordpress/files/mu-plugins</file>
   <file>ansible/roles/apache/files</file>
   <file>content/PHP</file>
   <file>content/data</file>
