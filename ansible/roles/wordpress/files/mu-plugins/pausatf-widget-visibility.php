@@ -2,7 +2,7 @@
 /**
  * Plugin Name: PAUSATF Widget Visibility & Classic Mode
  * Description: Deterministic widget visibility with code-defined overrides and editor-managed fallback. Replaces widget-logic plugin.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: PAUSATF Dev Team
  *
  * @package PAUSATF_WordPress
@@ -40,67 +40,8 @@ function get_code_rules(): array {
     ];
 }
 
-// ---------------------------------------------------------------------------
-// 3. Editor-Managed Visibility (widget_logic key in widget options)
-// ---------------------------------------------------------------------------
-
-/** Allowlisted WordPress conditional functions for eval. */
-const ALLOWED_FUNCTIONS = [
-    'is_home', 'is_front_page', 'is_page', 'is_single', 'is_singular',
-    'is_archive', 'is_category', 'is_tag', 'is_tax', 'is_author',
-    'is_search', 'is_404', 'is_attachment', 'is_feed',
-    'is_post_type_archive', 'is_date', 'is_year', 'is_month', 'is_day',
-    'is_user_logged_in', 'current_user_can', 'in_category', 'has_tag',
-    'is_page_template', 'is_paged', 'wp_is_mobile', 'is_preview',
-    'is_sticky', 'has_post_thumbnail', 'is_active_sidebar',
-];
-
-/**
- * Read widget_logic from a widget's stored options.
- */
-function get_widget_logic(string $widget_id): string {
-    if (!preg_match('/^(.+)-(\d+)$/', $widget_id, $m)) {
-        return '';
-    }
-    $opts = get_option('widget_' . $m[1]);
-    if (!is_array($opts) || empty($opts[(int) $m[2]])) {
-        return '';
-    }
-    return trim((string) ($opts[(int) $m[2]]['widget_logic'] ?? ''));
-}
-
-/**
- * Evaluate a widget_logic expression safely.
- *
- * @param string $logic PHP expression using allowlisted conditionals.
- * @return bool True = show widget. Returns true on empty logic or error (fail-open for editor rules).
- */
-function eval_logic(string $logic): bool {
-    if ($logic === '') {
-        return true;
-    }
-
-    // Reject any non-whitelisted function calls
-    $test = preg_replace('/\b(' . implode('|', ALLOWED_FUNCTIONS) . ')\s*\(/', '_OK_(', $logic);
-    if (preg_match('/[a-zA-Z_]\w*\s*\(/', $test)) {
-        error_log(sprintf('[PAUSATF Widgets] Blocked non-whitelisted function in logic: %s', $logic));
-        return true; // fail-open for editor-managed rules
-    }
-
-    try {
-        // Prepend global namespace to all allowed function calls so eval works inside this namespace
-        $pattern = '/\b(' . implode('|', ALLOWED_FUNCTIONS) . ')\s*\(/';
-        $namespaced = preg_replace_callback($pattern, function ($m) {
-            return '\\' . $m[1] . '(';
-        }, $logic);
-        // phpcs:ignore Squiz.PHP.Eval.Discouraged -- controlled eval with strict allowlist
-        $result = @eval('return (' . $namespaced . ');');
-        return (bool) $result;
-    } catch (\Throwable $e) {
-        error_log(sprintf('[PAUSATF Widgets] Eval error for logic "%s": %s (namespaced: %s)', $logic, $e->getMessage(), $namespaced));
-        return false; // fail-closed: hide widget on error
-    }
-}
+// Editor-managed expressions remain the responsibility of the widget-logic
+// plugin. This override exposes no PHP expression evaluator.
 
 // ---------------------------------------------------------------------------
 // 4. Main Filter: Apply visibility rules to sidebars_widgets
