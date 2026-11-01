@@ -232,7 +232,7 @@ jobs:
       - name: Run tfsec
         run: |
           version=v1.28.14
-          curl --fail --silent --show-error --location \
+          curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' \
             "https://github.com/aquasecurity/tfsec/releases/download/${version}/tfsec-linux-amd64" \
             --output tfsec-linux-amd64
           echo 'a32d0799bbefababaa4fcd814da9f4d251cd932789590b99d1d5fcb89ace6f68  tfsec-linux-amd64' \
