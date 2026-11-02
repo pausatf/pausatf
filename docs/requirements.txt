@@ -32,7 +32,7 @@ pytest-timeout>=2.2.0
 
 # Molecule for Ansible testing
 molecule>=26.10.0
-molecule-plugins[docker]>=26.7.15
+molecule-plugins[docker]>=26.10.12
 molecule-docker>=2.1.0
 
 # Integration testing
