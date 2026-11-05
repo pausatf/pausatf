@@ -531,23 +531,10 @@ Field Type Collation Attributes Null Default Extra Action
 
 </div>
 
-<!-- Start Quantcast tag -->
+<script src="/data/pausatf-legacy-analytics.js" data-provider="quantcast" defer></script>
+<noscript><img src="https://pixel.quantserve.com/pixel/p-72cL-7RSrrmhE.gif" alt="" hidden></noscript>
 
-<script type="text/javascript" src="http://edge.quantserve.com/quant.js"></script>
-
-<script type="text/javascript">_qacct="p-72cL-7RSrrmhE";quantserve();</script>
-
-<noscript>
-
-<a href="http://www.quantcast.com/p-72cL-7RSrrmhE" target="_blank"><img style="display: none;" src="http://pixel.quantserve.com/pixel/p-72cL-7RSrrmhE.gif" alt="Quantcast" height="1" width="1" border="0" /></a>
-
-</noscript>
-
-<!-- End Quantcast tag -->
-
-<script type="text/javascript">var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));</script>
-
-<script type="text/javascript">var pageTracker = _gat._getTracker("UA-2651783-1");pageTracker._initData();pageTracker._trackPageview();</script>
+<script src="/data/pausatf-legacy-analytics.js" data-provider="google" defer></script>
 
 </body>
 
