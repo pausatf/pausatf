@@ -12,6 +12,9 @@ on:
       - '**.tf'
       - '.github/workflows/terraform-validate.yml'
 
+permissions:
+  contents: read
+
 jobs:
   terraform-fmt:
     name: Terraform Format Check
@@ -19,10 +22,12 @@ jobs:
     if: "!contains(github.event.pull_request.title, 'chore(deps):')"
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
         with:
           terraform_version: ~1.6
 
@@ -41,10 +46,12 @@ jobs:
           - github
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
         with:
           terraform_version: ~1.6
 
@@ -59,20 +66,25 @@ jobs:
   tfsec:
     name: TFSec Security Scan
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write # Upload tfsec SARIF results
     if: "!contains(github.event.pull_request.title, 'chore(deps):')"
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
 
       - name: Run tfsec
-        uses: aquasecurity/tfsec-action@v1.0.3
+        uses: aquasecurity/tfsec-action@b466648d6e39e7c75324f25d83891162a721f2d6 # v1.0.3
         with:
           soft_fail: false
           format: sarif
           additional_args: --concise-output
 
       - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@v4
+        uses: github/codeql-action/upload-sarif@33d7b85da1a04171e211befe2c739303b9a4c066 # v4
         if: always()
         with:
           sarif_file: results.sarif
@@ -83,10 +95,12 @@ jobs:
     if: "!contains(github.event.pull_request.title, 'chore(deps):')"
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
 
       - name: Setup TFLint
-        uses: terraform-linters/setup-tflint@v6
+        uses: terraform-linters/setup-tflint@6ffdbaa3be476b3431f7275c26966ef32ff60337 # v6
         with:
           tflint_version: latest
 

@@ -4,6 +4,8 @@ updates:
   # Add an npm ecosystem block when a package manager manifest is introduced.
   # GitHub Actions
   - package-ecosystem: "github-actions"
+    cooldown:
+      default-days: 7
     directory: "/"
     schedule:
       interval: "weekly"
@@ -21,6 +23,8 @@ updates:
 
   # Terraform
   - package-ecosystem: "terraform"
+    cooldown:
+      default-days: 7
     directory: "/terraform"
     schedule:
       interval: "weekly"
@@ -31,6 +35,8 @@ updates:
 
   # Python (Ansible requirements)
   - package-ecosystem: "pip"
+    cooldown:
+      default-days: 7
     directory: "/ansible"
     schedule:
       interval: "weekly"
@@ -40,6 +46,8 @@ updates:
 
   # Python (docs build)
   - package-ecosystem: "pip"
+    cooldown:
+      default-days: 7
     directory: "/docs"
     schedule:
       interval: "weekly"
@@ -55,6 +63,8 @@ updates:
 
   # PHP (membership plugin)
   - package-ecosystem: "composer"
+    cooldown:
+      default-days: 7
     directory: "/wordpress/plugins/pausatf-membership"
     schedule:
       interval: "weekly"
@@ -70,6 +80,8 @@ updates:
 
   # Docker Compose (compose stack)
   - package-ecosystem: "docker-compose"
+    cooldown:
+      default-days: 7
     directory: "/scripts/docker"
     schedule:
       interval: "weekly"
@@ -85,6 +97,8 @@ updates:
 
   # Docker (nginx image)
   - package-ecosystem: "docker"
+    cooldown:
+      default-days: 7
     directory: "/scripts/docker/nginx"
     schedule:
       interval: "weekly"
@@ -100,6 +114,8 @@ updates:
 
   # Docker (wordpress image)
   - package-ecosystem: "docker"
+    cooldown:
+      default-days: 7
     directory: "/scripts/docker/wordpress"
     schedule:
       interval: "weekly"
@@ -115,6 +131,8 @@ updates:
 
   # GitHub Actions (docs workflows)
   - package-ecosystem: "github-actions"
+    cooldown:
+      default-days: 7
     directory: "/docs"
     schedule:
       interval: "weekly"
@@ -132,6 +150,8 @@ updates:
 
   # GitHub Actions (scripts workflows)
   - package-ecosystem: "github-actions"
+    cooldown:
+      default-days: 7
     directory: "/scripts"
     schedule:
       interval: "weekly"
@@ -149,6 +169,8 @@ updates:
 
   # GitHub Actions (terraform workflows)
   - package-ecosystem: "github-actions"
+    cooldown:
+      default-days: 7
     directory: "/terraform"
     schedule:
       interval: "weekly"

@@ -12,6 +12,9 @@ on:
       - '**.md'
       - '.github/workflows/markdown-lint.yml'
 
+permissions:
+  contents: read
+
 jobs:
   markdown-lint:
     name: Markdown Lint
@@ -19,10 +22,12 @@ jobs:
     if: "!contains(github.event.pull_request.title, 'chore(deps):')"
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
 
       - name: Run markdownlint
-        uses: nosborn/github-action-markdown-cli@v3.5.0
+        uses: nosborn/github-action-markdown-cli@508d6cefd8f0cc99eab5d2d4685b1d5f470042c1 # v3.5.0
         with:
           files: .
           config_file: .markdownlint.json
@@ -34,10 +39,12 @@ jobs:
     if: "!contains(github.event.pull_request.title, 'chore(deps):')"
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
 
       - name: Check links
-        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        uses: gaurav-nelson/github-action-markdown-link-check@5c5dfc0ac2e225883c0e5f03a85311ec2830d368 # v1
         with:
           use-quiet-mode: 'yes'
           use-verbose-mode: 'yes'
