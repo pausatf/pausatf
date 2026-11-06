@@ -11,10 +11,16 @@ on:
 env:
   TF_IN_AUTOMATION: true
 
+permissions:
+  contents: read
+
 jobs:
   plan:
     name: Terraform Plan
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write # Comment PR with Terraform plan
     if: "!contains(github.event.pull_request.title, 'chore(deps):')"
     strategy:
       matrix:
@@ -25,6 +31,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4 (was @v6 which does not exist)
+        with:
+          persist-credentials: false
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@b9cd54a3c349d3f85571c5fb643da9750e94b949  # v3
@@ -79,19 +87,24 @@ jobs:
 
       - name: Comment PR with Plan
         # TODO: pin to SHA — current tag: actions/github-script@v8
-        uses: actions/github-script@v8
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         if: github.event_name == 'pull_request'
         env:
-          PLAN_OUTPUT: ${{ matrix.environment }}
+          ENVIRONMENT: ${{ matrix.environment }}
+          PLAN_STATUS: ${{ steps.plan.outcome }}
+          GH_ACTOR: ${{ github.actor }}
+          GH_EVENT_NAME: ${{ github.event_name }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs');
             const path = require('path');
 
+            const environment = process.env.ENVIRONMENT;
+
             let planOutput = 'Plan output not available';
             try {
-              const planPath = path.join('environments', '${{ matrix.environment }}', 'plan_output.txt');
+              const planPath = path.join('environments', environment, 'plan_output.txt');
               if (fs.existsSync(planPath)) {
                 planOutput = fs.readFileSync(planPath, 'utf8');
                 // Truncate if too long (GitHub comment limit is 65536 chars)
@@ -103,10 +116,10 @@ jobs:
               planOutput = `Error reading plan: ${error.message}`;
             }
 
-            const planStatus = '${{ steps.plan.outcome }}';
+            const planStatus = process.env.PLAN_STATUS;
             const statusEmoji = planStatus === 'success' ? '✅' : '❌';
 
-            const output = `#### ${statusEmoji} Terraform Plan for \`${{ matrix.environment }}\`
+            const output = `#### ${statusEmoji} Terraform Plan for \`${environment}\`
 
             **Status:** ${planStatus}
 
@@ -118,7 +131,7 @@ jobs:
 
             </details>
 
-            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+            *Pusher: @${process.env.GH_ACTOR}, Action: \`${process.env.GH_EVENT_NAME}\`*`;
 
             github.rest.issues.createComment({
               issue_number: context.issue.number,
