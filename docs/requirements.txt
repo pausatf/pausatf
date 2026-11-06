@@ -12,7 +12,7 @@ yamllint>=1.38.0
 
 # Terraform tooling
 python-hcl2>=8.1.4
-terraform-compliance>=1.15.1
+terraform-compliance>=1.16.0
 
 # Utilities
 jinja2>=3.1.6
