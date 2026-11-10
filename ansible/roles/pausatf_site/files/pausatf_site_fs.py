@@ -26,6 +26,7 @@ import time
 
 MARKER = ".pausatf-site-release"
 SHA_RE = re.compile(r"[0-9a-f]{40}")
+NAME_RE = re.compile(r"[A-Za-z0-9_][A-Za-z0-9_.+-]*")
 RENAME_NOREPLACE = 1
 RENAME_EXCHANGE = 2
 DIR_FLAGS = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC
@@ -146,9 +147,9 @@ def verify_release(plugins_fd, slug):
     return info, sha
 
 
-def child_in(fd):
+def child_in(fd, umask=0o022):
     def enter():
-        os.umask(0o022)
+        os.umask(umask)
         os.fchdir(fd)
 
     return enter
@@ -174,7 +175,8 @@ def release(args):
     stage_name, stage_fd = make_stage(content_fd)
     keep_stage = False
     try:
-        os.mkdir(args.slug, 0o755, dir_fd=stage_fd)
+        # The web server must read the plugin; nothing in it is writable by it.
+        os.mkdir(args.slug, 0o755, dir_fd=stage_fd)  # NOSONAR
         new_fd = open_dir_at(stage_fd, args.slug)
         try:
             archive = subprocess.Popen(
@@ -205,7 +207,7 @@ def release(args):
             os.write(marker, (args.sha + "\n").encode("ascii"))
             os.fsync(marker)
             os.close(marker)
-            os.fchmod(new_fd, 0o755)
+            os.fchmod(new_fd, 0o755)  # NOSONAR: read-only to the web server, as above
         finally:
             os.close(new_fd)
 
@@ -332,7 +334,7 @@ def retire(args):
                     "--",
                     args.name,
                 ],
-                preexec_fn=child_in(stage_fd),
+                preexec_fn=child_in(stage_fd, 0o077),
                 check=True,
             )
             if os.stat(target).st_size == 0:
@@ -371,8 +373,21 @@ def main():
     ret.add_argument("--check", action="store_true")
     args = parser.parse_args()
     for value in (getattr(args, "slug", None), getattr(args, "name", None)):
-        if value is not None and (not value or "/" in value or value in (".", "..")):
-            parser.error("names must be single path components")
+        if value is not None and not NAME_RE.fullmatch(value):
+            parser.error(
+                "names must be single path components that do not start with '-' or '.'"
+            )
+    for value in (
+        args.docroot,
+        getattr(args, "gitdir", None),
+        getattr(args, "backup_dir", None),
+    ):
+        if value is not None and (
+            not os.path.isabs(value)
+            or os.path.normpath(value) != value
+            or "\0" in value
+        ):
+            parser.error("paths must be absolute and normalized")
     try:
         result = release(args) if args.command == "release" else retire(args)
     except Refused as error:
