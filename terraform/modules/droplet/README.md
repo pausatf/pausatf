@@ -562,10 +562,11 @@ redis-cli -s /var/run/redis/redis-server.sock --intrinsic-latency 100
 
 ## Current Production Usage
 
-| Droplet | Template | IP | Size | Status |
-|---------|----------|-----|------|--------|
-| ftp.pausatf.org | cloud-init-ubuntu-24.yml | REDACTED_PROD_NEW_IP | s-4vcpu-8gb | Production |
-| stage.pausatf.org | cloud-init-openlitespeed.yml | REDACTED_STAGE_IP | s-2vcpu-4gb | Staging |
+Neither server listed here previously still exists. On 2026-11-10 the PAUSATF
+droplets were `pausatf-prod-v2` (`s-2vcpu-4gb`), `pausatf-stage-v2` (`s-2vcpu-4gb`)
+and `pausatf-dev-v2` (`s-1vcpu-2gb`), all Ubuntu 26.04 in SFO2, managed through
+`stacks/wordpress`. See [INFRASTRUCTURE_INVENTORY.md](../../INFRASTRUCTURE_INVENTORY.md)
+for IDs and state ownership.
 
 ## Maintainer
 

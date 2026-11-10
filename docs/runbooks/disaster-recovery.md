@@ -220,6 +220,20 @@ crontab -u www-data /tmp/pausatf-restore/crontab-www-data.txt
 
 ### Scenario 2: Database Corruption/Loss
 
+> **Current production (2026-11-10):** the database is the managed `pausatf-prod-db`
+> cluster (MySQL 8.4), so there is no host MySQL to check or repair. Recovery paths,
+> neither exercised for this cluster yet:
+>
+> 1. **DigitalOcean point-in-time restore** (seven days) into a new cluster:
+>    `doctl databases create <new-name> --restore-from-cluster-name pausatf-prod-db --restore-from-timestamp "<YYYY-MM-DD HH:MM:SS +0000 UTC>" ...`.
+>    Add `pausatf-prod-v2` as a trusted source (`doctl databases firewalls append`), point
+>    `WORDPRESS_DB_HOST` in the root-only `.env` in `~/pausatf-deployment` at the new private
+>    host, and recreate the `pausatf-wordpress` container. Bring the Terraform state in line afterwards.
+> 2. **Encrypted Spaces backup** written nightly by `pausatf-db-backup`; follow the
+>    [backup runbook](../../scripts/backup/README.md), restoring to an isolated cluster first.
+>
+> The steps below are historical.
+
 **Symptoms:**
 - WordPress shows "Error establishing database connection"
 - Database queries failing
@@ -285,6 +299,10 @@ done
 ```
 
 ### Scenario 4: WordPress Compromise/Hack
+
+> **Retired host.** The commands in this section target the pre-v2 server `ftp.pausatf.org`
+> (host Apache and MySQL), which no longer exists. For the current Docker stack on
+> `pausatf-prod-v2`, see the [production runbook](production-operations.md#current-production-verified-2026-11-10).
 
 **Symptoms:**
 - Suspicious files detected
@@ -373,6 +391,10 @@ ansible-playbook -i inventory/hosts.yml \
 ## Migration Procedures
 
 ### Planned Migration to New Droplet
+
+> **Retired host.** The commands in this section target the pre-v2 server `ftp.pausatf.org`
+> (host Apache and MySQL), which no longer exists. For the current Docker stack on
+> `pausatf-prod-v2`, see the [production runbook](production-operations.md#current-production-verified-2026-11-10).
 
 **Use Case:** Upgrading to Ubuntu 22.04, changing droplet size, changing regions
 

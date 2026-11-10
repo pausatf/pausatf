@@ -243,6 +243,10 @@ mysql -h <host> -P 25060 -u doadmin -p --ssl-mode=REQUIRED
 
 ### Staging Database
 
+> **Retired.** `pausatf-stage-db` no longer exists (not listed by `doctl` on 2026-11-10).
+> Staging now runs MySQL in a `pausatf-db` container on `pausatf-stage-v2`. The details
+> below are historical.
+
 **Cluster ID:** `661fa8d4-077c-43d7-a47a-79bfc42737c8`
 **Cluster Name:** `pausatf-stage-db`
 **Engine:** MySQL 8.0

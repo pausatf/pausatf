@@ -5,30 +5,59 @@ For the October 1 merged changes, follow the [deployment gates](deployment.md),
 [recovery backup](../../scripts/backup/README.md) runbooks. Installed production behavior and recoverability
 require separate evidence.
 
-## Current operational entry points
+## Current production (verified 2026-11-10)
 
-Use the linked runbooks above for current execution and approval requirements.
-The tracked production inventory selects `somethingwithproof`, host Apache and
-`/var/www/html`; confirm the actual target and whether WordPress runs on that host
-or in the separately managed Docker stack before choosing commands.
-Production database health belongs to the managed database provider. A host-local
-`mysql` service check does not verify that database. Never print `DB_*` values or
-copy `wp-config.php` into diagnostics.
+Observed read-only on 2026-11-10 with `doctl` and an SSH session on the server.
+Re-check before relying on any value; nothing below was changed to collect it.
 
-For the verified host WordPress context, retain the group wrapper:
+| Component | Value |
+|---|---|
+| Droplet | `pausatf-prod-v2` (ID `586316413`), `s-2vcpu-4gb`, SFO2, Ubuntu 26.04.1 LTS |
+| SSH | `ssh-v2.pausatf.org` through Cloudflare Access (`ProxyCommand cloudflared access ssh --hostname %h`), user `somethingwithproof` with sudo. The droplet's public IP does not accept SSH or direct HTTP. |
+| Stack | Docker Compose in `~/pausatf-deployment` using `docker-compose.prod.yml`. That directory is a deployed copy, not a git checkout; its source is `pausatf/pausatf-deployment`. |
+| Containers | `pausatf-wordpress` (Apache, WordPress 7.1.4), `pausatf-redis`, `pausatf-mail`. There is no database container. |
+| Database | Managed `pausatf-prod-db`, MySQL 8.4 (server reports 8.4.11), `db-s-1vcpu-1gb`, one node, reached over its private host. Its only trusted source is the production droplet. Maintenance window: Sunday 02:00 UTC. |
+| Credentials | Passed to the container as `WORDPRESS_DB_*` from the root-only `.env` in the compose directory. Never print them. |
+| Content | WordPress core in the `pausatf_prod_wordpress_core` volume at `/var/www/html`. `wp-content` is bind-mounted from the compose directory, and uploads come from the s3fs Spaces mount `/mnt/spaces-uploads`. |
+| Logs | `~/pausatf-deployment/logs/apache2` and `logs/modsec`, plus `sudo docker logs pausatf-wordpress` |
+| Scheduled work | `/etc/cron.d/pausatf-wpcron` runs `wp-cron.php` in the container every 5 minutes. systemd timers: `pausatf-db-backup` (runs `/usr/local/sbin/pausatf-recovery-backup`), `pausatf-media-backup`, `pausatf-backup-audit`, `pausatf-health`, `pausatf-inventory`, `pausatf-usage`, `certbot`. On 2026-11-10 the last run of each backup, audit and health unit had succeeded. |
+| Snapshots | GitHub workflow `do-nightly-snapshot.yml` (seven retained). Native droplet backups are off. |
+
+The container has no WP-CLI. Read-only checks:
 
 ```bash
-ssh -i ~/.ssh/pausatf-prod somethingwithproof@ftp.pausatf.org \
-  'sg www-data -c "wp db check --path=/var/www/html"'
+ssh pausatf-prod-v2            # an ~/.ssh/config Host for ssh-v2.pausatf.org as above
+sudo docker ps --format '{{.Names}} {{.Image}} {{.Status}}'
+systemctl list-timers --all 'pausatf-*'
+sudo docker logs --since 1h pausatf-wordpress
 ```
 
-For Docker WordPress, use the deployment repository's verified container and
-application-user context instead. Repository merges do not authorize these operations.
+To confirm which database WordPress uses without printing credentials, pipe a
+script to PHP in the container from your workstation:
+
+```bash
+cat <<'PHP' | ssh pausatf-prod-v2 'sudo docker exec -i pausatf-wordpress php'
+<?php
+$_SERVER['HTTP_HOST'] = 'www.pausatf.org';
+define('SHORTINIT', true);
+require '/var/www/html/wp-load.php';
+echo preg_replace('/:.*/', '', DB_HOST), ' ', $GLOBALS['wpdb']->get_var('SELECT VERSION()'), PHP_EOL;
+PHP
+```
+
+On 2026-11-10 it printed the cluster's private hostname and `8.4.11`.
+
+A host `mysql` service check does not apply; database health belongs to the
+managed cluster (`doctl databases get <id>`, `doctl databases events list <id>`).
+Use the [deployment gates](deployment.md), [TLS ownership](tls-certificates.md)
+and [recovery backup](../../scripts/backup/README.md) runbooks for changes.
+Repository merges do not authorize operations on the server.
 
 ## Historical December 2025 operations reference
 
 **Everything below this heading is an inherited December 28, 2025 reference,
-including its accounts, versions, paths and operational commands. It is not a
+including its accounts, versions, paths and operational commands. Its server
+(`ftp.pausatf.org`, Ubuntu 20.04, host Apache and MySQL) has been retired. It is not a
 current execution procedure or installed-state inventory. Do not execute its
 mutating commands as current guidance.** Use the current entry points above and
 verify installed state before selecting any procedure.
