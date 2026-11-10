@@ -113,46 +113,6 @@ resource "cloudflare_dns_record" "www" {
   comment = "PROD cutover to prod-v2 tunnel (was A 165.22.153.191)"
 }
 
-resource "cloudflare_dns_record" "ftp" {
-  zone_id = cloudflare_zone.pausatf.id
-  name    = "ftp"
-  content = "165.22.153.191"
-  type    = "A"
-  ttl     = 1
-  proxied = false
-  comment = "Production droplet (direct access)"
-}
-
-resource "cloudflare_dns_record" "mail" {
-  zone_id = cloudflare_zone.pausatf.id
-  name    = "mail"
-  content = "165.22.153.191"
-  type    = "A"
-  ttl     = 1
-  proxied = false
-  comment = "Mail server"
-}
-
-resource "cloudflare_dns_record" "monitor" {
-  zone_id = cloudflare_zone.pausatf.id
-  name    = "monitor"
-  content = "165.22.153.191"
-  type    = "A"
-  ttl     = 1
-  proxied = false
-  comment = "Monitoring dashboard"
-}
-
-resource "cloudflare_dns_record" "direct_ssh" {
-  zone_id = cloudflare_zone.pausatf.id
-  name    = "direct-ssh"
-  content = "165.22.153.191"
-  type    = "A"
-  ttl     = 1
-  proxied = false
-  comment = "Direct SSH access (DNS only, not proxied)"
-}
-
 resource "cloudflare_dns_record" "runners" {
   zone_id = cloudflare_zone.pausatf.id
   name    = "runners"
@@ -166,28 +126,9 @@ resource "cloudflare_dns_record" "runners" {
 # DNS Records — Staging
 # =============================================================================
 
-resource "cloudflare_dns_record" "staging" {
-  zone_id = cloudflare_zone.pausatf.id
-  name    = "staging"
-  content = "64.227.85.73"
-  type    = "A"
-  ttl     = 1
-  proxied = true
-}
-
 # =============================================================================
 # DNS Records — CNAME
 # =============================================================================
-
-resource "cloudflare_dns_record" "prod" {
-  zone_id = cloudflare_zone.pausatf.id
-  name    = "prod"
-  content = "ftp.pausatf.org"
-  type    = "CNAME"
-  ttl     = 1
-  proxied = false
-  comment = "Production server alias"
-}
 
 resource "cloudflare_dns_record" "ssh" {
   zone_id = cloudflare_zone.pausatf.id
