@@ -31,7 +31,7 @@
 
 The three current droplets, their firewalls, the production database, project, SSH key, and four Spaces buckets are represented in HCP state. A state-only apply persisted the four database resource address moves in production; it reported zero resources added, changed, or destroyed. No live DigitalOcean resources were modified. Droplet `user_data` and attached SSH key changes are ignored by lifecycle rules because the live systems have migration-managed state; review that policy before changing it.
 
-Staging and dev have no managed database. Each runs MySQL in a `pausatf-db` container (MySQL 8.0.46 on 2026-11-10, built from `mysql:8.0`) from a compose file kept only on the droplet (`docker-compose.stage.yml`, `docker-compose.dev-v2.yml`), not in `pausatf/pausatf-deployment`. MySQL 8.0 reached end of life on 2026-04-30.
+Staging and dev have no managed database. Each runs MySQL in a `pausatf-db` container, upgraded in place from 8.0.46 to 8.4.13 on 2026-11-10 (backups and rehearsal recorded in pausatf/pausatf-deployment#21). Their compose files, previously kept only on the droplets, are added to `pausatf/pausatf-deployment` by that PR.
 
 Custom snapshot workflows are active: production nightly with seven retained snapshots and staging weekly with two. Native DigitalOcean droplet backup policies are not enabled. This is separate from the managed database's daily backups.
 
@@ -75,7 +75,7 @@ State-only removals were made from legacy workspaces after saving mode-600 state
 ## Remaining reconciliation
 
 1. Capture TLS settings and certificate renewal/termination responsibilities in Terraform/Ansible for dev, staging, and production.
-2. Audit supported software versions. The managed production database is on 8.4, the only MySQL version DigitalOcean offered on 2026-11-10; the staging and dev database containers are still on MySQL 8.0.
+2. Audit supported software versions. All three databases are on MySQL 8.4: production on the managed cluster (8.4.11; 8.4 is the only MySQL version DigitalOcean offered on 2026-11-10), staging and dev in containers (8.4.13). The next LTS series is 9.7; the managed cluster cannot move to it until DigitalOcean offers it.
 3. Reconcile and document database backup retention and restore testing, and retain a tested recovery copy of the pre-migration Terraform state.
 
 **Safety:** Imports and state-only changes did not create, modify, or destroy live services. The sole apply persisted database resource address moves and reported zero resources added, changed, or destroyed. Review an environment plan and obtain the normal PR approval before any infrastructure apply.

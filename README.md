@@ -97,7 +97,7 @@ All three inventories select PHP 8.4 and SSH user `somethingwithproof`.
 On 2026-11-10 all three droplets (`pausatf-prod-v2`, `pausatf-stage-v2`, `pausatf-dev-v2`, Ubuntu 26.04) ran the
 Docker stack from pausatf-deployment (`pausatf/pausatf-deployment`, private repository), not the host roles above.
 Production uses the managed `pausatf-prod-db` cluster, now MySQL 8.4 (see [database upgrades](docs/runbooks/database-upgrades.md));
-staging and dev run MySQL 8.0 in a `pausatf-db` container. See the
+staging and dev run MySQL 8.4.13 in a `pausatf-db` container (upgraded from 8.0 on 2026-11-10). See the
 [production runbook](docs/runbooks/production-operations.md) for access and read-only checks. Inspect the actual
 target before deployment.
 
