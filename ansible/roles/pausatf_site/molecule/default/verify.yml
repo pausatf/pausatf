@@ -5,55 +5,94 @@
   vars:
     plugin_dir: /var/www/html/wp-content/plugins/pausatf-seo
     git_dir: /var/lib/pausatf/git/pausatf-site.git
+    backup_dir: /var/backups/pausatf-site-retired
   tasks:
-    - name: Inspect the checkout and its git metadata
+    - name: Resolve the deployed commit
+      ansible.builtin.command: git --git-dir=/opt/src/site.git rev-parse main
+      register: _main_sha
+      changed_when: false
+
+    - name: Inspect the release and the bare clone
       ansible.builtin.stat:
         path: "{{ item }}"
         follow: false
       loop:
         - "{{ plugin_dir }}"
-        - "{{ plugin_dir }}/.git"
         - "{{ plugin_dir }}/pausatf-seo.php"
+        - "{{ plugin_dir }}/.pausatf-site-release"
+        - "{{ plugin_dir }}/includes/alias.php"
+        - "{{ plugin_dir }}/.git"
         - "{{ git_dir }}"
-      register: _checkout
+        - "{{ git_dir }}/HEAD"
+      register: _release
 
-    - name: Read the gitdir pointer
+    - name: Read the release marker
       ansible.builtin.slurp:
-        src: "{{ plugin_dir }}/.git"
-      register: _gitdir
+        src: "{{ plugin_dir }}/.pausatf-site-release"
+      register: _marker
 
-    - name: Require a root-owned, web-readable checkout with external git metadata
+    - name: List leftover staging directories
+      ansible.builtin.find:
+        paths: /var/www/html/wp-content
+        patterns: ".pausatf-site-stage-*"
+        file_type: any
+        hidden: true
+      register: _stages
+
+    - name: Require a root-owned, web-readable release with no git metadata
       ansible.builtin.assert:
         that:
-          - _checkout.results[0].stat.isdir and _checkout.results[0].stat.uid == 0
-          - _checkout.results[0].stat.mode == '0755'
-          - _checkout.results[1].stat.isreg and _checkout.results[1].stat.uid == 0
-          - "(_gitdir.content | b64decode | trim) == ('gitdir: ' ~ git_dir)"
-          - _checkout.results[2].stat.mode == '0644'
-          - _checkout.results[3].stat.isdir and _checkout.results[3].stat.uid == 0
+          - _release.results[0].stat.isdir and _release.results[0].stat.uid == 0
+          - _release.results[0].stat.mode == '0755'
+          - _release.results[1].stat.isreg and _release.results[1].stat.mode == '0644'
+          - _release.results[1].stat.uid == 0
+          - _release.results[2].stat.uid == 0
+          - (_marker.content | b64decode | trim) == _main_sha.stdout
+          - _release.results[3].stat.islnk and _release.results[3].stat.lnk_target == 'one.php'
+          - not _release.results[4].stat.exists
+          - _release.results[5].stat.isdir and _release.results[5].stat.uid == 0
+          - _release.results[6].stat.exists
+          - _stages.matched == 0
 
-    - name: Inspect retired entries and their backups
+    - name: Inspect retired entries
       ansible.builtin.stat:
-        path: "{{ item }}"
+        path: "/var/www/html/wp-content/{{ item }}"
         follow: false
       loop:
-        - /var/www/html/wp-content/plugins/pausatf-core
-        - /var/www/html/wp-content/plugins/pausatf-passwordless-login
-        - /var/www/html/wp-content/mu-plugins/pausatf-core.php
-        - /var/www/html/wp-content/mu-plugins/pausatf-content-architecture.php
-        - /var/www/html/wp-content/mu-plugins/pausatf-widget-visibility.php
-        - /var/backups/pausatf-site-retired/plugins/pausatf-core/pausatf-core.php
-        - /var/backups/pausatf-site-retired/plugins/pausatf-passwordless-login/pausatf-passwordless-login.php
-        - /var/backups/pausatf-site-retired/mu-plugins/pausatf-core.php
-        - /var/backups/pausatf-site-retired/mu-plugins/pausatf-content-architecture.php
-        - /var/backups/pausatf-site-retired/mu-plugins/pausatf-widget-visibility.php
+        - plugins/pausatf-core
+        - plugins/pausatf-passwordless-login
+        - mu-plugins/pausatf-core.php
+        - mu-plugins/pausatf-content-architecture.php
+        - mu-plugins/pausatf-widget-visibility.php
       register: _retired
 
-    - name: Require the superseded entries to be gone and backed up
+    - name: List the backup archives
+      ansible.builtin.shell: |
+        set -eu
+        for f in {{ backup_dir }}/*.tar; do
+          printf '%s:' "$(basename "$f" | sed 's/-[0-9T]*\.tar$//')"
+          tar -tf "$f" | sort | tr '\n' ' '
+          echo
+        done | sort
+      args:
+        executable: /bin/bash
+      register: _backups
+      changed_when: false
+
+    - name: Require the superseded entries to be gone and archived
       ansible.builtin.assert:
         that:
-          - _retired.results[:5] | map(attribute='stat.exists') | select | list | length == 0
-          - _retired.results[5:] | map(attribute='stat.exists') | reject | list | length == 0
+          - _retired.results | map(attribute='stat.exists') | select | list | length == 0
+          - _backups.stdout_lines == expected
+      vars:
+        expected:
+          - "mu-plugins-pausatf-content-architecture.php:pausatf-content-architecture.php "
+          - "mu-plugins-pausatf-core.php:pausatf-core.php "
+          - "mu-plugins-pausatf-widget-visibility.php:pausatf-widget-visibility.php "
+          - "plugins-pausatf-core:pausatf-core/ pausatf-core/pausatf-core.php "
+          - >-
+            plugins-pausatf-passwordless-login:pausatf-passwordless-login/
+            pausatf-passwordless-login/pausatf-passwordless-login.php{{ ' ' }}
 
     - name: Require refusal of untrusted layouts
       ansible.builtin.include_tasks: tasks/refusal-case.yml
@@ -61,33 +100,53 @@
         loop_var: case
         label: "{{ case.name }}"
       loop:
+        # An existing entry at the plugin path is replaced only when it is a
+        # release this role installed.
         - name: symlinked-plugin-dir
           planted: wp-content/plugins/pausatf-seo
           planted_uid: 0
           setup: ln -s /root/sentinel-symlinked-plugin-dir "$root/wp-content/plugins/pausatf-seo"
-        - name: web-owned-checkout
+        - name: web-owned-plugin-dir
           planted: wp-content/plugins/pausatf-seo
           planted_uid: 33
           setup: |
             d="$root/wp-content/plugins/pausatf-seo"
             mkdir "$d"
-            echo "gitdir: /var/lib/pausatf/git/web-owned-checkout.git" > "$d/.git"
-            ln -s /root/sentinel-web-owned-checkout "$d/escape"
+            ln -s /root/sentinel-web-owned-plugin-dir "$d/escape"
             chown -h -R www-data:www-data "$d"
-        - name: symlinked-git-entry
-          planted: wp-content/plugins/pausatf-seo/.git
+        - name: unmarked-root-dir
+          planted: wp-content/plugins/pausatf-seo
+          planted_uid: 0
+          setup: install -d -o root -g root -m 0755 "$root/wp-content/plugins/pausatf-seo"
+        - name: symlinked-release-marker
+          planted: wp-content/plugins/pausatf-seo/.pausatf-site-release
           planted_uid: 0
           setup: |
             d="$root/wp-content/plugins/pausatf-seo"
             install -d -o root -g root -m 0755 "$d"
-            ln -s /root/sentinel-symlinked-git-entry/file "$d/.git"
-        - name: foreign-gitdir-pointer
-          planted: wp-content/plugins/pausatf-seo/.git
+            ln -s /root/sentinel-symlinked-release-marker/file "$d/.pausatf-site-release"
+        - name: symlinked-content-dir
+          planted: wp-content/plugins
           planted_uid: 0
           setup: |
-            d="$root/wp-content/plugins/pausatf-seo"
-            install -d -o root -g root -m 0755 "$d"
-            echo "gitdir: /root/sentinel-foreign-gitdir-pointer" > "$d/.git"
+            mv "$root/wp-content/plugins" "$root/wp-content/plugins.real"
+            ln -s /root/sentinel-symlinked-content-dir "$root/wp-content/plugins"
+        # Concurrent changes made by the web server user between the checks
+        # and the swap.
+        - name: race-plant-on-first-install
+          planted: wp-content/plugins/pausatf-seo
+          planted_uid: 33
+          race: ln -s /root/sentinel-race-plant-on-first-install "$RACE_ROOT/wp-content/plugins/pausatf-seo"
+        - name: race-replace-existing-release
+          planted: wp-content/plugins/pausatf-seo
+          planted_uid: 33
+          preinstall: true
+          race: |
+            p="$RACE_ROOT/wp-content/plugins"
+            mv "$p/pausatf-seo" "$p/moved-away"
+            ln -s /root/sentinel-race-replace-existing-release "$p/pausatf-seo"
+        # Retired entries are archived and removed only when nothing in them
+        # is a link, a special or hard-linked file, or foreign-owned.
         - name: symlinked-retired-plugin
           planted: wp-content/plugins/pausatf-core
           planted_uid: 0
@@ -96,3 +155,29 @@
           planted: wp-content/mu-plugins/pausatf-core.php
           planted_uid: 0
           setup: ln -s /root/sentinel-symlinked-retired-mu-plugin/file "$root/wp-content/mu-plugins/pausatf-core.php"
+        - name: retired-tree-with-link
+          planted: wp-content/plugins/pausatf-core/assets/escape
+          planted_uid: 33
+          setup: |
+            d="$root/wp-content/plugins/pausatf-core/assets"
+            mkdir -p "$d"
+            touch "$root/wp-content/plugins/pausatf-core/pausatf-core.php"
+            ln -s /root/sentinel-retired-tree-with-link "$d/escape"
+            chown -h -R www-data:www-data "$root/wp-content/plugins/pausatf-core"
+        - name: retired-tree-foreign-owner
+          planted: wp-content/plugins/pausatf-core/pausatf-core.php
+          planted_uid: 4242
+          setup: |
+            d="$root/wp-content/plugins/pausatf-core"
+            mkdir "$d"
+            touch "$d/pausatf-core.php"
+            chown -R www-data:www-data "$d"
+            chown 4242 "$d/pausatf-core.php"
+        - name: retired-tree-hard-link
+          planted: wp-content/plugins/pausatf-core/pausatf-core.php
+          planted_uid: 0
+          setup: |
+            d="$root/wp-content/plugins/pausatf-core"
+            mkdir "$d"
+            chown www-data:www-data "$d"
+            ln /root/sentinel-retired-tree-hard-link/file "$d/pausatf-core.php"

@@ -48,17 +48,13 @@
   tags:
     - pausatf_site
 
-- name: Ensure retirement backup directories exist
+- name: Ensure the retirement backup directory exists
   ansible.builtin.file:
-    path: "{{ item }}"
+    path: "{{ pausatf_site_retire_backup_dir }}"
     state: directory
     owner: root
     group: root
     mode: "0700"
-  loop:
-    - "{{ pausatf_site_retire_backup_dir }}"
-    - "{{ pausatf_site_retire_backup_dir }}/plugins"
-    - "{{ pausatf_site_retire_backup_dir }}/mu-plugins"
   tags:
     - pausatf_site
 
@@ -93,104 +89,37 @@
   tags:
     - pausatf_site
 
-- name: Find superseded plugin directories
-  ansible.builtin.stat:
-    path: "{{ pausatf_site_wp_docroot }}/wp-content/plugins/{{ item }}"
-    follow: false
-  loop: "{{ pausatf_site_retired_plugins }}"
-  register: _pausatf_site_retired_dirs
-  tags:
-    - pausatf_site
-
-# Back up and remove only what the plugins installed: real directories.
-- name: Refuse superseded plugin entries that are not plain directories
-  ansible.builtin.assert:
-    that:
-      - item.stat.isdir
-      - not item.stat.islnk
-    fail_msg: "{{ item.stat.path }} is not a plain directory; inspect it and remove it by hand."
-    quiet: true
-  loop: "{{ _pausatf_site_retired_dirs.results }}"
+# Each entry is first moved into a root-only directory, so it cannot change
+# while it is checked. Links, special files, hard-linked files and anything
+# owned outside pausatf_site_retire_owners stop the retirement and the entry is
+# put back. Otherwise it is archived with tar, which stores links as links, and
+# deleted through directory descriptors that never follow links. Deleting the
+# files directly, like "wp plugin delete", does not run an uninstall routine.
+- name: Back up and remove superseded entries
+  ansible.builtin.script:
+    cmd: >-
+      pausatf_site_fs.py retire
+      --docroot {{ pausatf_site_wp_docroot | quote }}
+      --kind {{ item[1] }}
+      --name {{ item[0] | quote }}
+      --owners {{ pausatf_site_retire_owners | join(',') | quote }}
+      --backup-dir {{ pausatf_site_retire_backup_dir | quote }}
+      {{ '--check' if ansible_check_mode else '' }}
+    executable: python3
+  # Plugin directories first (already deactivated above), then the must-use
+  # files; without pausatf-content-architecture.php PAUSATF Site loads its own
+  # committee content module on the next request.
+  loop: >-
+    {{ pausatf_site_retired_plugins | product(['plugins']) | list
+       + pausatf_site_retired_mu_plugins | product(['mu-plugins']) | list }}
   loop_control:
-    label: "{{ item.item }}"
-  when: item.stat.exists
-  tags:
-    - pausatf_site
-
-- name: Back up superseded plugin directories
-  ansible.builtin.copy:
-    src: "{{ item.stat.path }}"
-    dest: "{{ pausatf_site_retire_backup_dir }}/plugins/"
-    remote_src: true
-    mode: preserve
-  loop: "{{ _pausatf_site_retired_dirs.results }}"
-  loop_control:
-    label: "{{ item.item }}"
-  when: item.stat.exists
-  tags:
-    - pausatf_site
-
-# Deleting the files directly, like "wp plugin delete", does not run the
-# plugin's uninstall routine.
-- name: Remove superseded plugin directories
-  ansible.builtin.file:
-    path: "{{ item.stat.path }}"
-    state: absent
-  loop: "{{ _pausatf_site_retired_dirs.results }}"
-  loop_control:
-    label: "{{ item.item }}"
-  when: item.stat.exists
-  notify: Flush WordPress object cache for pausatf-site
-  tags:
-    - pausatf_site
-
-- name: Find superseded must-use plugin files
-  ansible.builtin.stat:
-    path: "{{ pausatf_site_wp_docroot }}/wp-content/mu-plugins/{{ item }}"
-    follow: false
-  loop: "{{ pausatf_site_retired_mu_plugins }}"
-  register: _pausatf_site_retired_mu
-  tags:
-    - pausatf_site
-
-- name: Refuse superseded must-use entries that are not regular files
-  ansible.builtin.assert:
-    that:
-      - item.stat.isreg
-      - not item.stat.islnk
-    fail_msg: "{{ item.stat.path }} is not a regular file; inspect it and remove it by hand."
-    quiet: true
-  loop: "{{ _pausatf_site_retired_mu.results }}"
-  loop_control:
-    label: "{{ item.item }}"
-  when: item.stat.exists
-  tags:
-    - pausatf_site
-
-- name: Back up superseded must-use plugin files
-  ansible.builtin.copy:
-    src: "{{ item.stat.path }}"
-    dest: "{{ pausatf_site_retire_backup_dir }}/mu-plugins/"
-    remote_src: true
-    mode: preserve
-  loop: "{{ _pausatf_site_retired_mu.results }}"
-  loop_control:
-    label: "{{ item.item }}"
-  when: item.stat.exists
-  tags:
-    - pausatf_site
-
-# With pausatf-content-architecture.php gone, PAUSATF Site loads its own
-# committee content module on the next request and installs its capabilities
-# on the first administrator request.
-- name: Remove superseded must-use plugin files
-  ansible.builtin.file:
-    path: "{{ item.stat.path }}"
-    state: absent
-  loop: "{{ _pausatf_site_retired_mu.results }}"
-  loop_control:
-    label: "{{ item.item }}"
-  when: item.stat.exists
+    label: "{{ item[1] }}/{{ item[0] }}"
+  register: _pausatf_site_retired
+  check_mode: false
+  changed_when: (_pausatf_site_retired.stdout | from_json).changed
+  failed_when: >-
+    _pausatf_site_retired.rc != 0
+    or (_pausatf_site_retired.stdout | from_json).refused is defined
   notify: Flush WordPress object cache for pausatf-site
   tags:
     - pausatf_site

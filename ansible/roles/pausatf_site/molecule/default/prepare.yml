@@ -11,17 +11,49 @@
         state: present
         update_cache: true
 
-    - name: Create a source repository with one commit
+    # Two commits, so a case can install one release and then replace it.
+    # The repository includes a link, which a release must carry as a link.
+    - name: Create a source repository with two commits
       ansible.builtin.shell: |
         set -eu
+        g() { git -C /opt/src/site -c user.name=test -c user.email=test@example.invalid "$@"; }
         git init -q -b main /opt/src/site
+        mkdir /opt/src/site/includes
         printf '<?php\n// Plugin Name: PAUSATF Site test\n' > /opt/src/site/pausatf-seo.php
-        git -C /opt/src/site -c user.name=test -c user.email=test@example.invalid add pausatf-seo.php
-        git -C /opt/src/site -c user.name=test -c user.email=test@example.invalid commit -q -m test
+        printf '<?php\n' > /opt/src/site/includes/one.php
+        ln -s one.php /opt/src/site/includes/alias.php
+        g add -A
+        g commit -q -m one
+        g tag first
+        printf '<?php\n// second\n' >> /opt/src/site/pausatf-seo.php
+        g commit -q -am two
         git clone -q --bare /opt/src/site /opt/src/site.git
       args:
         creates: /opt/src/site.git
         executable: /bin/bash
+
+    # Runs RACE_ACTION as the web server user while the role exports a
+    # release, which is the window between its checks and the swap.
+    - name: Create the git wrapper directory
+      ansible.builtin.file:
+        path: /opt/race-bin
+        state: directory
+        mode: "0755"
+
+    - name: Install a git wrapper that injects a concurrent change
+      ansible.builtin.copy:
+        dest: /opt/race-bin/git
+        mode: "0755"
+        content: |
+          #!/bin/sh
+          case " $* " in
+            *" archive "*)
+              if [ -n "${RACE_ACTION:-}" ]; then
+                runuser -u www-data -- /bin/sh -c "$RACE_ACTION"
+              fi
+              ;;
+          esac
+          exec /usr/bin/git "$@"
 
     # Reports pausatf-seo active and every other plugin inactive.
     - name: Install a WP-CLI stub
