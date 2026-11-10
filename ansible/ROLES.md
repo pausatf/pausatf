@@ -201,3 +201,26 @@ Cloudflare IP ranges current in Apache.
 
 **Vars required**: `newrelic_license_key` (vault), `newrelic_app_name`,
 `php_version`
+
+---
+
+## Role: `pausatf_site`
+
+**Purpose**: Deploys the consolidated PAUSATF Site plugin (`pausatf/pausatf-site`)
+and, where enabled, retires the plugins it absorbed. Enabled for dev only.
+
+**Key tasks**:
+- Clones the private repository over SSH at the pinned `pausatf_site_version`
+  into `wp-content/plugins/pausatf-seo`, the plugin's installed directory, with
+  git metadata kept outside the web root; refuses to replace a `pausatf-seo`
+  directory it did not install
+- Activates `pausatf-seo` with WP-CLI
+- With `pausatf_site_retire_superseded`, refused on production: deactivates
+  PAUSATF Passwordless Login and PAUSATF Core, then removes their directories
+  and the superseded must-use files, keeping copies in
+  `/var/backups/pausatf-site-retired`. `pausatf-results-manager` is not changed.
+
+**Tags**: `pausatf_site`
+
+**Vars required**: `pausatf_site_enabled`; the host's root account needs read
+access to `pausatf/pausatf-site` (set `pausatf_site_git_key_file` for a deploy key)

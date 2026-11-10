@@ -1,0 +1,109 @@
+---
+# Deploy and activate the consolidated PAUSATF Site plugin (pausatf/pausatf-site)
+# at a pinned commit, then optionally retire the plugins it absorbed.
+
+- name: Install git
+  ansible.builtin.apt:
+    name: git
+    state: present
+  tags:
+    - pausatf_site
+
+- name: Ensure the pausatf-site git metadata parent directory exists
+  ansible.builtin.file:
+    path: "{{ pausatf_site_git_dir | dirname }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0700"
+  tags:
+    - pausatf_site
+
+- name: Check for an existing pausatf-seo plugin directory
+  ansible.builtin.stat:
+    path: "{{ pausatf_site_path }}"
+  register: _pausatf_site_dir
+  tags:
+    - pausatf_site
+
+- name: Check whether the existing directory is a git checkout
+  ansible.builtin.stat:
+    path: "{{ pausatf_site_path }}/.git"
+  register: _pausatf_site_git
+  when: _pausatf_site_dir.stat.exists
+  tags:
+    - pausatf_site
+
+# The pausatf-site rollout guide requires a backup of an existing
+# wp-content/plugins/pausatf-seo before it is replaced. Stop instead of
+# overwriting a copy this role did not install.
+- name: Refuse to overwrite a pausatf-seo directory that is not a git checkout
+  ansible.builtin.fail:
+    msg: >-
+      {{ pausatf_site_path }} exists but is not a git checkout. Back it up,
+      move it out of wp-content/plugins, and rerun the deploy.
+  when:
+    - _pausatf_site_dir.stat.exists
+    - not _pausatf_site_git.stat.exists
+  tags:
+    - pausatf_site
+
+- name: Clone or update pausatf-site at the pinned commit
+  ansible.builtin.git:
+    repo: "{{ pausatf_site_repo }}"
+    dest: "{{ pausatf_site_path }}"
+    separate_git_dir: "{{ pausatf_site_git_dir }}"
+    version: "{{ pausatf_site_version }}"
+    key_file: "{{ pausatf_site_git_key_file if pausatf_site_git_key_file | length > 0 else omit }}"
+    accept_newhostkey: true
+    update: true
+    force: false
+  notify: Flush WordPress object cache for pausatf-site
+  tags:
+    - pausatf_site
+
+# An explicit mode keeps the checkout read-only to the web server whatever
+# umask the clone ran under.
+- name: Set pausatf-site plugin ownership and permissions
+  ansible.builtin.file:
+    path: "{{ pausatf_site_path }}"
+    owner: "{{ pausatf_site_owner }}"
+    group: "{{ pausatf_site_group }}"
+    mode: "u=rwX,g=rX,o=rX"
+    recurse: true
+    state: directory
+  tags:
+    - pausatf_site
+
+- name: Check whether pausatf-site is active
+  ansible.builtin.command: >-
+    wp plugin is-active {{ pausatf_site_slug }}
+    --path={{ pausatf_site_wp_docroot }}
+    --allow-root
+  register: _pausatf_site_active
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  tags:
+    - pausatf_site
+
+# Activation is additive. While the superseded plugins are still loaded,
+# PAUSATF Site leaves passwordless sign-in and the committee content model to
+# them, and its widget filter matches PAUSATF Core's for the same widget.
+- name: Activate pausatf-site
+  ansible.builtin.command: >-
+    wp plugin activate {{ pausatf_site_slug }}
+    --path={{ pausatf_site_wp_docroot }}
+    --allow-root
+  register: _pausatf_site_activate
+  changed_when: "'activated' in _pausatf_site_activate.stdout"
+  when: _pausatf_site_active.rc != 0
+  notify: Flush WordPress object cache for pausatf-site
+  tags:
+    - pausatf_site
+
+- name: Retire the plugins pausatf-site supersedes
+  ansible.builtin.include_tasks: retire.yml
+  when: pausatf_site_retire_superseded | bool
+  tags:
+    - pausatf_site

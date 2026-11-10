@@ -1,0 +1,42 @@
+---
+# pausatf/pausatf-site is private, so the host clones it over SSH. The host's
+# root account needs read access to the repository, normally a read-only
+# GitHub deploy key; set pausatf_site_git_key_file to its path on the host.
+pausatf_site_repo: "git@github.com:pausatf/pausatf-site.git"
+pausatf_site_git_key_file: ""
+
+# Pinned commit. pausatf-site publishes no tags; this is main at the merge of
+# pausatf/pausatf-site#11, whose head passed CI with an identical tree.
+pausatf_site_version: "523b363c5eeb4d8475aacecaf3f7ec8bf0df98dd" # pragma: allowlist secret (commit SHA)
+
+pausatf_site_wp_docroot: "/var/www/html"
+
+# The plugin keeps its earlier installed directory and main file,
+# pausatf-seo/pausatf-seo.php, so WP-CLI addresses it as "pausatf-seo".
+pausatf_site_slug: "pausatf-seo"
+pausatf_site_path: "{{ pausatf_site_wp_docroot }}/wp-content/plugins/{{ pausatf_site_slug }}"
+
+# Git metadata lives outside the web root so the private history is not
+# served from wp-content/plugins.
+pausatf_site_git_dir: "/var/lib/pausatf/git/pausatf-site.git"
+
+# The web server only needs to read the plugin. Root ownership also keeps the
+# checkout in the ownership git expects when the role updates it as root.
+pausatf_site_owner: "root"
+pausatf_site_group: "root"
+
+# Retiring the plugins pausatf-site absorbed is a separate opt-in. It is
+# refused on production (see tasks/retire.yml).
+pausatf_site_retire_superseded: false
+pausatf_site_retire_backup_dir: "/var/backups/pausatf-site-retired"
+
+# Deactivated in this order: PAUSATF Site stands down for passwordless
+# sign-in while the standalone plugin is loaded, so that one goes first.
+pausatf_site_retired_plugins:
+  - pausatf-passwordless-login
+  - pausatf-core
+
+pausatf_site_retired_mu_plugins:
+  - pausatf-core.php
+  - pausatf-content-architecture.php
+  - pausatf-widget-visibility.php
