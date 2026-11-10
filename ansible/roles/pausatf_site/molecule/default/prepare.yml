@@ -1,0 +1,62 @@
+---
+# A local stand-in for pausatf/pausatf-site, a WP-CLI stub, and the
+# superseded plugin files the role retires. No WordPress or network is needed.
+- name: Prepare
+  hosts: all
+  become: true
+  tasks:
+    - name: Install git
+      ansible.builtin.apt:
+        name: git
+        state: present
+        update_cache: true
+
+    - name: Create a source repository with one commit
+      ansible.builtin.shell: |
+        set -eu
+        git init -q -b main /opt/src/site
+        printf '<?php\n// Plugin Name: PAUSATF Site test\n' > /opt/src/site/pausatf-seo.php
+        git -C /opt/src/site -c user.name=test -c user.email=test@example.invalid add pausatf-seo.php
+        git -C /opt/src/site -c user.name=test -c user.email=test@example.invalid commit -q -m test
+        git clone -q --bare /opt/src/site /opt/src/site.git
+      args:
+        creates: /opt/src/site.git
+        executable: /bin/bash
+
+    # Reports pausatf-seo active and every other plugin inactive.
+    - name: Install a WP-CLI stub
+      ansible.builtin.copy:
+        dest: /usr/local/bin/wp
+        mode: "0755"
+        content: |
+          #!/bin/sh
+          [ "$1 $2 $3" = "plugin is-active pausatf-seo" ] && exit 0
+          [ "$1 $2" = "cache flush" ] && exit 0
+          exit 1
+
+    - name: Create the WordPress content directories
+      ansible.builtin.file:
+        path: "/var/www/html/wp-content/{{ item }}"
+        state: directory
+        owner: www-data
+        group: www-data
+        mode: "0755"
+      loop:
+        - plugins
+        - plugins/pausatf-core
+        - plugins/pausatf-passwordless-login
+        - mu-plugins
+
+    - name: Create superseded plugin files
+      ansible.builtin.copy:
+        dest: "/var/www/html/wp-content/{{ item }}"
+        content: "<?php\n"
+        owner: www-data
+        group: www-data
+        mode: "0644"
+      loop:
+        - plugins/pausatf-core/pausatf-core.php
+        - plugins/pausatf-passwordless-login/pausatf-passwordless-login.php
+        - mu-plugins/pausatf-core.php
+        - mu-plugins/pausatf-content-architecture.php
+        - mu-plugins/pausatf-widget-visibility.php

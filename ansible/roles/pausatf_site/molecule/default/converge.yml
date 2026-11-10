@@ -1,0 +1,11 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+  vars:
+    wp_environment_type: development
+    pausatf_site_repo: "file:///opt/src/site.git"
+    pausatf_site_version: main
+    pausatf_site_retire_superseded: true
+  roles:
+    - role: pausatf_site

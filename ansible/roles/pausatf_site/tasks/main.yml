@@ -19,32 +19,76 @@
   tags:
     - pausatf_site
 
-- name: Check for an existing pausatf-seo plugin directory
+# wp-content/plugins is writable by the web server, so an existing
+# pausatf-seo entry is reused only after it is shown to be this role's
+# checkout: a real directory owned by root whose .git is a root-owned file
+# pointing at pausatf_site_git_dir. Anything else stops the deploy untouched.
+- name: Inspect an existing pausatf-seo plugin entry
   ansible.builtin.stat:
     path: "{{ pausatf_site_path }}"
+    follow: false
   register: _pausatf_site_dir
   tags:
     - pausatf_site
 
-- name: Check whether the existing directory is a git checkout
+- name: Inspect the existing checkout's .git entry
   ansible.builtin.stat:
     path: "{{ pausatf_site_path }}/.git"
+    follow: false
   register: _pausatf_site_git
   when: _pausatf_site_dir.stat.exists
   tags:
     - pausatf_site
 
-# The pausatf-site rollout guide requires a backup of an existing
-# wp-content/plugins/pausatf-seo before it is replaced. Stop instead of
-# overwriting a copy this role did not install.
-- name: Refuse to overwrite a pausatf-seo directory that is not a git checkout
-  ansible.builtin.fail:
-    msg: >-
-      {{ pausatf_site_path }} exists but is not a git checkout. Back it up,
-      move it out of wp-content/plugins, and rerun the deploy.
+- name: Read the existing checkout's gitdir pointer
+  ansible.builtin.slurp:
+    src: "{{ pausatf_site_path }}/.git"
+  register: _pausatf_site_gitdir
   when:
     - _pausatf_site_dir.stat.exists
-    - not _pausatf_site_git.stat.exists
+    - _pausatf_site_git.stat.isreg | default(false)
+    - not (_pausatf_site_git.stat.islnk | default(false))
+  tags:
+    - pausatf_site
+
+# The pausatf-site rollout guide also requires a backup of any earlier
+# pausatf-seo copy before it is replaced, so an unrecognized one is not removed.
+- name: Refuse to reuse a pausatf-seo entry this role did not install
+  ansible.builtin.assert:
+    that:
+      - _pausatf_site_dir.stat.isdir
+      - not _pausatf_site_dir.stat.islnk
+      - _pausatf_site_dir.stat.uid == 0
+      - _pausatf_site_git.stat.exists
+      - _pausatf_site_git.stat.isreg
+      - not _pausatf_site_git.stat.islnk
+      - _pausatf_site_git.stat.uid == 0
+      - "(_pausatf_site_gitdir.content | b64decode | trim) == ('gitdir: ' ~ pausatf_site_git_dir)"
+    fail_msg: >-
+      {{ pausatf_site_path }} is not a checkout installed by this role. Inspect
+      it, back it up, move it out of wp-content/plugins, and rerun the deploy.
+    quiet: true
+  when: _pausatf_site_dir.stat.exists
+  tags:
+    - pausatf_site
+
+- name: Inspect the pausatf-site git metadata directory
+  ansible.builtin.stat:
+    path: "{{ pausatf_site_git_dir }}"
+    follow: false
+  register: _pausatf_site_git_dir
+  tags:
+    - pausatf_site
+
+- name: Refuse git metadata that root does not own
+  ansible.builtin.assert:
+    that:
+      - _pausatf_site_git_dir.stat.isdir
+      - not _pausatf_site_git_dir.stat.islnk
+      - _pausatf_site_git_dir.stat.uid == 0
+    fail_msg: "{{ pausatf_site_git_dir }} must be a root-owned directory."
+    quiet: true
+  when: _pausatf_site_git_dir.stat.exists
   tags:
     - pausatf_site
 
@@ -62,15 +106,37 @@
   tags:
     - pausatf_site
 
-# An explicit mode keeps the checkout read-only to the web server whatever
-# umask the clone ran under.
+- name: Inspect the checkout after cloning
+  ansible.builtin.stat:
+    path: "{{ pausatf_site_path }}"
+    follow: false
+  register: _pausatf_site_checkout
+  tags:
+    - pausatf_site
+
+# Guards the window between the checks above and the clone.
+- name: Confirm the checkout is a root-owned directory
+  ansible.builtin.assert:
+    that:
+      - _pausatf_site_checkout.stat.isdir
+      - not _pausatf_site_checkout.stat.islnk
+      - _pausatf_site_checkout.stat.uid == 0
+    fail_msg: "{{ pausatf_site_path }} is not the root-owned checkout the clone created."
+    quiet: true
+  when: not ansible_check_mode or _pausatf_site_checkout.stat.exists
+  tags:
+    - pausatf_site
+
+# The code stays root-owned and read-only to the web server; the plugin writes
+# nothing into its own directory. An explicit mode corrects the clone's umask.
 - name: Set pausatf-site plugin ownership and permissions
   ansible.builtin.file:
     path: "{{ pausatf_site_path }}"
-    owner: "{{ pausatf_site_owner }}"
-    group: "{{ pausatf_site_group }}"
+    owner: root
+    group: root
     mode: "u=rwX,g=rX,o=rX"
     recurse: true
+    follow: false
     state: directory
   tags:
     - pausatf_site

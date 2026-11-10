@@ -96,8 +96,24 @@
 - name: Find superseded plugin directories
   ansible.builtin.stat:
     path: "{{ pausatf_site_wp_docroot }}/wp-content/plugins/{{ item }}"
+    follow: false
   loop: "{{ pausatf_site_retired_plugins }}"
   register: _pausatf_site_retired_dirs
+  tags:
+    - pausatf_site
+
+# Back up and remove only what the plugins installed: real directories.
+- name: Refuse superseded plugin entries that are not plain directories
+  ansible.builtin.assert:
+    that:
+      - item.stat.isdir
+      - not item.stat.islnk
+    fail_msg: "{{ item.stat.path }} is not a plain directory; inspect it and remove it by hand."
+    quiet: true
+  loop: "{{ _pausatf_site_retired_dirs.results }}"
+  loop_control:
+    label: "{{ item.item }}"
+  when: item.stat.exists
   tags:
     - pausatf_site
 
@@ -131,8 +147,23 @@
 - name: Find superseded must-use plugin files
   ansible.builtin.stat:
     path: "{{ pausatf_site_wp_docroot }}/wp-content/mu-plugins/{{ item }}"
+    follow: false
   loop: "{{ pausatf_site_retired_mu_plugins }}"
   register: _pausatf_site_retired_mu
+  tags:
+    - pausatf_site
+
+- name: Refuse superseded must-use entries that are not regular files
+  ansible.builtin.assert:
+    that:
+      - item.stat.isreg
+      - not item.stat.islnk
+    fail_msg: "{{ item.stat.path }} is not a regular file; inspect it and remove it by hand."
+    quiet: true
+  loop: "{{ _pausatf_site_retired_mu.results }}"
+  loop_control:
+    label: "{{ item.item }}"
+  when: item.stat.exists
   tags:
     - pausatf_site
 
