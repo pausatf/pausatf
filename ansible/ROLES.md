@@ -201,3 +201,32 @@ Cloudflare IP ranges current in Apache.
 
 **Vars required**: `newrelic_license_key` (vault), `newrelic_app_name`,
 `php_version`
+
+---
+
+## Role: `pausatf_site`
+
+**Purpose**: Deploys the consolidated PAUSATF Site plugin (`pausatf/pausatf-site`)
+and, where enabled, retires the plugins it absorbed. Enabled for dev only.
+
+**Key tasks**:
+- Fetches the private repository over SSH into a root-only bare clone, exports
+  the pinned `pausatf_site_version` (a full commit SHA) into a root-only staging
+  directory and swaps it into `wp-content/plugins/pausatf-seo` with one rename;
+  refuses to replace a `pausatf-seo` entry it did not install, and re-checks
+  the destination immediately before the swap
+- Writes the deploy key from `pausatf_site_deploy_key` (vault) to
+  `pausatf_site_git_key_file` as a root-only file
+- Activates `pausatf-seo` with WP-CLI
+- With `pausatf_site_retire_superseded`, refused on production: deactivates
+  PAUSATF Passwordless Login and PAUSATF Core, then removes their directories
+  and the superseded must-use files, keeping tar archives in
+  `/var/backups/pausatf-site-retired`. An entry containing links, special or
+  hard-linked files, or files owned outside `pausatf_site_retire_owners` is
+  left in place and the run stops. `pausatf-results-manager` is not changed.
+
+**Tags**: `pausatf_site`
+
+**Vars required**: `pausatf_site_enabled`; the host's root account needs read
+access to `pausatf/pausatf-site` (dev: `vault_pausatf_site_deploy_key` and
+`pausatf_site_git_key_file`); `python3` and `tar` on the host

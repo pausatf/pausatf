@@ -45,6 +45,9 @@
     owner: "{{ pausatf_plugin_owner }}"
     group: "{{ pausatf_plugin_group }}"
     recurse: true
+    # Links inside a tree the web server can write must not redirect the
+    # ownership change to files outside it.
+    follow: false
     state: directory
   tags:
     - pausatf_plugin

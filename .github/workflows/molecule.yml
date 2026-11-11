@@ -37,6 +37,7 @@ jobs:
           - modsecurity
           - monitoring
           - cloudflare
+          - pausatf_site
 
     steps:
       - name: Checkout code

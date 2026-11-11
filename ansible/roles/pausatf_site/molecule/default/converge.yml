@@ -1,0 +1,20 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+  vars:
+    wp_environment_type: development
+    pausatf_site_repo: "file:///opt/src/site.git"
+    pausatf_site_retire_superseded: true
+  tasks:
+    - name: Resolve the commit to deploy
+      ansible.builtin.command: git --git-dir=/opt/src/site.git rev-parse main
+      register: _main_sha
+      changed_when: false
+      check_mode: false
+
+    - name: Deploy pausatf-site
+      ansible.builtin.include_role:
+        name: pausatf_site
+      vars:
+        pausatf_site_version: "{{ _main_sha.stdout }}"

@@ -1,0 +1,45 @@
+---
+# pausatf/pausatf-site is private, so the host fetches it over SSH with a
+# read-only GitHub deploy key. When pausatf_site_deploy_key holds the private
+# key (from the vault), the role writes it to pausatf_site_git_key_file;
+# otherwise that file must already exist on the host.
+pausatf_site_repo: "git@github.com:pausatf/pausatf-site.git"
+pausatf_site_git_key_file: ""
+pausatf_site_deploy_key: ""
+
+# Pinned commit. pausatf-site publishes no tags; this is main at the merge of
+# pausatf/pausatf-site#11, whose head passed CI with an identical tree.
+pausatf_site_version: "523b363c5eeb4d8475aacecaf3f7ec8bf0df98dd" # pragma: allowlist secret (commit SHA)
+
+pausatf_site_wp_docroot: "/var/www/html"
+
+# The plugin keeps its earlier installed directory and main file,
+# pausatf-seo/pausatf-seo.php, so WP-CLI addresses it as "pausatf-seo".
+pausatf_site_slug: "pausatf-seo"
+
+# A root-only bare clone. Releases are exported from it into a root-only
+# staging directory and swapped into wp-content/plugins with one rename, so
+# the web server never sees a partial tree and git never runs on a path it
+# can write. The installed tree is root-owned and read-only to the web server.
+pausatf_site_git_dir: "/var/lib/pausatf/git/pausatf-site.git"
+
+# Retiring the plugins pausatf-site absorbed is a separate opt-in. It is
+# refused on production (see tasks/retire.yml).
+pausatf_site_retire_superseded: false
+pausatf_site_retire_backup_dir: "/var/backups/pausatf-site-retired"
+# Accounts allowed to own anything retired. Entries owned by anyone else, links,
+# special files and hard-linked files stop the retirement.
+pausatf_site_retire_owners:
+  - www-data
+  - root
+
+# Deactivated in this order: PAUSATF Site stands down for passwordless
+# sign-in while the standalone plugin is loaded, so that one goes first.
+pausatf_site_retired_plugins:
+  - pausatf-passwordless-login
+  - pausatf-core
+
+pausatf_site_retired_mu_plugins:
+  - pausatf-core.php
+  - pausatf-content-architecture.php
+  - pausatf-widget-visibility.php

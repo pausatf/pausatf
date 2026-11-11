@@ -112,6 +112,12 @@
           when: pausatf_plugin_enabled | default(false)
           tags: pausatf_plugin
 
+        - name: Include PAUSATF Site plugin role
+          ansible.builtin.include_role:
+            name: pausatf_site
+          when: pausatf_site_enabled | default(false)
+          tags: pausatf_site
+
         - name: Include Backups role
           ansible.builtin.include_role:
             name: backups

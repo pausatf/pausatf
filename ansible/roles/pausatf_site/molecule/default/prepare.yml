@@ -1,0 +1,94 @@
+---
+# A local stand-in for pausatf/pausatf-site, a WP-CLI stub, and the
+# superseded plugin files the role retires. No WordPress or network is needed.
+- name: Prepare
+  hosts: all
+  become: true
+  tasks:
+    - name: Install git
+      ansible.builtin.apt:
+        name: git
+        state: present
+        update_cache: true
+
+    # Two commits, so a case can install one release and then replace it.
+    # The repository includes a link, which a release must carry as a link.
+    - name: Create a source repository with two commits
+      ansible.builtin.shell: |
+        set -eu
+        g() { git -C /opt/src/site -c user.name=test -c user.email=test@example.invalid "$@"; }
+        git init -q -b main /opt/src/site
+        mkdir /opt/src/site/includes
+        printf '<?php\n// Plugin Name: PAUSATF Site test\n' > /opt/src/site/pausatf-seo.php
+        printf '<?php\n' > /opt/src/site/includes/one.php
+        ln -s one.php /opt/src/site/includes/alias.php
+        g add -A
+        g commit -q -m one
+        g tag first
+        printf '<?php\n// second\n' >> /opt/src/site/pausatf-seo.php
+        g commit -q -am two
+        git clone -q --bare /opt/src/site /opt/src/site.git
+      args:
+        creates: /opt/src/site.git
+        executable: /bin/bash
+
+    # Runs RACE_ACTION as the web server user while the role exports a
+    # release, which is the window between its checks and the swap.
+    - name: Create the git wrapper directory
+      ansible.builtin.file:
+        path: /opt/race-bin
+        state: directory
+        mode: "0755"
+
+    - name: Install a git wrapper that injects a concurrent change
+      ansible.builtin.copy:
+        dest: /opt/race-bin/git
+        mode: "0755"
+        content: |
+          #!/bin/sh
+          case " $* " in
+            *" archive "*)
+              if [ -n "${RACE_ACTION:-}" ]; then
+                runuser -u www-data -- /bin/sh -c "$RACE_ACTION"
+              fi
+              ;;
+          esac
+          exec /usr/bin/git "$@"
+
+    # Reports pausatf-seo active and every other plugin inactive.
+    - name: Install a WP-CLI stub
+      ansible.builtin.copy:
+        dest: /usr/local/bin/wp
+        mode: "0755"
+        content: |
+          #!/bin/sh
+          [ "$1 $2 $3" = "plugin is-active pausatf-seo" ] && exit 0
+          [ "$1 $2" = "cache flush" ] && exit 0
+          exit 1
+
+    - name: Create the WordPress content directories
+      ansible.builtin.file:
+        path: "/var/www/html/wp-content/{{ item }}"
+        state: directory
+        owner: www-data
+        group: www-data
+        mode: "0755"
+      loop:
+        - plugins
+        - plugins/pausatf-core
+        - plugins/pausatf-passwordless-login
+        - mu-plugins
+
+    - name: Create superseded plugin files
+      ansible.builtin.copy:
+        dest: "/var/www/html/wp-content/{{ item }}"
+        content: "<?php\n"
+        owner: www-data
+        group: www-data
+        mode: "0644"
+      loop:
+        - plugins/pausatf-core/pausatf-core.php
+        - plugins/pausatf-passwordless-login/pausatf-passwordless-login.php
+        - mu-plugins/pausatf-core.php
+        - mu-plugins/pausatf-content-architecture.php
+        - mu-plugins/pausatf-widget-visibility.php

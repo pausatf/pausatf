@@ -1,0 +1,125 @@
+---
+# Retire the plugins PAUSATF Site absorbed, in the order its rollout guide
+# gives: PAUSATF Site is active first, then the standalone plugins are
+# deactivated, then their files and the superseded must-use files are removed.
+# Removed copies are kept under pausatf_site_retire_backup_dir for rollback.
+# pausatf-results-manager is not touched: PAUSATF Site still reads its tables.
+
+- name: Refuse to retire superseded plugins on production
+  ansible.builtin.assert:
+    that:
+      - wp_environment_type | default('production') != 'production'
+    fail_msg: >-
+      pausatf_site_retire_superseded is not allowed when wp_environment_type is
+      production; production retirement needs its own reviewed change.
+  tags:
+    - pausatf_site
+
+- name: Confirm pausatf-site is active before retiring what it replaces
+  ansible.builtin.command: >-
+    wp plugin is-active {{ pausatf_site_slug }}
+    --path={{ pausatf_site_wp_docroot }}
+    --allow-root
+  changed_when: false
+  check_mode: false
+  # In check mode the activation above did not run, so this cannot pass yet.
+  when: not ansible_check_mode
+  tags:
+    - pausatf_site
+
+- name: Check whether pausatf-results-manager is active
+  ansible.builtin.command: >-
+    wp plugin is-active pausatf-results-manager
+    --path={{ pausatf_site_wp_docroot }}
+    --allow-root
+  register: _pausatf_site_results_manager
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  tags:
+    - pausatf_site
+
+- name: Report pausatf-results-manager status
+  ansible.builtin.debug:
+    msg: >-
+      pausatf-results-manager is
+      {{ 'active' if _pausatf_site_results_manager.rc == 0 else 'not active' }};
+      this role leaves it unchanged.
+  tags:
+    - pausatf_site
+
+- name: Ensure the retirement backup directory exists
+  ansible.builtin.file:
+    path: "{{ pausatf_site_retire_backup_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0700"
+  tags:
+    - pausatf_site
+
+- name: Check whether superseded plugins are active
+  ansible.builtin.command: >-
+    wp plugin is-active {{ item }}
+    --path={{ pausatf_site_wp_docroot }}
+    --allow-root
+  loop: "{{ pausatf_site_retired_plugins }}"
+  register: _pausatf_site_retired_active
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  tags:
+    - pausatf_site
+
+# Deactivate rather than "wp plugin uninstall": PAUSATF Passwordless Login's
+# uninstall routine deletes the pausatf_login_settings option and pending
+# _pausatf_magic_login tokens that PAUSATF Site reuses.
+- name: Deactivate superseded plugins
+  ansible.builtin.command: >-
+    wp plugin deactivate {{ item.item }}
+    --path={{ pausatf_site_wp_docroot }}
+    --allow-root
+  loop: "{{ _pausatf_site_retired_active.results }}"
+  loop_control:
+    label: "{{ item.item }}"
+  when: item.rc == 0
+  register: _pausatf_site_deactivate
+  changed_when: "'deactivated' in _pausatf_site_deactivate.stdout"
+  notify: Flush WordPress object cache for pausatf-site
+  tags:
+    - pausatf_site
+
+# Each entry is first moved into a root-only directory, so it cannot change
+# while it is checked. Links, special files, hard-linked files and anything
+# owned outside pausatf_site_retire_owners stop the retirement and the entry is
+# put back. Otherwise it is archived with tar, which stores links as links, and
+# deleted through directory descriptors that never follow links. Deleting the
+# files directly, like "wp plugin delete", does not run an uninstall routine.
+- name: Back up and remove superseded entries
+  ansible.builtin.script:
+    cmd: >-
+      pausatf_site_fs.py retire
+      --docroot {{ pausatf_site_wp_docroot | quote }}
+      --kind {{ item[1] }}
+      --name {{ item[0] | quote }}
+      --owners {{ pausatf_site_retire_owners | join(',') | quote }}
+      --backup-dir {{ pausatf_site_retire_backup_dir | quote }}
+      {{ '--check' if ansible_check_mode else '' }}
+    executable: python3
+  # Plugin directories first (already deactivated above), then the must-use
+  # files; without pausatf-content-architecture.php PAUSATF Site loads its own
+  # committee content module on the next request.
+  loop: >-
+    {{ pausatf_site_retired_plugins | product(['plugins']) | list
+       + pausatf_site_retired_mu_plugins | product(['mu-plugins']) | list }}
+  loop_control:
+    label: "{{ item[1] }}/{{ item[0] }}"
+  register: _pausatf_site_retired
+  check_mode: false
+  changed_when: (_pausatf_site_retired.stdout | from_json).changed
+  failed_when: >-
+    _pausatf_site_retired.rc != 0
+    or (_pausatf_site_retired.stdout | from_json).refused is defined
+  notify: Flush WordPress object cache for pausatf-site
+  tags:
+    - pausatf_site

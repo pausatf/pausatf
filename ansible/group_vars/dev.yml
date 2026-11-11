@@ -62,3 +62,15 @@ wordpress_installs:
 # These accounts exist on dev and are authorized.
 # Dev mirrors production admin accounts managed by Cynci.
 # wp_users: stored in GitHub Secret WP_USERS
+
+# PAUSATF Site (pausatf/pausatf-site) replaces PAUSATF Core, PAUSATF
+# Passwordless Login and the superseded must-use plugins. Dev only until it has
+# been verified there; production and staging keep their current plugins.
+pausatf_site_enabled: true
+pausatf_site_retire_superseded: true
+# pausatf-site is private. The host reads it with a read-only deploy key held
+# in vault_pausatf_site_deploy_key (an encrypt_string value in this file, so it
+# is decrypted with the deploy's vault password). Until that is set the role
+# stops before fetching.
+pausatf_site_git_key_file: /root/.ssh/pausatf-site-deploy-key
+pausatf_site_deploy_key: "{{ vault_pausatf_site_deploy_key | default('') }}"

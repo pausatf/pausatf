@@ -1,0 +1,165 @@
+---
+# Deploy and activate the consolidated PAUSATF Site plugin (pausatf/pausatf-site)
+# at a pinned commit, then optionally retire the plugins it absorbed.
+
+- name: Install git and tar
+  ansible.builtin.apt:
+    name:
+      - git
+      - tar
+    state: present
+  tags:
+    - pausatf_site
+
+- name: Ensure the pausatf-site git metadata parent directory exists
+  ansible.builtin.file:
+    path: "{{ pausatf_site_git_dir | dirname }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0700"
+  tags:
+    - pausatf_site
+
+- name: Ensure the deploy key directory exists
+  ansible.builtin.file:
+    path: "{{ pausatf_site_git_key_file | dirname }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0700"
+  when: pausatf_site_deploy_key | length > 0
+  tags:
+    - pausatf_site
+
+- name: Write the pausatf-site deploy key
+  ansible.builtin.copy:
+    content: "{{ pausatf_site_deploy_key | trim }}\n"
+    dest: "{{ pausatf_site_git_key_file }}"
+    owner: root
+    group: root
+    mode: "0600"
+  no_log: true
+  when: pausatf_site_deploy_key | length > 0
+  tags:
+    - pausatf_site
+
+- name: Inspect the deploy key file
+  ansible.builtin.stat:
+    path: "{{ pausatf_site_git_key_file }}"
+    follow: false
+  register: _pausatf_site_key
+  when: pausatf_site_git_key_file | length > 0
+  tags:
+    - pausatf_site
+
+- name: Require a root-only deploy key file
+  ansible.builtin.assert:
+    that:
+      - _pausatf_site_key.stat.exists
+      - _pausatf_site_key.stat.isreg
+      - _pausatf_site_key.stat.uid == 0
+      - _pausatf_site_key.stat.mode == '0600'
+    fail_msg: >-
+      {{ pausatf_site_git_key_file }} must be a root-owned 0600 file holding the
+      pausatf-site read-only deploy key; set vault_pausatf_site_deploy_key.
+    quiet: true
+  when:
+    - pausatf_site_git_key_file | length > 0
+    - not (ansible_check_mode and pausatf_site_deploy_key | length > 0)
+  tags:
+    - pausatf_site
+
+- name: Inspect the pausatf-site git metadata directory
+  ansible.builtin.stat:
+    path: "{{ pausatf_site_git_dir }}"
+    follow: false
+  register: _pausatf_site_git_dir
+  tags:
+    - pausatf_site
+
+- name: Refuse git metadata that root does not own
+  ansible.builtin.assert:
+    that:
+      - _pausatf_site_git_dir.stat.isdir
+      - not _pausatf_site_git_dir.stat.islnk
+      - _pausatf_site_git_dir.stat.uid == 0
+    fail_msg: "{{ pausatf_site_git_dir }} must be a root-owned directory."
+    quiet: true
+  when: _pausatf_site_git_dir.stat.exists
+  tags:
+    - pausatf_site
+
+# The clone lives entirely under a root-only directory, so nothing the web
+# server can write is involved in fetching.
+- name: Fetch pausatf-site into the root-only bare clone
+  ansible.builtin.git:
+    repo: "{{ pausatf_site_repo }}"
+    dest: "{{ pausatf_site_git_dir }}"
+    bare: true
+    version: "{{ pausatf_site_version }}"
+    key_file: "{{ pausatf_site_git_key_file if pausatf_site_git_key_file | length > 0 else omit }}"
+    accept_newhostkey: true
+    update: true
+  # The release step reports what changes; a fetch diff would list the whole
+  # history of the private repository in --diff output.
+  diff: false
+  tags:
+    - pausatf_site
+
+# Exports the pinned commit into a root-only staging directory beside
+# wp-content/plugins and swaps it in with one rename. An existing entry is
+# replaced only when it is a release this role installed; anything else stops
+# the deploy unchanged.
+- name: Install the pinned pausatf-site release
+  ansible.builtin.script:
+    cmd: >-
+      pausatf_site_fs.py release
+      --docroot {{ pausatf_site_wp_docroot | quote }}
+      --slug {{ pausatf_site_slug | quote }}
+      --gitdir {{ pausatf_site_git_dir | quote }}
+      --sha {{ pausatf_site_version | quote }}
+      {{ '--check' if ansible_check_mode else '' }}
+    executable: python3
+  register: _pausatf_site_release
+  check_mode: false
+  changed_when: (_pausatf_site_release.stdout | from_json).changed
+  failed_when: >-
+    _pausatf_site_release.rc != 0
+    or (_pausatf_site_release.stdout | from_json).refused is defined
+  notify: Flush WordPress object cache for pausatf-site
+  tags:
+    - pausatf_site
+
+- name: Check whether pausatf-site is active
+  ansible.builtin.command: >-
+    wp plugin is-active {{ pausatf_site_slug }}
+    --path={{ pausatf_site_wp_docroot }}
+    --allow-root
+  register: _pausatf_site_active
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  tags:
+    - pausatf_site
+
+# Activation is additive. While the superseded plugins are still loaded,
+# PAUSATF Site leaves passwordless sign-in and the committee content model to
+# them, and its widget filter matches PAUSATF Core's for the same widget.
+- name: Activate pausatf-site
+  ansible.builtin.command: >-
+    wp plugin activate {{ pausatf_site_slug }}
+    --path={{ pausatf_site_wp_docroot }}
+    --allow-root
+  register: _pausatf_site_activate
+  changed_when: "'activated' in _pausatf_site_activate.stdout"
+  when: _pausatf_site_active.rc != 0
+  notify: Flush WordPress object cache for pausatf-site
+  tags:
+    - pausatf_site
+
+- name: Retire the plugins pausatf-site supersedes
+  ansible.builtin.include_tasks: retire.yml
+  when: pausatf_site_retire_superseded | bool
+  tags:
+    - pausatf_site

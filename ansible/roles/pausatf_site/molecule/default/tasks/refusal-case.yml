@@ -1,0 +1,95 @@
+---
+# One untrusted layout: build it, run the role, and require that the role
+# fails without changing the root-owned sentinel the layout points at.
+- name: "Build layout: {{ case.name }}"
+  ansible.builtin.shell: |
+    set -eu
+    root=/srv/{{ case.name }}
+    mkdir -p "$root/wp-content/plugins" "$root/wp-content/mu-plugins"
+    chown -R www-data:www-data "$root/wp-content"
+    install -d -o root -g root -m 0700 /root/sentinel-{{ case.name }}
+    install -o root -g root -m 0600 /dev/null /root/sentinel-{{ case.name }}/file
+    {{ case.setup | default('') }}
+  args:
+    executable: /bin/bash
+  changed_when: true
+
+- name: "Resolve the two source commits: {{ case.name }}"
+  ansible.builtin.command: git --git-dir=/opt/src/site.git rev-parse first main
+  register: _shas
+  changed_when: false
+
+- name: "Install the earlier release first: {{ case.name }}"
+  ansible.builtin.include_role:
+    name: pausatf_site
+  vars:
+    wp_environment_type: development
+    pausatf_site_repo: "file:///opt/src/site.git"
+    pausatf_site_version: "{{ _shas.stdout_lines[0] }}"
+    pausatf_site_wp_docroot: "/srv/{{ case.name }}"
+    pausatf_site_git_dir: "/var/lib/pausatf/git/{{ case.name }}.git"
+  when: case.preinstall | default(false)
+
+- name: "Run the role: {{ case.name }}"
+  environment:
+    PATH: >-
+      {{ '/opt/race-bin:' if case.race is defined else '' -}}
+      /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    RACE_ACTION: "{{ case.race | default('') }}"
+    RACE_ROOT: "/srv/{{ case.name }}"
+  block:
+    - name: "Include pausatf_site: {{ case.name }}"
+      ansible.builtin.include_role:
+        name: pausatf_site
+      vars:
+        wp_environment_type: development
+        pausatf_site_repo: "file:///opt/src/site.git"
+        pausatf_site_version: "{{ _shas.stdout_lines[1] }}"
+        pausatf_site_wp_docroot: "/srv/{{ case.name }}"
+        pausatf_site_git_dir: "/var/lib/pausatf/git/{{ case.name }}.git"
+        pausatf_site_retire_backup_dir: "/var/backups/{{ case.name }}"
+        pausatf_site_retire_superseded: true
+
+    - name: "Record that the role accepted the layout: {{ case.name }}"
+      ansible.builtin.set_fact:
+        _case_refused: false
+  rescue:
+    - name: "Record that the role refused the layout: {{ case.name }}"
+      ansible.builtin.set_fact:
+        _case_refused: true
+
+- name: "Inspect the sentinel: {{ case.name }}"
+  ansible.builtin.stat:
+    path: "{{ item }}"
+    follow: false
+  loop:
+    - /root/sentinel-{{ case.name }}
+    - /root/sentinel-{{ case.name }}/file
+  register: _sentinel
+
+- name: "Inspect the planted entry: {{ case.name }}"
+  ansible.builtin.stat:
+    path: "/srv/{{ case.name }}/{{ case.planted }}"
+    follow: false
+  register: _planted
+
+- name: "List leftover staging directories: {{ case.name }}"
+  ansible.builtin.find:
+    paths: "/srv/{{ case.name }}/wp-content"
+    patterns: ".pausatf-site-stage-*"
+    file_type: any
+    hidden: true
+  register: _case_stages
+
+- name: "Require refusal with nothing changed: {{ case.name }}"
+  ansible.builtin.assert:
+    that:
+      - _case_refused
+      - _sentinel.results[0].stat.uid | default(-1) == 0
+      - _sentinel.results[0].stat.mode | default('') == '0700'
+      - _sentinel.results[1].stat.uid | default(-1) == 0
+      - _sentinel.results[1].stat.mode | default('') == '0600'
+      - _planted.stat.exists
+      - _planted.stat.uid | default(-1) == case.planted_uid
+      - _case_stages.matched == 0
+    fail_msg: "{{ case.name }}: the role accepted an untrusted layout or changed it"
