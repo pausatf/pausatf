@@ -2,6 +2,17 @@
 
 ## Production MySQL 8.0 to 8.4 LTS
 
+**Status (verified 2026-11-10): complete.** `doctl` reports `pausatf-prod-db` on
+MySQL 8.4, and production WordPress (7.1.4) reads from it through the private
+host; the server reports `8.4.11`. The cluster's event log shows a maintenance
+run and `cluster_update` from 01:54 to 02:08 UTC on 2026-11-01, consistent with
+DigitalOcean's forced 8.0-to-8.4 upgrade starting 2026-10-30. Nothing in this
+repository records an apply, or completion of gates 1 to 3 below, so the upgrade
+most likely happened through that forced upgrade rather than this procedure.
+The production recovery backup and backup audit ran successfully afterwards. A
+restore of a post-upgrade backup has not been recorded. The section below is
+kept as the record of the planned procedure.
+
 The production `pausatf-prod-db` cluster was checked on 2026-09-27. It was
 online on MySQL 8, Standard Edition, a single `db-s-1vcpu-1gb` node in `sfo2`.
 DigitalOcean listed MySQL 8.4 as the only available MySQL version. The maintenance

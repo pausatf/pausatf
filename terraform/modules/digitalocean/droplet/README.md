@@ -407,10 +407,11 @@ This module creates a **firewall** (not security group). Key differences:
 
 ## Current Production Usage
 
-| Droplet | ID | Size | Region | Purpose |
-|---------|-------|------|--------|---------|
-| ftp.pausatf.org | REDACTED_DROPLET_ID | s-4vcpu-8gb | sfo3 | Production WordPress |
-| stage.pausatf.org | REDACTED_DROPLET_ID | s-2vcpu-4gb | sfo3 | Staging environment |
+Neither server listed here previously still exists. On 2026-11-10 the PAUSATF
+droplets were `pausatf-prod-v2` (`s-2vcpu-4gb`), `pausatf-stage-v2` (`s-2vcpu-4gb`)
+and `pausatf-dev-v2` (`s-1vcpu-2gb`), all Ubuntu 26.04 in SFO2, managed through
+`stacks/wordpress`. See [INFRASTRUCTURE_INVENTORY.md](../../../INFRASTRUCTURE_INVENTORY.md)
+for IDs and state ownership.
 
 ## Maintainer
 

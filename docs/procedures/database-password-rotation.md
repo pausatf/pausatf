@@ -1,8 +1,15 @@
 # Database Password Rotation Procedure
 
-**Applies to**: WordPress production database on `ftp.pausatf.org`
+**Applies to**: the retired production server `ftp.pausatf.org` (host MySQL). Kept for reference only.
 **Frequency**: Immediately after any suspected credential exposure; otherwise annually
 **Prerequisite**: Root SSH access to production server
+
+> **Current production (2026-11-10):** the database is the managed `pausatf-prod-db`
+> cluster, and WordPress receives its credentials as `WORDPRESS_DB_*` from the root-only
+> `.env` in `~/pausatf-deployment` on `pausatf-prod-v2`. Rotation there means resetting
+> the database user's password with DigitalOcean (`doctl databases user reset`), updating
+> that `.env`, and recreating the `pausatf-wordpress` container. That procedure has not
+> been written or exercised yet; the steps below do not apply to it.
 
 ---
 

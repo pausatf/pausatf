@@ -92,10 +92,14 @@ For full operational procedures see [RUNBOOK.md](RUNBOOK.md).
 
 This table describes the tracked inventory and roles, not a fresh production inventory. The tracked Ansible path now
 selects host Apache with event MPM/PHP-FPM for production and dev, and host OpenLiteSpeed for staging.
-All three inventories select PHP 8.4 and SSH user `somethingwithproof`. Production uses managed MySQL;
-Terraform targets MySQL 8.4, but the upgrade requires the [database gates](docs/runbooks/database-upgrades.md).
-The separately maintained Docker production stack lives in
-pausatf-deployment (`pausatf/pausatf-deployment`, private repository). Inspect the actual target before deployment.
+All three inventories select PHP 8.4 and SSH user `somethingwithproof`.
+
+On 2026-11-10 all three droplets (`pausatf-prod-v2`, `pausatf-stage-v2`, `pausatf-dev-v2`, Ubuntu 26.04) ran the
+Docker stack from pausatf-deployment (`pausatf/pausatf-deployment`, private repository), not the host roles above.
+Production uses the managed `pausatf-prod-db` cluster, now MySQL 8.4 (see [database upgrades](docs/runbooks/database-upgrades.md));
+staging and dev run MySQL 8.4.13 in a `pausatf-db` container (upgraded from 8.0 on 2026-11-10). See the
+[production runbook](docs/runbooks/production-operations.md) for access and read-only checks. Inspect the actual
+target before deployment.
 
 ### Key tech stack
 

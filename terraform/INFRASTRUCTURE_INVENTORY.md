@@ -1,6 +1,6 @@
 # PAUSATF Infrastructure Inventory
 
-**Verified:** 2026-09-27
+**Verified:** 2026-09-27; DigitalOcean database and droplet rows re-checked 2026-11-10
 **Source:** DigitalOcean API, HCP Terraform states, GitHub API, and Cloudflare inventory recorded in the reconciliation notes.
 **Purpose:** Track which PAUSATF resources exist, where their Terraform configuration lives, and whether HCP Terraform currently owns their state.
 
@@ -20,7 +20,7 @@
 | Production web | `pausatf-prod-v2`, droplet `586316413`, SFO2, `s-2vcpu-4gb`, Ubuntu 26.04 LTS | `environments/production` via `stacks/wordpress` | Imported | Firewall `pausatf-prod-v2-fw` (`5fb8b83b-12bb-4256-8ffc-ccf275f55a7e`) imported. |
 | Staging web | `pausatf-stage-v2`, droplet `586535212`, SFO2, `s-2vcpu-4gb`, Ubuntu 26.04 LTS | `environments/staging` via `stacks/wordpress` | Imported | Firewall `pausatf-stage-v2-tunnel` (`b17da40d-aac5-48d0-8553-160a77212e82`) imported. |
 | Development web | `pausatf-dev-v2`, droplet `586535214`, SFO2, `s-1vcpu-2gb`, Ubuntu 26.04 LTS | `environments/dev` via `stacks/wordpress` | Imported | Firewall `pausatf-nonprod-cf-lock` (`96d0d607-9071-4a7c-8c61-10614453f98c`) imported. |
-| Production database | `pausatf-prod-db`, MySQL 8, SFO2, `db-s-1vcpu-1gb`, one node; ID `ad2a900b-8181-4506-805d-d19eef90b337` | `environments/production` and `modules/digitalocean/database` | Imported | Trusted source is the production droplet. Daily database backups were present for eight consecutive days; confirm retention in the DO console/API. |
+| Production database | `pausatf-prod-db`, MySQL 8.4 (server 8.4.11 on 2026-11-10; upgraded from 8.0 during the 2026-11-01 maintenance run), SFO2, `db-s-1vcpu-1gb`, one node; ID `ad2a900b-8181-4506-805d-d19eef90b337` | `environments/production` and `modules/digitalocean/database` | Imported | Trusted source is the production droplet. Daily database backups were present for eight consecutive days; confirm retention in the DO console/API. |
 | VPC | Shared `default-sfo2`, ID `4ee39499-dc85-11e8-9f23-3cfdfea9fff1` | Referenced as a data source in each DO environment | Read via data source | Shared default VPC is not owned or modified by this project. |
 | Project | `PAUSATF`, ID `8ddce7ba-f064-4611-8460-0771dd817342` | Production configuration | Imported | Project membership also contains resources that appear unrelated to PAUSATF; do not move/delete those without confirming ownership. |
 | SSH key | `m3 laptop`, ID `46721354` | Production configuration | Imported | Existing key reference. |
@@ -30,6 +30,8 @@
 | Spaces `pausatf-terraform-state` | SFO2, private | `environments/production/spaces.tf` | Imported | Versioning enabled; retained as a recovery archive after migration to HCP Terraform. |
 
 The three current droplets, their firewalls, the production database, project, SSH key, and four Spaces buckets are represented in HCP state. A state-only apply persisted the four database resource address moves in production; it reported zero resources added, changed, or destroyed. No live DigitalOcean resources were modified. Droplet `user_data` and attached SSH key changes are ignored by lifecycle rules because the live systems have migration-managed state; review that policy before changing it.
+
+Staging and dev have no managed database. Each runs MySQL in a `pausatf-db` container, upgraded in place from 8.0.46 to 8.4.13 on 2026-11-10 (backups and rehearsal recorded in pausatf/pausatf-deployment#21). Their compose files, previously kept only on the droplets, are added to `pausatf/pausatf-deployment` by that PR.
 
 Custom snapshot workflows are active: production nightly with seven retained snapshots and staging weekly with two. Native DigitalOcean droplet backup policies are not enabled. This is separate from the managed database's daily backups.
 
@@ -73,7 +75,7 @@ State-only removals were made from legacy workspaces after saving mode-600 state
 ## Remaining reconciliation
 
 1. Capture TLS settings and certificate renewal/termination responsibilities in Terraform/Ansible for dev, staging, and production.
-2. Audit supported software versions, especially managed database engine versions and DigitalOcean maintenance options.
+2. Audit supported software versions. All three databases are on MySQL 8.4: production on the managed cluster (8.4.11; 8.4 is the only MySQL version DigitalOcean offered on 2026-11-10), staging and dev in containers (8.4.13). The next LTS series is 9.7; the managed cluster cannot move to it until DigitalOcean offers it.
 3. Reconcile and document database backup retention and restore testing, and retain a tested recovery copy of the pre-migration Terraform state.
 
 **Safety:** Imports and state-only changes did not create, modify, or destroy live services. The sole apply persisted database resource address moves and reported zero resources added, changed, or destroyed. Review an environment plan and obtain the normal PR approval before any infrastructure apply.

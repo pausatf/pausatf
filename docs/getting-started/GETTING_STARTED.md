@@ -25,9 +25,10 @@ infrastructure-as-code/
 ### What's Managed
 
 ✅ **DigitalOcean Resources**
-- Production web server (pausatf-prod): 8GB RAM, 4 vCPUs
-- Staging web server (pausatf-stage): 4GB RAM, 2 vCPUs
-- Staging MySQL database (pausatf-stage-db)
+- Production web server (`pausatf-prod-v2`): 4GB RAM, 2 vCPUs
+- Staging web server (`pausatf-stage-v2`): 4GB RAM, 2 vCPUs
+- Development web server (`pausatf-dev-v2`): 2GB RAM, 1 vCPU
+- Production managed MySQL 8.4 database (`pausatf-prod-db`)
 - Firewalls, VPCs, SSH keys
 
 ✅ **Cloudflare Resources**
@@ -221,8 +222,8 @@ dig pausatf.org
 
 3. **Verify backups**
    ```bash
-   doctl compute droplet-action list REDACTED_DROPLET_ID
-   doctl databases backups list pausatf-stage-db
+   doctl compute snapshot list --resource droplet --format Name,ResourceId,CreatedAt | grep 586316413   # pausatf-prod-v2 nightly snapshots
+   doctl databases backups ad2a900b-8181-4506-805d-d19eef90b337 --format CreatedAt,Size   # pausatf-prod-db
    ```
 
 4. **Create change tickets** for significant changes
