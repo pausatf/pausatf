@@ -41,7 +41,7 @@ dnspython>=2.9.1
 
 # Cloud SDKs
 python-digitalocean>=1.17.0
-cloudflare>=5.9.0
+cloudflare>=5.10.0
 
 # Documentation
 mkdocs>=1.6.1
