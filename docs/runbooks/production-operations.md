@@ -703,7 +703,7 @@ ssh deploy@ftp.pausatf.org 'sudo systemctl status mysql'
 - [Deployment Runbook](deployment.md)
 - [Disaster Recovery Runbook](disaster-recovery.md)
 - [Migration Guide](../MIGRATION.md)
-- [GitHub Secrets](../.github/SECRETS.md)
+- [GitHub Secrets](../governance/SECRETS.md)
 
 ---
 
