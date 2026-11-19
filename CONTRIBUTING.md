@@ -226,7 +226,7 @@ composer global require dealerdirect/phpcodesniffer-composer-installer:^1 squizl
 - Run checks locally:
 
 ```bash
-php -l themes/thesource-child/functions.php
+php -l ansible/roles/wordpress/files/TheSource-child/functions.php
 python3 scripts/check_phpcs_changed_lines.py --base origin/main --phpcs "$(command -v phpcs)"
 ```
 
@@ -409,7 +409,7 @@ See [scripts/README.md](scripts/README.md) for detailed guidelines.
 
 See [docs/README.md](docs/README.md) for detailed guidelines.
 
-### WordPress Themes (`themes/`)
+### WordPress Themes (`ansible/roles/wordpress/files/`)
 
 - Never modify parent theme
 - All changes in child theme
@@ -417,7 +417,7 @@ See [docs/README.md](docs/README.md) for detailed guidelines.
 - Document customizations
 - Follow WordPress coding standards
 
-See [themes/README.md](themes/README.md) for detailed guidelines.
+See [the role files README](ansible/roles/wordpress/files/README.md) for detailed guidelines.
 
 ## Security
 

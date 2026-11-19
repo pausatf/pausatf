@@ -257,7 +257,7 @@ GitHub sends automatic email notifications on:
 
 **Workflow fails with "401 Unauthorized":**
 - **Cause:** Expired DigitalOcean or Cloudflare API token
-- **Solution:** Rotate token via `.github/SECRETS.md` procedure
+- **Solution:** Rotate token via [SECRETS.md](SECRETS.md) procedure
 
 **Workflow fails with "Resource not found":**
 - **Cause:** Incorrect droplet ID or zone ID
@@ -653,7 +653,7 @@ git push --force-with-lease
 
 ## Secret Management
 
-All workflows use GitHub Secrets for sensitive credentials. See `.github/SECRETS.md` for complete documentation.
+All workflows use GitHub Secrets for sensitive credentials. See [SECRETS.md](SECRETS.md) for complete documentation.
 
 ### Secrets Used
 
@@ -691,7 +691,7 @@ All workflows use GitHub Secrets for sensitive credentials. See `.github/SECRETS
 1. Create workflow file in `.github/workflows/`
 2. Test workflow via `workflow_dispatch` trigger
 3. Document workflow in this file (GITHUB-ACTIONS.md)
-4. Update `.github/SECRETS.md` if new secrets added
+4. Update [SECRETS.md](SECRETS.md) if new secrets added
 5. Add to README.md CI/CD status section
 
 ### Modifying Existing Workflows
@@ -851,7 +851,7 @@ GitHub Actions is free for public repositories with unlimited minutes.
 
 ## Related Documentation
 
-- **Secret Management:** `.github/SECRETS.md`
+- **Secret Management:** [SECRETS.md](SECRETS.md)
 - **Commit Standards:** `COMMIT-STANDARDS.md`
 - **Contributing Guide:** `CONTRIBUTING.md`
 - **Operational Procedures:** `10-operational-procedures.md`

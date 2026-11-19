@@ -89,7 +89,7 @@ All CI checks must pass before merging.
 
 ## WordPress Themes
 
-- **Never modify the parent theme** (`themes/thesource/`)
-- All customizations go in the child theme (`themes/thesource-child/`)
+- **Never modify the parent theme** (`ansible/roles/wordpress/files/TheSource/`)
+- All customizations go in the child theme (`ansible/roles/wordpress/files/TheSource-child/`)
 - Test in the staging environment before production
 - Follow [WordPress Coding Standards](https://developer.wordpress.org/coding-standards/)

@@ -687,7 +687,7 @@ Contact: Thomas Vincent (@somethingwithproof)
 - [Production Operations Runbook](production-operations.md)
 - [Ansible README](../../ansible/README.md)
 - [Terraform README](../../terraform/README.md)
-- [GitHub Secrets Documentation](../.github/SECRETS.md)
+- [GitHub Secrets Documentation](../governance/SECRETS.md)
 - [Deployment Runbook](deployment.md)
 
 ## Document History

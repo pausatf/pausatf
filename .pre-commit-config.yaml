@@ -37,8 +37,7 @@ repos:
             .*\.md$|
             terraform/import-all-resources\.sh|
             terraform/modules/droplet/cloud-init.*\.yml|
-            ansible/roles/wordpress/files/TheSource/.*|
-            themes/thesource/.*
+            ansible/roles/wordpress/files/TheSource/.*
           )$
 
   - repo: https://github.com/zricethezav/gitleaks
@@ -138,7 +137,7 @@ repos:
         entry: phpcs --standard=phpcs.xml.dist
         language: system
         types: [php]
-        files: ^(themes/|wp-content/plugins/).+\.php$
+        files: ^(ansible/roles/wordpress/files/TheSource-child/|wp-content/plugins/).+\.php$
 
   # ===========================================================================
   # GitHub Actions Workflow Linting
