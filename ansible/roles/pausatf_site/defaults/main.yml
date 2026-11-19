@@ -8,8 +8,10 @@ pausatf_site_git_key_file: ""
 pausatf_site_deploy_key: ""
 
 # Pinned commit. pausatf-site publishes no tags; this is main at the merge of
-# pausatf/pausatf-site#11, whose head passed CI with an identical tree.
-pausatf_site_version: "523b363c5eeb4d8475aacecaf3f7ec8bf0df98dd" # pragma: allowlist secret (commit SHA)
+# pausatf/pausatf-site#21, which ports all 17 PAUSATF Core widget rules. Its
+# Actions CI could not start (billing), so PHPUnit (1018 tests) and the syntax
+# check were run locally on this merge commit under PHP 8.4.25.
+pausatf_site_version: "679bde25bdfa5f22bb4da8b2f8e79445a08c86a7" # pragma: allowlist secret (commit SHA)
 
 pausatf_site_wp_docroot: "/var/www/html"
 
