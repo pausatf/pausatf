@@ -6,25 +6,13 @@
  */
 
 global $shortname; ?>
-	<script type="text/javascript" src="<?php echo get_template_directory_uri(); ?>/js/superfish.js"></script>
-	<script type="text/javascript">
-	//<![CDATA[
+	<script>
 		jQuery.noConflict();
-
-		jQuery('ul.superfish, #page-menu ul.nav').superfish({
-			delay:       300,                            // one second delay on mouseout
-			animation:   {opacity:'show',height:'show'},  // fade-in and slide-down animation
-			speed:       'fast',                          // faster animation speed
-			autoArrows:  true,                           // disable generation of arrow mark-up
-			dropShadows: false                            // disable drop shadows
-		});
-
-		jQuery('ul.nav > li > a.sf-with-ul').parent('li').addClass('sf-ul');
 
 		et_search_bar();
 		et_footer_improvements('#footer .footer-widget');
 
-		<!---- et_switcher plugin v1.3 ---->
+		// et_switcher plugin v1.3
 		(function($)
 		{
 			$.fn.et_switcher = function(options)
@@ -127,7 +115,7 @@ global $shortname; ?>
 		var $featuredArea = jQuery('#featured'),
 			$all_tabs = jQuery('#all_tabs');
 
-		jQuery(window).load( function(){
+		jQuery(window).on('load', function(){
 			if ($featuredArea.length) {
 				$featuredArea.addClass('et_slider_loaded').et_switcher({
 					useArrows: true <?php if (get_option($shortname.'_slider_auto') == 'on') { ?>,
@@ -150,7 +138,7 @@ global $shortname; ?>
 
 		<?php if (get_option($shortname.'_disable_toptier') == 'on') echo('jQuery("ul.nav > li > ul").prev("a").attr("href","#");'); ?>
 
-		<!---- Footer Improvements ---->
+		// Footer Improvements
 		function et_footer_improvements($selector){
 			var $footer_widget = jQuery($selector);
 
@@ -161,7 +149,7 @@ global $shortname; ?>
 			};
 		};
 
-		<!---- Search Bar Improvements ---->
+		// Search Bar Improvements
 		function et_search_bar(){
 			var $searchform = jQuery('#cat-nav div#search-form'),
 				$searchinput = $searchform.find("input#searchinput"),
@@ -174,5 +162,7 @@ global $shortname; ?>
 			});
 		};
 
-	//]]>
+			et_search_bar();
+			et_footer_improvements('#footer .footer-widget');
+
 	</script>

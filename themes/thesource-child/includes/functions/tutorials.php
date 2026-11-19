@@ -1,1 +1,0 @@
-<a href="https://www.elegantthemes.com/members-area/tutorials/" target="_blank">Watch video tutorials</a>

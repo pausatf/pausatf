@@ -2,7 +2,6 @@
 <ruleset name="PAUSATF WordPress Standards">
   <description>WordPress Coding Standards for themes and custom plugins</description>
 
-  <file>themes/thesource-child</file>
   <file>wp-content/plugins</file>
   <file>wp-content/mu-plugins</file>
   <file>wordpress/plugins</file>

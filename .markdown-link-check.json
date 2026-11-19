@@ -7,7 +7,7 @@
     { "pattern": "^LICENSE$" },
     { "pattern": "PERFORMANCE_OPTIMIZATION_REPORT\\.md$" },
     { "pattern": "tests/README\\.md$" },
-    { "pattern": "themes/thesource-child/CHANGELOG\\.md$" },
+    { "pattern": "ansible/roles/wordpress/files/TheSource-child/CHANGELOG\\.md$" },
     { "pattern": "^https?://(www\\.)?pausatf\\.org" },
     { "pattern": "^https://stage\\.pausatf\\.org" },
     { "pattern": "^https://dash\\.cloudflare\\.com" },

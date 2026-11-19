@@ -11,6 +11,7 @@ $fullWidthPage = is_page_template('page-full.php'); ?>
 		</div> <!-- end #main-content-wrap -->
 	</div> 	<!-- end .container -->
 </div> <!-- end #content -->
+	</main> <!-- end #main-content-area -->
 
 <div id="content-bottom">
 	<div class="container<?php if ($fullWidthPage) echo(' nobg'); ?>"></div>
@@ -19,7 +20,7 @@ $fullWidthPage = is_page_template('page-full.php'); ?>
 <div id="footer">
 	<div class="container clearfix">
 
-		<?php if ( !function_exists('dynamic_sidebar') || !dynamic_sidebar('Footer') ) : ?>
+		<?php if ( !dynamic_sidebar('Footer') ) : ?>
 		<?php endif; ?>
 		<div class="clear"></div>
 
@@ -31,14 +32,9 @@ $fullWidthPage = is_page_template('page-full.php'); ?>
 		<?php global $is_footer;
 		$is_footer = true; ?>
 
-		<?php $menuClass = 'bottom-nav';
-		$footerNav = '';
+		<?php wp_nav_menu( array( 'theme_location' => 'footer-menu', 'container' => '', 'fallback_cb' => false, 'menu_class' => 'bottom-nav', 'depth' => 1 ) ); ?>
 
-		if (function_exists('wp_nav_menu')) $footerNav = wp_nav_menu( array( 'theme_location' => 'footer-menu', 'container' => '', 'fallback_cb' => '', 'menu_class' => $menuClass, 'echo' => false, 'depth' => '1' ) );
-		if ($footerNav == '') show_page_menu($menuClass);
-		else echo($footerNav); ?>
-
-		<p id="copyright"><?php esc_html_e('Designed by ','TheSource'); ?> <a href="https://www.smd-designs.com" target="_blank" title="SMDdesigns">SMDdesigns</a> | <?php esc_html_e('Powered by ','TheSource'); ?> <a href="https://www.wordpress.org" target="_blank">Wordpress</a></p>
+		<p id="copyright"><?php esc_html_e('Designed by ','TheSource'); ?> <a href="https://www.smd-designs.com" target="_blank" rel="noopener noreferrer" title="SMDdesigns">SMDdesigns</a> | <?php esc_html_e('Powered by ','TheSource'); ?> <a href="https://www.wordpress.org" target="_blank" rel="noopener noreferrer">WordPress</a></p>
 	</div> <!--end .container -->
 </div> <!-- end #footer-bottom -->
 

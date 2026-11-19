@@ -213,7 +213,7 @@ This content is tracked in the PAUSATF infrastructure repository. Component guid
 - [Terraform provisioning](../terraform/README.md)
 - [Ansible configuration](../ansible/README.md)
 - [Automation scripts](../scripts/README.md)
-- [WordPress themes](../themes/README.md)
+- [WordPress themes](../ansible/roles/wordpress/files/README.md)
 - [Server migration guide](../docs/guides/05-server-migration-guide.md)
 - [Operational procedures](../docs/guides/10-operational-procedures.md)
 

@@ -23,7 +23,7 @@ Central repository for all PAUSATF infrastructure, configuration, automation scr
 - **`/scripts`** - Automation scripts for backup, deployment, and maintenance
 - **`/docs`** - Documentation hub including guides, runbooks, and architecture docs
 - **`/content`** - Legacy content archive (race results, images, PDFs)
-- **`/themes`** - WordPress themes (TheSource parent and child themes)
+- **`/ansible/roles/wordpress/files`** - WordPress themes and must-use plugins that Ansible deploys
 
 ## Quick Start
 
@@ -50,7 +50,7 @@ Central repository for all PAUSATF infrastructure, configuration, automation scr
    - [Scripts Documentation](./scripts/README.md)
    - [Infrastructure Docs](./docs/README.md)
    - [Legacy Content](./content/README.md)
-   - [WordPress Themes](./themes/README.md)
+   - [WordPress Themes](./ansible/roles/wordpress/files/README.md)
 
 ### Common operations
 
@@ -187,7 +187,7 @@ Each component has its own README with specific instructions:
 | Scripts | [scripts/](./scripts) | Automation and maintenance scripts |
 | Docs | [docs/](./docs) | Guides, runbooks, and architecture documentation |
 | Content | [content/](./content) | Historical race data and media archive |
-| Themes | [themes/](./themes) | WordPress themes for pausatf.org |
+| Themes | [ansible/roles/wordpress/files/](./ansible/roles/wordpress/files) | WordPress themes deployed by Ansible |
 
 ## Migration Notes
 
@@ -198,8 +198,8 @@ This monorepo was created by consolidating 7 separate repositories with full git
 - `pausatf-scripts` → `scripts/`
 - `pausatf-infrastructure-docs` → `docs/`
 - `pausatf-legacy-content` → `content/`
-- `pausatf-theme-thesource` → `themes/thesource/`
-- `pausatf-theme-thesource-child` → `themes/thesource-child/`
+- `pausatf-theme-thesource` → `themes/thesource/` (removed; Ansible deploys `ansible/roles/wordpress/files/TheSource/`)
+- `pausatf-theme-thesource-child` → `themes/thesource-child/` (now `ansible/roles/wordpress/files/TheSource-child/`)
 
 **Migration Date**: December 21, 2025
 **Migration Method**: Git subtree with full commit history preserved
