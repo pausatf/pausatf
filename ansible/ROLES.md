@@ -2,7 +2,7 @@
 
 This file describes what the code under `ansible/` does today. There are 24
 roles in `ansible/roles/`, one orchestration playbook (`ansible/site.yml`) and
-19 playbooks in `ansible/playbooks/`. For setup and day-to-day usage see
+18 playbooks in `ansible/playbooks/`. For setup and day-to-day usage see
 `ansible/README.md`.
 
 Defaults quoted below come from each role's `defaults/main.yml`. Most are
@@ -490,7 +490,6 @@ Run from `ansible/`. `site.yml` is the main entry point; the files in
 | `playbooks/security-remediation.yml` | `production` | Response to the January 2026 breach. `--tags audit` runs read-only checks; mutating tasks are tagged `never, remediate` and run only with `--tags remediate`. |
 | `playbooks/rotate-credentials.yml` | `webservers` | Regenerates WordPress salts (`rotate_salts`, default true) and prints a checklist; API tokens are rotated by hand. `rotate_db_password` only changes the checklist line, no task rotates the database password. |
 | `playbooks/reset-wp-admin-passwords.yml` | `webservers` | Resets WordPress administrator passwords; `-e wp_target_user=<login>` limits it to one user. |
-| `playbooks/deploy-legacy-content-sync.yml` | `production` | Deploys the legacy-content sync watcher and/or cron job from `scripts/legacy-content/`. Tags: `watcher`, `cron`, `both`. |
 | `playbooks/capture-wordpress-config.yml` | `webservers` | Captures WordPress, PHP, web server, database (sanitized), cron, cert and `.htaccess` configuration into a local directory. Read-only on the servers. |
 | `playbooks/capture-ols-config.yml` | `staging` | Captures the OpenLiteSpeed config, vhosts, lsphp packages, service status and certbot timers. |
 | `playbooks/capture-wp-inventory.yml` | `production` | Records plugins, themes, users, last logins, menus and site settings with WP-CLI, and writes them to `group_vars/production/wordpress.yml`. |

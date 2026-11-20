@@ -174,52 +174,17 @@ restore verification. A merge does not install these files on the host.
 
 See [docker/README.md](docker/README.md) for the MariaDB 13.0 upgrade procedure.
 
-## Legacy content sync (`legacy-content/`)
+## Legacy content sync (removed)
 
-These scripts mirror `/var/www/legacy/public_html/` on the production host into
-a clone of `git@github.com:pausatf/pausatf-legacy-content.git` at
-`/opt/pausatf-legacy-content` and push the result. Both push to the branch
-`legacy-content-sync`, not to `main`, so changes arrive through a pull request.
-Each run first does `git pull origin main`, then `rsync` from the legacy tree.
-Setup and operations: [legacy-content/README.md](legacy-content/README.md) and
-[legacy-content/SYNC-SETUP.md](legacy-content/SYNC-SETUP.md).
-
-### `sync-legacy-content-watcher.sh`
-
-Uses `inotifywait` (package `inotify-tools`) to watch the legacy tree for
-create, modify, delete and move events, waits for 30 seconds without further
-events, then syncs. `rsync` runs with `--delete`, so deletions in the legacy tree
-are committed. Metadata files are skipped (`.DS_Store`, `._*`, `.mirrorinfo*`,
-`.ftpquota`, `.wysiwygPro_*`, `Thumbs.db`). Logs to
-`/var/log/legacy-content-sync.log`. Installed at
-`/usr/local/bin/sync-legacy-content-watcher.sh`.
-
-### `sync-legacy-content-watcher.service`
-
-systemd unit for the watcher: runs as root, restarts on failure after 10
-seconds, appends output to `/var/log/legacy-content-sync.log`, and sets
-`PrivateTmp`, `NoNewPrivileges` and `ProtectSystem=strict` with write access to
-`/opt/pausatf-legacy-content` and `/var/log`.
-
-### `sync-legacy-content-cron.sh`
-
-One-shot version for cron. Takes a lock at `/var/run/legacy-content-sync.lock`
-(a stale lock from a dead PID is removed), pulls, rsyncs with the same excludes
-plus `*.swp` and `*.tmp`, commits with a change summary and pushes. Logs to
-stdout, redirected by cron to `/var/log/legacy-content-sync-cron.log`. Installed
-at `/usr/local/bin/sync-legacy-content-cron.sh`.
-
-### Deployment
-
-`ansible/playbooks/deploy-legacy-content-sync.yml` (hosts: `production`)
-installs the packages, clones the repository, sets the git identity, and installs
-the watcher, its unit, the cron script, a cron entry (default `0 */6 * * *`) and
-logrotate. Select what to install with `--tags watcher`, `--tags cron` or
-`--tags both`. The playbook downloads the scripts from
-`https://raw.githubusercontent.com/pausatf/pausatf-scripts/main/legacy-content`
-(its `scripts_source` variable), not from this repository's checkout, so a change
-here reaches the host only after it is available at that URL or the variable is
-changed.
+The `legacy-content/` watcher, cron script and systemd unit, and
+`ansible/playbooks/deploy-legacy-content-sync.yml`, were removed. They mirrored
+`/var/www/legacy/public_html/` on the retired production host into a clone of
+`pausatf/pausatf-legacy-content` and pushed the result, and the playbook
+downloaded the scripts from `pausatf/pausatf-scripts`. Neither repository exists
+any more. The legacy archive is the `content/` directory of this repository, and
+the production legacy data is covered by the encrypted recovery backup
+([backup/README.md](backup/README.md)). The copies of the sync files under
+`content/` came over with the old repository; nothing installs them.
 
 ## Unit tests
 
