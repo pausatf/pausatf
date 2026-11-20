@@ -2,11 +2,14 @@ version: 2
 updates:
   # JavaScript assets are vendored/static in this repo and currently have no npm/yarn/pnpm manifests.
   # Add an npm ecosystem block when a package manager manifest is introduced.
-  # GitHub Actions
+  # GitHub Actions: workflows, plus the composite actions under
+  # .github/actions, which "/" alone does not scan.
   - package-ecosystem: "github-actions"
     cooldown:
       default-days: 7
-    directory: "/"
+    directories:
+      - "/"
+      - "/.github/actions/*"
     schedule:
       interval: "weekly"
       day: "monday"
@@ -21,28 +24,24 @@ updates:
           - "actions/*"
           - "hashicorp/*"
 
-  # Terraform
+  # Terraform: roots, modules and stacks. /terraform itself holds no .tf files.
   - package-ecosystem: "terraform"
     cooldown:
       default-days: 7
-    directory: "/terraform"
+    directories:
+      - "/terraform/environments/*"
+      - "/terraform/modules/**"
+      - "/terraform/stacks/*"
     schedule:
       interval: "weekly"
       day: "monday"
     labels:
       - "dependencies"
       - "terraform"
-
-  # Python (Ansible requirements)
-  - package-ecosystem: "pip"
-    cooldown:
-      default-days: 7
-    directory: "/ansible"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    labels:
-      - "dependencies"
+    groups:
+      terraform:
+        patterns:
+          - "*"
 
   # Python (docs build)
   - package-ecosystem: "pip"
@@ -128,60 +127,3 @@ updates:
         update-types:
           - "minor"
           - "patch"
-
-  # GitHub Actions (docs workflows)
-  - package-ecosystem: "github-actions"
-    cooldown:
-      default-days: 7
-    directory: "/docs"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    labels:
-      - "dependencies"
-    groups:
-      codeql:
-        patterns:
-          - "github/codeql-action*"
-      actions:
-        patterns:
-          - "actions/*"
-          - "hashicorp/*"
-
-  # GitHub Actions (scripts workflows)
-  - package-ecosystem: "github-actions"
-    cooldown:
-      default-days: 7
-    directory: "/scripts"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    labels:
-      - "dependencies"
-    groups:
-      codeql:
-        patterns:
-          - "github/codeql-action*"
-      actions:
-        patterns:
-          - "actions/*"
-          - "hashicorp/*"
-
-  # GitHub Actions (terraform workflows)
-  - package-ecosystem: "github-actions"
-    cooldown:
-      default-days: 7
-    directory: "/terraform"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    labels:
-      - "dependencies"
-    groups:
-      codeql:
-        patterns:
-          - "github/codeql-action*"
-      actions:
-        patterns:
-          - "actions/*"
-          - "hashicorp/*"
