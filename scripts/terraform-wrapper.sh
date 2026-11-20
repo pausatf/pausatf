@@ -122,7 +122,9 @@ run_terraform() {
 
     case "$ACTION" in
         init)
-            terraform init -backend-config="$ROOT_DIR/terraform/backend.hcl"
+            # Every environment selects its HCP Terraform workspace in a `cloud`
+            # block; init takes no backend configuration.
+            terraform init
             ;;
         validate)
             terraform validate
