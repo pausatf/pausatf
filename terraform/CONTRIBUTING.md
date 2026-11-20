@@ -43,8 +43,8 @@ Pre-commit hooks will run automatically:
 - Linting (tflint)
 
 ```bash
-git add .
-git commit -m "feat: add staging database configuration"
+git add <the files you changed>
+git commit -s -m "feat: add staging database configuration"
 ```
 
 ### 5. Push and Create PR
@@ -298,6 +298,6 @@ Reviewers should verify:
 
 ## Questions?
 
-- **Documentation:** https://github.com/pausatf/pausatf-infrastructure-docs
-- **Issues:** https://github.com/pausatf/pausatf-terraform/issues
-- **Maintainer:** Thomas Vincent
+- **Documentation:** [terraform/README.md](README.md) and [docs/](../docs/README.md) in this repository
+- **Issues:** https://github.com/pausatf/pausatf/issues
+- **Maintainer:** @somethingwithproof

@@ -37,7 +37,7 @@ terraform validate
 terraform plan
 ```
 
-Use the Terraform version specified by mise in this repository. Plans are read-only until explicitly applied, but review them carefully: resource replacement, destruction, duplicate DNS creation, and settings changes require investigation first. The Cloudflare resources have been imported; require a fresh reviewed plan before any apply.
+Terraform 1.10 or later is required; CI runs 1.10.3. The repository does not pin a version with mise. Plans are read-only until explicitly applied, but review them carefully: resource replacement, destruction, duplicate DNS creation, and settings changes require investigation first. The Cloudflare resources have been imported; require a fresh reviewed plan before any apply.
 
 ## Safety and changes
 
@@ -48,6 +48,20 @@ Use the Terraform version specified by mise in this repository. Plans are read-o
 5. Apply only after review and the required GitHub approvals.
 
 Terraform state operations such as import and `state rm` change state ownership without changing the remote infrastructure. Back up state before state surgery and record the resource IDs and reason in the inventory.
+
+## Layout
+
+- `environments/`: one root per workspace (`production`, `staging`, `dev`, `cloudflare`, `github`, `hcp`).
+- `stacks/wordpress`: the droplet, firewall and optional managed database shared by production, staging and dev; it calls `modules/digitalocean/database`.
+- `modules/cloudflare/{zone,dns}`, `modules/digitalocean/{droplet,database}`, `modules/github/repository`: reusable modules.
+- `modules/droplet`: the cloud-init templates that the production, staging and dev roots render with `templatefile()`. It holds no `.tf` files.
+- `tests/compliance`: Terraform compliance tests.
+
+## Automation
+
+CI runs `terraform fmt -check`, `terraform validate` for five roots (not `hcp`), tfsec and TFLint on every pull request.
+The manual `infra-staging.yml` workflow plans the staging root. **No workflow applies Terraform.** Run `terraform apply`
+yourself from the environment directory after a reviewed plan. Details: [GitHub Actions reference](../docs/governance/GITHUB-ACTIONS.md).
 
 ## Documentation
 

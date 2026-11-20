@@ -41,7 +41,7 @@ The `PAUSATF` DigitalOcean project also lists a `trading-dashboard-backup` Space
 
 The `pausatf.org` zone (zone ID `67b87131144a68ad5ed43ebfd4e6d811`) and its DNS, zone settings, and security rules are declared in `environments/cloudflare`. The Cloudflare configuration was reconciled against the live account in PR #210, merged as `fcc9fa9850b2572e135cd07fe562828b1fb2d812`.
 
-The Cloudflare HCP workspace now owns the zone, 37 central DNS records, six zone settings, and two active rulesets. The dev and staging DNS records are imported to their dedicated states. The first refreshed plan found six metadata/content/TTL differences; configuration was aligned to live values, and the next plan reported no changes. No Cloudflare apply has been run.
+The Cloudflare HCP workspace owns the zone, 37 central DNS records as last imported (main now declares 31 after #276 removed six records for retired servers; that removal needs a manual apply), six zone settings, and two active rulesets. The dev and staging DNS records are imported to their dedicated states. The first refreshed plan found six metadata/content/TTL differences; configuration was aligned to live values, and the next plan reported no changes. No Cloudflare apply has been run.
 
 The dev and staging droplet/firewall state imports use Cloudflare's public IP ranges data source. This does not import or change Cloudflare account resources.
 
@@ -65,7 +65,7 @@ The configuration was updated to match the live settings: squash-only merge, aut
 | `pausatf-production` | Current production DO resources, database, and Spaces imported; migrated from S3 | Latest plan: no changes; database state addresses are migrated. |
 | `pausatf-staging` | Current staging droplet, firewall, and stage DNS imported | Latest plan: no changes. |
 | `pausatf-dev` | Current dev droplet, firewall, and dev DNS imported | Latest plan: no changes. |
-| `pausatf-cloudflare` | Zone, 37 central DNS records, six settings, and two rulesets imported | Latest plan: no changes. |
+| `pausatf-cloudflare` | Zone, 37 central DNS records as last imported (main declares 31 after #276), six settings, and two rulesets imported | Last recorded plan: no changes. Apply of the #276 record removal is manual and not recorded here. |
 | `pausatf-github` | Repository, default branch, branch protection, Dependabot, vulnerability alerts, and topics are tracked | Latest plan: no changes. |
 | `pausatf-hcp` | HCP workspace safety and execution settings for six active and three retired PAUSATF workspaces | All nine workspaces imported; latest plan: no changes. |
 | `pausatf`, `painfra`, `do-terraform` | Retired legacy workspaces; all state entries were removed after backing up their state, and no live DigitalOcean resources were destroyed | Workspace metadata and local execution are managed by `pausatf-hcp`; backups are in `/tmp/pausatf-legacy-state-20260927/`. |
