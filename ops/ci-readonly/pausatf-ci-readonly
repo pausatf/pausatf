@@ -1,0 +1,8 @@
+#!/bin/sh
+# Forced command for the github-deploy CI key (authorized_keys "restrict,command=").
+# The key can run only the subcommands listed here; anything else is refused.
+set -eu
+case "${SSH_ORIGINAL_COMMAND:-}" in
+  wp-versions) exec sudo -n /usr/local/sbin/pausatf-wp-versions ;;
+  *) echo "pausatf-ci-readonly: allowed commands: wp-versions" >&2; exit 2 ;;
+esac

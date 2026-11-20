@@ -238,8 +238,8 @@ ssh deploy@ftp.pausatf.org 'tail -20 /var/www/html/wp-content/debug.log'
 
 **Nightly Automated Tasks:**
 
-1. **WordPress Inventory Capture** (2:00 AM PT)
-   - Workflow: `.github/workflows/capture-prod-inventory.yml`
+1. **WordPress Inventory Capture** (manual)
+   - Playbook: `ansible/playbooks/capture-wp-inventory.yml`
    - Captures: plugins, themes, theme_mods, users, site config
    - Output: Commits to `ansible/group_vars/production/wordpress.yml`
    - Includes: 27 users (11 admins, 16 editors)
@@ -352,12 +352,8 @@ ssh deploy@ftp.pausatf.org \
 
 ### Inventory Capture (Automated)
 
-**Manual trigger of nightly capture:**
+**Manual capture:**
 ```bash
-# Via GitHub CLI
-gh workflow run capture-prod-inventory.yml
-
-# Via Ansible playbook
 cd /path/to/pausatf
 ansible-playbook -i ansible/inventory/hosts.yml \
   ansible/playbooks/capture-wp-inventory.yml \

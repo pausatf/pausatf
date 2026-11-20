@@ -11,18 +11,9 @@ Two workflows have state that the YAML does not show:
   so its `push` to `main` trigger and its manual dispatch do not run. The file still declares both triggers. Enabling it
   again makes every push to `main` queue a production deployment, including docs-only pushes. Do not enable it without
   a deliberate production decision.
-- **Terraform apply is manual.** No workflow applies Terraform. `infra-staging.yml` only plans. Applies are run from an
+- **Terraform apply is manual.** No workflow applies Terraform. `infra-staging.yml` and `terraform-plan.yml` only plan. Applies are run from an
   operator's terminal against the HCP Terraform workspace, after a reviewed plan (see
   [Deployment](../runbooks/deployment.md) and [terraform/README.md](../../terraform/README.md)).
-
-## Pending #295
-
-Pull request #295 (open when this was written) adds a composite action, `.github/actions/cloudflare-access-ssh`, and
-moves the production probe workflows from direct SSH to a Cloudflare Access SSH connection. It changes
-`wordpress-update-check`, `integration-tests`, `prod-widgets-log-probe`, `capture-prod-inventory` and `wp-plugin-audit`.
-It also introduces a repository variable `PROD_SSH_HOST` and the secrets `CF_ACCESS_CLIENT_ID` and
-`CF_ACCESS_CLIENT_SECRET`, requires an updated `PROD_SSH_KNOWN_HOSTS`, and stops those workflows from reading
-`PROD_HOST`. This page describes the behaviour on `main` today. Update the SSH rows below when #295 merges.
 
 ## Workflows
 
@@ -63,9 +54,8 @@ Terraform checks use Terraform 1.10.3. The `hcp` root is not in the validate mat
 | `deploy-dev.yml` | Push to `dev`; manual | `pausatf-dev`, environment `development` | Calls `deploy.yml`. |
 | `deploy-staging.yml` | Push to `staging`; manual | `pausatf-stage`, environment `staging` | Calls `deploy.yml`. |
 | `deploy-prod.yml` | Push to `main`; manual. **Disabled in repository settings.** | `pausatf-prod`, environment `production` | A `staging-validate` job runs the playbook against staging, then `deploy` calls `deploy.yml`. The `healthcheck_host` it passes is a placeholder address, so the post-deploy health check would not reach a real host. |
-| `deploy-prod-new.yml` | Manual | `pausatf-prod-new`, environment `production_new` | Calls `deploy.yml` for the replacement production inventory group. |
-| `migrate-server.yml` | Manual | `dev`, `staging` or `production` | Seven jobs: preflight, configure the new server, migrate data, smoke test, Cloudflare DNS cutover, verify, and rollback on failure. Inputs: `environment`, `new_server_ip`, `dry_run`, `skip_data_migration` and `confirm_production`. A production run requires typing the confirmation phrase. |
 | `infra-staging.yml` | Manual | `terraform/environments/staging` | Plan only: `terraform init` and `terraform plan -input=false -out=tfplan`. It never applies. Runs in environment `terraform-plan`. |
+| `terraform-plan.yml` | Push to `main` touching `terraform/**`; Mondays 14:00 UTC; manual | `cloudflare`, `staging` and `dev` | Plan only, with `-lock=false -detailed-exitcode`; the job summary says whether each workspace has drift. Runs in environment `terraform-plan`, whose branch policy allows only `main`, so it cannot run on pull requests. |
 
 All deploy workflows serialize on a concurrency group and do not cancel an in-progress run. The `deploy.yml` job
 removes the vault file, vault password and SSH key at the end, even on failure.
@@ -80,19 +70,14 @@ These playbook runs configure the host web stack. The Docker stack that runs on 
 | --- | --- | --- |
 | `do-nightly-snapshot.yml` | Daily 10:00 UTC; manual | Snapshots the production droplet with `doctl` and keeps the seven newest. |
 | `do-weekly-stage-snapshot.yml` | Sundays 11:00 UTC; manual | Snapshots the staging droplet and keeps the two newest. |
-| `sync-cloudflare-ips.yml` | Mondays 06:00 UTC; manual | Runs `scripts/firewall-maintenance.py --cloudflare --apply` to refresh the Cloudflare ranges in the DigitalOcean firewalls without opening tunnel-only ports. |
-| `update-firewall-ip.yml` | Manual; input `new_ip` | Runs `scripts/firewall-maintenance.py --ssh-ip <ip> --apply` to add one SSH source address while keeping existing rules. |
 | `sync-jetpack-ips.yml` | Mondays 07:00 UTC; manual | Fetches Jetpack's published IPv4 ranges, rewrites the `jetpack_ip_ranges` list when it changed, and opens a pull request. Uses the built-in `GITHUB_TOKEN` with `contents`, `pull-requests` and `issues` write access. |
-| `wordpress-update-check.yml` | Daily 09:17 UTC; manual | Read-only check of WordPress core and plugin updates on production over SSH. Opens, refreshes or closes one tracking issue labelled `wordpress`, `dependencies` and `ops`. It applies no updates. |
-| `integration-tests.yml` | Mondays 07:00 UTC; manual (input `environment`) | Installs pytest and paramiko and runs `docs/tests/integration/` with `-m "not slow"` as the `github-deploy` user. It skips with a success status when the SSH key or `PROD_HOST` is unset. |
-| `capture-prod-inventory.yml` | Manual (input `probe_widgets`) | Runs `ansible/playbooks/capture-wp-inventory.yml` against production and opens a pull request with the captured inventory. With `probe_widgets` it only collects a widgets log timeline. |
-| `prod-widgets-log-probe.yml` | Manual | Collects widget log evidence from production over SSH. |
-| `wp-plugin-audit.yml` | Manual; ten boolean inputs and `widget_source_db` | Default mode lists available plugin updates and prints them in the job log; the consolidated update issue belongs to `wordpress-update-check`. Other inputs run probes (`probe_auth_mail`, `probe_widget_logic`, `probe_modsecurity_logs`) or explicitly requested changes (`disable_jetpack_protect`, `install_login_hotfix`, `apply_widget_logic_recovery`, `repair_active_widget_logic`, `enable_widget_logic_filter`). Read the workflow before enabling a change input. |
+| `wordpress-update-check.yml` | Daily 09:17 UTC; manual | Reads installed WordPress core and plugin versions from production and compares them with wordpress.org on the runner. Opens, refreshes or closes one tracking issue labelled `wordpress`, `dependencies` and `ops`. It applies no updates. |
+| `integration-tests.yml` | Mondays 07:00 UTC; manual (input `environment`) | Runs the HTTP and DNS classes of `docs/tests/integration/test_infrastructure.py` against `www.pausatf.org`. It needs no secrets and has no SSH access. |
 
-The production probe workflows currently connect directly to production as `github-deploy`. `wordpress-update-check`
-pins the host key from `PROD_SSH_KNOWN_HOSTS` and uses `StrictHostKeyChecking=yes`. `prod-widgets-log-probe` and
-`capture-prod-inventory` use `accept-new`, and `capture-prod-inventory` falls back to a placeholder address when
-`PROD_HOST` is unset. See [Pending #295](#pending-295).
+`wordpress-update-check` is the only workflow with shell access to production. It connects through the Cloudflare Access
+SSH application with a service token, pins the host key from `PROD_SSH_KNOWN_HOSTS`, and logs in with a key the server
+forces to one read-only command. The server side is in [`ops/ci-readonly`](../../ops/ci-readonly/README.md). For other
+production diagnostics or an inventory capture, run the playbooks from an operator machine.
 
 ### Composite action
 
@@ -111,35 +96,31 @@ Names only. Where the value lives is noted under [Where values are stored](#wher
 | `deploy-dev.yml` | `DEV_SSH_PRIVATE_KEY`, `DEV_SERVER_IP`, `ANSIBLE_VAULT_PASSWORD`, `ANSIBLE_VAULT_FILE` | none |
 | `deploy-staging.yml` | `STAGING_SSH_PRIVATE_KEY`, `STAGE_SERVER_IP`, `ANSIBLE_VAULT_PASSWORD`, `ANSIBLE_VAULT_FILE` | none |
 | `deploy-prod.yml` | `PROD_SSH_PRIVATE_KEY`, `PROD_SERVER_IP`, `STAGING_SSH_PRIVATE_KEY`, `STAGE_SERVER_IP`, `ANSIBLE_VAULT_PASSWORD`, `ANSIBLE_VAULT_FILE` | none |
-| `deploy-prod-new.yml` | `PROD_NEW_SSH_PRIVATE_KEY`, `PROD_NEW_SERVER_IP`, `ANSIBLE_VAULT_PASSWORD`, `ANSIBLE_VAULT_FILE` | none |
 | `deploy.yml` | Receives `SSH_PRIVATE_KEY`, `TARGET_SERVER_IP`, `ANSIBLE_VAULT_PASSWORD`, `ANSIBLE_VAULT_FILE` from the caller | none |
-| `migrate-server.yml` | `ANSIBLE_VAULT_PASSWORD`, `CLOUDFLARE_API_TOKEN`, `DO_TOKEN`, `MIGRATION_NEW_SSH_PRIVATE_KEY`, plus `DEV_SSH_PRIVATE_KEY`, `STAGING_SSH_PRIVATE_KEY` and `PROD_SSH_PRIVATE_KEY` for the old server of the chosen environment | none |
-| `infra-staging.yml` | `HCP_TERRAFORM_API_TOKEN`, `DO_TOKEN`, `CLOUDFLARE_API_TOKEN`, `TF_VAR_SSH_ALLOWED_IPS` | none |
+| `infra-staging.yml`, `terraform-plan.yml` | `HCP_TERRAFORM_API_TOKEN`, `DO_TOKEN`, `CLOUDFLARE_API_TOKEN`, `TF_VAR_SSH_ALLOWED_IPS` | none |
 | `do-nightly-snapshot.yml` | `DO_TOKEN`; `DO_PROD_DROPLET_ID` optional | none |
 | `do-weekly-stage-snapshot.yml` | `DO_TOKEN`; `DO_STAGE_DROPLET_ID` optional | none |
-| `sync-cloudflare-ips.yml`, `update-firewall-ip.yml` | `DO_TOKEN` | none |
 | `sync-jetpack-ips.yml` | built-in `GITHUB_TOKEN` | none |
-| `wordpress-update-check.yml` | `PROD_SSH_PRIVATE_KEY` | `PROD_HOST`, `PROD_SSH_KNOWN_HOSTS` |
-| `integration-tests.yml`, `capture-prod-inventory.yml`, `prod-widgets-log-probe.yml`, `wp-plugin-audit.yml` | `PROD_SSH_PRIVATE_KEY` | `PROD_HOST` |
-| `ci.yml`, `codeql.yml`, `molecule.yml`, `php-quality.yml` | none | none |
+| `wordpress-update-check.yml` | `PROD_CI_SSH_KEY`, `CF_ACCESS_CLIENT_ID`, `CF_ACCESS_CLIENT_SECRET` | `PROD_HOST`, `PROD_SSH_KNOWN_HOSTS` |
+| `integration-tests.yml`, `ci.yml`, `codeql.yml`, `molecule.yml`, `php-quality.yml` | none | none |
 
-When a value is missing: `deploy.yml` fails fast on a missing `TARGET_SERVER_IP`, vault password or vault file. The
-probe workflows fail or skip as described in the table above.
+When a value is missing: `deploy.yml` fails fast on a missing `TARGET_SERVER_IP`, vault password or vault file. `wordpress-update-check`
+fails when its key, token, host or known_hosts value is missing.
 
 ### Where values are stored
 
 - **Repository level.** When this was written, `gh secret list` and `gh variable list` showed `ANSIBLE_VAULT_FILE`,
   `ANSIBLE_VAULT_PASSWORD`, `DEV_SSH_PRIVATE_KEY`, `DO_PROD_DROPLET_ID`, `DO_TOKEN`, `PROD_SSH_PRIVATE_KEY`,
   `STAGING_SSH_PRIVATE_KEY`, `PROD_CI_SSH_KEY`, `CF_ACCESS_CLIENT_ID` and `CF_ACCESS_CLIENT_SECRET` as secrets, and
-  `PROD_HOST` and `PROD_SSH_KNOWN_HOSTS` as variables. No current workflow reads `PROD_CI_SSH_KEY`, and the two
-  `CF_ACCESS_*` secrets are read only by the action proposed in #295.
+  `PROD_HOST` and `PROD_SSH_KNOWN_HOSTS` as variables. `PROD_CI_SSH_KEY` and the two `CF_ACCESS_*` secrets are read only
+  by `wordpress-update-check`.
 - **Environment level.** Environment `production` holds `ANSIBLE_VAULT_FILE` and `PROD_SSH_PRIVATE_KEY` and has required
   reviewers. Environment `terraform-plan` holds `CLOUDFLARE_API_TOKEN`, `HCP_TERRAFORM_API_TOKEN` and
   `TF_VAR_SSH_ALLOWED_IPS`. Environments `development` and `staging` have a branch policy. Environments `production_new`
   and `copilot` hold nothing.
-- **Not found.** The `*_SERVER_IP` secrets, `PROD_NEW_*`, `MIGRATION_NEW_SSH_PRIVATE_KEY` and `DO_STAGE_DROPLET_ID` do
-  not appear at repository or environment level. An organization-level secret would not show up in that listing, so a
-  deploy or migration may still work; check before relying on either result.
+- **Not found.** The `*_SERVER_IP` secrets and `DO_STAGE_DROPLET_ID` do not appear at repository or environment level.
+  An organization-level secret would not show up in that listing, so a deploy may still work; check before relying on
+  either result.
 
 [SECRETS.md](SECRETS.md) covers handling, rotation and the vault file.
 
@@ -150,15 +131,14 @@ Every workflow follows the hardening in the merged Actions hardening change and 
 - Third-party actions are pinned to a commit SHA with the version in a trailing comment. Dependabot proposes the bumps.
 - `permissions: contents: read` at the top level; a job asks for more only where it needs it (CodeQL, issue and pull
   request writers).
-- `actions/checkout` runs with `persist-credentials: false`, except in `capture-prod-inventory` and `sync-jetpack-ips`, which push a branch.
+- `actions/checkout` runs with `persist-credentials: false`, except in `sync-jetpack-ips`, which pushes a branch.
 - Jobs set `timeout-minutes` and run on `ubuntu-24.04`, not `ubuntu-latest`.
 - User-controlled input reaches shell steps through `env:`, not through `${{ }}` interpolation in `run:`.
 
-## Registered workflows without a file
+## Registered workflow without a file
 
-The repository's Actions list still contains two entries whose files are no longer in `main`: `ansible-lint.yml` and
-`Terraform Plan` (`terraform-plan.yml`). They are stale registrations and do not run. Ansible lint now runs inside
-`ci.yml`, and no Terraform plan workflow exists beyond the manual `infra-staging.yml`.
+The repository's Actions list still contains `ansible-lint.yml`, whose file is no longer in `main`. It is a stale
+registration and does not run; Ansible lint now runs inside `ci.yml`.
 
 ## Dependabot
 

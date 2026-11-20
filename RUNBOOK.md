@@ -349,17 +349,11 @@ Themes excluded from auto-update: `TheSource-child`, `pausatf-oceanwp-child`,
 
 ### Capture production plugin/theme inventory
 
-The `capture-prod-inventory` workflow runs `capture-wp-inventory.yml` against
-production and commits the result to
-`ansible/group_vars/production/wordpress.yml`.
+Run `capture-wp-inventory.yml` against production and commit the result to
+`ansible/group_vars/production/wordpress.yml`. There is no workflow for this:
+CI has read-only access to prod (see `ops/ci-readonly/`).
 
-Trigger manually:
-
-```bash
-gh workflow run capture-prod-inventory.yml
-```
-
-Or run the playbook directly:
+Run the playbook:
 
 ```bash
 cd ansible
