@@ -1,11 +1,14 @@
 name: Setup Ansible
-description: Install Python and ansible-core, add shared Galaxy collections, and stub a CI vault password.
+description: >-
+  Install Python and ansible-core, add shared Galaxy collections, and
+  optionally stub a CI vault password. This action is the single place that
+  pins ansible-core for the repository's workflows.
 
 inputs:
   python-version:
     description: Python version to install.
     required: false
-    default: '3.11'
+    default: '3.12'
   ansible-core-version:
     description: ansible-core version to pin.
     required: false
@@ -14,12 +17,18 @@ inputs:
     description: Extra pip packages to install (space-separated), e.g. ansible-lint or molecule.
     required: false
     default: ''
+  ci-vault-stub:
+    description: >-
+      Write ansible/.vault_pass.sh with a dummy password for lint and syntax
+      jobs. Set to 'false' in jobs that decrypt the real vault.
+    required: false
+    default: 'true'
 
 runs:
   using: composite
   steps:
     - name: Setup Python
-      uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0
+      uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
       with:
         python-version: ${{ inputs.python-version }}
 
@@ -38,6 +47,7 @@ runs:
         exit 1
 
     - name: Create dummy vault password for CI
+      if: inputs.ci-vault-stub == 'true'
       shell: bash
       run: |
         printf '#!/bin/sh\necho ci-dummy-vault-password\n' > ansible/.vault_pass.sh
