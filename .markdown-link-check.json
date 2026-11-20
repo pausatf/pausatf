@@ -4,6 +4,7 @@
     { "pattern": "^https://localhost" },
     { "pattern": "^https://www.gnu.org/" },
     { "pattern": "^https://github.com/pausatf/pausatf-(terraform|infrastructure-docs|ansible|legacy-content|scripts|theme-thesource)" },
+    { "pattern": "^https://github\\.com/pausatf/pausatf-(site|deployment|generatepress-child|archive-tooling)(/|$)" },
     { "pattern": "^LICENSE$" },
     { "pattern": "PERFORMANCE_OPTIMIZATION_REPORT\\.md$" },
     { "pattern": "tests/README\\.md$" },
