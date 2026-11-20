@@ -18,21 +18,11 @@ The legacy
 `import-dns-records.sh` script is obsolete and must not be run: it targets the
 old provider resource type and an incomplete, stale record map.
 
-The 2026-09-27 inventory contained 39 DNS records: 7 A, 14 CNAME, 5 MX, 6 TXT,
-and 7 CAA. On 2026-11-10, six of them still pointed at servers retired in the v2
-migration, at addresses no longer in the PAUSATF DigitalOcean account: the A
-records `ftp`, `mail`, `monitor`, `direct-ssh` and `staging`, and the `prod`
-CNAME to `ftp`. They were removed from this configuration, so applying it
-deletes them, leaving 33 records (2 A, 13 CNAME, 5 MX, 6 TXT, 7 CAA). Inbound
-mail uses the Google Workspace MX records, not `mail`. This Cloudflare
-environment owns 31 records; `dev` is owned by the dev
+This Cloudflare environment owns the records listed below; `dev` is owned by the dev
 environment and `stage` by the staging environment. Keep those ownership
 boundaries intact so different remote states cannot overwrite the same DNS
 record. The `dev` and `stage` records are now imported into their respective
 environment workspaces.
-
-The `_acme-challenge.www` TXT value is time-sensitive; it is imported as-is.
-Confirm it is still needed before changing or renewing that challenge.
 
 ### Observed zone settings and rulesets
 
@@ -45,32 +35,32 @@ cache for WordPress admin and authenticated requests. The live login rate
 limit blocks five POST requests per ten seconds per source IP and Cloudflare
 colo, with a ten-second mitigation timeout.
 
-The live zone has no custom WAF ruleset or `transit` redirect ruleset. Those
-previously declared but absent rules have been removed from this desired-state
-configuration so an import and review plan will not propose creating them.
+The custom WAF ruleset blocks `/wp-content/uploads/backups*` and archive
+extensions under uploads, and applies a managed challenge to `/wp-login.php` and
+`/wp-admin` (except `admin-ajax.php`). The zone has no `transit` redirect
+ruleset.
 
 ## Live DNS inventory
 
 | Type | Names |
 | --- | --- |
-| A | `dev`, `runners` |
-| CNAME | `@`, `www`, `stage`, `ssh`, `ssh-stage-v2`, `ssh-v2`, `v2canary`, `51871933`, `em5172`, `url7068`, `url7741`, `s1._domainkey`, `s2._domainkey` |
+| CNAME | `@`, `www`, `stage`, `runners`, `ssh-stage-v2`, `ssh-v2`, `v2canary`, `51871933`, `em5172`, `url7068`, `url7741`, `s1._domainkey`, `s2._domainkey` |
 | MX | `@` (five Google Workspace records) |
-| TXT | `@` (SPF and Google verification), `_dmarc`, `cf2024-1._domainkey`, `mail._domainkey`, `_acme-challenge.www` |
+| TXT | `@` (SPF `-all` and Google verification), `_dmarc` (`p=reject`), `cf2024-1._domainkey`, `mail._domainkey` |
 | CAA | `@` (seven records for Google Trust Services, DigiCert, Let's Encrypt, and iodef) |
 
-The apex, `www`, `stage`, SSH tunnel aliases, and canary use Cloudflare Tunnel
-hostnames. `dev` and `stage` are configured in their dedicated environment
-states, not in this Cloudflare environment. `staging` and the direct A records
-retain their observed addresses; these values are an inventory snapshot, not a
-claim that those hosts are healthy or should remain pointed at those addresses.
+The apex, `www`, `stage`, `runners`, SSH tunnel aliases, and canary use
+Cloudflare Tunnel hostnames; no record points directly at a droplet IP. `dev`
+and `stage` are configured in their dedicated environment states, not in this
+Cloudflare environment. The former direct A records (`ftp`, `mail`, `monitor`,
+`direct-ssh`, `staging`) and the `prod` and `ssh` aliases were removed on
+2026-11-19 because their addresses no longer belonged to the account.
 
 ## Backend and credentials
 
 State belongs to the HCP Terraform workspace `pausatf-cloudflare` in the
-`pausatf` organization. The live resources are imported and the current plan is
-clean. Use `terraform login`, then initialize
-with the repository's pinned Terraform version:
+`pausatf` organization. Use `terraform login`, then initialize with the
+repository's pinned Terraform version:
 
 ```bash
 cd terraform/environments/cloudflare
@@ -78,6 +68,19 @@ terraform init
 terraform validate
 terraform plan
 ```
+
+The custom WAF entrypoint ruleset (`cloudflare_ruleset.waf_custom`) was created
+through the API on 2026-11-19 and is not in state yet. Until it is imported, a
+plan proposes to create it, and an apply fails because the zone already has
+that entrypoint. Import it once before the next apply:
+
+```bash
+terraform import cloudflare_ruleset.waf_custom \
+  zones/67b87131144a68ad5ed43ebfd4e6d811/1fcc42aa2e3944e2aecc08aa6e3578ed
+```
+
+The import is a CLI step rather than an `import` block because the TFSec check in
+CI cannot parse `import` blocks.
 
 Provide a narrowly scoped Cloudflare token as a sensitive environment value on
 the trusted runner. The existing zone, DNS records, settings, and rulesets are

@@ -116,24 +116,16 @@ resource "cloudflare_dns_record" "www" {
 resource "cloudflare_dns_record" "runners" {
   zone_id = cloudflare_zone.pausatf.id
   name    = "runners"
-  content = "165.227.114.184"
-  type    = "A"
+  content = "6fa9662f-7435-4b9e-9c54-6cc6b25c9cc5.cfargotunnel.com"
+  type    = "CNAME"
   ttl     = 1
-  proxied = false
+  proxied = true
+  comment = "via runners-webhook tunnel"
 }
 
 # =============================================================================
 # DNS Records — CNAME
 # =============================================================================
-
-resource "cloudflare_dns_record" "ssh" {
-  zone_id = cloudflare_zone.pausatf.id
-  name    = "ssh"
-  content = "942e32fe-29b5-4ca2-b876-b3e3b3f0b9c6.cfargotunnel.com"
-  type    = "CNAME"
-  ttl     = 1
-  proxied = true
-}
 
 resource "cloudflare_dns_record" "ssh_stage_v2" {
   zone_id = cloudflare_zone.pausatf.id
@@ -291,7 +283,7 @@ resource "cloudflare_dns_record" "mx_alt4" {
 resource "cloudflare_dns_record" "spf" {
   zone_id = cloudflare_zone.pausatf.id
   name    = "@"
-  content = "v=spf1 include:_spf.google.com include:sendgrid.net ~all"
+  content = "v=spf1 include:_spf.google.com include:sendgrid.net -all"
   type    = "TXT"
   ttl     = 3600
   comment = "SPF record for Google Workspace and SendGrid"
@@ -308,10 +300,10 @@ resource "cloudflare_dns_record" "google_site_verification" {
 resource "cloudflare_dns_record" "dmarc" {
   zone_id = cloudflare_zone.pausatf.id
   name    = "_dmarc"
-  content = "v=DMARC1; p=quarantine; rua=mailto:admin@pausatf.org; pct=100;"
+  content = "v=DMARC1; p=reject; rua=mailto:admin@pausatf.org; pct=100;"
   type    = "TXT"
   ttl     = 1
-  comment = "DMARC policy (quarantine enforcement, aggregate reports to admin@pausatf.org)"
+  comment = "DMARC policy (reject enforcement, aggregate reports to admin@pausatf.org)"
 }
 
 resource "cloudflare_dns_record" "dkim_cloudflare" {
@@ -330,14 +322,6 @@ resource "cloudflare_dns_record" "dkim_mail" {
   content = "v=DKIM1; h=sha256; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtI1RFbT2Q/l8jxNfidHBMpDaw6UxnO3NwbJo58DLyKJX0WfICTpvUxPopz+xOl6Lcu27hFSZwWKgSEnDjhTdE1ytMuNNgUJ7O+n82VQQdJ5USiYGEHoIGFmuqcm6Ctwl3xQKHLeDsY56E16ry0U20necZuBOMjaRL8IAkaSUNlNpR1okwG0UC/SI/8t/KN+3b63OI/m9SFZeWajhMER+f9P3yWxo6EnMirC6tkooWlCP1DpAvJCz1CMtTewbtPUahUqhURKLVJIVYyT9mxGY0+qxMOWGMl0GoZjKZ39C0vMlWTTXNkbakav4HVUK2F6a3n1pG1xg0IRkRTXdhbNTywIDAQAB" # pragma: allowlist secret
   type    = "TXT"
   ttl     = 3600
-}
-
-resource "cloudflare_dns_record" "acme_challenge_www" {
-  zone_id = cloudflare_zone.pausatf.id
-  name    = "_acme-challenge.www"
-  content = "JmQAJz96_x3ZwO5VqAfTMWAu5GMU7HXgGcaCpoRB2Cg" # pragma: allowlist secret
-  type    = "TXT"
-  ttl     = 120
 }
 
 # =============================================================================
@@ -499,6 +483,39 @@ resource "cloudflare_ruleset" "cache_rules" {
 }
 
 # =============================================================================
+# WAF custom rules
+# =============================================================================
+
+# The live entrypoint ruleset was created through the API on 2026-11-19. Import it
+# before the first apply; see README.md "Backend and credentials".
+resource "cloudflare_ruleset" "waf_custom" {
+  zone_id = cloudflare_zone.pausatf.id
+  name    = "default"
+  kind    = "zone"
+  phase   = "http_request_firewall_custom"
+
+  rules = [
+    {
+      action      = "block"
+      description = "Block backup archives under uploads"
+      enabled     = true
+      # The uploads directory is an s3fs mount of pausatf-static/uploads, so any
+      # archive written there is publicly served. Block the backups prefix and
+      # archive extensions at the edge (Pro plan has no regex operator).
+      expression = "starts_with(lower(http.request.uri.path), \"/wp-content/uploads/backups\") or (starts_with(lower(http.request.uri.path), \"/wp-content/uploads/\") and (ends_with(lower(http.request.uri.path), \".sql\") or ends_with(lower(http.request.uri.path), \".gz\") or ends_with(lower(http.request.uri.path), \".tgz\") or ends_with(lower(http.request.uri.path), \".tar\") or ends_with(lower(http.request.uri.path), \".wpress\") or ends_with(lower(http.request.uri.path), \".bak\") or ends_with(lower(http.request.uri.path), \".age\") or ends_with(lower(http.request.uri.path), \".7z\") or ends_with(lower(http.request.uri.path), \".dump\")))"
+    },
+    {
+      action      = "managed_challenge"
+      description = "Challenge WordPress login and admin"
+      enabled     = true
+      # Prefix match: the origin also serves /wp-login.php/<path-info>.
+      # admin-ajax.php is called by public pages, so it stays unchallenged.
+      expression = "starts_with(lower(http.request.uri.path), \"/wp-login.php\") or (starts_with(lower(http.request.uri.path), \"/wp-admin\") and lower(http.request.uri.path) ne \"/wp-admin/admin-ajax.php\")"
+    },
+  ]
+}
+
+# =============================================================================
 # Rate Limiting — match the live wp-login brute-force rule
 # =============================================================================
 
@@ -519,7 +536,7 @@ resource "cloudflare_ruleset" "rate_limit" {
       }
       description = "wp-login brute-force rate limit"
       enabled     = true
-      expression  = "(http.request.uri.path eq \"/wp-login.php\" and http.request.method eq \"POST\")"
+      expression  = "(starts_with(lower(http.request.uri.path), \"/wp-login.php\") and http.request.method eq \"POST\")"
     },
   ]
 }
