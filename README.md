@@ -61,9 +61,6 @@ gh workflow run deploy-prod.yml
 # Deploy to dev (or push to dev branch)
 gh workflow run deploy-dev.yml
 
-# Capture current prod plugin/theme inventory
-gh workflow run capture-prod-inventory.yml
-
 # Run Ansible against production manually
 cd ansible
 ansible-playbook -i inventory/hosts.yml site.yml -l production \
@@ -121,9 +118,7 @@ target before deployment.
 | `do-nightly-snapshot.yml` | Daily 02:00 Pacific, manual dispatch | Creates timestamped DigitalOcean snapshot of prod droplet |
 | `do-weekly-stage-snapshot.yml` | Weekly Sunday 11:00 UTC, manual dispatch | Creates a completed DigitalOcean staging snapshot and retains the two newest |
 | systemd `pausatf-db-backup.timer` | 09:20 UTC daily + up to 20 minutes jitter | Tracked recovery drop-in adds encrypted deployment/configuration archives, image references and a manifest; verify installed service before relying on it |
-| `wordpress-update-check.yml` | Daily 09:17 UTC, manual dispatch | Read-only production check for WordPress core and plugin updates; opens or closes a tracking issue without applying updates |
-| `wp-plugin-audit.yml` | Manual dispatch | Production plugin/auth/WordPress diagnostics and explicitly requested remediation probes |
-| `capture-prod-inventory.yml` | Manual dispatch | Runs `capture-wp-inventory.yml`; commits `group_vars/production/wordpress.yml` |
+| `wordpress-update-check.yml` | Daily 09:17 UTC, manual dispatch | Reads installed core and plugin versions over a forced-command SSH key ([`ops/ci-readonly`](ops/ci-readonly/README.md)), compares them with wordpress.org, and opens or closes a tracking issue without applying updates |
 | `infra-staging.yml` | Manual dispatch | Terraform plan + apply for staging environment |
 | `terraform-plan.yml` | Push to `main` touching `terraform/`, weekly, manual dispatch | Plans the `cloudflare`, `staging` and `dev` HCP workspaces; apply stays manual |
 | `ci.yml` | PR and push to `main` | Ansible/YAML, Terraform, ShellCheck/Bash, Markdown/link and maintenance safety checks |
@@ -134,10 +129,12 @@ target before deployment.
 
 | Secret | Used by | Description |
 |--------|---------|-------------|
-| `PROD_SSH_PRIVATE_KEY` | deploy-prod, capture-prod-inventory, wordpress-update-check, prod-widgets-log-probe, wp-plugin-audit, integration-tests | Production SSH private key; verify the user selected by each workflow and inventory |
+| `PROD_CI_SSH_KEY` | wordpress-update-check | Read-only CI key for `github-deploy` on prod; the server forces it to `pausatf-ci-readonly` |
+| `CF_ACCESS_CLIENT_ID`, `CF_ACCESS_CLIENT_SECRET` | wordpress-update-check | Cloudflare Access service token allowed on the `ssh-v2.pausatf.org` app only |
+| `PROD_SSH_PRIVATE_KEY` | deploy-prod | Production SSH private key; verify the user selected by each workflow and inventory |
 | `STAGING_SSH_PRIVATE_KEY` | deploy-prod staging validation | SSH key for the staging check-mode job |
 | `DEV_SSH_PRIVATE_KEY` | deploy-dev | Private key for dev host |
-| `ANSIBLE_VAULT_PASSWORD` | deploy-prod, deploy-staging, deploy-dev, capture-prod-inventory | Ansible vault decryption password |
+| `ANSIBLE_VAULT_PASSWORD` | deploy-prod, deploy-staging, deploy-dev | Ansible vault decryption password |
 | `DO_TOKEN` | infra-staging, do-nightly-snapshot, do-weekly-stage-snapshot | DigitalOcean API token with permission to create and prune droplet snapshots |
 | `DO_PROD_DROPLET_ID` | do-nightly-snapshot (optional) | Numeric production droplet ID; when unset or inaccessible, the workflow resolves `pausatf-prod-v2` by name |
 | `DO_STAGE_DROPLET_ID` | do-weekly-stage-snapshot (optional) | Numeric staging droplet ID; when unset or inaccessible, the workflow resolves `pausatf-stage-v2` by name |
@@ -147,7 +144,7 @@ target before deployment.
 
 | Variable | Used by | Description |
 |----------|---------|-------------|
-| `PROD_HOST` | capture-prod-inventory, wp-plugin-audit, wordpress-update-check | Production SSH host/IP for GitHub Actions workflows that run remote checks over SSH |
+| `PROD_HOST` | wordpress-update-check | Production SSH hostname behind Cloudflare Access (`ssh-v2.pausatf.org`) |
 | `PROD_SSH_KNOWN_HOSTS` | wordpress-update-check | Trusted `known_hosts` entries for the production SSH endpoint; configure the host key out of band and keep strict host-key checking enabled |
 
 ## Development Workflow

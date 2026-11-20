@@ -45,38 +45,14 @@ jobs:
             dnspython \
             requests
 
-      - name: Write SSH key
-        id: ssh
-        env:
-          PROD_SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
-          PROD_HOST: ${{ vars.PROD_HOST }}
-        run: |
-          if [ -z "${PROD_SSH_PRIVATE_KEY:-}" ] || [ -z "${PROD_HOST:-}" ]; then
-            echo "SSH credentials not configured — skipping integration tests"
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          mkdir -p ~/.ssh
-          printf '%s\n' "$PROD_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          echo "skip=false" >> "$GITHUB_OUTPUT"
-
+      # HTTP and DNS checks only. CI has no shell access to production; the
+      # SSH-based classes in test_infrastructure.py are for local runs.
       - name: Run integration tests
-        if: steps.ssh.outputs.skip == 'false'
         env:
-          PROD_HOST: ${{ vars.PROD_HOST }}
           TEST_DOMAIN: www.pausatf.org
-          TEST_SSH_KEY: ~/.ssh/id_rsa
-          TEST_SSH_USER: github-deploy
         run: |
-          pytest docs/tests/integration/ \
+          pytest docs/tests/integration/test_infrastructure.py \
+            -k "TestWebsite or TestDNS" \
             -v \
             --timeout=60 \
-            -m "not slow" \
-            --tb=short \
-            --cov=docs/tests \
-            --cov-report=term-missing
-
-      - name: Remove SSH key
-        if: always()
-        run: rm -f ~/.ssh/id_rsa
+            --tb=short

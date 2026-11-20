@@ -87,8 +87,8 @@ Store securely in password manager:
    - Recovery Time: Typically 10-15 minutes to create a droplet from a snapshot, plus DNS and validation
 
 2. **WordPress Inventory**
-   - Workflow: `.github/workflows/capture-prod-inventory.yml`
-   - Frequency: Daily
+   - Playbook: `ansible/playbooks/capture-wp-inventory.yml`
+   - Frequency: Manual
    - Captures: Plugins, themes, configurations
    - Location: `ansible/group_vars/production/wordpress.yml` (committed to git)
 

@@ -1,0 +1,5 @@
+#!/bin/sh
+# Root helper (sudoers allows github-deploy to run it with no arguments).
+# Runs the fixed, read-only inventory script inside the WordPress container.
+set -eu
+exec docker exec -i -u www-data pausatf-wordpress php < /usr/local/lib/pausatf-ci/wp-versions.php

@@ -461,11 +461,9 @@ ansible-playbook -i inventory/hosts.yml site.yml --ask-vault-pass
 
 ## Automated Backups
 
-### Nightly Inventory Capture
+### Inventory Capture
 
-**GitHub Action:** `.github/workflows/capture-prod-inventory.yml`
-
-Runs on manual dispatch to capture WordPress plugins/themes/config and commit to the repository.
+Run `playbooks/capture-wp-inventory.yml` manually to capture WordPress plugins/themes/config and commit the result to the repository.
 
 ### Production Database and Legacy Backup
 

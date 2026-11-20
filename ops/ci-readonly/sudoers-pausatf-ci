@@ -1,0 +1,2 @@
+# Installed as /etc/sudoers.d/pausatf-ci (mode 0440). The empty "" forbids arguments.
+github-deploy ALL=(root) NOPASSWD: /usr/local/sbin/pausatf-wp-versions ""
