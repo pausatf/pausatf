@@ -11,23 +11,17 @@ For the Terraform layout, state and workspaces, read
 [../terraform/README.md](../terraform/README.md) first; those are the authority
 on how Terraform is run in this repository.
 
-## Known limitation: `init` does not work
+## Before the first run
 
-The `init` action runs
-`terraform init -backend-config="<repo>/terraform/backend.hcl"`. That file does
-not exist: it described the retired DigitalOcean Spaces backend, and the
-environments now use HCP Terraform through a `cloud` block. `terraform/README.md`
-says not to pass `backend.hcl`. Initialize from the environment directory
-instead:
+Every environment selects its HCP Terraform workspace (organization `pausatf`)
+in a `cloud` block and runs with local execution, so state lives in HCP
+Terraform and the plan runs on your workstation. Authenticate once per
+workstation, then initialize each environment through the wrapper:
 
 ```bash
-terraform login                      # once per workstation
-cd terraform/environments/production
-terraform init
+terraform login
+scripts/terraform-wrapper.sh production init
 ```
-
-The other actions (`validate`, `plan`, `apply`, `output`, `destroy`) call
-`terraform` directly and work after a manual `init`.
 
 ## Usage
 
@@ -57,7 +51,7 @@ scripts/terraform-wrapper.sh cloudflare output
 
 | Action | Command run in `terraform/environments/<environment>` | Notes |
 | --- | --- | --- |
-| `init` | `terraform init -backend-config=.../terraform/backend.hcl` | Fails; see above. |
+| `init` | `terraform init` | Uses the environment's `cloud` block. Needs `terraform login` first. |
 | `validate` | `terraform validate` | |
 | `plan` | `terraform plan -out=tfplan` | Saves the plan to `tfplan` in the environment directory. |
 | `apply` | `terraform apply tfplan` | Runs `plan` first if `tfplan` does not exist. Waits 5 seconds (Ctrl+C cancels), applies, then deletes `tfplan`. |

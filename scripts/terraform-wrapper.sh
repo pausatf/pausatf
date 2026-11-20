@@ -88,7 +88,7 @@ acquire_lock() {
         local lock_pid
         lock_pid=$(cat "$LOCK_FILE" 2>/dev/null || echo "unknown")
         local lock_age
-        lock_age=$(( $(date +%s) - $(stat -f %m "$LOCK_FILE" 2>/dev/null || stat -c %Y "$LOCK_FILE" 2>/dev/null || echo 0) ))
+        lock_age=$(( $(date +%s) - $(stat -c %Y "$LOCK_FILE" 2>/dev/null || stat -f %m "$LOCK_FILE" 2>/dev/null || echo 0) ))
         if [ "$lock_age" -gt 3600 ]; then
             echo -e "${YELLOW}Warning: Stale lock found (${lock_age}s old, PID $lock_pid). Removing.${NC}"
             rm -f "$LOCK_FILE"
@@ -122,7 +122,9 @@ run_terraform() {
 
     case "$ACTION" in
         init)
-            terraform init -backend-config="$ROOT_DIR/terraform/backend.hcl"
+            # Every environment selects its HCP Terraform workspace in a `cloud`
+            # block; init takes no backend configuration.
+            terraform init
             ;;
         validate)
             terraform validate
