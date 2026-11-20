@@ -536,7 +536,7 @@ only + Cloudflare Full (Strict) SSL.
 
 - Terraform >= 1.10.0
 - Ansible >= 2.15
-- `DO_TOKEN`, `SPACES_ACCESS_KEY_ID` / `SPACES_SECRET_ACCESS_KEY` configured
+- `DO_TOKEN` configured; HCP Terraform login (`terraform login`) for the `pausatf` organization
 - `CLOUDFLARE_API_TOKEN` configured
 - Ansible vault password (macOS Keychain: `security find-generic-password -s "pausatf-ansible-vault" -a "ansible" -w`)
 - Tailscale authkey generated; `vault_tailscale_authkey` added to vault

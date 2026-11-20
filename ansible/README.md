@@ -88,7 +88,6 @@ set as environment variables before running playbooks locally.
 | `PROD_SERVER_IP` | Production droplet public IP |
 | `DEV_SERVER_IP` | Development droplet public IP |
 | `STAGE_SERVER_IP` | Staging droplet public IP |
-| `PROD_NEW_SERVER_IP` | Migration target droplet IP |
 | `DO_VPC_UUID` | DigitalOcean VPC UUID |
 | `DO_PRIVATE_IP` | Droplet private/VPC IP |
 | `ALLOWED_SSH_NETWORKS` | JSON array of SSH allowlist CIDRs |
