@@ -414,7 +414,7 @@ All technical details are documented in 8 comprehensive guides:
 - README - Overview and quick start guides
 - CHANGELOG - Complete history of all changes
 
-**Location:** https://github.com/pausatf/pausatf-infrastructure-docs
+**Location:** https://github.com/pausatf/pausatf
 
 ---
 
@@ -423,7 +423,7 @@ All technical details are documented in 8 comprehensive guides:
 ### For Website Issues or Questions
 
 **Technical Administrator:** Thomas Vincent
-**Documentation:** https://github.com/pausatf/pausatf-infrastructure-docs
+**Documentation:** https://github.com/pausatf/pausatf
 
 ### Service Providers
 
@@ -525,7 +525,7 @@ If you have any questions about anything in this document, please don't hesitate
 **Document Version:** 1.0
 **Date:** December 20, 2025
 **Format:** Executive Summary for Non-Technical Stakeholders
-**Repository:** https://github.com/pausatf/pausatf-infrastructure-docs
+**Repository:** https://github.com/pausatf/pausatf
 **Technical Documentation:** See repository for detailed guides
 
 ---

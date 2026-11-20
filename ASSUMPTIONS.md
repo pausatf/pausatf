@@ -1,5 +1,10 @@
 # Assumptions — Ubuntu 24.04 Rebuild
 
+> **Historical (Ubuntu 24.04 rebuild changeset).** These assumptions were written for the `feat/ubuntu24-rebuild`
+> branch. Terraform state is no longer in DigitalOcean Spaces: all six roots use HCP Terraform (see
+> [terraform/README.md](terraform/README.md)), so ignore the Spaces-backend item below. The live droplets are
+> `pausatf-prod-v2`, `pausatf-stage-v2` and `pausatf-dev-v2`; see the [production runbook](docs/runbooks/production-operations.md).
+
 This document lists assumptions made in the `feat/ubuntu24-rebuild` changeset.
 Items marked **ACTION REQUIRED** need manual steps before or during cutover.
 

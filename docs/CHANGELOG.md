@@ -22,6 +22,13 @@ and this project adheres to semantic versioning principles for infrastructure ch
 
 ## [Unreleased]
 
+### Documentation
+- Rewrote the GitHub Actions reference and secrets guide from the current workflows, including which secrets and variables each reads
+- Recorded that `deploy-prod.yml` is disabled in repository settings and that Terraform apply is manual
+- Rewrote the automation guide: no Dependabot auto-merge, no commit-message hook, secret detection is local only
+- Removed three planning documents for the retired `pausatf-infrastructure-docs` repository (workflow strategy, workflow quickstart, documentation refactor plan)
+- Added a repository map and noted the pending Cloudflare Access SSH change (#295)
+
 ---
 
 ## [2025-12-21] - WordPress Security Audit and Remediation

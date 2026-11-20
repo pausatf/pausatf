@@ -1,5 +1,11 @@
 # Legacy Content Automated Sync Setup
 
+> **Not current.** This sync design pushes to `pausatf/pausatf-legacy-content` and downloads its scripts from
+> `pausatf/pausatf-scripts`. Neither repository exists in the organization any more; the content is the `content/`
+> directory of this repository and the scripts are in `scripts/legacy-content/`. `ansible/playbooks/deploy-legacy-content-sync.yml`
+> still points at the old repository URLs, so it cannot run as written. Do not follow these steps without first
+> deciding where the content should sync to.
+
 This document explains how to set up automated syncing of the legacy content from the production server to the Git repository.
 
 ## Overview

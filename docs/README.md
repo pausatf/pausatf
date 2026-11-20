@@ -4,11 +4,30 @@ The infrastructure documentation is maintained in `pausatf/pausatf`. Start with 
 Configuration in Git describes intended behavior; verify installed services, current inventory and recovery evidence
 before operating on a live environment. Dated audit reports and migration records describe their recorded period.
 
+## Where things live
+
+The PAUSATF site is split across six repositories. This repository holds infrastructure and the deploy configuration
+for the host web stack; the others own the application code and the local build.
+
+| Repository | Owns | Visibility |
+| --- | --- | --- |
+| [pausatf](https://github.com/pausatf/pausatf) (this repository) | Infrastructure and deploy: Ansible roles and playbooks, Terraform for Cloudflare, DigitalOcean, GitHub and HCP, GitHub Actions, operational scripts and runbooks | Public |
+| [pausatf-site](https://github.com/pausatf/pausatf-site) | The central WordPress plugin: news, committees, events, results library, governance documents, sign-in, widget scoping and SEO. Installs as `pausatf-seo/pausatf-seo.php` | Private |
+| [pausatf-results-manager](https://github.com/pausatf/pausatf-results-manager) | WordPress plugin that imports, manages and displays legacy competition results | Public |
+| [pausatf-generatepress-child](https://github.com/pausatf/pausatf-generatepress-child) | The GeneratePress child theme for pausatf.org. It is the staged successor to TheSource-child, which Ansible still deploys from this repository | Private |
+| [pausatf-deployment](https://github.com/pausatf/pausatf-deployment) | The Docker Compose stack, the Composer site build and the migration scripts. The three current droplets run this stack | Private |
+| [pausatf-archive-tooling](https://github.com/pausatf/pausatf-archive-tooling) | Offline extraction, independent review and preview tooling for the results archive | Private |
+
+pausatf-core is archived, and pausatf-site replaces it. Dev plugins are installed by pausatf-deployment, not Ansible.
+
 ## Operations
 
 | Document | Purpose |
 | --- | --- |
 | [Repository overview](../README.md) | Components, workflows and operational gates |
+| [GitHub Actions reference](governance/GITHUB-ACTIONS.md) | Every workflow, its triggers, secrets and variables; which are disabled |
+| [Secrets and variables](governance/SECRETS.md) | Names, scope, handling and rotation |
+| [Automation](governance/AUTOMATION.md) | Dependabot and pre-commit configuration |
 | [Operator runbook](../RUNBOOK.md) | Infrastructure and application operations |
 | [Deployment](runbooks/deployment.md) | Review, validation, deployment and rollback |
 | [Production operations](runbooks/production-operations.md) | Routine operations and escalation |
@@ -53,7 +72,7 @@ Their version, resource, cost and deployment claims are not current inventory ve
 | [11 - Database Maintenance](guides/11-database-maintenance.md) | Database procedures, primary keys, troubleshooting | Dec 21, 2025 |
 | [13 - DigitalOcean Optimization](guides/13-digitalocean-optimization-guide.md) | Infrastructure improvements, security, monitoring, DR | Dec 21, 2025 |
 
-### 📊 Reports & Audits
+### Reports and audits
 
 **Historical audits, assessments, and implementation summaries:**
 
@@ -69,7 +88,7 @@ Their version, resource, cost and deployment claims are not current inventory ve
 | [Phase 1 Implementation](reports/PHASE1-IMPLEMENTATION-REPORT.md) | Phase 1 security improvements summary | Dec 21, 2025 |
 | [IaC Updates](reports/INFRASTRUCTURE-AS-CODE-UPDATES.md) | Terraform/Ansible configurations | Dec 21, 2025 |
 
-### 🗺️ Planning & Roadmaps
+### Planning and roadmaps
 
 **Future roadmaps and strategic planning:**
 
@@ -79,7 +98,7 @@ Their version, resource, cost and deployment claims are not current inventory ve
 
 ## License
 
-Internal documentation for pausatf.org infrastructure. Not for public distribution.
+This repository is public. It has no top-level license file; see [CONTRIBUTING.md](../CONTRIBUTING.md#license).
 
 **Maintained by:** Thomas Vincent (@somethingwithproof)
 **Organization:** Pacific Association of USA Track and Field (PAUSATF)

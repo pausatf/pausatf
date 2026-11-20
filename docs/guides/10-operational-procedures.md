@@ -458,7 +458,7 @@ https://dash.cloudflare.com/ → pausatf.org → DNS
 
 ### Documentation
 
-**Repository:** https://github.com/pausatf/pausatf-infrastructure-docs
+**Repository:** https://github.com/pausatf/pausatf
 
 **Key Documents:**
 - `README.md` - Start here

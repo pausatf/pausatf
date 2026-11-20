@@ -1,5 +1,11 @@
 # Monorepo Migration Guide
 
+> **Historical record (December 2025).** The consolidation described here is complete. Since then the site code moved
+> out again: the central plugin is [pausatf-site](https://github.com/pausatf/pausatf-site), the GeneratePress theme is
+> [pausatf-generatepress-child](https://github.com/pausatf/pausatf-generatepress-child), and the local stack and build are
+> [pausatf-deployment](https://github.com/pausatf/pausatf-deployment). See the [repository map](README.md#where-things-live).
+> The `themes/thesource*` paths below no longer exist; Ansible deploys `ansible/roles/wordpress/files/TheSource-child/`.
+
 This document provides information about the pausatf organization's migration to a monorepo structure.
 
 ## Migration Overview
