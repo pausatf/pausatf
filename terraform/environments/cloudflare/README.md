@@ -27,7 +27,7 @@ environment workspaces.
 ### Observed zone settings and rulesets
 
 The declared zone settings match the dashboard: Full (strict), Always Use
-HTTPS, minimum TLS 1.2, Brotli, opportunistic encryption, and HSTS
+HTTPS, minimum TLS 1.2, TLS 1.3 with 0-RTT (`zrt`), Brotli, opportunistic encryption, and HSTS
 (`max-age=15552000`, include subdomains, preload, and nosniff). The live cache
 ruleset bypasses caching for the apex and `/data/`, caches anonymous public
 pages for 7200 seconds at the edge and 300 seconds in browsers, and bypasses
