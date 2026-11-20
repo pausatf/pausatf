@@ -1,8 +1,10 @@
-name: Nightly DO Snapshot (prod)
+name: Weekly DO Snapshot (prod)
 
 on:
   schedule:
-    - cron: '0 10 * * *'  # 2 AM Pacific approx
+    # Native daily droplet backups (7-day retention) cover recent restores;
+    # weekly snapshots extend coverage to about a month.
+    - cron: '0 10 * * 0'  # Sundays, 2 AM Pacific approx
   workflow_dispatch:
 
 permissions:
@@ -71,7 +73,7 @@ jobs:
           doctl compute droplet-action snapshot "$DROPLET_ID" --snapshot-name "$snapshot_name" --wait
           echo "name=$snapshot_name" >> "$GITHUB_OUTPUT"
 
-      - name: Prune old snapshots (keep last 7)
+      - name: Prune old snapshots (keep last 4)
         env:
           DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DO_TOKEN }}
           DROPLET_ID: ${{ steps.droplet.outputs.id }}
@@ -80,7 +82,7 @@ jobs:
           set -euo pipefail
           doctl compute snapshot list --resource droplet --output json > snapshots.json
           python3 scripts/snapshot-retention.py --droplet-id "$DROPLET_ID" \
-            --completed-name "$SNAPSHOT_NAME" < snapshots.json > prune.txt
+            --completed-name "$SNAPSHOT_NAME" --keep 4 < snapshots.json > prune.txt
           while IFS= read -r snap_id; do
             [ -n "$snap_id" ] || continue
             doctl compute snapshot delete "$snap_id" --force
