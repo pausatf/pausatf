@@ -21,7 +21,7 @@ Re-check before relying on any value; nothing below was changed to collect it.
 | Content | WordPress core in the `pausatf_prod_wordpress_core` volume at `/var/www/html`. `wp-content` is bind-mounted from the compose directory, and uploads come from the s3fs Spaces mount `/mnt/spaces-uploads`. |
 | Logs | `~/pausatf-deployment/logs/apache2` and `logs/modsec`, plus `sudo docker logs pausatf-wordpress` |
 | Scheduled work | `/etc/cron.d/pausatf-wpcron` runs `wp-cron.php` in the container every 5 minutes. systemd timers: `pausatf-db-backup` (runs `/usr/local/sbin/pausatf-recovery-backup`), `pausatf-media-backup`, `pausatf-backup-audit`, `pausatf-health`, `pausatf-inventory`, `pausatf-usage`, `certbot`. On 2026-11-10 the last run of each backup, audit and health unit had succeeded. |
-| Snapshots | GitHub workflow `do-nightly-snapshot.yml` (seven retained). Native droplet backups are off. |
+| Snapshots | GitHub workflow `do-nightly-snapshot.yml`, weekly on Sundays (four retained). Native daily droplet backups are on (seven-day retention). |
 
 The container has no WP-CLI. Read-only checks:
 
@@ -249,11 +249,11 @@ ssh deploy@ftp.pausatf.org 'tail -20 /var/www/html/wp-content/debug.log'
    - Stores encrypted artifacts in private DigitalOcean Spaces; backup data is not committed to git.
    - Runbook: `scripts/backup/README.md`
 
-3. **DigitalOcean Snapshot** (2:00 AM PT)
+3. **DigitalOcean Snapshot** (Sundays, 2:00 AM PT)
    - Workflow: `.github/workflows/do-nightly-snapshot.yml`
    - Creates: Full droplet snapshot
    - Naming: `prod-nightly-YYYYMMDD-HHMMSS`
-   - Retention: Managed by DigitalOcean (7 days)
+   - Retention: last four, pruned by `scripts/snapshot-retention.py`
 
 ### Cron Jobs
 
