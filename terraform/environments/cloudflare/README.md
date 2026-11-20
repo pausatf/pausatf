@@ -59,9 +59,8 @@ Cloudflare environment. The former direct A records (`ftp`, `mail`, `monitor`,
 ## Backend and credentials
 
 State belongs to the HCP Terraform workspace `pausatf-cloudflare` in the
-`pausatf` organization. The live resources are imported and the current plan is
-clean. Use `terraform login`, then initialize
-with the repository's pinned Terraform version:
+`pausatf` organization. Use `terraform login`, then initialize with the
+repository's pinned Terraform version:
 
 ```bash
 cd terraform/environments/cloudflare
@@ -69,6 +68,19 @@ terraform init
 terraform validate
 terraform plan
 ```
+
+The custom WAF entrypoint ruleset (`cloudflare_ruleset.waf_custom`) was created
+through the API on 2026-11-19 and is not in state yet. Until it is imported, a
+plan proposes to create it, and an apply fails because the zone already has
+that entrypoint. Import it once before the next apply:
+
+```bash
+terraform import cloudflare_ruleset.waf_custom \
+  zones/67b87131144a68ad5ed43ebfd4e6d811/1fcc42aa2e3944e2aecc08aa6e3578ed
+```
+
+The import is a CLI step rather than an `import` block because the TFSec check in
+CI cannot parse `import` blocks.
 
 Provide a narrowly scoped Cloudflare token as a sensitive environment value on
 the trusted runner. The existing zone, DNS records, settings, and rulesets are

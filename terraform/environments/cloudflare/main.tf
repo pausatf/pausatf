@@ -486,6 +486,8 @@ resource "cloudflare_ruleset" "cache_rules" {
 # WAF custom rules
 # =============================================================================
 
+# The live entrypoint ruleset was created through the API on 2026-11-19. Import it
+# before the first apply; see README.md "Backend and credentials".
 resource "cloudflare_ruleset" "waf_custom" {
   zone_id = cloudflare_zone.pausatf.id
   name    = "default"
@@ -537,10 +539,4 @@ resource "cloudflare_ruleset" "rate_limit" {
       expression  = "(starts_with(lower(http.request.uri.path), \"/wp-login.php\") and http.request.method eq \"POST\")"
     },
   ]
-}
-
-# The custom WAF entrypoint ruleset was created via the API on 2026-11-19.
-import {
-  to = cloudflare_ruleset.waf_custom
-  id = "zones/67b87131144a68ad5ed43ebfd4e6d811/1fcc42aa2e3944e2aecc08aa6e3578ed"
 }
