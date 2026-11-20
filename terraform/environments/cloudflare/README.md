@@ -18,8 +18,14 @@ The legacy
 `import-dns-records.sh` script is obsolete and must not be run: it targets the
 old provider resource type and an incomplete, stale record map.
 
-The live inventory contains 39 DNS records: 7 A, 14 CNAME, 5 MX, 6 TXT, and 7
-CAA. This Cloudflare environment owns 37 records; `dev` is owned by the dev
+The 2026-09-27 inventory contained 39 DNS records: 7 A, 14 CNAME, 5 MX, 6 TXT,
+and 7 CAA. On 2026-11-10, six of them still pointed at servers retired in the v2
+migration, at addresses no longer in the PAUSATF DigitalOcean account: the A
+records `ftp`, `mail`, `monitor`, `direct-ssh` and `staging`, and the `prod`
+CNAME to `ftp`. They were removed from this configuration, so applying it
+deletes them, leaving 33 records (2 A, 13 CNAME, 5 MX, 6 TXT, 7 CAA). Inbound
+mail uses the Google Workspace MX records, not `mail`. This Cloudflare
+environment owns 31 records; `dev` is owned by the dev
 environment and `stage` by the staging environment. Keep those ownership
 boundaries intact so different remote states cannot overwrite the same DNS
 record. The `dev` and `stage` records are now imported into their respective
@@ -47,8 +53,8 @@ configuration so an import and review plan will not propose creating them.
 
 | Type | Names |
 | --- | --- |
-| A | `dev`, `direct-ssh`, `ftp`, `mail`, `monitor`, `runners`, `staging` |
-| CNAME | `@`, `www`, `stage`, `prod`, `ssh`, `ssh-stage-v2`, `ssh-v2`, `v2canary`, `51871933`, `em5172`, `url7068`, `url7741`, `s1._domainkey`, `s2._domainkey` |
+| A | `dev`, `runners` |
+| CNAME | `@`, `www`, `stage`, `ssh`, `ssh-stage-v2`, `ssh-v2`, `v2canary`, `51871933`, `em5172`, `url7068`, `url7741`, `s1._domainkey`, `s2._domainkey` |
 | MX | `@` (five Google Workspace records) |
 | TXT | `@` (SPF and Google verification), `_dmarc`, `cf2024-1._domainkey`, `mail._domainkey`, `_acme-challenge.www` |
 | CAA | `@` (seven records for Google Trust Services, DigiCert, Let's Encrypt, and iodef) |
