@@ -1,225 +1,82 @@
-# PAUSATF Automation Scripts
+# Scripts
 
-## Current backup and local-stack entry points
+Operational scripts, CI helpers and their unit tests for the pausatf repository.
+Every file in this directory is documented in [SCRIPTS.md](SCRIPTS.md); this page
+is the map.
 
-- [Production recovery backup](backup/README.md): tracked systemd service/drop-in, exact database invocation receipts,
-  encrypted archives, manifest and retention safeguards. Verify the installed command and an isolated restore.
-- [Local OpenLiteSpeed database](docker/README.md): MariaDB 11.8 backup/restore checks before 13.0 startup.
-- `local/sync-from-stage.sh`: refuses existing volumes unless the running database reports 13.0, and uses
-  credentials inside the Compose database container. It is a data-sync operation requiring local overwrite review.
+## Layout
 
-The planned script names below are proposals, not installed commands. Use the actual script and its runbook.
+| Path | What it is | Documentation |
+| --- | --- | --- |
+| `firewall-maintenance.py` | Updates the DigitalOcean firewalls (Cloudflare ranges, one SSH source). Run by GitHub Actions. | [SCRIPTS.md](SCRIPTS.md#firewall-maintenancepy) |
+| `snapshot-retention.py` | Chooses which droplet snapshots to delete after a new snapshot succeeds. Run by the snapshot workflows. | [SCRIPTS.md](SCRIPTS.md#snapshot-retentionpy) |
+| `check_phpcs_changed_lines.py` | PHPCS gate that fails only on violations in changed lines. Run by the PHP quality workflow. | [SCRIPTS.md](SCRIPTS.md#check_phpcs_changed_linespy) |
+| `terraform-wrapper.sh` | Local wrapper for `terraform` in `terraform/environments/<name>`. | [TERRAFORM-WRAPPER.md](TERRAFORM-WRAPPER.md) |
+| `setup-managed-db-vars.sh` | Writes Managed MySQL credentials from DigitalOcean into an Ansible vault file. | [SCRIPTS.md](SCRIPTS.md#setup-managed-db-varssh) |
+| `test_*.py` | Unit tests for the Python scripts and some WordPress and archive checks. | [Tests](#tests) |
+| `backup/` | Production database and recovery backup scripts, systemd units and a test. | [backup/README.md](backup/README.md) |
+| `docker/` | Local Docker Compose stacks (Apache and nginx with monitoring, and OpenLiteSpeed with MariaDB). | [docker/README.md](docker/README.md) |
+| `legacy-content/` | Sync of the legacy static site to the `pausatf-legacy-content` repository. | [legacy-content/README.md](legacy-content/README.md), [legacy-content/SYNC-SETUP.md](legacy-content/SYNC-SETUP.md) |
+| `local/sync-from-stage.sh` | Copies the staging database and uploads into the local OpenLiteSpeed stack. | [SCRIPTS.md](SCRIPTS.md#localsync-from-stagesh) |
 
-**Operational scripts and automation tools for pausatf.org infrastructure**
+The scripts that touch DigitalOcean, Cloudflare or production hosts are meant to
+run from CI or from an operator's workstation with credentials supplied through
+the environment. Nothing here stores a credential. Read each script's section in
+[SCRIPTS.md](SCRIPTS.md) before running it; several modify live infrastructure.
 
-[![Shell Script](https://img.shields.io/badge/Shell-Bash-4EAA25?logo=gnu-bash)](https://www.gnu.org/software/bash/)
-[![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python)](https://www.python.org/)
-[![Infrastructure as Code](https://img.shields.io/badge/IaC-Ansible-EE0000?logo=ansible)](https://www.ansible.com/)
-[![Terraform](https://img.shields.io/badge/IaC-Terraform-7B42BC?logo=terraform)](https://www.terraform.io/)
+## Tests
 
----
-
-## Overview
-
-Collection of automation scripts for PAUSATF.org infrastructure operations, maintenance, monitoring, and deployment tasks.
-
-**Complete Script Inventory**: See [SCRIPTS.md](SCRIPTS.md) for comprehensive documentation of all scripts.
-
-## Quick Links
-
-| Document | Purpose |
-|----------|---------|
-| [SCRIPTS.md](SCRIPTS.md) | Complete inventory of all scripts with detailed documentation |
-| [TERRAFORM-WRAPPER.md](TERRAFORM-WRAPPER.md) | Terraform wrapper script documentation |
-| [legacy-content/README.md](legacy-content/README.md) | Legacy content sync scripts overview |
-| [legacy-content/SYNC-SETUP.md](legacy-content/SYNC-SETUP.md) | Legacy content sync setup guide |
-
-## Active Scripts
-
-Currently deployed and operational scripts:
-
-### Infrastructure Management
-- **[terraform-wrapper.sh](terraform-wrapper.sh)** - Safe Terraform execution wrapper
-  - [Documentation](TERRAFORM-WRAPPER.md)
-
-### Legacy Content Synchronization
-- **[sync-legacy-content-watcher.sh](legacy-content/sync-legacy-content-watcher.sh)** - Real-time file watcher
-- **[sync-legacy-content-cron.sh](legacy-content/sync-legacy-content-cron.sh)** - Scheduled sync via cron
-- **[sync-legacy-content-watcher.service](legacy-content/sync-legacy-content-watcher.service)** - Systemd service
-  - [Documentation](legacy-content/README.md)
-
-## Repository Structure
-
-```
-pausatf-scripts/
-├── backup/              # Backup and restore scripts
-├── deployment/          # Deployment automation
-├── monitoring/          # Health checks and alerts
-├── maintenance/         # Routine maintenance tasks
-├── security/            # Security scans and updates
-├── cloudflare/          # Cloudflare API automation
-└── database/            # Database maintenance scripts
-```
-
-## Planned Future Scripts
-
-The following directory structure and scripts are planned for future development:
-
-### Backup (Planned)
-- `backup-wordpress.sh` - WordPress file and database backup
-- `backup-to-spaces.sh` - Upload backups to DigitalOcean Spaces
-- `restore-wordpress.sh` - Restore from backup
-
-### Deployment (Planned)
-- `deploy-to-staging.sh` - Deploy changes to staging
-- `deploy-to-production.sh` - Deploy to production (with checks)
-- `rollback.sh` - Rollback to previous version
-
-### Monitoring (Planned)
-- `health-check.sh` - Server health monitoring
-- `check-ssl-expiry.sh` - SSL certificate expiration check
-- `disk-usage-alert.sh` - Disk space monitoring
-
-### Maintenance (Planned)
-- `update-wordpress.sh` - WordPress core updates
-- `update-plugins.sh` - Plugin updates
-- `optimize-database.sh` - Database optimization
-- `clear-cache.sh` - Clear all caches
-
-### Security (Planned)
-- `security-scan.sh` - WordPress security scan
-- `update-firewall-rules.sh` - Update firewall configurations
-- `rotate-secrets.sh` - Rotate API tokens and passwords
-
-### Cloudflare (Planned)
-- `purge-cloudflare-cache.sh` - Purge Cloudflare cache
-- `update-dns-records.sh` - Update DNS via API
-- `check-cloudflare-status.sh` - Cloudflare status check
-
-### Database (Planned)
-- `backup-database.sh` - MySQL database backup
-- `optimize-tables.sh` - Optimize MySQL tables
-- `check-primary-keys.sh` - Verify all tables have primary keys
-
-**Note**: For currently active scripts, see the [Active Scripts](#active-scripts) section above or [SCRIPTS.md](SCRIPTS.md) for complete documentation.
-
----
-
-## Usage
-
-### Prerequisites
+CI runs the Python unit tests with:
 
 ```bash
-# Install required tools
-brew install jq curl
-
-# Set environment variables
-export DIGITALOCEAN_TOKEN="your-token"
-export CLOUDFLARE_API_TOKEN="your-token"
+python3 -m unittest discover -s scripts -p 'test_*.py'
 ```
 
-### Running Scripts
+Run it from the repository root. The command takes about ten seconds and runs 27
+tests. Some of them need `git`, `node` and `php` on the path: the archive test
+runs JavaScript through `node`, and the widget visibility test runs the real
+mu-plugin through `php`. CI installs PHP 8.3 for this job.
+
+`scripts/backup/tests/test_manifest.py` lives in a directory without an
+`__init__.py`, so the command above does not discover it. Run it directly:
 
 ```bash
-# Make executable
-chmod +x script-name.sh
-
-# Validate syntax only; this does not execute a backup or prove recovery
-bash -n backup/pausatf-db-backup.sh
-
-# Or use bash directly
-bash deployment/deploy-to-staging.sh
+python3 -m unittest scripts/backup/tests/test_manifest.py
 ```
 
----
+| Test file | Covers |
+| --- | --- |
+| `test_firewall_maintenance.py` | Rule planning in `firewall-maintenance.py`: web ports untouched on the tunnel firewall, non-destructive SSH add, input validation, drift detection, dry run and partial failure reporting. |
+| `test_firewall_fetch.py` | The Cloudflare range fetch path: both address families required, malformed responses never write, a missing token never reaches the network. |
+| `test_snapshot_retention.py` | `snapshot-retention.py`: only matching snapshots of one droplet are candidates, fails closed if the new snapshot is not listed, retention minimum, name prefix validation. |
+| `test_phpcs_legacy_encoding.py` | `check_phpcs_changed_lines.py` keeps legacy-encoded bytes intact when parsing diffs and scanning the base version. |
+| `test_widget_visibility.py` | The `pausatf-widget-visibility.php` mu-plugin in the `wordpress` Ansible role: hides non-matching widgets, no longer evaluates stored PHP. |
+| `test_archive_https.py` | The shared analytics loader and the tracked legacy pages under `content/`: every shipped tracking reference uses the HTTPS loader or a verified variant. |
+| `backup/tests/test_manifest.py` | Manifest generation in the recovery backup, without production hosts. |
 
-## Best Practices
+## Other CI checks on this directory
 
-### Script Standards
+- ShellCheck at warning severity over `scripts/` (`ci.yml`, job `shellcheck`).
+- `bash -n` on every `*.sh` file under `scripts/` (`ci.yml`, job `bash-syntax`).
+- Markdown lint, and the repository pre-commit hooks (`.pre-commit-config.yaml`:
+  shellcheck, gitleaks, detect-secrets, checkov and others).
 
-1. **Shebang**: Always use `#!/bin/bash`
-2. **Error Handling**: Use `set -euo pipefail`
-3. **Logging**: Log to both console and file
-4. **Documentation**: Include header comments
-5. **Validation**: Check prerequisites before execution
+## Conventions for new scripts
 
-### Example Script Template
+- Shell: `#!/usr/bin/env bash` or `#!/bin/bash`, `set -euo pipefail`, and clean
+  ShellCheck output at warning severity.
+- Python: standard library only unless there is a reason, a `--help` through
+  `argparse`, and a `test_*.py` next to it so the CI command picks it up.
+- Read credentials from the environment or the OS keychain at run time. Never
+  put a literal credential on a command line or in a file.
+- Destructive scripts take a dry-run default or an explicit `--apply`, as
+  `firewall-maintenance.py` does.
+- Document the script in [SCRIPTS.md](SCRIPTS.md) in the same change.
 
-```bash
-#!/bin/bash
-# Script Name: example-script.sh
-# Description: Brief description of what this script does
-# Author: Thomas Vincent
-# Date: 2025-12-21
-
-set -euo pipefail
-
-# Configuration
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-LOG_FILE="/var/log/pausatf/example.log"
-
-# Functions
-log() {
-    echo "[$(date +%Y-%m-%d\ %H:%M:%S)] $*" | tee -a "$LOG_FILE"
-}
-
-error() {
-    log "ERROR: $*" >&2
-    exit 1
-}
-
-# Validation
-command -v jq >/dev/null 2>&1 || error "jq is required"
-
-# Main Logic
-log "Starting script..."
-# Your code here
-log "Script completed successfully"
-```
-
----
-
-## Security
-
-### Secrets Management
-
-**Never commit secrets to the repository!**
-
-- Use environment variables for API tokens
-- Use `.env` files (gitignored) for local development
-- Use GitHub Secrets for CI/CD
-- Rotate credentials regularly
-
-### Pre-commit Hooks
-
-Install to prevent committing secrets:
-
-```bash
-pip install pre-commit
-pre-commit install
-```
-
----
-
-## CI/CD
-
-Scripts are validated on every PR:
-- ShellCheck linting
-- Secret detection
-- Syntax validation
-
----
-
-## Contributing
-
-See [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines.
-
----
-
-## License
-
-Private repository - Internal use only
-
-**Maintained by:** Thomas Vincent
-**Organization:** Pacific Association of USA Track and Field (PAUSATF)
-**Last Updated:** 2025-12-21
+The scripts that were once planned here (deployment, monitoring, maintenance and
+security helpers, a standalone WordPress backup script, Cloudflare purge scripts)
+do not exist in this directory. Equivalents that do exist live elsewhere: the
+WordPress backup and Cloudflare purge scripts are Ansible role templates under
+`ansible/roles/backups`, `ansible/roles/backup-wordpress` and
+`ansible/roles/cloudflare`; deployments run through GitHub Actions workflows
+under `.github/workflows/`.
