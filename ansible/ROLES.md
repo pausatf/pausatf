@@ -1,8 +1,8 @@
 # Ansible roles, playbooks and inventory
 
-This file describes what the code under `ansible/` does today. There are 24
+This file describes what the code under `ansible/` does today. There are 23
 roles in `ansible/roles/`, one orchestration playbook (`ansible/site.yml`) and
-19 playbooks in `ansible/playbooks/`. For setup and day-to-day usage see
+18 playbooks in `ansible/playbooks/`. For setup and day-to-day usage see
 `ansible/README.md`.
 
 Defaults quoted below come from each role's `defaults/main.yml`. Most are
@@ -355,22 +355,6 @@ configures logrotate (`/etc/logrotate.d/pausatf-backup`, log
   sets it).
 - Tags: `backups`.
 
-### `backup-wordpress`
-
-A second, stricter backup role with its own README (`roles/backup-wordpress/`).
-It deploys `backup-wordpress.sh` to `/usr/local/sbin/`, schedules it from root's
-crontab, and configures logrotate. It reads MySQL credentials from
-`backup_db_cred_file` (`/root/.my-backup-wordpress.cnf`, which must already
-exist), skips the run above a disk-usage threshold, and can offload archives to
-DigitalOcean Spaces with `s3cmd` when `backup_do_spaces_bucket` is set.
-
-- Variables: `backup_dir`, `backup_retention_days` (3), `backup_retention_count`
-  (3), `backup_disk_threshold_pct` (80), `backup_cron_hour` (`2`),
-  `backup_webroot`, `backup_do_spaces_*`. See the role README for the full table.
-- Used by: no playbook references it. Apply it from a one-off playbook that
-  lists the role. It has a Molecule scenario.
-- Tags: none.
-
 ### `monitoring`
 
 Host monitoring. Installs `htop`, `iotop`, `iftop`, `nethogs`, `sysstat` and
@@ -490,7 +474,6 @@ Run from `ansible/`. `site.yml` is the main entry point; the files in
 | `playbooks/security-remediation.yml` | `production` | Response to the January 2026 breach. `--tags audit` runs read-only checks; mutating tasks are tagged `never, remediate` and run only with `--tags remediate`. |
 | `playbooks/rotate-credentials.yml` | `webservers` | Regenerates WordPress salts (`rotate_salts`, default true) and prints a checklist; API tokens are rotated by hand. `rotate_db_password` only changes the checklist line, no task rotates the database password. |
 | `playbooks/reset-wp-admin-passwords.yml` | `webservers` | Resets WordPress administrator passwords; `-e wp_target_user=<login>` limits it to one user. |
-| `playbooks/deploy-legacy-content-sync.yml` | `production` | Deploys the legacy-content sync watcher and/or cron job from `scripts/legacy-content/`. Tags: `watcher`, `cron`, `both`. |
 | `playbooks/capture-wordpress-config.yml` | `webservers` | Captures WordPress, PHP, web server, database (sanitized), cron, cert and `.htaccess` configuration into a local directory. Read-only on the servers. |
 | `playbooks/capture-ols-config.yml` | `staging` | Captures the OpenLiteSpeed config, vhosts, lsphp packages, service status and certbot timers. |
 | `playbooks/capture-wp-inventory.yml` | `production` | Records plugins, themes, users, last logins, menus and site settings with WP-CLI, and writes them to `group_vars/production/wordpress.yml`. |
@@ -572,7 +555,7 @@ ansible-playbook site.yml -e @<(ansible/scripts/tf-to-ansible.sh production)
 
 ## Overlaps and gaps in the code
 
-- `backups`, `backup-wordpress` and `monitoring` each deploy a script to
+- `backups` and `monitoring` both deploy a script to
   `/usr/local/sbin/backup-wordpress.sh` and use overlapping variable names
   (`backup_dir`, `backup_retention_days`, `backup_cron_hour`) with different
   defaults. Apply at most one of them per host.

@@ -16,7 +16,6 @@ is the map.
 | `test_*.py` | Unit tests for the Python scripts and some WordPress and archive checks. | [Tests](#tests) |
 | `backup/` | Production database and recovery backup scripts, systemd units and a test. | [backup/README.md](backup/README.md) |
 | `docker/` | Local Docker Compose stacks (Apache and nginx with monitoring, and OpenLiteSpeed with MariaDB). | [docker/README.md](docker/README.md) |
-| `legacy-content/` | Sync of the legacy static site to the `pausatf-legacy-content` repository. | [legacy-content/README.md](legacy-content/README.md), [legacy-content/SYNC-SETUP.md](legacy-content/SYNC-SETUP.md) |
 | `local/sync-from-stage.sh` | Copies the staging database and uploads into the local OpenLiteSpeed stack. | [SCRIPTS.md](SCRIPTS.md#localsync-from-stagesh) |
 
 The scripts that touch DigitalOcean, Cloudflare or production hosts are meant to
@@ -77,6 +76,6 @@ The scripts that were once planned here (deployment, monitoring, maintenance and
 security helpers, a standalone WordPress backup script, Cloudflare purge scripts)
 do not exist in this directory. Equivalents that do exist live elsewhere: the
 WordPress backup and Cloudflare purge scripts are Ansible role templates under
-`ansible/roles/backups`, `ansible/roles/backup-wordpress` and
+`ansible/roles/backups`, `ansible/roles/monitoring` and
 `ansible/roles/cloudflare`; deployments run through GitHub Actions workflows
 under `.github/workflows/`.
