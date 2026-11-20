@@ -23,28 +23,26 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Python
-        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
+      - name: Setup Ansible
+        uses: ./.github/actions/setup-ansible
+
+      - name: Connect to production through Cloudflare Access
+        uses: ./.github/actions/cloudflare-access-ssh
         with:
-          python-version: '3.12'
+          host: ${{ vars.PROD_SSH_HOST }}
+          user: github-deploy
+          ssh-key: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+          known-hosts: ${{ vars.PROD_SSH_KNOWN_HOSTS }}
+          access-client-id: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          access-client-secret: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+          alias: pausatf-prod
 
-      - name: Install Ansible
-        run: |
-          python -m pip install --upgrade pip
-          pip install ansible-core==2.17.5
-
-      - name: Setup SSH key
-        env:
-          SSH_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
-          PROD_HOST: ${{ vars.PROD_HOST }}
-        run: |
-          TARGET_HOST="${PROD_HOST:-REDACTED_PROD_NEW_IP}"
-          install -m 700 -d ~/.ssh
-          printf "%s" "$SSH_KEY" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H "$TARGET_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
-
+      # The inventory reads the production address from PROD_SERVER_IP; the
+      # alias picks up the key, pinned known_hosts and Access proxy from
+      # ~/.ssh/config. The inventory's ansible_user still applies.
       - name: Run capture playbook (prod)
+        env:
+          PROD_SERVER_IP: pausatf-prod
         run: |
           ansible-playbook -i ansible/inventory/hosts.yml ansible/playbooks/capture-wp-inventory.yml -l production
 

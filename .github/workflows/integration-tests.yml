@@ -45,38 +45,29 @@ jobs:
             dnspython \
             requests
 
-      - name: Write SSH key
+      - name: Connect to production through Cloudflare Access
         id: ssh
-        env:
-          PROD_SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
-          PROD_HOST: ${{ vars.PROD_HOST }}
-        run: |
-          if [ -z "${PROD_SSH_PRIVATE_KEY:-}" ] || [ -z "${PROD_HOST:-}" ]; then
-            echo "SSH credentials not configured — skipping integration tests"
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          mkdir -p ~/.ssh
-          printf '%s\n' "$PROD_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          echo "skip=false" >> "$GITHUB_OUTPUT"
+        uses: ./.github/actions/cloudflare-access-ssh
+        with:
+          host: ${{ vars.PROD_SSH_HOST }}
+          user: github-deploy
+          ssh-key: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+          known-hosts: ${{ vars.PROD_SSH_KNOWN_HOSTS }}
+          access-client-id: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          access-client-secret: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+          alias: pausatf-prod
 
+      # Only the production suite: test_dev_*.py target the dev droplet.
       - name: Run integration tests
-        if: steps.ssh.outputs.skip == 'false'
         env:
-          PROD_HOST: ${{ vars.PROD_HOST }}
+          PROD_HOST: pausatf-prod
           TEST_DOMAIN: www.pausatf.org
-          TEST_SSH_KEY: ~/.ssh/id_rsa
-          TEST_SSH_USER: github-deploy
+          TEST_SSH_CONFIG: ${{ steps.ssh.outputs.config-file }}
         run: |
-          pytest docs/tests/integration/ \
+          pytest docs/tests/integration/test_infrastructure.py \
             -v \
             --timeout=60 \
             -m "not slow" \
             --tb=short \
             --cov=docs/tests \
             --cov-report=term-missing
-
-      - name: Remove SSH key
-        if: always()
-        run: rm -f ~/.ssh/id_rsa

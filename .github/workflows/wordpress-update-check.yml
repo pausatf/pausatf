@@ -20,40 +20,30 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Connect to production through Cloudflare Access
+        uses: ./.github/actions/cloudflare-access-ssh
+        with:
+          host: ${{ vars.PROD_SSH_HOST }}
+          user: github-deploy
+          ssh-key: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+          known-hosts: ${{ vars.PROD_SSH_KNOWN_HOSTS }}
+          access-client-id: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          access-client-secret: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+          alias: pausatf-prod
+
       - name: Read core and plugin update metadata
         id: updates
-        env:
-          PROD_SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
-          PROD_HOST: ${{ vars.PROD_HOST }}
-          PROD_SSH_KNOWN_HOSTS: ${{ vars.PROD_SSH_KNOWN_HOSTS }}
         shell: bash
         run: |
           # shellcheck disable=SC2016
           set -euo pipefail
 
-          if [[ -z "${PROD_SSH_PRIVATE_KEY:-}" || -z "${PROD_HOST:-}" || -z "${PROD_SSH_KNOWN_HOSTS:-}" ]]; then
-            echo "Production SSH credentials or trusted host keys are not configured." >&2
-            exit 1
-          fi
-
-          install -m 700 -d "$HOME/.ssh"
-          key_file="$HOME/.ssh/pausatf_prod"
-          trap 'rm -f "$key_file"' EXIT
-          printf '%s\n' "$PROD_SSH_PRIVATE_KEY" > "$key_file"
-          chmod 600 "$key_file"
-          known_hosts_file="$HOME/.ssh/known_hosts"
-          printf '%s\n' "$PROD_SSH_KNOWN_HOSTS" > "$known_hosts_file"
-          chmod 600 "$known_hosts_file"
-
-          ssh_options=(
-            -o BatchMode=yes
-            -o ConnectTimeout=15
-            -o StrictHostKeyChecking=yes
-            -o "UserKnownHostsFile=$known_hosts_file"
-            -i "$key_file"
-          )
-          remote="github-deploy@${PROD_HOST}"
-          update_json="$(ssh "${ssh_options[@]}" "$remote" 'bash -s' <<'REMOTE'
+          update_json="$(ssh pausatf-prod 'bash -s' <<'REMOTE'
           set -euo pipefail
           wp_path=/var/www/html
           sudo -n -u www-data wp eval "$(cat <<'PHP'

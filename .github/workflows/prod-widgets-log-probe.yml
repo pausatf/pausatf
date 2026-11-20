@@ -15,30 +15,33 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Connect to production through Cloudflare Access
+        uses: ./.github/actions/cloudflare-access-ssh
+        with:
+          host: ${{ vars.PROD_SSH_HOST }}
+          user: github-deploy
+          ssh-key: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+          known-hosts: ${{ vars.PROD_SSH_KNOWN_HOSTS }}
+          access-client-id: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          access-client-secret: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+          alias: pausatf-prod
+
       - name: Collect widgets log evidence from production
-        env:
-          PROD_SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
-          PROD_HOST: ${{ vars.PROD_HOST }}
         run: |
           set -euo pipefail
 
-          if [ -z "${PROD_SSH_PRIVATE_KEY:-}" ] || [ -z "${PROD_HOST:-}" ]; then
-            echo "ERROR: PROD_SSH_PRIVATE_KEY or PROD_HOST is missing" >&2
-            exit 1
-          fi
-
-          install -m 700 -d ~/.ssh
-          printf '%s\n' "$PROD_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-
           REMOTE_SHELL="bash -s"
-          if ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
-            github-deploy@"$PROD_HOST" "sudo -n true" >/dev/null 2>&1; then
+          if ssh pausatf-prod "sudo -n true" >/dev/null 2>&1; then
             REMOTE_SHELL="sudo -n bash -s"
           fi
 
-          ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
-            github-deploy@"$PROD_HOST" "$REMOTE_SHELL" <<'REMOTE'
+          # shellcheck disable=SC2029 # REMOTE_SHELL is chosen on the runner
+          ssh pausatf-prod "$REMOTE_SHELL" <<'REMOTE'
           set -euo pipefail
 
           list_logs() {
@@ -93,5 +96,3 @@ jobs:
             echo "debug.log not found at /var/www/html/wp-content/debug.log"
           fi
           REMOTE
-
-          rm -f ~/.ssh/id_rsa

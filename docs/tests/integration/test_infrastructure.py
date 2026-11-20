@@ -19,6 +19,41 @@ SSH_KEY = os.path.expanduser(
 )
 
 
+def connect(host: str) -> paramiko.SSHClient:
+    """Open an SSH session that refuses unknown host keys.
+
+    When TEST_SSH_CONFIG names an ssh_config file (CI writes one with the
+    cloudflare-access-ssh action), `host` may be a Host alias from it; its
+    HostName, User, IdentityFile, UserKnownHostsFile and ProxyCommand apply.
+    """
+    hostname, username, key_file = host, SSH_USER, SSH_KEY
+    known_hosts_files = []
+    sock = None
+    config_path = os.getenv("TEST_SSH_CONFIG")
+    if config_path:
+        options = paramiko.SSHConfig.from_path(config_path).lookup(host)
+        hostname = options.get("hostname", host)
+        username = options.get("user", username)
+        key_file = os.path.expanduser(options.get("identityfile", [key_file])[0])
+        known_hosts_files = options.get("userknownhostsfile", "").split()
+        if "proxycommand" in options:
+            sock = paramiko.ProxyCommand(options["proxycommand"])
+
+    ssh = paramiko.SSHClient()
+    ssh.load_system_host_keys()
+    for path in known_hosts_files:
+        ssh.load_host_keys(os.path.expanduser(path))
+    ssh.set_missing_host_key_policy(paramiko.RejectPolicy())
+    ssh.connect(
+        hostname=hostname,
+        username=username,
+        key_filename=key_file,
+        timeout=30,
+        sock=sock,
+    )
+    return ssh
+
+
 class TestInfrastructure:
     """Integration tests for complete infrastructure stack."""
 
@@ -41,15 +76,8 @@ class TestInfrastructure:
         return hosts
 
     def _connect(self, host: str) -> paramiko.SSHClient:
-        ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(
-            hostname=host,
-            username=SSH_USER,
-            key_filename=SSH_KEY,
-            timeout=10,
-        )
-        return ssh
+        return connect(host)
+
 
     def test_droplet_reachable(self, droplet_info):
         """Test that target hosts are reachable via SSH."""
