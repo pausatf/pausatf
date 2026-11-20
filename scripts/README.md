@@ -8,7 +8,6 @@ is the map.
 
 | Path | What it is | Documentation |
 | --- | --- | --- |
-| `firewall-maintenance.py` | Updates the DigitalOcean firewalls (Cloudflare ranges, one SSH source). Run by GitHub Actions. | [SCRIPTS.md](SCRIPTS.md#firewall-maintenancepy) |
 | `snapshot-retention.py` | Chooses which droplet snapshots to delete after a new snapshot succeeds. Run by the snapshot workflows. | [SCRIPTS.md](SCRIPTS.md#snapshot-retentionpy) |
 | `check_phpcs_changed_lines.py` | PHPCS gate that fails only on violations in changed lines. Run by the PHP quality workflow. | [SCRIPTS.md](SCRIPTS.md#check_phpcs_changed_linespy) |
 | `terraform-wrapper.sh` | Local wrapper for `terraform` in `terraform/environments/<name>`. | [TERRAFORM-WRAPPER.md](TERRAFORM-WRAPPER.md) |
@@ -29,24 +28,19 @@ CI runs the Python unit tests with:
 
 ```bash
 python3 -m unittest discover -s scripts -p 'test_*.py'
+python3 -m unittest discover -s scripts/backup/tests -p 'test_*.py'
 ```
 
-Run it from the repository root. The command takes about ten seconds and runs 27
-tests. Some of them need `git`, `node` and `php` on the path: the archive test
+Run them from the repository root. The first takes about ten seconds and runs 14
+tests; the second runs 2. Some of them need `git`, `node` and `php` on the path: the archive test
 runs JavaScript through `node`, and the widget visibility test runs the real
 mu-plugin through `php`. CI installs PHP 8.3 for this job.
 
 `scripts/backup/tests/test_manifest.py` lives in a directory without an
-`__init__.py`, so the command above does not discover it. Run it directly:
-
-```bash
-python3 -m unittest scripts/backup/tests/test_manifest.py
-```
+`__init__.py`, so the first command does not discover it; the second runs it.
 
 | Test file | Covers |
 | --- | --- |
-| `test_firewall_maintenance.py` | Rule planning in `firewall-maintenance.py`: web ports untouched on the tunnel firewall, non-destructive SSH add, input validation, drift detection, dry run and partial failure reporting. |
-| `test_firewall_fetch.py` | The Cloudflare range fetch path: both address families required, malformed responses never write, a missing token never reaches the network. |
 | `test_snapshot_retention.py` | `snapshot-retention.py`: only matching snapshots of one droplet are candidates, fails closed if the new snapshot is not listed, retention minimum, name prefix validation. |
 | `test_phpcs_legacy_encoding.py` | `check_phpcs_changed_lines.py` keeps legacy-encoded bytes intact when parsing diffs and scanning the base version. |
 | `test_widget_visibility.py` | The `pausatf-widget-visibility.php` mu-plugin in the `wordpress` Ansible role: hides non-matching widgets, no longer evaluates stored PHP. |
@@ -68,8 +62,7 @@ python3 -m unittest scripts/backup/tests/test_manifest.py
   `argparse`, and a `test_*.py` next to it so the CI command picks it up.
 - Read credentials from the environment or the OS keychain at run time. Never
   put a literal credential on a command line or in a file.
-- Destructive scripts take a dry-run default or an explicit `--apply`, as
-  `firewall-maintenance.py` does.
+- Destructive scripts take a dry-run default or an explicit `--apply`.
 - Document the script in [SCRIPTS.md](SCRIPTS.md) in the same change.
 
 The scripts that were once planned here (deployment, monitoring, maintenance and

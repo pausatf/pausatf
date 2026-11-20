@@ -11,42 +11,7 @@ Two groups of files are documented in their own places and only summarized here:
 
 ## Python tools run by CI
 
-All three use only the Python standard library and need Python 3.
-
-### `firewall-maintenance.py`
-
-Updates three DigitalOcean firewalls (`pausatf-prod-v2-fw`,
-`pausatf-stage-v2-tunnel` and `pausatf-nonprod-cf-lock`, identified by ID in the
-script). It changes existing rules only. It never creates or deletes rules, and
-it refuses to touch a firewall whose name or droplet assignment differs from
-what the script expects.
-
-```bash
-export DIGITALOCEAN_ACCESS_TOKEN="$(security find-generic-password -w -s <service>)"
-python3 scripts/firewall-maintenance.py --cloudflare              # dry run
-python3 scripts/firewall-maintenance.py --cloudflare --apply
-python3 scripts/firewall-maintenance.py --ssh-ip 203.0.113.10 --apply
-```
-
-Exactly one of `--cloudflare` or `--ssh-ip` is required. Without `--apply` it
-prints which firewalls it would update and writes nothing.
-
-- `--cloudflare` downloads the IPv4 and IPv6 ranges from
-  `https://www.cloudflare.com/ips-v4` and `.../ips-v6`, requires both families,
-  rejects non-global or overly broad ranges, and replaces the source addresses of
-  the TCP 80 and 443 rules. It stops if those rules use any source type other
-  than addresses.
-- `--ssh-ip` takes one public IPv4 or IPv6 address and appends it as a `/32` or
-  `/128` to the first TCP 22 rule. It does not remove existing sources.
-- All targets are validated before the first change is sent. If an update fails
-  part way, the error lists the updates that were confirmed and warns that a
-  failed request may still have reached the API.
-
-Callers: `.github/workflows/sync-cloudflare-ips.yml` (weekly, Monday 06:00 UTC,
-and manual) and `.github/workflows/update-firewall-ip.yml` (manual, input
-`new_ip`). Both read the token from the `DO_TOKEN` repository secret and share a
-concurrency group. Tests: `test_firewall_maintenance.py`,
-`test_firewall_fetch.py`.
+Both use only the Python standard library and need Python 3.
 
 ### `snapshot-retention.py`
 
@@ -188,23 +153,21 @@ the production legacy data is covered by the encrypted recovery backup
 
 ## Unit tests
 
-Run with `python3 -m unittest discover -s scripts -p 'test_*.py'` from the
-repository root (this is the CI command; see [README.md](README.md#tests)).
+Run with `python3 -m unittest discover -s scripts -p 'test_*.py'` and
+`python3 -m unittest discover -s scripts/backup/tests -p 'test_*.py'` from the
+repository root (these are the CI commands; see [README.md](README.md#tests)).
 
 | File | Subject |
 | --- | --- |
-| `test_firewall_maintenance.py` | `plan()` and `main()` in `firewall-maintenance.py`. |
-| `test_firewall_fetch.py` | Cloudflare range fetch and token handling. |
 | `test_snapshot_retention.py` | `candidates()` in `snapshot-retention.py`. |
 | `test_phpcs_legacy_encoding.py` | Diff parsing and baseline scan in `check_phpcs_changed_lines.py`. |
 | `test_widget_visibility.py` | `ansible/roles/wordpress/files/mu-plugins/pausatf-widget-visibility.php`, executed with `php`. |
 | `test_archive_https.py` | Analytics loader `content/data/pausatf-legacy-analytics.js` and the tracked legacy pages, executed with `node`. |
-| `backup/tests/test_manifest.py` | Recovery manifest generation (not collected by the CI command). |
+| `backup/tests/test_manifest.py` | Recovery manifest generation (run by a separate `discover -s scripts/backup/tests` step in CI). |
 
 ## Credentials
 
-No script stores a secret. `firewall-maintenance.py` reads
-`DIGITALOCEAN_ACCESS_TOKEN`; `terraform-wrapper.sh` warns when
+No script stores a secret. `terraform-wrapper.sh` warns when
 `DIGITALOCEAN_TOKEN` or `CLOUDFLARE_API_TOKEN` is unset; `setup-managed-db-vars.sh`
 reads `DIGITALOCEAN_TOKEN`. In CI the token is the `DO_TOKEN` secret. Locally,
 fetch values from the OS keychain or a secret manager at run time instead of
