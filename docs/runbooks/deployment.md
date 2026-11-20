@@ -6,10 +6,14 @@ Follow the [current-head review policy](../../CONTRIBUTING.md#review-process): C
 must be resolved, and the required maintainer decision must identify the reviewed revision.
 Repository approval is separate from production authorization.
 
-`deploy-prod.yml` queues on pushes to main, including docs changes, as well as manual dispatch.
-It checks staging in Ansible check mode before invoking production deployment through `deploy.yml`.
-This check is not evidence that the same production artifact was deployed and tested in staging.
-Retain environment gates and cancel unintended runs while production is held.
+`deploy-prod.yml` is disabled in the repository's Actions settings (state `disabled_manually`), so neither its push to
+`main` trigger nor manual dispatch runs it. The file still declares both. Re-enabling it would queue a production
+deployment on every push to `main`, including docs changes. It runs a staging job in Ansible check mode and then calls
+`deploy.yml`; that check is not evidence that the same production artifact was deployed and tested in staging. Its
+post-deploy health check passes a placeholder host. Treat production deployment as a manual, authorized operation, and
+see [GITHUB-ACTIONS.md](../governance/GITHUB-ACTIONS.md) for what each deploy workflow does.
+
+Terraform apply is manual. No workflow applies Terraform; `infra-staging.yml` only produces a plan.
 
 Before execution, record the source commit, actual target, intended changes, maintenance window and rollback target.
 Inspect the inventory and rendered variables before running a playbook.
@@ -25,7 +29,7 @@ plugin checkouts until its host is redeployed with that compose file.
 
 ## Infrastructure and managed database changes
 
-Use the target environment's existing Terraform backend and authorized plan runner.
+Use the target environment's HCP Terraform workspace and an authorized operator terminal.
 Review the plan at the exact source revision for replacement, unrelated changes and unexpected provider effects.
 Apply only the reviewed plan after the authorized operational decision.
 For production MySQL 8.4, complete the [compatibility, restore and HCP plan gates](database-upgrades.md).

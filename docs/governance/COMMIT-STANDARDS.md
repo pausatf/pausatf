@@ -2,7 +2,7 @@
 
 **Version:** 1.0
 **Last Updated:** 2025-12-21
-**Status:** Enforced via pre-commit hooks and GitHub Actions
+**Status:** Convention checked in review; not enforced by a hook or workflow
 
 ---
 
@@ -218,127 +218,20 @@ Note the `!` after the type/scope indicates a breaking change.
 
 ## Enforcement
 
-### Pre-Commit Hooks
+Conventional Commits are a convention that reviewers check. No hook or workflow rejects a non-conforming message:
+`.pre-commit-config.yaml` has no `commit-msg` stage, there is no `.commitlintrc.json`, and no commit-validation
+workflow exists in `.github/workflows/`. Pull requests are squash-merged, so the pull request title becomes the commit
+subject on `main` and should follow the same format.
 
-Install pre-commit hooks to validate commits locally:
-
-```bash
-# Install pre-commit (if not already installed)
-pip install pre-commit
-
-# Install hooks
-pre-commit install --hook-type commit-msg
-
-# Test manually
-pre-commit run --hook-stage commit-msg --commit-msg-filename .git/COMMIT_EDITMSG
-```
-
-The `.pre-commit-config.yaml` file includes:
-
-```yaml
-repos:
-  - repo: https://github.com/compilerla/conventional-pre-commit
-    rev: v3.0.0
-    hooks:
-      - id: conventional-pre-commit
-        stages: [commit-msg]
-        args:
-          - feat
-          - fix
-          - docs
-          - refactor
-          - perf
-          - test
-          - build
-          - ci
-          - chore
-          - revert
-```
-
-### GitHub Actions
-
-Commits are automatically validated in pull requests via `.github/workflows/commit-validation.yml`:
-
-```yaml
-name: Validate Commit Messages
-
-on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-
-jobs:
-  validate-commits:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Validate Commit Messages
-        uses: wagoid/commitlint-github-action@v5
-        with:
-          configFile: .commitlintrc.json
-```
-
-### Manual Validation
-
-Check your commit message before pushing:
+To check a message yourself before pushing, use commitlint:
 
 ```bash
-# Install commitlint
 npm install -g @commitlint/cli @commitlint/config-conventional
-
-# Validate last commit
-git log -1 --pretty=format:"%s" | commitlint
+git log -1 --pretty=format:"%B" | commitlint --extends @commitlint/config-conventional
 ```
 
----
-
-## Configuration Files
-
-### .commitlintrc.json
-
-```json
-{
-  "extends": ["@commitlint/config-conventional"],
-  "rules": {
-    "type-enum": [
-      2,
-      "always",
-      [
-        "feat",
-        "fix",
-        "docs",
-        "refactor",
-        "perf",
-        "test",
-        "build",
-        "ci",
-        "chore",
-        "revert"
-      ]
-    ],
-    "type-case": [2, "always", "lowercase"],
-    "subject-case": [2, "always", "lowercase"],
-    "subject-empty": [2, "never"],
-    "subject-full-stop": [2, "never", "."],
-    "header-max-length": [2, "always", 72],
-    "body-max-line-length": [2, "always", 72]
-  }
-}
-```
-
-### .pre-commit-config.yaml (commit-msg section)
-
-```yaml
-repos:
-  - repo: https://github.com/compilerla/conventional-pre-commit
-    rev: v3.0.0
-    hooks:
-      - id: conventional-pre-commit
-        stages: [commit-msg]
-        args: []
-```
+Commits are signed off (`git commit -s`), which adds a `Signed-off-by` trailer. See
+[CONTRIBUTING.md](../../CONTRIBUTING.md#commit-message-format) for the repository's current commit rules.
 
 ---
 
