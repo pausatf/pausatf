@@ -1,5 +1,10 @@
 # Monorepo Improvement Recommendations
 
+> **Proposals from December 2025, not a status report.** Nothing here is implemented unless the repository shows it.
+> There is no root `Makefile`, and the workflow files named below (`security-scan.yml`, `performance.yml`,
+> `changelog.yml`, `commit-lint.yml`) do not exist. For what runs today see
+> [GitHub Actions](governance/GITHUB-ACTIONS.md) and [Automation](governance/AUTOMATION.md).
+
 This document outlines potential improvements for the PAUSATF monorepo to enhance
 developer experience, automation, security, and maintainability.
 

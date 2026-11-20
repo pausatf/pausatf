@@ -1,554 +1,246 @@
-# PAUSATF Scripts Inventory
+# Script inventory
 
-Complete inventory of all scripts in the pausatf-scripts repository.
+Every script, test and unit file in `scripts/`, with what it does, how it is
+invoked and what it needs. The directory overview is in [README.md](README.md).
+Paths are relative to the repository root.
 
-**Last Updated**: 2025-12-21
+Two groups of files are documented in their own places and only summarized here:
 
----
+- `scripts/backup/`: [backup/README.md](backup/README.md)
+- `scripts/docker/`: [docker/README.md](docker/README.md)
 
-## Overview
+## Python tools run by CI
 
-This document provides a comprehensive inventory of all operational scripts, their purpose, dependencies, and usage instructions.
+All three use only the Python standard library and need Python 3.
 
-## Script Categories
+### `firewall-maintenance.py`
 
-- [Infrastructure Management](#infrastructure-management)
-- [Legacy Content Sync](#legacy-content-sync)
-- [Configuration Files](#configuration-files)
+Updates three DigitalOcean firewalls (`pausatf-prod-v2-fw`,
+`pausatf-stage-v2-tunnel` and `pausatf-nonprod-cf-lock`, identified by ID in the
+script). It changes existing rules only. It never creates or deletes rules, and
+it refuses to touch a firewall whose name or droplet assignment differs from
+what the script expects.
 
----
-
-## Infrastructure Management
-
-### terraform-wrapper.sh
-
-**Location**: `terraform-wrapper.sh`
-**Type**: Bash shell script
-**Purpose**: Safe execution wrapper for Terraform commands with validation and safety checks
-
-**Features**:
-- Environment validation (production/staging)
-- Dependency checking (terraform, jq)
-- Plan file management
-- Safety delays for destructive operations
-- Colored output for clarity
-
-**Usage**:
 ```bash
-./terraform-wrapper.sh <environment> <action>
-
-# Examples:
-./terraform-wrapper.sh production plan
-./terraform-wrapper.sh staging apply
-./terraform-wrapper.sh production output
+export DIGITALOCEAN_ACCESS_TOKEN="$(security find-generic-password -w -s <service>)"
+python3 scripts/firewall-maintenance.py --cloudflare              # dry run
+python3 scripts/firewall-maintenance.py --cloudflare --apply
+python3 scripts/firewall-maintenance.py --ssh-ip 203.0.113.10 --apply
 ```
 
-**Actions Supported**:
-- `init` - Initialize Terraform
-- `validate` - Validate configuration
-- `plan` - Create execution plan
-- `apply` - Apply changes (5-second safety delay)
-- `destroy` - Destroy infrastructure (10-second safety delay)
-- `output` - Display output values
+Exactly one of `--cloudflare` or `--ssh-ip` is required. Without `--apply` it
+prints which firewalls it would update and writes nothing.
 
-**Dependencies**:
-- terraform (HashiCorp Terraform CLI)
-- jq (JSON processor)
+- `--cloudflare` downloads the IPv4 and IPv6 ranges from
+  `https://www.cloudflare.com/ips-v4` and `.../ips-v6`, requires both families,
+  rejects non-global or overly broad ranges, and replaces the source addresses of
+  the TCP 80 and 443 rules. It stops if those rules use any source type other
+  than addresses.
+- `--ssh-ip` takes one public IPv4 or IPv6 address and appends it as a `/32` or
+  `/128` to the first TCP 22 rule. It does not remove existing sources.
+- All targets are validated before the first change is sent. If an update fails
+  part way, the error lists the updates that were confirmed and warns that a
+  failed request may still have reached the API.
 
-**Environment Variables**:
-- `DIGITALOCEAN_ACCESS_TOKEN` (optional, warns if not set)
-- `CLOUDFLARE_API_TOKEN` (optional, warns if not set)
+Callers: `.github/workflows/sync-cloudflare-ips.yml` (weekly, Monday 06:00 UTC,
+and manual) and `.github/workflows/update-firewall-ip.yml` (manual, input
+`new_ip`). Both read the token from the `DO_TOKEN` repository secret and share a
+concurrency group. Tests: `test_firewall_maintenance.py`,
+`test_firewall_fetch.py`.
 
-**Error Handling**:
-- Uses `set -euo pipefail` for strict error handling
-- Validates all inputs before execution
-- Checks for required dependencies
-- Provides clear error messages
+### `snapshot-retention.py`
 
-**Safety Features**:
-- Enforces plan-before-apply workflow
-- Countdown delays for destructive operations
-- Environment name validation
-- Automatic plan file cleanup
+Reads the JSON from `doctl compute snapshot list --resource droplet --output json`
+on stdin and prints the IDs of snapshots to delete, one per line. When a safety
+check fails it writes an error to stderr, prints no IDs and exits 1, so a caller
+using `set -euo pipefail` never deletes after a failure.
 
-**Documentation**: See [TERRAFORM-WRAPPER.md](TERRAFORM-WRAPPER.md) for complete documentation
-
-**Related IaC Components**:
-- Used by: Manual infrastructure operations, CI/CD pipelines
-- Works with: [pausatf-terraform](https://github.com/pausatf/pausatf-terraform)
-- Deployed via: Manual execution, documented in [pausatf-infrastructure-docs](https://github.com/pausatf/pausatf-infrastructure-docs)
-
-**Maintenance Notes**:
-- Last modified: 2025-12-21
-- Maintained by: Thomas Vincent
-- Status: Active, production-ready
-
----
-
-## Legacy Content Sync
-
-### sync-legacy-content-watcher.sh
-
-**Location**: `legacy-content/sync-legacy-content-watcher.sh`
-**Type**: Bash shell script
-**Purpose**: Real-time file watcher for syncing legacy static content to GitHub
-
-**Features**:
-- Uses inotify for real-time file system monitoring
-- 30-second debounce to prevent excessive commits
-- Automatic exclusion of metadata files
-- Comprehensive error handling and logging
-- Runs as systemd service
-
-**Usage**:
 ```bash
-# Run manually (testing)
-/usr/local/bin/sync-legacy-content-watcher.sh
-
-# Run as systemd service (production)
-systemctl start sync-legacy-content-watcher
-systemctl status sync-legacy-content-watcher
+doctl compute snapshot list --resource droplet --output json > snapshots.json
+python3 scripts/snapshot-retention.py --droplet-id 123456 \
+  --completed-name prod-nightly-20260101-100000 < snapshots.json
 ```
 
-**Configuration**:
+| Option | Default | Meaning |
+| --- | --- | --- |
+| `--droplet-id` | required | Numeric ID. Only snapshots of this droplet are considered. |
+| `--completed-name` | required | The snapshot that was just taken. It must appear in the list, otherwise nothing is pruned. |
+| `--keep` | `7` | Number of newest matching snapshots to keep. Must be 1 or more. |
+| `--name-prefix` | `prod-nightly` | Lowercase prefix. Only names matching `<prefix>-YYYYMMDD-HHMMSS` are eligible, so manual snapshots and volume snapshots are never selected. |
+
+Callers: `.github/workflows/do-nightly-snapshot.yml` (daily 10:00 UTC, default
+prefix and keep 7) and `.github/workflows/do-weekly-stage-snapshot.yml` (Sunday
+11:00 UTC, `--name-prefix stage-weekly --keep 2`). Test:
+`test_snapshot_retention.py`.
+
+### `check_phpcs_changed_lines.py`
+
+Runs PHP_CodeSniffer on the PHP files changed in a pull request and fails only
+for violations on changed lines that did not already exist in the base version.
+Legacy files with old encodings are handled by passing the original bytes to
+PHPCS.
+
 ```bash
-LEGACY_DIR="/var/www/legacy/public_html"  # Source directory
-GIT_REPO_PATH="/opt/pausatf-legacy-content" # Git repository path
-DEBOUNCE_SECONDS=30                         # Wait time after changes
+python3 scripts/check_phpcs_changed_lines.py --base origin/main --phpcs ~/.composer/vendor/bin/phpcs
 ```
 
-**Monitored Events**:
-- File creation
-- File modification
-- File deletion
-- File moves/renames
+Both options are required. The script must run from a checkout where
+`git diff <base>...HEAD` works (the workflow uses `fetch-depth: 0`), and it uses
+`phpcs.xml.dist` at the repository root. It ignores hunks under
+`content/calendar/`. It prints `path:line: TYPE [source] message` for each new
+violation and exits 1. It also exits non-zero when PHPCS fails without reporting
+anything, so a crash is not read as a pass.
 
-**Excluded Files** (automatically):
-- `.DS_Store` (macOS metadata)
-- `._*` (macOS resource forks)
-- `.mirrorinfo*` (FTP sync metadata)
-- `.ftpquota` (FTP quota files)
-- `.wysiwygPro_*` (Editor temporary files)
-- `Thumbs.db` (Windows metadata)
-- `*.swp` (Vim swap files)
-- `*.tmp` (Temporary files)
+Caller: `.github/workflows/php-quality.yml`. Test:
+`test_phpcs_legacy_encoding.py`.
 
-**Dependencies**:
-- inotify-tools (`inotifywait`)
-- git
-- rsync
+## Shell scripts
 
-**Logging**:
-- Log file: `/var/log/legacy-content-sync.log`
-- Systemd journal: `journalctl -u sync-legacy-content-watcher`
+### `terraform-wrapper.sh`
 
-**Error Handling**:
-- Continues monitoring on sync failures
-- Logs all errors
-- Automatic restart on failure (systemd configuration)
+Runs `terraform` for one directory under `terraform/environments/` with an
+action allow-list and a per-environment lock. Full reference:
+[TERRAFORM-WRAPPER.md](TERRAFORM-WRAPPER.md).
 
-**Deployment**:
-- Deployed via: [pausatf-ansible](https://github.com/pausatf/pausatf-ansible) playbook `deploy-legacy-content-sync.yml`
-- Systemd service: `sync-legacy-content-watcher.service`
-
-**Documentation**: See [legacy-content/README.md](legacy-content/README.md) and [legacy-content/SYNC-SETUP.md](legacy-content/SYNC-SETUP.md)
-
-**Related Repositories**:
-- Target repository: [pausatf-legacy-content](https://github.com/pausatf/pausatf-legacy-content)
-- Deployment: [pausatf-ansible](https://github.com/pausatf/pausatf-ansible)
-
-**Maintenance Notes**:
-- Last modified: 2025-12-21
-- Maintained by: Thomas Vincent
-- Status: Active, deployed on production server
-- Server: pausatf-prod (REDACTED_PROD_NEW_IP)
-
----
-
-### sync-legacy-content-cron.sh
-
-**Location**: `legacy-content/sync-legacy-content-cron.sh`
-**Type**: Bash shell script
-**Purpose**: Scheduled sync of legacy content to GitHub (cron job alternative/backup)
-
-**Features**:
-- Lock file prevents concurrent runs
-- Comprehensive change detection and reporting
-- Safe for frequent execution (checks for changes before committing)
-- Full logging of all operations
-- Can run alongside watcher as backup
-
-**Usage**:
 ```bash
-# Run manually
-/usr/local/bin/sync-legacy-content-cron.sh
-
-# Run via cron (recommended: every 6 hours)
-0 */6 * * * /usr/local/bin/sync-legacy-content-cron.sh >> /var/log/legacy-content-sync-cron.log 2>&1
+scripts/terraform-wrapper.sh <production|staging|dev|cloudflare|github> <plan|apply|destroy|output|init|validate>
 ```
 
-**Configuration**:
+### `setup-managed-db-vars.sh`
+
+Looks up the DigitalOcean Managed MySQL cluster for an environment with `doctl`
+and writes its host, user and password into
+`ansible/group_vars/<environment>/vault.yml` as `vault_managed_db_host`,
+`vault_managed_db_user` and `vault_managed_db_password`, encrypted with
+`ansible-vault`. If the vault file exists, the script decrypts it, replaces the
+`vault_managed_db_*` lines and re-encrypts it, asking before overwriting existing
+values.
+
 ```bash
-LEGACY_DIR="/var/www/legacy/public_html"  # Source directory
-GIT_REPO_PATH="/opt/pausatf-legacy-content" # Git repository path
-LOCK_FILE="/var/run/legacy-content-sync.lock" # Prevents concurrent runs
+./scripts/setup-managed-db-vars.sh [production|staging]    # default: production
 ```
 
-**Workflow**:
-1. Check for lock file (prevent concurrent runs)
-2. Pull latest changes from GitHub
-3. Rsync files from legacy directory
-4. Check for changes
-5. Commit changes with detailed message
-6. Push to GitHub
-7. Remove lock file
+Requirements: `DIGITALOCEAN_TOKEN` in the environment, `doctl`, `ansible-vault`
+with a vault password configured, and an existing cluster named
+`pausatf-prod-db` or `pausatf-stage-db`. It prints the password's last four
+characters. The script passes the token to `doctl` with `-t`, which puts it in
+the process argument list.
 
-**Dependencies**:
-- git
-- rsync
-- Standard Unix tools (awk, grep, etc.)
+It finishes by printing the `migrate-to-managed-db.yml` command to run next. That
+playbook targets the `production` group only and requires
+`-e confirm_production=yes`; see [../ansible/ROLES.md](../ansible/ROLES.md).
 
-**Logging**:
-- Log file: `/var/log/legacy-content-sync-cron.log`
-- Includes change counts in commit messages
-- Timestamps all operations
+### `local/sync-from-stage.sh`
 
-**Error Handling**:
-- Lock file prevents overlapping runs
-- Cleans up lock file on exit
-- Continues on non-fatal errors
-- Detailed error logging
+Copies the staging database and uploads into the local OpenLiteSpeed Compose
+stack (`scripts/docker/docker-compose.ols.yml`).
 
-**Deployment**:
-- Deployed via: [pausatf-ansible](https://github.com/pausatf/pausatf-ansible) playbook `deploy-legacy-content-sync.yml`
-- Cron job configured automatically by Ansible
-
-**Recommended Schedule**:
 ```bash
-# Every 6 hours (default)
-0 */6 * * * /usr/local/bin/sync-legacy-content-cron.sh >> /var/log/legacy-content-sync-cron.log 2>&1
-
-# Daily at 2 AM (light usage)
-0 2 * * * /usr/local/bin/sync-legacy-content-cron.sh >> /var/log/legacy-content-sync-cron.log 2>&1
-
-# Every hour (heavy usage)
-0 * * * * /usr/local/bin/sync-legacy-content-cron.sh >> /var/log/legacy-content-sync-cron.log 2>&1
+./scripts/local/sync-from-stage.sh root@stage.pausatf.org
 ```
 
-**Documentation**: See [legacy-content/README.md](legacy-content/README.md) and [legacy-content/SYNC-SETUP.md](legacy-content/SYNC-SETUP.md)
-
-**Related Repositories**:
-- Target repository: [pausatf-legacy-content](https://github.com/pausatf/pausatf-legacy-content)
-- Deployment: [pausatf-ansible](https://github.com/pausatf/pausatf-ansible)
-
-**Maintenance Notes**:
-- Last modified: 2025-12-21
-- Maintained by: Thomas Vincent
-- Status: Active, deployed on production server
-- Server: pausatf-prod (REDACTED_PROD_NEW_IP)
-
----
-
-## Configuration Files
-
-### sync-legacy-content-watcher.service
-
-**Location**: `legacy-content/sync-legacy-content-watcher.service`
-**Type**: Systemd service unit file
-**Purpose**: Systemd service configuration for legacy content watcher
-
-**Features**:
-- Automatic restart on failure
-- Security hardening (PrivateTmp, NoNewPrivileges)
-- Centralized logging via systemd journal
-- Starts after network is available
-
-**Installation**:
-```bash
-# Copy to systemd directory
-sudo cp sync-legacy-content-watcher.service /etc/systemd/system/
-
-# Reload systemd
-sudo systemctl daemon-reload
-
-# Enable and start
-sudo systemctl enable sync-legacy-content-watcher
-sudo systemctl start sync-legacy-content-watcher
-```
-
-**Service Configuration**:
-```ini
-[Unit]
-Description=PAUSATF Legacy Content Git Sync Watcher
-After=network.target
-
-[Service]
-Type=simple
-User=root
-ExecStart=/usr/local/bin/sync-legacy-content-watcher.sh
-Restart=always
-RestartSec=10
-StandardOutput=append:/var/log/legacy-content-sync.log
-StandardError=append:/var/log/legacy-content-sync.log
-
-[Install]
-WantedBy=multi-user.target
-```
-
-**Management Commands**:
-```bash
-# Check status
-systemctl status sync-legacy-content-watcher
-
-# View logs
-journalctl -u sync-legacy-content-watcher -f
-
-# Restart service
-systemctl restart sync-legacy-content-watcher
-
-# Stop service
-systemctl stop sync-legacy-content-watcher
-
-# Disable service
-systemctl disable sync-legacy-content-watcher
-```
-
-**Deployment**:
-- Deployed via: [pausatf-ansible](https://github.com/pausatf/pausatf-ansible) playbook `deploy-legacy-content-sync.yml`
-
-**Documentation**: See [legacy-content/SYNC-SETUP.md](legacy-content/SYNC-SETUP.md)
-
-**Maintenance Notes**:
-- Last modified: 2025-12-21
-- Maintained by: Thomas Vincent
-- Status: Active, running on production server
-- Server: pausatf-prod (REDACTED_PROD_NEW_IP)
-
----
-
-## Script Statistics
-
-### By Type
-
-| Type | Count | Percentage |
-|------|-------|------------|
-| Bash Scripts | 3 | 75% |
-| Systemd Service Files | 1 | 25% |
-| **Total** | **4** | **100%** |
-
-### By Category
-
-| Category | Scripts | Status |
-|----------|---------|--------|
-| Infrastructure Management | terraform-wrapper.sh | Active |
-| Legacy Content Sync | sync-legacy-content-watcher.sh, sync-legacy-content-cron.sh | Active |
-| System Services | sync-legacy-content-watcher.service | Active |
-
-### By Deployment Status
-
-| Status | Count | Scripts |
-|--------|-------|---------|
-| Production Deployed | 3 | sync-legacy-content-watcher.sh, sync-legacy-content-cron.sh, sync-legacy-content-watcher.service |
-| Local/Manual Use | 1 | terraform-wrapper.sh |
-
----
-
-## Dependencies Summary
-
-### Required Tools
-
-| Tool | Scripts Using | Purpose |
-|------|---------------|---------|
-| bash | All shell scripts | Script execution |
-| git | sync-legacy-content-*.sh | Version control operations |
-| rsync | sync-legacy-content-*.sh | File synchronization |
-| inotify-tools | sync-legacy-content-watcher.sh | File system monitoring |
-| terraform | terraform-wrapper.sh | Infrastructure as code |
-| jq | terraform-wrapper.sh | JSON processing |
-
-### Environment Variables
-
-| Variable | Scripts Using | Required? |
-|----------|---------------|-----------|
-| DIGITALOCEAN_ACCESS_TOKEN | terraform-wrapper.sh | Optional (warns if missing) |
-| CLOUDFLARE_API_TOKEN | terraform-wrapper.sh | Optional (warns if missing) |
-
----
-
-## Deployment Locations
-
-### Production Server (pausatf-prod: REDACTED_PROD_NEW_IP)
-
-| Script | Deployed Location | Status |
-|--------|------------------|--------|
-| sync-legacy-content-watcher.sh | /usr/local/bin/ | Active (systemd) |
-| sync-legacy-content-cron.sh | /usr/local/bin/ | Active (cron) |
-| sync-legacy-content-watcher.service | /etc/systemd/system/ | Enabled |
-
-### Local/Development
-
-| Script | Location | Status |
-|--------|----------|--------|
-| terraform-wrapper.sh | Repository root | Manual use |
-
----
-
-## Monitoring and Logs
-
-### Log Files
-
-| Script | Log Location | Rotation |
-|--------|-------------|----------|
-| sync-legacy-content-watcher.sh | /var/log/legacy-content-sync.log | Configured |
-| sync-legacy-content-cron.sh | /var/log/legacy-content-sync-cron.log | Configured |
-| terraform-wrapper.sh | stdout/stderr | N/A |
-
-### Systemd Services
-
-| Service | Journal Command |
-|---------|----------------|
-| sync-legacy-content-watcher | `journalctl -u sync-legacy-content-watcher -f` |
-
-### Log Rotation
-
-Configured via `/etc/logrotate.d/legacy-content-sync`:
-```
-/var/log/legacy-content-sync.log
-/var/log/legacy-content-sync-cron.log {
-    daily
-    rotate 30
-    compress
-    delaycompress
-    missingok
-    notifempty
-    create 0640 root root
-}
-```
-
----
-
-## Integration with IaC Ecosystem
-
-### Repository Dependencies
-
-```mermaid
-graph TD
-    A[pausatf-scripts] --> B[pausatf-ansible]
-    A --> C[pausatf-terraform]
-    A --> D[pausatf-legacy-content]
-    A --> E[pausatf-infrastructure-docs]
-
-    B --> F[Production Server]
-    C --> F
-
-    F --> D
-```
-
-### Related Repositories
-
-| Repository | Purpose | Relationship |
-|------------|---------|--------------|
-| [pausatf-ansible](https://github.com/pausatf/pausatf-ansible) | Configuration management | Deploys scripts to servers |
-| [pausatf-terraform](https://github.com/pausatf/pausatf-terraform) | Infrastructure provisioning | Used by terraform-wrapper.sh |
-| [pausatf-legacy-content](https://github.com/pausatf/pausatf-legacy-content) | Legacy content archive | Target of sync scripts |
-| [pausatf-infrastructure-docs](https://github.com/pausatf/pausatf-infrastructure-docs) | Documentation | Documents all scripts and infrastructure |
-
----
-
-## Maintenance
-
-### Adding New Scripts
-
-When adding a new script to this repository:
-
-1. **Create the script** following the template in README.md
-2. **Add documentation** to this SCRIPTS.md file
-3. **Create detailed docs** if complex (like TERRAFORM-WRAPPER.md)
-4. **Update README.md** if needed
-5. **Add to Ansible** if deployed to servers
-6. **Update related documentation** in pausatf-infrastructure-docs
-7. **Test thoroughly** in staging before production
-8. **Commit with descriptive message**
-
-### Script Review Checklist
-
-- [ ] Shebang line (`#!/bin/bash`)
-- [ ] Error handling (`set -euo pipefail`)
-- [ ] Header comments (purpose, author, date)
-- [ ] Dependency checking
-- [ ] Input validation
-- [ ] Logging capability
-- [ ] Error messages
-- [ ] Documentation added to SCRIPTS.md
-- [ ] Tested in staging
-- [ ] Pre-commit hooks pass
-
-### Update Frequency
-
-This inventory should be updated:
-- When new scripts are added
-- When scripts are modified significantly
-- When deployment locations change
-- When dependencies change
-- Monthly review for accuracy
-
----
-
-## Security Considerations
-
-### Secrets Management
-
-- **Never commit secrets** to this repository
-- Use environment variables for API tokens
-- Use `.env` files (gitignored) for local development
-- Use Ansible Vault for deployed secrets
-- Rotate credentials regularly
-
-### Access Control
-
-| Script | Permissions | Owner | Group |
-|--------|-------------|-------|-------|
-| sync-legacy-content-watcher.sh | 700 | root | root |
-| sync-legacy-content-cron.sh | 700 | root | root |
-| terraform-wrapper.sh | 755 | user | user |
-
-### Security Features
-
-- Pre-commit hooks prevent secret commits
-- Scripts use minimal required permissions
-- Systemd services include security hardening
-- Lock files prevent concurrent dangerous operations
-- Safety delays on destructive operations
-
----
-
-## Future Plans
-
-### Planned Script Categories
-
-These directories exist for future scripts:
-
-- `backup/` - Backup and restore automation
-- `deployment/` - Deployment automation
-- `monitoring/` - Health checks and monitoring
-- `maintenance/` - Routine maintenance tasks
-- `security/` - Security scans and updates
-- `cloudflare/` - Cloudflare API automation
-- `database/` - Database maintenance
-
-See README.md for planned scripts in each category.
-
----
-
-## Support
-
-For questions or issues with any scripts:
-- [Open an issue](https://github.com/pausatf/pausatf-infrastructure-docs/issues)
-- [Start a discussion](https://github.com/pausatf/pausatf-infrastructure-docs/discussions)
-- Contact: @somethingwithproof
-
----
-
-**Document Maintained By**: Thomas Vincent
-**Organization**: Pacific Association of USA Track and Field (PAUSATF)
-**Last Updated**: 2025-12-21
+It refuses to run if the `db-data` volume already exists and the running
+database is not MariaDB 13.0, and points to `docker/README.md` for the backup
+and upgrade steps. Otherwise it exports the remote database with `wp db export`
+over SSH into `/tmp/pausatf-stage.sql.gz`, starts the stack, imports the dump
+using credentials from inside the database container, and rsyncs
+`wp-content/uploads/` to `./wp-uploads/` with `--delete`. It needs
+`scripts/docker/.env` with the variables `docker-compose.ols.yml` reads, Docker Compose,
+`rsync` and SSH access to the host. Review what `--delete` will remove in
+`./wp-uploads/` before running it. After the import, update site URLs with WP-CLI
+`search-replace`.
+
+### `backup/`
+
+| File | Purpose |
+| --- | --- |
+| `pausatf-db-backup.sh` | Encrypted database and legacy-data backup uploaded to Spaces. |
+| `pausatf-recovery-backup.sh` | Wrapper that runs the database backup, then archives deployment files, host configuration and container images, and uploads a recovery manifest. |
+| `pausatf-db-backup.service`, `pausatf-db-backup.timer` | systemd units; the timer fires daily at 09:20 UTC. |
+| `pausatf-db-backup.service.d/recovery.conf` | Production drop-in that makes the service run `pausatf-recovery-backup`. |
+| `tests/test_manifest.py` | Manifest generation test. |
+
+See [backup/README.md](backup/README.md) for installation, retention and
+restore verification. A merge does not install these files on the host.
+
+### `docker/`
+
+| File | Purpose |
+| --- | --- |
+| `docker-compose.yml` | nginx proxy in front of a WordPress container, with Prometheus, Grafana and node-exporter. |
+| `docker-compose.ols.yml` | OpenLiteSpeed, MariaDB and phpMyAdmin stack used by `local/sync-from-stage.sh`. |
+| `nginx/`, `wordpress/` | Dockerfiles and nginx configuration for the first stack. |
+| `.env.example` | Template for the ignored `.env` (database and Grafana settings). |
+
+See [docker/README.md](docker/README.md) for the MariaDB 13.0 upgrade procedure.
+
+## Legacy content sync (`legacy-content/`)
+
+These scripts mirror `/var/www/legacy/public_html/` on the production host into
+a clone of `git@github.com:pausatf/pausatf-legacy-content.git` at
+`/opt/pausatf-legacy-content` and push the result. Both push to the branch
+`legacy-content-sync`, not to `main`, so changes arrive through a pull request.
+Each run first does `git pull origin main`, then `rsync` from the legacy tree.
+Setup and operations: [legacy-content/README.md](legacy-content/README.md) and
+[legacy-content/SYNC-SETUP.md](legacy-content/SYNC-SETUP.md).
+
+### `sync-legacy-content-watcher.sh`
+
+Uses `inotifywait` (package `inotify-tools`) to watch the legacy tree for
+create, modify, delete and move events, waits for 30 seconds without further
+events, then syncs. `rsync` runs with `--delete`, so deletions in the legacy tree
+are committed. Metadata files are skipped (`.DS_Store`, `._*`, `.mirrorinfo*`,
+`.ftpquota`, `.wysiwygPro_*`, `Thumbs.db`). Logs to
+`/var/log/legacy-content-sync.log`. Installed at
+`/usr/local/bin/sync-legacy-content-watcher.sh`.
+
+### `sync-legacy-content-watcher.service`
+
+systemd unit for the watcher: runs as root, restarts on failure after 10
+seconds, appends output to `/var/log/legacy-content-sync.log`, and sets
+`PrivateTmp`, `NoNewPrivileges` and `ProtectSystem=strict` with write access to
+`/opt/pausatf-legacy-content` and `/var/log`.
+
+### `sync-legacy-content-cron.sh`
+
+One-shot version for cron. Takes a lock at `/var/run/legacy-content-sync.lock`
+(a stale lock from a dead PID is removed), pulls, rsyncs with the same excludes
+plus `*.swp` and `*.tmp`, commits with a change summary and pushes. Logs to
+stdout, redirected by cron to `/var/log/legacy-content-sync-cron.log`. Installed
+at `/usr/local/bin/sync-legacy-content-cron.sh`.
+
+### Deployment
+
+`ansible/playbooks/deploy-legacy-content-sync.yml` (hosts: `production`)
+installs the packages, clones the repository, sets the git identity, and installs
+the watcher, its unit, the cron script, a cron entry (default `0 */6 * * *`) and
+logrotate. Select what to install with `--tags watcher`, `--tags cron` or
+`--tags both`. The playbook downloads the scripts from
+`https://raw.githubusercontent.com/pausatf/pausatf-scripts/main/legacy-content`
+(its `scripts_source` variable), not from this repository's checkout, so a change
+here reaches the host only after it is available at that URL or the variable is
+changed.
+
+## Unit tests
+
+Run with `python3 -m unittest discover -s scripts -p 'test_*.py'` from the
+repository root (this is the CI command; see [README.md](README.md#tests)).
+
+| File | Subject |
+| --- | --- |
+| `test_firewall_maintenance.py` | `plan()` and `main()` in `firewall-maintenance.py`. |
+| `test_firewall_fetch.py` | Cloudflare range fetch and token handling. |
+| `test_snapshot_retention.py` | `candidates()` in `snapshot-retention.py`. |
+| `test_phpcs_legacy_encoding.py` | Diff parsing and baseline scan in `check_phpcs_changed_lines.py`. |
+| `test_widget_visibility.py` | `ansible/roles/wordpress/files/mu-plugins/pausatf-widget-visibility.php`, executed with `php`. |
+| `test_archive_https.py` | Analytics loader `content/data/pausatf-legacy-analytics.js` and the tracked legacy pages, executed with `node`. |
+| `backup/tests/test_manifest.py` | Recovery manifest generation (not collected by the CI command). |
+
+## Credentials
+
+No script stores a secret. `firewall-maintenance.py` reads
+`DIGITALOCEAN_ACCESS_TOKEN`; `terraform-wrapper.sh` warns when
+`DIGITALOCEAN_TOKEN` or `CLOUDFLARE_API_TOKEN` is unset; `setup-managed-db-vars.sh`
+reads `DIGITALOCEAN_TOKEN`. In CI the token is the `DO_TOKEN` secret. Locally,
+fetch values from the OS keychain or a secret manager at run time instead of
+typing them on a command line.

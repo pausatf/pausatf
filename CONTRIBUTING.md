@@ -20,9 +20,9 @@ Ensure you have the following tools installed:
 
 - **Git** (2.30+)
 - **GitHub CLI** (`gh`) - for repository operations
-- **Terraform** (~1.6) - for infrastructure work
+- **Terraform** (1.10 or later; CI uses 1.10.3) - for infrastructure work
 - **Ansible** (latest) - for configuration management
-- **Python** (3.11+) - for Ansible and pre-commit
+- **Python** (3.12; CI and the `setup-ansible` action use 3.12) - for Ansible and pre-commit
 - **pre-commit** - for automated code quality checks
 
 ### Initial Setup
@@ -292,8 +292,12 @@ Our CI/CD workflows automatically test:
 - **Ansible**: ansible-lint, yamllint, syntax checks
 - **Scripts**: ShellCheck, bash syntax validation
 - **Markdown**: markdownlint, link checking
-- **Security**: Secret detection (detect-secrets, gitleaks)
+- **PHP**: syntax lint and WordPress Coding Standards on changed lines (`php-quality.yml`)
+- **Roles**: Molecule scenarios when `ansible/roles/**` changes (`molecule.yml`)
+- **Security**: CodeQL for workflows and JavaScript (`codeql.yml`)
 
+Secret detection (`detect-secrets`, `gitleaks`) runs only as local pre-commit hooks, not in CI. The full list of
+workflows, triggers and the secrets they use is in [docs/governance/GITHUB-ACTIONS.md](docs/governance/GITHUB-ACTIONS.md).
 All checks must pass before merging.
 
 ## Pull Request Process
@@ -374,8 +378,9 @@ plan review, backup/restore validation and deployment gates still apply.
 - Follow HashiCorp best practices
 - Use variables for configurable values
 - Document all modules
-- Use remote state (configured)
-- Separate environments (production, staging, github)
+- Use HCP Terraform state (each root has a `cloud` block)
+- Separate environments (production, staging, dev, cloudflare, github, hcp)
+- Applies are manual; no workflow applies Terraform
 
 See [terraform/README.md](terraform/README.md) for detailed guidelines.
 
@@ -448,12 +453,12 @@ If you accidentally commit a secret:
 
 - **Documentation**: Check component-specific READMEs
 - **Issues**: Open a GitHub issue for bugs or questions
-- **Discussions**: Use GitHub Discussions for general questions
 - **Contact**: Reach out to @somethingwithproof
 
 ## License
 
-See [LICENSE](LICENSE) file for details.
+The repository has no top-level license file. A component directory may carry its own. Ask the maintainer before
+reusing code or content from this repository.
 
 ---
 

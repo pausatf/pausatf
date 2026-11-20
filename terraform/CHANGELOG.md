@@ -9,6 +9,9 @@ and this project adheres to semantic versioning.
 
 ## [Unreleased]
 
+### Changed
+- Documentation now states that Terraform is applied manually (no workflow applies it), that `infra-staging.yml` only plans, and that main declares 31 central Cloudflare DNS records after #276 removed six for retired servers
+
 ### Added
 - Weekly staging droplet snapshots through GitHub Actions, retaining two completed copies while the automatic Backups feature remains disabled
 - GitHub repository management module

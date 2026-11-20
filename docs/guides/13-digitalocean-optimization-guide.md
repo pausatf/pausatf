@@ -699,8 +699,9 @@ jobs:
 
 **Usage:**
 ```bash
-# Before any major change, run workflow
-gh workflow run pre-deployment-snapshot.yml --repo pausatf/pausatf-infrastructure-docs -f server=production
+# Proposed, not implemented: there is no pre-deployment-snapshot.yml.
+# Today the nightly production snapshot runs from do-nightly-snapshot.yml; take an extra one with:
+gh workflow run do-nightly-snapshot.yml -R pausatf/pausatf
 ```
 
 ---

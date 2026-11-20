@@ -2,7 +2,7 @@
 
 **Historical static content and data files for pausatf.org**
 
-This repository contains the legacy static content that was hosted on the PAUSATF website before the migration to WordPress. This content includes historical race results, event information, photos, and other static files dating back to the early 2000s.
+This directory of the `pausatf/pausatf` repository contains the legacy static content that was hosted on the PAUSATF website before the migration to WordPress. This content includes historical race results, event information, photos, and other static files dating back to the early 2000s.
 
 ## Repository Purpose
 
@@ -108,10 +108,12 @@ New content should generally go into the WordPress site, not here. However, if l
 3. Document in commit message
 4. Update relevant index pages
 
-## Repository Structure
+## Directory structure
+
+The tree below is the layout of `content/`; it may not list every file.
 
 ```
-pausatf-legacy-content/
+content/
 ├── data/                   # Race results and event data by year
 │   ├── 2006/
 │   ├── 2007/

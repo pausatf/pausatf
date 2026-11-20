@@ -6,7 +6,7 @@ This file describes the current environment layout. Live resource IDs and reconc
 
 All six Terraform roots use HCP Terraform organization `pausatf`. Each root selects its own workspace in its `cloud` block. HCP stores state while workspace execution is local, allowing CLI runs to resolve shared modules outside an individual environment directory. Run `terraform login` and `terraform init` from the environment directory on a trusted runner with provider credentials set; the `hcp` root also needs `TFE_TOKEN`. Do not use the retired `backend.hcl` S3 configuration.
 
-Terraform requires version 1.10 or later. Use the repository's mise-pinned version. Inject provider credentials as sensitive environment values in trusted CLI or CI runners. Never commit API tokens, provider credentials, state files, or credential-filled tfvars files.
+Terraform requires version 1.10 or later (`required_version = ">= 1.10.0"`). CI and `infra-staging.yml` run 1.10.3, and the repository has no mise or `.tool-versions` file that pins it. Inject provider credentials as sensitive environment values in trusted CLI or CI runners. Never commit API tokens, provider credentials, state files, or credential-filled tfvars files.
 
 | Directory | Workspace | Purpose | Current state |
 |---|---|---|---|
@@ -25,11 +25,11 @@ Firewall web ingress is limited to Cloudflare address ranges. SSH source CIDRs a
 
 ## Cloudflare ownership
 
-The central Cloudflare root owns the zone, 37 central DNS records, settings, and rulesets. `dev.pausatf.org` belongs to the dev root and `stage.pausatf.org` to staging; never declare the same record in multiple states. These resources are imported in their respective workspaces, and all three roots currently plan with no changes.
+The central Cloudflare root owns the zone, 31 central DNS records (6 fewer than the 37 recorded before #276, which removed `ftp`, `mail`, `monitor`, `direct-ssh`, `staging` and `prod` for servers retired in the v2 migration; the removal reaches Cloudflare only on a manual apply, so the live zone may still hold them until one runs), settings, and rulesets. `dev.pausatf.org` belongs to the dev root and `stage.pausatf.org` to staging; never declare the same record in multiple states. These resources are imported in their respective workspaces, and all three roots currently plan with no changes.
 
 ## GitHub configuration
 
-The GitHub root manages the `pausatf/pausatf` repository using the reusable module in `modules/github/repository`. Repository settings, default branch, main branch protection, Dependabot updates, vulnerability alerts, and topics are imported into HCP state. The latest plan reports no changes. The current GitHub Actions infrastructure workflow still needs an HCP API token secret before it can initialize and plan against the HCP backend.
+The GitHub root manages the `pausatf/pausatf` repository using the reusable module in `modules/github/repository`. Repository settings, default branch, main branch protection, Dependabot updates, vulnerability alerts, and topics are imported into HCP state. The latest plan reports no changes. The manual `infra-staging.yml` workflow runs in the `terraform-plan` environment, which holds the HCP Terraform, Cloudflare and SSH allowlist secrets it needs. It plans only. No workflow applies Terraform; applies are run by an operator.
 
 ## Routine workflow
 
