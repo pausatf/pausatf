@@ -140,9 +140,9 @@ target before deployment.
 | `DO_TOKEN` | infra-staging, do-nightly-snapshot, do-weekly-stage-snapshot | DigitalOcean API token with permission to create and prune droplet snapshots |
 | `DO_PROD_DROPLET_ID` | do-nightly-snapshot (optional) | Numeric production droplet ID; when unset or inaccessible, the workflow resolves `pausatf-prod-v2` by name |
 | `DO_STAGE_DROPLET_ID` | do-weekly-stage-snapshot (optional) | Numeric staging droplet ID; when unset or inaccessible, the workflow resolves `pausatf-stage-v2` by name |
-| `HCP_TERRAFORM_API_TOKEN` | infra-staging | HCP Terraform token for the `pausatf` organization (not currently set) |
-| `CLOUDFLARE_API_TOKEN` | infra-staging | Cloudflare API token for Terraform (not currently set) |
-| `TF_VAR_SSH_ALLOWED_IPS` | infra-staging | SSH allow-list passed to Terraform (not currently set) |
+| `HCP_TERRAFORM_API_TOKEN` | infra-staging | HCP Terraform token for the `pausatf` organization (`terraform-plan` environment secret) |
+| `CLOUDFLARE_API_TOKEN` | infra-staging | Cloudflare API token for Terraform (`terraform-plan` environment secret) |
+| `TF_VAR_SSH_ALLOWED_IPS` | infra-staging | SSH allow-list passed to Terraform (`terraform-plan` environment secret) |
 
 | Variable | Used by | Description |
 |----------|---------|-------------|
