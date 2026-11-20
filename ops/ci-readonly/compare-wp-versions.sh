@@ -10,7 +10,7 @@ newer() { [[ "$1" != "$2" && "$(printf '%s\n%s\n' "$1" "$2" | sort -V | tail -n1
 
 core_version="$(jq -r '.core_version' <<< "$inventory")"
 [[ "$core_version" =~ ^[0-9]+\.[0-9] ]] || { echo "Inventory has no core version" >&2; exit 1; }
-latest_core="$(curl -fsS --retry 3 --max-time 30 "$api/core/version-check/1.7/" | jq -r '.offers[0].current')"
+latest_core="$(curl -fsS --proto '=https' --retry 3 --max-time 30 "$api/core/version-check/1.7/" | jq -r '.offers[0].current')"
 [[ -n "$latest_core" && "$latest_core" != null ]] || { echo "No core version from wordpress.org" >&2; exit 1; }
 core_updates='[]'
 if newer "$core_version" "$latest_core"; then
@@ -19,7 +19,7 @@ fi
 
 plugin_updates='[]'
 while IFS=$'\t' read -r slug name version status; do
-  info="$(curl -sS --retry 3 --max-time 30 -G "$api/plugins/info/1.2/" \
+  info="$(curl -sS --proto '=https' --retry 3 --max-time 30 -G "$api/plugins/info/1.2/" \
     --data-urlencode action=plugin_information \
     --data-urlencode "request[slug]=$slug" \
     --data-urlencode 'request[fields][sections]=0')" || { echo "wordpress.org lookup failed for $slug" >&2; exit 1; }
