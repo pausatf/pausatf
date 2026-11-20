@@ -8,33 +8,27 @@ line. The workflow-by-workflow mapping is in [GITHUB-ACTIONS.md](GITHUB-ACTIONS.
 
 | Name | Used by | Purpose |
 | --- | --- | --- |
-| `ANSIBLE_VAULT_PASSWORD` | Deploy workflows, `migrate-server` | Password for the Ansible vault. |
+| `ANSIBLE_VAULT_PASSWORD` | Deploy workflows | Password for the Ansible vault. |
 | `ANSIBLE_VAULT_FILE` | Deploy workflows | The encrypted `ansible/group_vars/vault.yml`, base64 encoded. The workflow decodes it to disk for the run and deletes it afterwards. |
-| `PROD_SSH_PRIVATE_KEY` | `deploy-prod`, `migrate-server`, `wordpress-update-check`, `integration-tests`, `capture-prod-inventory`, `prod-widgets-log-probe`, `wp-plugin-audit` | SSH key for the production `github-deploy` user. |
-| `STAGING_SSH_PRIVATE_KEY` | `deploy-staging`, `deploy-prod` (staging validation), `migrate-server` | SSH key for staging. |
-| `DEV_SSH_PRIVATE_KEY` | `deploy-dev`, `migrate-server` | SSH key for dev. |
-| `PROD_NEW_SSH_PRIVATE_KEY` | `deploy-prod-new` | SSH key for the replacement production group. |
-| `MIGRATION_NEW_SSH_PRIVATE_KEY` | `migrate-server` | SSH key for the new server during a migration. |
-| `PROD_SERVER_IP`, `STAGE_SERVER_IP`, `DEV_SERVER_IP`, `PROD_NEW_SERVER_IP` | Matching deploy workflows | Target address. The deploy job exports it under the inventory variable named by the caller's `host_env_name`. |
-| `DO_TOKEN` | Snapshot, firewall, `migrate-server` and `infra-staging` workflows | DigitalOcean API token. The snapshot and firewall workflows need droplet snapshot and firewall write access, so treat it as a write token. |
+| `PROD_SSH_PRIVATE_KEY` | `deploy-prod` | SSH key for the production `github-deploy` user. |
+| `PROD_CI_SSH_KEY` | `wordpress-update-check` | Read-only CI key. The server forces it to one command; see [ops/ci-readonly](../../ops/ci-readonly/README.md). |
+| `CF_ACCESS_CLIENT_ID`, `CF_ACCESS_CLIENT_SECRET` | `wordpress-update-check` | Cloudflare Access service token allowed only on the production SSH application. It expires 2027-11-20. |
+| `STAGING_SSH_PRIVATE_KEY` | `deploy-staging`, `deploy-prod` (staging validation) | SSH key for staging. |
+| `DEV_SSH_PRIVATE_KEY` | `deploy-dev` | SSH key for dev. |
+| `PROD_SERVER_IP`, `STAGE_SERVER_IP`, `DEV_SERVER_IP` | Matching deploy workflows | Target address. The deploy job exports it under the inventory variable named by the caller's `host_env_name`. |
+| `DO_TOKEN` | Snapshot workflows, `infra-staging`, `terraform-plan` | DigitalOcean API token. The snapshot workflows need droplet snapshot write access, so treat it as a write token. |
 | `DO_PROD_DROPLET_ID`, `DO_STAGE_DROPLET_ID` | Snapshot workflows | Optional numeric droplet IDs. When unset or inaccessible, the workflow looks the droplet up by name. |
-| `CLOUDFLARE_API_TOKEN` | `infra-staging`, `migrate-server` | Cloudflare API token. `migrate-server` uses it for the DNS cutover and rollback, so it needs DNS edit on the zone. |
-| `HCP_TERRAFORM_API_TOKEN` | `infra-staging` | HCP Terraform token, exported as `TF_TOKEN_app_terraform_io`. |
-| `TF_VAR_SSH_ALLOWED_IPS` | `infra-staging` | Value for the Terraform `ssh_allowed_ips` variable. |
+| `CLOUDFLARE_API_TOKEN` | `infra-staging`, `terraform-plan` | Cloudflare API token for Terraform plans. |
+| `HCP_TERRAFORM_API_TOKEN` | `infra-staging`, `terraform-plan` | HCP Terraform token, exported as `TF_TOKEN_app_terraform_io`. |
+| `TF_VAR_SSH_ALLOWED_IPS` | `infra-staging`, `terraform-plan` | Value for the Terraform `ssh_allowed_ips` variable. |
 | `GITHUB_TOKEN` | `sync-jetpack-ips` and workflows that call the API | Built in. Not stored by anyone. |
-
-Secrets added for #295 and not yet read by any merged workflow: `CF_ACCESS_CLIENT_ID` and `CF_ACCESS_CLIENT_SECRET`
-(a Cloudflare Access service token). `PROD_CI_SSH_KEY` also exists but no current workflow reads it.
 
 ## Variables
 
 | Name | Used by | Purpose |
 | --- | --- | --- |
-| `PROD_HOST` | `wordpress-update-check`, `integration-tests`, `capture-prod-inventory`, `prod-widgets-log-probe`, `wp-plugin-audit` | Production SSH host. |
+| `PROD_HOST` | `wordpress-update-check` | Cloudflare Access SSH hostname of production. |
 | `PROD_SSH_KNOWN_HOSTS` | `wordpress-update-check` | Trusted `known_hosts` lines for the production SSH endpoint. Set it from a host key verified out of band. |
-
-Pending #295: it adds the variable `PROD_SSH_HOST` (the Cloudflare Access SSH hostname), requires a `known_hosts` line
-for that name in `PROD_SSH_KNOWN_HOSTS`, and stops reading `PROD_HOST`.
 
 ## Scopes
 
@@ -84,7 +78,7 @@ For the managed database password, follow [database-password-rotation.md](../pro
 | `403 Forbidden` | Token scope is too narrow for the call. |
 | `ANSIBLE_VAULT_PASSWORD and ANSIBLE_VAULT_FILE secrets are required` | The job did not declare the environment that holds the secret, or the secret is unset. |
 | `TARGET_SERVER_IP secret is required` | The matching `*_SERVER_IP` secret is not visible to the calling job. |
-| A probe workflow skips or fails on SSH | `PROD_SSH_PRIVATE_KEY`, `PROD_HOST` or `PROD_SSH_KNOWN_HOSTS` is missing or the host key changed. |
+| `wordpress-update-check` fails on SSH | `PROD_CI_SSH_KEY`, a `CF_ACCESS_*` secret, `PROD_HOST` or `PROD_SSH_KNOWN_HOSTS` is missing, the service token expired, or the host key changed. |
 
 List recent runs with `gh run list -R pausatf/pausatf` and read one with `gh run view <id> --log`.
 
