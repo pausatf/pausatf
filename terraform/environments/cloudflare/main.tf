@@ -60,7 +60,8 @@ resource "cloudflare_zone_setting" "min_tls_version" {
 resource "cloudflare_zone_setting" "tls_1_3" {
   zone_id    = cloudflare_zone.pausatf.id
   setting_id = "tls_1_3"
-  value      = "on"
+  # zrt = TLS 1.3 with 0-RTT resumption, the value set in the dashboard.
+  value = "zrt"
 }
 
 resource "cloudflare_zone_setting" "brotli" {
