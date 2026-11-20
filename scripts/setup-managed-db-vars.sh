@@ -24,6 +24,9 @@ if [[ -z "${DIGITALOCEAN_TOKEN:-}" ]]; then
   exit 1
 fi
 
+# doctl reads its token from the environment, which keeps it out of process listings.
+export DIGITALOCEAN_ACCESS_TOKEN="$DIGITALOCEAN_TOKEN"
+
 if ! command -v doctl &>/dev/null; then
   echo "ERROR: doctl is not installed. Run: brew install doctl" >&2
   exit 1
@@ -48,13 +51,13 @@ case "$ENVIRONMENT" in
     ;;
 esac
 
-CLUSTER_ID=$(doctl databases list --format ID,Name --no-header -t "$DIGITALOCEAN_TOKEN" \
+CLUSTER_ID=$(doctl databases list --format ID,Name --no-header \
   | grep "$CLUSTER_NAME" | awk '{print $1}')
 
 if [[ -z "$CLUSTER_ID" ]]; then
   echo "ERROR: No database cluster matching '$CLUSTER_NAME' found." >&2
   echo "Available clusters:" >&2
-  doctl databases list --format ID,Name,Engine,Status -t "$DIGITALOCEAN_TOKEN" >&2
+  doctl databases list --format ID,Name,Engine,Status >&2
   exit 1
 fi
 
@@ -65,7 +68,7 @@ echo "Found cluster: $CLUSTER_ID ($CLUSTER_NAME)"
 echo "Fetching connection details..."
 
 DB_INFO=$(doctl databases connection "$CLUSTER_ID" --format Host,Port,User,Password,Database \
-  --no-header -t "$DIGITALOCEAN_TOKEN")
+  --no-header)
 
 DB_HOST=$(echo "$DB_INFO" | awk '{print $1}')
 DB_PORT=$(echo "$DB_INFO" | awk '{print $2}')
