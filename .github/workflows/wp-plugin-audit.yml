@@ -68,35 +68,44 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Connect to production through Cloudflare Access
+        uses: ./.github/actions/cloudflare-access-ssh
+        with:
+          host: ${{ vars.PROD_SSH_HOST }}
+          user: github-deploy
+          ssh-key: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+          known-hosts: ${{ vars.PROD_SSH_KNOWN_HOSTS }}
+          access-client-id: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          access-client-secret: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+          alias: pausatf-prod
+
       - name: Probe widget logic recovery sources
         if: ${{ inputs.probe_widget_logic == true }}
         env:
-          PROD_SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
-          PROD_HOST: ${{ vars.PROD_HOST }}
           APPLY_WIDGET_LOGIC_RECOVERY: ${{ inputs.apply_widget_logic_recovery }}
           WIDGET_SOURCE_DB: ${{ inputs.widget_source_db }}
           REPAIR_ACTIVE_WIDGET_LOGIC: ${{ inputs.repair_active_widget_logic }}
           ENABLE_WIDGET_LOGIC_FILTER: ${{ inputs.enable_widget_logic_filter }}
         run: |
           set -euo pipefail
-          if [ -z "${PROD_SSH_PRIVATE_KEY:-}" ]; then
-            echo "PROD_SSH_PRIVATE_KEY not set" >&2
+          # The value is placed inside the remote command line below.
+          if [[ ! "${WIDGET_SOURCE_DB:-}" =~ ^[A-Za-z0-9_]*$ ]]; then
+            echo "widget_source_db must be a database name (letters, digits, underscore)" >&2
             exit 1
           fi
 
-          TARGET_HOST="${PROD_HOST:-REDACTED_PROD_NEW_IP}"
-          mkdir -p ~/.ssh
-          printf '%s\n' "$PROD_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-
           REMOTE_SHELL="bash -s"
-          if ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
-            github-deploy@"$TARGET_HOST" "sudo -n true" >/dev/null 2>&1; then
+          if ssh pausatf-prod "sudo -n true" >/dev/null 2>&1; then
             REMOTE_SHELL="sudo -E -n bash -s"
           fi
 
-          ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
-            github-deploy@"$TARGET_HOST" \
+          # shellcheck disable=SC2029 # the values are expanded here on purpose
+          ssh pausatf-prod \
             "APPLY_WIDGET_LOGIC_RECOVERY='${APPLY_WIDGET_LOGIC_RECOVERY:-false}' WIDGET_SOURCE_DB='${WIDGET_SOURCE_DB:-}' REPAIR_ACTIVE_WIDGET_LOGIC='${REPAIR_ACTIVE_WIDGET_LOGIC:-false}' ENABLE_WIDGET_LOGIC_FILTER='${ENABLE_WIDGET_LOGIC_FILTER:-false}' $REMOTE_SHELL" <<'REMOTE'
           set -euo pipefail
 
@@ -595,36 +604,21 @@ jobs:
           ' --path="$WP_PATH"
           REMOTE
 
-          rm -f ~/.ssh/id_rsa
-
       - name: Probe production auth and mail health
         if: ${{ inputs.probe_auth_mail == true }}
         env:
-          PROD_SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
-          PROD_HOST: ${{ vars.PROD_HOST }}
           DISABLE_JETPACK_PROTECT: ${{ inputs.disable_jetpack_protect }}
           SKIP_SYNTHETIC_LOGIN: ${{ inputs.skip_synthetic_login }}
           INSTALL_LOGIN_HOTFIX: ${{ inputs.install_login_hotfix }}
         run: |
           set -euo pipefail
-          if [ -z "${PROD_SSH_PRIVATE_KEY:-}" ]; then
-            echo "PROD_SSH_PRIVATE_KEY not set" >&2
-            exit 1
-          fi
-
-          TARGET_HOST="${PROD_HOST:-REDACTED_PROD_NEW_IP}"
-          mkdir -p ~/.ssh
-          printf '%s\n' "$PROD_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-
           REMOTE_SHELL="bash -s"
-          if ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
-            github-deploy@"$TARGET_HOST" "sudo -n true" >/dev/null 2>&1; then
+          if ssh pausatf-prod "sudo -n true" >/dev/null 2>&1; then
             REMOTE_SHELL="sudo -E -n bash -s"
           fi
 
-          ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
-            github-deploy@"$TARGET_HOST" \
+          # shellcheck disable=SC2029 # the values are expanded here on purpose
+          ssh pausatf-prod \
             "DISABLE_JETPACK_PROTECT='${DISABLE_JETPACK_PROTECT:-false}' SKIP_SYNTHETIC_LOGIN='${SKIP_SYNTHETIC_LOGIN:-false}' INSTALL_LOGIN_HOTFIX='${INSTALL_LOGIN_HOTFIX:-false}' $REMOTE_SHELL" <<'REMOTE'
           set -euo pipefail
 
@@ -848,33 +842,18 @@ jobs:
           fi
           REMOTE
 
-          rm -f ~/.ssh/id_rsa
-
       - name: Probe production ModSecurity logs
         if: ${{ inputs.probe_modsecurity_logs == true }}
-        env:
-          PROD_SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
-          PROD_HOST: ${{ vars.PROD_HOST }}
         run: |
           set -euo pipefail
-          if [ -z "${PROD_SSH_PRIVATE_KEY:-}" ]; then
-            echo "PROD_SSH_PRIVATE_KEY not set" >&2
-            exit 1
-          fi
-
-          TARGET_HOST="${PROD_HOST:-REDACTED_PROD_NEW_IP}"
-          mkdir -p ~/.ssh
-          printf '%s\n' "$PROD_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-
           REMOTE_SHELL="bash -s"
-          if ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
-            github-deploy@"$TARGET_HOST" "sudo -n true" >/dev/null 2>&1; then
+          if ssh pausatf-prod "sudo -n true" >/dev/null 2>&1; then
             REMOTE_SHELL="sudo -E -n bash -s"
           fi
 
-          ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_rsa \
-            github-deploy@"$TARGET_HOST" \
+          # shellcheck disable=SC2029 # the values are expanded here on purpose
+          # shellcheck disable=SC2029 # REMOTE_SHELL is chosen on the runner
+          ssh pausatf-prod \
             "$REMOTE_SHELL" <<'REMOTE'
           set -euo pipefail
 
@@ -1021,24 +1000,12 @@ jobs:
             "$APACHE_LOG_DIR"/error.log* 2>/dev/null | tail -n 200 || true
           REMOTE
 
-          rm -f ~/.ssh/id_rsa
-
       - name: Check for available plugin updates
         if: ${{ inputs.probe_auth_mail != true && inputs.probe_widget_logic != true && inputs.probe_modsecurity_logs != true }}
         id: check
-        env:
-          PROD_SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
-          PROD_HOST: ${{ vars.PROD_HOST }}
         run: |
           set -euo pipefail
-          : "${PROD_SSH_PRIVATE_KEY:?Production SSH key is required}"
-          : "${PROD_HOST:?Production host is required}"
-          mkdir -p ~/.ssh
-          printf '%s\n' "$PROD_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          trap 'rm -f ~/.ssh/id_rsa' EXIT
-          ssh -o BatchMode=yes -o ConnectTimeout=15 -o StrictHostKeyChecking=accept-new \
-            -i ~/.ssh/id_rsa github-deploy@"$PROD_HOST" 'bash -s' > updates.json <<'REMOTE'
+          ssh pausatf-prod 'bash -s' > updates.json <<'REMOTE'
           set -euo pipefail
           mapfile -t containers < <(sudo -n docker ps \
             --filter 'label=com.docker.compose.project=pausatf-prod' \
