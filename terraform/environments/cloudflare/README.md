@@ -35,7 +35,8 @@ cache for WordPress admin and authenticated requests. The live login rate
 limit blocks five POST requests per ten seconds per source IP and Cloudflare
 colo, with a ten-second mitigation timeout.
 
-The custom WAF ruleset applies a managed challenge to `/wp-login.php` and
+The custom WAF ruleset blocks `/wp-content/uploads/backups*` and archive
+extensions under uploads, and applies a managed challenge to `/wp-login.php` and
 `/wp-admin` (except `admin-ajax.php`). The zone has no `transit` redirect
 ruleset.
 

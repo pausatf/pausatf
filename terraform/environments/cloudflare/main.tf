@@ -494,6 +494,15 @@ resource "cloudflare_ruleset" "waf_custom" {
 
   rules = [
     {
+      action      = "block"
+      description = "Block backup archives under uploads"
+      enabled     = true
+      # The uploads directory is an s3fs mount of pausatf-static/uploads, so any
+      # archive written there is publicly served. Block the backups prefix and
+      # archive extensions at the edge (Pro plan has no regex operator).
+      expression = "starts_with(lower(http.request.uri.path), \"/wp-content/uploads/backups\") or (starts_with(lower(http.request.uri.path), \"/wp-content/uploads/\") and (ends_with(lower(http.request.uri.path), \".sql\") or ends_with(lower(http.request.uri.path), \".gz\") or ends_with(lower(http.request.uri.path), \".tgz\") or ends_with(lower(http.request.uri.path), \".tar\") or ends_with(lower(http.request.uri.path), \".wpress\") or ends_with(lower(http.request.uri.path), \".bak\") or ends_with(lower(http.request.uri.path), \".age\") or ends_with(lower(http.request.uri.path), \".7z\") or ends_with(lower(http.request.uri.path), \".dump\")))"
+    },
+    {
       action      = "managed_challenge"
       description = "Challenge WordPress login and admin"
       enabled     = true
