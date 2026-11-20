@@ -76,6 +76,6 @@ The scripts that were once planned here (deployment, monitoring, maintenance and
 security helpers, a standalone WordPress backup script, Cloudflare purge scripts)
 do not exist in this directory. Equivalents that do exist live elsewhere: the
 WordPress backup and Cloudflare purge scripts are Ansible role templates under
-`ansible/roles/backups`, `ansible/roles/backup-wordpress` and
+`ansible/roles/backups`, `ansible/roles/monitoring` and
 `ansible/roles/cloudflare`; deployments run through GitHub Actions workflows
 under `.github/workflows/`.
