@@ -497,8 +497,9 @@ resource "cloudflare_ruleset" "waf_custom" {
       action      = "managed_challenge"
       description = "Challenge WordPress login and admin"
       enabled     = true
+      # Prefix match: the origin also serves /wp-login.php/<path-info>.
       # admin-ajax.php is called by public pages, so it stays unchallenged.
-      expression = "(http.request.uri.path eq \"/wp-login.php\") or (starts_with(http.request.uri.path, \"/wp-admin\") and http.request.uri.path ne \"/wp-admin/admin-ajax.php\")"
+      expression = "starts_with(lower(http.request.uri.path), \"/wp-login.php\") or (starts_with(lower(http.request.uri.path), \"/wp-admin\") and lower(http.request.uri.path) ne \"/wp-admin/admin-ajax.php\")"
     },
   ]
 }
@@ -524,7 +525,7 @@ resource "cloudflare_ruleset" "rate_limit" {
       }
       description = "wp-login brute-force rate limit"
       enabled     = true
-      expression  = "(http.request.uri.path eq \"/wp-login.php\" and http.request.method eq \"POST\")"
+      expression  = "(starts_with(lower(http.request.uri.path), \"/wp-login.php\") and http.request.method eq \"POST\")"
     },
   ]
 }
