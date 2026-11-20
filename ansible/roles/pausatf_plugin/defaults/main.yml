@@ -2,6 +2,8 @@
 pausatf_plugin_repo: "https://github.com/pausatf/pausatf-results-manager.git"
 pausatf_plugin_version: "main"
 pausatf_plugin_path: "/var/www/html/wp-content/plugins/pausatf-results-manager"
-pausatf_plugin_owner: "www-data"
-pausatf_plugin_group: "www-data"
+# Root-owned and read-only to the web server: results-manager writes only under
+# wp-content/uploads, so the server never needs to modify its own code.
+pausatf_plugin_owner: "root"
+pausatf_plugin_group: "root"
 pausatf_wp_docroot: "/var/www/html"

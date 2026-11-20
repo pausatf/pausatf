@@ -45,6 +45,10 @@
     owner: "{{ pausatf_plugin_owner }}"
     group: "{{ pausatf_plugin_group }}"
     recurse: true
+    # A tree left www-data-owned by an earlier run may hold links the web
+    # server planted; they must not redirect the change to files outside it.
+    follow: false
+    mode: "u=rwX,go=rX"
     state: directory
   tags:
     - pausatf_plugin
