@@ -538,3 +538,9 @@ resource "cloudflare_ruleset" "rate_limit" {
     },
   ]
 }
+
+# The custom WAF entrypoint ruleset was created via the API on 2026-11-19.
+import {
+  to = cloudflare_ruleset.waf_custom
+  id = "zones/67b87131144a68ad5ed43ebfd4e6d811/1fcc42aa2e3944e2aecc08aa6e3578ed"
+}
