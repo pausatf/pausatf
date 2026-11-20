@@ -1,17 +1,21 @@
 name: Terraform Plan
 
-# Plans each HCP-backed environment on pull requests so drift and unintended
-# changes show up before merge. Apply stays manual (workspaces use local
+# Plans each HCP-backed environment after merges and weekly so drift shows up.
+# The terraform-plan environment releases its secrets only to main, so this
+# does not run on pull requests. Apply stays manual (workspaces use local
 # execution; HCP holds state and locks), per docs/governance/GITHUB-ACTIONS.md.
 on:
-  pull_request:
+  push:
+    branches: [main]
     paths:
       - 'terraform/**'
       - '.github/workflows/terraform-plan.yml'
+  schedule:
+    - cron: '0 14 * * 1'
   workflow_dispatch:
 
 concurrency:
-  group: terraform-plan-${{ github.event.pull_request.number || github.ref }}
+  group: terraform-plan
   cancel-in-progress: true
 
 permissions:
@@ -19,8 +23,6 @@ permissions:
 
 jobs:
   plan:
-    # Secrets are not available to fork PRs.
-    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     environment: terraform-plan
