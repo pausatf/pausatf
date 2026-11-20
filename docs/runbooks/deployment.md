@@ -18,6 +18,11 @@ the separately managed Docker stack is owned by
 pausatf-deployment (`pausatf/pausatf-deployment`, private repository).
 Do not apply the host web-stack playbook to a Docker origin as though it manages that container stack.
 
+Dev's WordPress plugins also belong to pausatf-deployment. Its `docker-compose.dev-v2.yml` mounts the `wp-content/`
+tree built by its Composer manifest, which installs PAUSATF Site as `plugins/pausatf-seo` in place of PAUSATF Core
+and PAUSATF Passwordless Login. Ansible does not install, update or retire dev plugins. Dev keeps the earlier
+plugin checkouts until its host is redeployed with that compose file.
+
 ## Infrastructure and managed database changes
 
 Use the target environment's existing Terraform backend and authorized plan runner.
