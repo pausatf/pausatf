@@ -133,16 +133,16 @@ target before deployment.
 
 | Secret | Used by | Description |
 |--------|---------|-------------|
-| `PROD_SSH_PRIVATE_KEY` | deploy-prod, capture-prod-inventory, wordpress-update-check, prod-widgets-log-probe, wp-plugin-audit, integration-tests, migrate-server (production selection) | Production SSH private key; verify the user selected by each workflow and inventory |
+| `PROD_SSH_PRIVATE_KEY` | deploy-prod, capture-prod-inventory, wordpress-update-check, prod-widgets-log-probe, wp-plugin-audit, integration-tests | Production SSH private key; verify the user selected by each workflow and inventory |
 | `STAGING_SSH_PRIVATE_KEY` | deploy-prod staging validation | SSH key for the staging check-mode job |
 | `DEV_SSH_PRIVATE_KEY` | deploy-dev | Private key for dev host |
 | `ANSIBLE_VAULT_PASSWORD` | deploy-prod, deploy-staging, deploy-dev, capture-prod-inventory | Ansible vault decryption password |
 | `DO_TOKEN` | infra-staging, do-nightly-snapshot, do-weekly-stage-snapshot | DigitalOcean API token with permission to create and prune droplet snapshots |
 | `DO_PROD_DROPLET_ID` | do-nightly-snapshot (optional) | Numeric production droplet ID; when unset or inaccessible, the workflow resolves `pausatf-prod-v2` by name |
 | `DO_STAGE_DROPLET_ID` | do-weekly-stage-snapshot (optional) | Numeric staging droplet ID; when unset or inaccessible, the workflow resolves `pausatf-stage-v2` by name |
-| `SPACES_ACCESS_KEY_ID` | infra-staging | DO Spaces key for Terraform state backend |
-| `SPACES_SECRET_ACCESS_KEY` | infra-staging | DO Spaces secret for Terraform state backend |
-| `CLOUDFLARE_API_TOKEN` | infra-staging | Cloudflare API token for Terraform |
+| `HCP_TERRAFORM_API_TOKEN` | infra-staging | HCP Terraform token for the `pausatf` organization (`terraform-plan` environment secret) |
+| `CLOUDFLARE_API_TOKEN` | infra-staging | Cloudflare API token for Terraform (`terraform-plan` environment secret) |
+| `TF_VAR_SSH_ALLOWED_IPS` | infra-staging | SSH allow-list passed to Terraform (`terraform-plan` environment secret) |
 
 | Variable | Used by | Description |
 |----------|---------|-------------|
