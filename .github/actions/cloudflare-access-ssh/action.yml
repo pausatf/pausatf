@@ -1,0 +1,176 @@
+name: SSH through Cloudflare Access
+description: >-
+  Install a checksum-pinned cloudflared and write an SSH client configuration
+  that reaches an origin through Cloudflare Access, with a pinned known_hosts
+  entry and strict host key checking. After this step, `ssh <alias>` works in
+  later steps of the same job. Other repositories in the organization can use
+  it as pausatf/pausatf/.github/actions/cloudflare-access-ssh@<full SHA>.
+  Files are written under RUNNER_TEMP, which GitHub-hosted runners empty at
+  the end of every job.
+
+inputs:
+  host:
+    description: Cloudflare Access SSH hostname of the origin.
+    required: true
+  user:
+    description: Remote user. Leave empty to give the user on the ssh command line.
+    required: false
+    default: ''
+  ssh-key:
+    description: Private key for the remote user.
+    required: true
+  known-hosts:
+    description: known_hosts lines for the Access hostname (hashed entries work).
+    required: true
+  access-client-id:
+    description: Cloudflare Access service token client ID. Set both token inputs or neither.
+    required: false
+    default: ''
+  access-client-secret:
+    description: Cloudflare Access service token client secret.
+    required: false
+    default: ''
+  alias:
+    description: Host alias written to ~/.ssh/config.
+    required: false
+    default: origin
+
+outputs:
+  alias:
+    description: Host alias to pass to ssh.
+    value: ${{ inputs.alias }}
+  config-file:
+    description: ssh_config file holding only this origin's Host block.
+    value: ${{ steps.configure.outputs.config-file }}
+  key-file:
+    description: Private key file (mode 0600).
+    value: ${{ steps.configure.outputs.key-file }}
+  known-hosts-file:
+    description: Pinned known_hosts file.
+    value: ${{ steps.configure.outputs.known-hosts-file }}
+  cloudflared:
+    description: Absolute path of the installed cloudflared (it is not added to PATH).
+    value: ${{ steps.configure.outputs.cloudflared }}
+
+runs:
+  using: composite
+  steps:
+    - name: Install the checksum-pinned cloudflared
+      shell: bash
+      env:
+        # Keep in step with any other cloudflared pin in the organization.
+        CLOUDFLARED_VERSION: 2026.10.7
+        CLOUDFLARED_SHA256: 1f99fb518b83dec2ba8d870a7cc991d82a77e6196295a3d2754ba17ab9f91872  # pragma: allowlist secret
+        SSH_ALIAS: ${{ inputs.alias }}
+      run: |
+        set -euo pipefail
+        if [[ "$RUNNER_OS" != Linux || "$RUNNER_ARCH" != X64 ]]; then
+          echo "::error::cloudflare-access-ssh supports Linux X64 runners only." >&2
+          exit 1
+        fi
+        if [[ ! "$SSH_ALIAS" =~ ^[A-Za-z0-9._-]+$ ]]; then
+          echo "::error::alias must contain only letters, digits, '.', '_' or '-'." >&2
+          exit 1
+        fi
+        bin_dir="$RUNNER_TEMP/cloudflare-access-ssh-bin"
+        if [[ ! -x "$bin_dir/cloudflared" ]]; then
+          install -d -m 700 "$bin_dir"
+          curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' \
+            "https://github.com/cloudflare/cloudflared/releases/download/${CLOUDFLARED_VERSION}/cloudflared-linux-amd64" \
+            --output "$bin_dir/cloudflared"
+          echo "${CLOUDFLARED_SHA256}  $bin_dir/cloudflared" | sha256sum --check --status
+          chmod 755 "$bin_dir/cloudflared"
+        fi
+
+    - name: Write the SSH key, known_hosts and client configuration
+      id: configure
+      shell: bash
+      env:
+        SSH_HOST: ${{ inputs.host }}
+        SSH_USER: ${{ inputs.user }}
+        SSH_KEY: ${{ inputs.ssh-key }}
+        KNOWN_HOSTS: ${{ inputs.known-hosts }}
+        ACCESS_CLIENT_ID: ${{ inputs.access-client-id }}
+        ACCESS_CLIENT_SECRET: ${{ inputs.access-client-secret }}
+        SSH_ALIAS: ${{ inputs.alias }}
+      run: |
+        set -euo pipefail
+        fail() { echo "::error::$1" >&2; exit 1; }
+        [[ -n "$SSH_HOST" ]] || fail "host is empty; set the repository variable that holds the Access SSH hostname."
+        [[ -n "$SSH_KEY" ]] || fail "ssh-key is empty; set the SSH private key secret."
+        [[ -n "$KNOWN_HOSTS" ]] || fail "known-hosts is empty; set the known_hosts variable for ${SSH_HOST}."
+        [[ "$SSH_HOST" =~ ^[A-Za-z0-9.-]+$ ]] || fail "host must be a plain DNS name."
+        [[ -z "$SSH_USER" || "$SSH_USER" =~ ^[a-z_][a-z0-9_-]*$ ]] || fail "user is not a valid login name."
+        if [[ -n "$ACCESS_CLIENT_ID" && -z "$ACCESS_CLIENT_SECRET" ]] || [[ -z "$ACCESS_CLIENT_ID" && -n "$ACCESS_CLIENT_SECRET" ]]; then
+          fail "Set both Cloudflare Access service token inputs or neither."
+        fi
+        if [[ -z "$ACCESS_CLIENT_ID" ]]; then
+          echo "::warning::No Cloudflare Access service token given; this works only if the Access application lets the runner through without one."
+        fi
+        # The token is written into a shell script below, so allow only the
+        # characters Cloudflare uses (hex, plus '.access' in the client ID).
+        for value in "$ACCESS_CLIENT_ID" "$ACCESS_CLIENT_SECRET"; do
+          [[ -z "$value" || "$value" =~ ^[A-Za-z0-9._-]+$ ]] || fail "Access service token values contain unexpected characters."
+        done
+
+        umask 077
+        dir="$RUNNER_TEMP/cloudflare-access-ssh-$SSH_ALIAS"
+        rm -rf "$dir"
+        install -d -m 700 "$dir"
+        key_file="$dir/id"
+        known_hosts_file="$dir/known_hosts"
+        proxy="$dir/proxy"
+        config_file="$dir/config"
+
+        printf '%s\n' "$SSH_KEY" > "$key_file"
+        printf '%s\n' "$KNOWN_HOSTS" > "$known_hosts_file"
+        if ! ssh-keygen -F "$SSH_HOST" -f "$known_hosts_file" >/dev/null; then
+          fail "known-hosts has no entry for ${SSH_HOST}; pin the host key of the Access hostname."
+        fi
+
+        # cloudflared reads the service token from the environment, so the
+        # token never appears in a process argument list.
+        {
+          echo '#!/bin/sh'
+          if [[ -n "$ACCESS_CLIENT_ID" ]]; then
+            printf "TUNNEL_SERVICE_TOKEN_ID='%s'\n" "$ACCESS_CLIENT_ID"
+            printf "TUNNEL_SERVICE_TOKEN_SECRET='%s'\n" "$ACCESS_CLIENT_SECRET"
+            echo 'export TUNNEL_SERVICE_TOKEN_ID TUNNEL_SERVICE_TOKEN_SECRET'
+          fi
+          printf 'exec "%s" access ssh --hostname "$1"\n' "$RUNNER_TEMP/cloudflare-access-ssh-bin/cloudflared"
+        } > "$proxy"
+        chmod 700 "$proxy"
+
+        {
+          printf 'Host %s %s\n' "$SSH_ALIAS" "$SSH_HOST"
+          printf '  HostName %s\n' "$SSH_HOST"
+          if [[ -n "$SSH_USER" ]]; then
+            printf '  User %s\n' "$SSH_USER"
+          fi
+          printf '  IdentityFile "%s"\n' "$key_file"
+          echo '  IdentitiesOnly yes'
+          printf '  UserKnownHostsFile "%s"\n' "$known_hosts_file"
+          echo '  GlobalKnownHostsFile /dev/null'
+          echo '  StrictHostKeyChecking yes'
+          echo '  BatchMode yes'
+          echo '  ConnectTimeout 30'
+          echo '  ServerAliveInterval 30'
+          printf '  ProxyCommand "%s" %%h\n' "$proxy"
+        } > "$config_file"
+
+        install -d -m 700 "$HOME/.ssh"
+        user_config="$HOME/.ssh/config"
+        touch "$user_config"
+        if ! grep -qxF "Include $config_file" "$user_config"; then
+          # Include must come before any Host block to apply globally.
+          { printf 'Include %s\n' "$config_file"; cat "$user_config"; } > "$user_config.new"
+          mv "$user_config.new" "$user_config"
+        fi
+        chmod 600 "$user_config"
+
+        {
+          echo "config-file=$config_file"
+          echo "key-file=$key_file"
+          echo "known-hosts-file=$known_hosts_file"
+          echo "cloudflared=$RUNNER_TEMP/cloudflare-access-ssh-bin/cloudflared"
+        } >> "$GITHUB_OUTPUT"
