@@ -125,6 +125,7 @@ target before deployment.
 | `wp-plugin-audit.yml` | Manual dispatch | Production plugin/auth/WordPress diagnostics and explicitly requested remediation probes |
 | `capture-prod-inventory.yml` | Manual dispatch | Runs `capture-wp-inventory.yml`; commits `group_vars/production/wordpress.yml` |
 | `infra-staging.yml` | Manual dispatch | Terraform plan + apply for staging environment |
+| `terraform-plan.yml` | PRs touching `terraform/`, manual dispatch | Plans the `cloudflare`, `staging` and `dev` HCP workspaces; apply stays manual |
 | `ci.yml` | PR and push to `main` | Ansible/YAML, Terraform, ShellCheck/Bash, Markdown/link and maintenance safety checks |
 | `codeql.yml` | See workflow triggers | CodeQL analysis of Actions and JavaScript |
 | `molecule.yml` | See workflow path filters | Role integration scenarios |

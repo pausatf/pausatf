@@ -1,0 +1,74 @@
+name: Terraform Plan
+
+# Plans each HCP-backed environment on pull requests so drift and unintended
+# changes show up before merge. Apply stays manual (workspaces use local
+# execution; HCP holds state and locks), per docs/governance/GITHUB-ACTIONS.md.
+on:
+  pull_request:
+    paths:
+      - 'terraform/**'
+      - '.github/workflows/terraform-plan.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: terraform-plan-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    # Secrets are not available to fork PRs.
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment: terraform-plan
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        env: [cloudflare, staging, dev]
+    defaults:
+      run:
+        working-directory: terraform/environments/${{ matrix.env }}
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e  # v4.0.1
+        with:
+          terraform_version: 1.10.3
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        env:
+          TF_TOKEN_app_terraform_io: ${{ secrets.HCP_TERRAFORM_API_TOKEN }}
+        run: terraform init -input=false
+
+      - name: Terraform Plan
+        env:
+          TF_TOKEN_app_terraform_io: ${{ secrets.HCP_TERRAFORM_API_TOKEN }}
+          TF_VAR_do_token: ${{ secrets.DO_TOKEN }}
+          TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          TF_VAR_cloudflare_zone_id: 67b87131144a68ad5ed43ebfd4e6d811
+          TF_VAR_ssh_allowed_ips: ${{ secrets.TF_VAR_SSH_ALLOWED_IPS }}
+        run: |
+          set -euo pipefail
+          # -lock=false: plan never writes state, and must not block a local apply.
+          set +e
+          terraform plan -input=false -lock=false -no-color -detailed-exitcode > plan.txt 2>&1
+          code=$?
+          set -e
+          {
+            echo "### ${{ matrix.env }}"
+            echo '```'
+            grep -E '^\s+# |^Plan:|^No changes|Error' plan.txt | head -80 || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          # 0 = no changes, 2 = changes present; both are a successful plan.
+          if [ "$code" = 1 ]; then cat plan.txt; exit 1; fi
