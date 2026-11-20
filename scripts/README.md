@@ -30,19 +30,16 @@ CI runs the Python unit tests with:
 
 ```bash
 python3 -m unittest discover -s scripts -p 'test_*.py'
+python3 -m unittest discover -s scripts/backup/tests -p 'test_*.py'
 ```
 
-Run it from the repository root. The command takes about ten seconds and runs 27
-tests. Some of them need `git`, `node` and `php` on the path: the archive test
+Run them from the repository root. The first takes about ten seconds and runs 14
+tests; the second runs 2. Some of them need `git`, `node` and `php` on the path: the archive test
 runs JavaScript through `node`, and the widget visibility test runs the real
 mu-plugin through `php`. CI installs PHP 8.3 for this job.
 
 `scripts/backup/tests/test_manifest.py` lives in a directory without an
-`__init__.py`, so the command above does not discover it. Run it directly:
-
-```bash
-python3 -m unittest scripts/backup/tests/test_manifest.py
-```
+`__init__.py`, so the first command does not discover it; the second runs it.
 
 | Test file | Covers |
 | --- | --- |

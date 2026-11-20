@@ -223,8 +223,9 @@ changed.
 
 ## Unit tests
 
-Run with `python3 -m unittest discover -s scripts -p 'test_*.py'` from the
-repository root (this is the CI command; see [README.md](README.md#tests)).
+Run with `python3 -m unittest discover -s scripts -p 'test_*.py'` and
+`python3 -m unittest discover -s scripts/backup/tests -p 'test_*.py'` from the
+repository root (these are the CI commands; see [README.md](README.md#tests)).
 
 | File | Subject |
 | --- | --- |
@@ -234,7 +235,7 @@ repository root (this is the CI command; see [README.md](README.md#tests)).
 | `test_phpcs_legacy_encoding.py` | Diff parsing and baseline scan in `check_phpcs_changed_lines.py`. |
 | `test_widget_visibility.py` | `ansible/roles/wordpress/files/mu-plugins/pausatf-widget-visibility.php`, executed with `php`. |
 | `test_archive_https.py` | Analytics loader `content/data/pausatf-legacy-analytics.js` and the tracked legacy pages, executed with `node`. |
-| `backup/tests/test_manifest.py` | Recovery manifest generation (not collected by the CI command). |
+| `backup/tests/test_manifest.py` | Recovery manifest generation (run by a separate `discover -s scripts/backup/tests` step in CI). |
 
 ## Credentials
 

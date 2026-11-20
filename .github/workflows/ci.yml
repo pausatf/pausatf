@@ -26,6 +26,8 @@ jobs:
           php-version: '8.3'
           coverage: none
       - run: python3 -m unittest discover -s scripts -p 'test_*.py'
+      # scripts/backup/tests has no __init__.py, so the discover above skips it.
+      - run: python3 -m unittest discover -s scripts/backup/tests -p 'test_*.py'
 
   # --- Ansible ---
 
