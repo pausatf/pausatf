@@ -128,6 +128,17 @@ using credentials from inside the database container, and rsyncs
 See [backup/README.md](backup/README.md) for installation, retention and
 restore verification. A merge does not install these files on the host.
 
+### `mail/`
+
+| File | Purpose |
+|---|---|
+| `pausatf-mail-netns.sh` | Recreates `pausatf-mail` when it is attached to a WordPress container that no longer exists. Mail runs with `network_mode: "service:wordpress"`, so recreating WordPress alone strands it: WordPress gets "connection refused" on port 25 and mail cannot resolve its relay. |
+| `pausatf-mail-netns.service`, `pausatf-mail-netns.timer` | Run the check every two minutes. |
+
+Installed on `pausatf-prod-v2` on 2026-11-21 as `/usr/local/sbin/pausatf-mail-netns`
+(root, mode 0750) with the two units in `/etc/systemd/system`. A repository merge
+does not install or update them.
+
 ### `docker/`
 
 | File | Purpose |

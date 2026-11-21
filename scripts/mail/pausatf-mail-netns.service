@@ -1,0 +1,9 @@
+[Unit]
+Description=Keep pausatf-mail in the current WordPress network namespace
+Wants=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/pausatf-mail-netns
+TimeoutStartSec=5min
