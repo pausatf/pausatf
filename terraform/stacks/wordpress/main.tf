@@ -179,6 +179,13 @@ resource "digitalocean_firewall" "this" {
     destination_addresses = ["0.0.0.0/0", "::/0"] #tfsec:ignore:AVD-DIG-0003
   }
 
+  # The rules above are only the starting point for a new firewall. Production's
+  # egress was narrowed to a per-destination allowlist on the live firewall
+  # (pausatf-prod-v2-fw) and is maintained there. Without this, an apply would
+  # replace that allowlist with the open rules above.
+  lifecycle {
+    ignore_changes = [outbound_rule]
+  }
 }
 
 # Monitoring Alerts — disabled for non-production by default
