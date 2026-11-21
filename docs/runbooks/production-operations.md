@@ -53,6 +53,27 @@ Use the [deployment gates](deployment.md), [TLS ownership](tls-certificates.md)
 and [recovery backup](../../scripts/backup/README.md) runbooks for changes.
 Repository merges do not authorize operations on the server.
 
+### Outbound firewall allowlist (observed 2026-11-21)
+
+`pausatf-prod-v2-fw` allows outbound traffic only to listed destinations. The
+list is kept on the live firewall, not in Terraform: the stack's `outbound_rule`
+blocks are the open defaults for a new firewall and carry
+`ignore_changes = [outbound_rule]`, so an apply leaves the live list alone.
+
+| Purpose | Protocol and port |
+|---|---|
+| DigitalOcean resolvers | TCP and UDP 53 |
+| HTTPS to listed Cloudflare, DigitalOcean and Fastly addresses | TCP 443 |
+| Gmail submission | TCP 587 |
+| Cloudflare Tunnel | TCP 7844 |
+| Managed database | TCP 25060 |
+| Ubuntu time servers (NTS key exchange and NTP), added 2026-11-21 | TCP 4460, UDP 123 |
+
+A service that needs a new destination fails with a timeout, not a refusal.
+chrony had no reachable source from 2026-11-17 until the time-server rules were
+added. Read the current rules with `doctl compute firewall get <id> -o json` and
+add one with `doctl compute firewall add-rules <id> --outbound-rules ...`.
+
 ## Historical December 2025 operations reference
 
 **Everything below this heading is an inherited December 28, 2025 reference,
