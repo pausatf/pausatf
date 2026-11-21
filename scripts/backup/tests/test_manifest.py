@@ -34,7 +34,8 @@ class ManifestTests(unittest.TestCase):
             expected = json.loads(receipt.read_text())
             self.assertEqual(expected['database']['uri'], 's3://fixture/prod/' + database.name)
             self.assertEqual(expected['database']['sha256'], hashlib.sha256(database.read_bytes()).hexdigest())
-            for name in ('deployment.tar.gz.age', 'host-config.tar.gz.age'):
+            set_artifacts = ('deployment.tar.gz.age', 'host-config.tar.gz.age', 'media-inventory.json')
+            for name in set_artifacts:
                 (work / name).write_bytes(b'encrypted fixture')
             (work / 'images.txt').write_text('fixture sha256:fixture s3://fixture/images/image.age\n')
             env.update(work=directory, stamp='fixture', DEST='s3://fixture/recovery')
@@ -43,6 +44,7 @@ class ManifestTests(unittest.TestCase):
             manifest = json.loads((work / 'manifest.json').read_text())
             for kind in ('database', 'legacy'):
                 self.assertEqual(manifest['artifacts'][kind], expected[kind])
+            self.assertEqual(set(manifest['artifacts']), {'database', 'legacy', *set_artifacts})
 
     def test_incomplete_database_receipt_fails_closed(self):
         with tempfile.TemporaryDirectory() as directory:
